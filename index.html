@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="theme-color" content="#070a13">
+   <meta name="theme-color" content="#060d08">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="The Crown Collection — 55 essential Islamic duas from the Quran and Sunnah, with tasbeeh counter, bookmarks, daily routines, and scholarly authentication.">
@@ -229,12 +229,12 @@
             text-align: center; padding: 2.5rem 1rem 2rem;
             position: relative; overflow: hidden;
         }
-        .hero::before {
-            content: ''; position: absolute;
-            top: -50%; left: -50%; right: -50%; bottom: -50%;
-            background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.03) 0%, transparent 60%);
-            animation: heroGlow 8s ease-in-out infinite;
-        }
+          .hero::before {
+    content: ''; position: absolute;
+    top: -50%; left: -50%; right: -50%; bottom: -50%;
+    background: radial-gradient(ellipse at center, rgba(13, 107, 71, 0.04) 0%, transparent 60%);
+    animation: heroGlow 8s ease-in-out infinite;
+}
         @keyframes heroGlow {
             0%, 100% { opacity: 0.5; transform: scale(1); }
             50% { opacity: 1; transform: scale(1.1); }
@@ -242,24 +242,25 @@
         .hero-content { position: relative; z-index: 1; }
 
         .bismillah {
-            font-family: var(--font-arabic);
-            font-size: calc(2.2rem * var(--font-scale));
-            color: var(--gold-mid); margin-bottom: 1.5rem;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
-            line-height: 1.8;
-        }
+            .bismillah {
+    font-family: var(--font-arabic);
+    font-size: calc(2.2rem * var(--font-scale));
+    color: var(--gold-mid); margin-bottom: 1.5rem;
+    text-shadow: 0 0 20px rgba(184, 150, 62, 0.15);
+    line-height: 1.8;
+}
 
         .hero-ornament {
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            margin: 1rem 0; color: var(--gold-dark); font-size: 0.8rem; opacity: 0.5;
-        }
-        .hero-ornament .line {
-            width: 50px; height: 1px;
-            background: linear-gradient(to right, transparent, var(--gold-dark));
-        }
-        .hero-ornament .line:last-child {
-            background: linear-gradient(to left, transparent, var(--gold-dark));
-        }
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin: 1rem 0; color: var(--emerald-light); font-size: 0.8rem; opacity: 0.5;
+}
+.hero-ornament .line {
+    width: 50px; height: 1px;
+    background: linear-gradient(to right, transparent, var(--emerald-light));
+}
+.hero-ornament .line:last-child {
+    background: linear-gradient(to left, transparent, var(--emerald-light));
+}
 
         h1 {
             font-family: var(--font-title); font-size: 1.8rem; font-weight: 800;
@@ -286,181 +287,184 @@
         }
         .stat-item { text-align: center; }
         .stat-number {
-            font-family: var(--font-title); font-size: 1.6rem;
-            color: var(--gold-mid); font-weight: 700;
-        }
-        .stat-label {
-            font-family: var(--font-title); font-size: 0.55rem;
-            letter-spacing: 2px; text-transform: uppercase;
-            color: rgba(252, 246, 186, 0.4); margin-top: 2px;
-        }
+            .stat-number {
+    font-family: var(--font-title); font-size: 1.6rem;
+    color: var(--emerald-light); font-weight: 700;
+}
+.stat-label {
+    font-family: var(--font-title); font-size: 0.55rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(208, 225, 193, 0.4); margin-top: 2px;
+}
 
         /* ============================================ */
         /* ===== STREAK BANNER ===== */
         /* ============================================ */
         .streak-banner {
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(13, 18, 32, 0.8));
-            border: 1px solid rgba(212, 175, 55, 0.12);
-            border-radius: var(--radius-lg);
-            padding: 10px 16px; margin: 0 0 1rem;
-            font-family: var(--font-title); font-size: 0.6rem;
-            letter-spacing: 1.5px; text-transform: uppercase;
-            color: rgba(212, 175, 55, 0.6);
-        }
-        .streak-fire { font-size: 1.2rem; }
-        .streak-count { color: var(--gold-mid); font-size: 1.1rem; font-weight: 700; }
+            .streak-banner {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    background: linear-gradient(135deg, rgba(13, 107, 71, 0.1), rgba(10, 22, 16, 0.8));
+    border: 1px solid rgba(13, 107, 71, 0.15);
+    border-radius: var(--radius-lg);
+    padding: 10px 16px; margin: 0 0 1rem;
+    font-family: var(--font-title); font-size: 0.6rem;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: rgba(13, 107, 71, 0.6);
+}
+.streak-fire { font-size: 1.2rem; }
+.streak-count { color: var(--emerald-light); font-size: 1.1rem; font-weight: 700; }
 
         /* ============================================ */
         /* ===== DAILY DUA BANNER ===== */
         /* ============================================ */
-        .daily-dua-banner {
-            background: linear-gradient(135deg, rgba(10, 77, 51, 0.3), rgba(13, 18, 32, 0.8));
-            border: 1px solid rgba(13, 107, 71, 0.3);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem; margin: 1rem 0 2rem;
-            text-align: center; position: relative; overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .daily-dua-banner:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(10, 77, 51, 0.2);
-        }
-        .daily-dua-banner::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--emerald-light), transparent);
-        }
-        .daily-label {
-            font-family: var(--font-title); font-size: 0.6rem;
-            letter-spacing: 3px; text-transform: uppercase;
-            color: rgba(13, 107, 71, 0.8); margin-bottom: 0.5rem;
-        }
-        .daily-label .sparkle { margin: 0 4px; }
-        .daily-arabic {
-            font-family: var(--font-arabic);
-            font-size: calc(1.5rem * var(--font-scale));
-            color: var(--gold-light); direction: rtl;
-            line-height: 2.2; margin: 0.5rem 0;
-        }
-        .daily-translation {
-            font-family: var(--font-text); font-size: 0.85rem;
-            color: rgba(252, 246, 186, 0.6); font-style: italic;
-        }
+       .daily-dua-banner {
+    background: linear-gradient(135deg, rgba(184, 150, 62, 0.08), rgba(10, 22, 16, 0.8));
+    border: 1px solid rgba(184, 150, 62, 0.15);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem; margin: 1rem 0 2rem;
+    text-align: center; position: relative; overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.daily-dua-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(184, 150, 62, 0.1);
+}
+.daily-dua-banner::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-mid), transparent);
+}
+.daily-label {
+    font-family: var(--font-title); font-size: 0.6rem;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(184, 150, 62, 0.7); margin-bottom: 0.5rem;
+}
+.daily-label .sparkle { margin: 0 4px; }
+.daily-arabic {
+    font-family: var(--font-arabic);
+    font-size: calc(1.5rem * var(--font-scale));
+    color: var(--gold-light); direction: rtl;
+    line-height: 2.2; margin: 0.5rem 0;
+}
+.daily-translation {
+    font-family: var(--font-text); font-size: 0.85rem;
+    color: rgba(208, 225, 193, 0.5); font-style: italic;
+}
 
         /* ============================================ */
         /* ===== SEARCH BAR ===== */
         /* ============================================ */
         .search-container { position: relative; margin: 1rem 0 1.5rem; }
-        .search-input {
-            width: 100%; padding: 14px 16px 14px 44px;
-            background: rgba(13, 18, 32, 0.8);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            border-radius: var(--radius-lg);
-            color: var(--gold-light); font-family: var(--font-text);
-            font-size: 0.9rem; outline: none;
-            transition: all 0.3s ease;
-        }
-        .search-input::placeholder { color: rgba(212, 175, 55, 0.3); }
-        .search-input:focus {
-            border-color: rgba(212, 175, 55, 0.4);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.08);
-        }
-        .search-icon {
-            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            color: rgba(212, 175, 55, 0.4); font-size: 1.1rem;
-        }
-        .search-clear {
-            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; color: rgba(212, 175, 55, 0.4);
-            cursor: pointer; font-size: 1.1rem; display: none;
-            transition: color 0.2s;
-        }
-        .search-clear.visible { display: block; }
-        .search-clear:hover { color: var(--gold-mid); }
-
+.search-input {
+    width: 100%; padding: 14px 16px 14px 44px;
+    background: rgba(10, 22, 16, 0.8);
+    border: 1px solid rgba(13, 107, 71, 0.2);
+    border-radius: var(--radius-lg);
+    color: var(--gold-light); font-family: var(--font-text);
+    font-size: 0.9rem; outline: none;
+    transition: all 0.3s ease;
+}
+.search-input::placeholder { color: rgba(13, 107, 71, 0.35); }
+.search-input:focus {
+    border-color: rgba(13, 107, 71, 0.5);
+    box-shadow: 0 0 20px rgba(13, 107, 71, 0.1);
+}
+.search-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: rgba(13, 107, 71, 0.4); font-size: 1.1rem;
+}
+.search-clear {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: rgba(13, 107, 71, 0.4);
+    cursor: pointer; font-size: 1.1rem; display: none;
+    transition: color 0.2s;
+}
+.search-clear.visible { display: block; }
+.search-clear:hover { color: var(--emerald-light); }
         /* ============================================ */
         /* ===== TOOLBAR ROW ===== */
         /* ============================================ */
         .toolbar-row {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 12px; gap: 8px; flex-wrap: wrap;
-        }
-        .toolbar-btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 7px 14px; border-radius: 50px;
-            background: rgba(13, 18, 32, 0.6);
-            border: 1px solid rgba(212, 175, 55, 0.12);
-            color: rgba(212, 175, 55, 0.5);
-            font-family: var(--font-title); font-size: 0.5rem;
-            letter-spacing: 1.5px; text-transform: uppercase;
-            cursor: pointer; transition: all 0.3s ease; white-space: nowrap;
-        }
-        .toolbar-btn:hover, .toolbar-btn.active {
-            background: rgba(212, 175, 55, 0.1);
-            border-color: var(--gold-mid); color: var(--gold-mid);
-        }
-
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; gap: 8px; flex-wrap: wrap;
+}
+.toolbar-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 50px;
+    background: rgba(10, 22, 16, 0.6);
+    border: 1px solid rgba(13, 107, 71, 0.15);
+    color: rgba(13, 107, 71, 0.5);
+    font-family: var(--font-title); font-size: 0.5rem;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s ease; white-space: nowrap;
+}
+.toolbar-btn:hover, .toolbar-btn.active {
+    background: rgba(13, 107, 71, 0.12);
+    border-color: var(--emerald-light); color: var(--emerald-light);
+}
         /* ============================================ */
         /* ===== CATEGORY PILLS ===== */
         /* ============================================ */
         .category-pills {
-            display: flex; gap: 8px; overflow-x: auto;
-            padding: 4px 0 12px; margin-bottom: 1rem;
-            -ms-overflow-style: none; scrollbar-width: none;
-        }
-        .category-pills::-webkit-scrollbar { display: none; }
-        .pill {
-            flex-shrink: 0; padding: 8px 16px; border-radius: 50px;
-            background: rgba(13, 18, 32, 0.6);
-            border: 1px solid rgba(212, 175, 55, 0.12);
-            color: rgba(212, 175, 55, 0.5);
-            font-family: var(--font-title); font-size: 0.55rem;
-            letter-spacing: 1.5px; text-transform: uppercase;
-            cursor: pointer; transition: all 0.3s ease; white-space: nowrap;
-        }
-        .pill:hover, .pill.active {
-            background: rgba(212, 175, 55, 0.1);
-            border-color: var(--gold-mid); color: var(--gold-mid);
-        }
-        .pill.active { box-shadow: 0 0 12px rgba(212, 175, 55, 0.1); }
-        .pill .count {
-            display: inline-block; margin-left: 6px;
-            background: rgba(212, 175, 55, 0.15);
-            padding: 1px 6px; border-radius: 10px; font-size: 0.5rem;
-        }
-
+    display: flex; gap: 8px; overflow-x: auto;
+    padding: 4px 0 12px; margin-bottom: 1rem;
+    -ms-overflow-style: none; scrollbar-width: none;
+}
+.category-pills::-webkit-scrollbar { display: none; }
+.pill {
+    flex-shrink: 0; padding: 8px 16px; border-radius: 50px;
+    background: rgba(10, 22, 16, 0.6);
+    border: 1px solid rgba(13, 107, 71, 0.15);
+    color: rgba(13, 107, 71, 0.5);
+    font-family: var(--font-title); font-size: 0.55rem;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s ease; white-space: nowrap;
+}
+.pill:hover, .pill.active {
+    background: rgba(13, 107, 71, 0.12);
+    border-color: var(--emerald-light); color: var(--emerald-light);
+}
+.pill.active { box-shadow: 0 0 12px rgba(13, 107, 71, 0.12); }
+.pill .count {
+    display: inline-block; margin-left: 6px;
+    background: rgba(13, 107, 71, 0.15);
+    padding: 1px 6px; border-radius: 10px; font-size: 0.5rem;
+}
         /* ============================================ */
         /* ===== DUA CARDS ===== */
         /* ============================================ */
-        .dua-card {
-            background: var(--bg-card);
-            border: 1px solid rgba(212, 175, 55, 0.08);
-            border-radius: var(--radius-lg);
-            margin-bottom: 16px; overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            opacity: 0; transform: translateY(20px);
-            animation: cardReveal 0.6s ease forwards;
-        }
-        .dua-card.hidden-card { display: none; }
-        .dua-card.read-card { border-left: 3px solid rgba(13, 107, 71, 0.4); }
+.dua-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(13, 107, 71, 0.1);
+    border-radius: var(--radius-lg);
+    margin-bottom: 16px; overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    opacity: 0; transform: translateY(30px);
+}
+.dua-card.visible {
+    opacity: 1; transform: translateY(0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.dua-card.hidden-card { display: none; }
+.dua-card.read-card { border-left: 3px solid rgba(13, 107, 71, 0.5); }
 
-        @keyframes cardReveal {
-            to { opacity: 1; transform: translateY(0); }
-        }
+.dua-card:hover {
+    border-color: rgba(13, 107, 71, 0.25);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+}
 
-        .dua-card:hover {
-            border-color: rgba(212, 175, 55, 0.2);
-            box-shadow: var(--shadow-glow);
-            transform: translateY(-2px);
-        }
+.dua-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(13, 107, 71, 0.25), transparent);
+}
 
-        .dua-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
-        }
-
+/* Focus styles for keyboard navigation */
+.dua-card:focus-within {
+    border-color: rgba(13, 107, 71, 0.4);
+    box-shadow: 0 0 0 2px rgba(13, 107, 71, 0.15), var(--shadow-glow);
+}
         /* ===== AUTHENTICATION BADGE ===== */
         .auth-badge {
             display: inline-block; font-family: var(--font-title);
@@ -483,13 +487,14 @@
         .card-header-left { display: flex; align-items: center; gap: 12px; flex: 1; }
 
         .dua-number {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.04));
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-family: var(--font-title); font-size: 0.7rem; font-weight: 700;
-            color: var(--gold-mid); flex-shrink: 0;
-        }
+            .dua-number {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, rgba(13, 107, 71, 0.15), rgba(13, 107, 71, 0.05));
+    border: 1px solid rgba(13, 107, 71, 0.25);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-title); font-size: 0.7rem; font-weight: 700;
+    color: var(--emerald-light); flex-shrink: 0;
+}
 
         .card-title-group { flex: 1; min-width: 0; }
         .dua-title {
@@ -498,31 +503,31 @@
             color: var(--gold-light); font-weight: 600; line-height: 1.4;
         }
         .dua-category-tag {
-            font-family: var(--font-title); font-size: 0.5rem;
-            letter-spacing: 1.5px; text-transform: uppercase;
-            color: rgba(212, 175, 55, 0.35); margin-top: 2px;
-        }
+    font-family: var(--font-title); font-size: 0.5rem;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: rgba(13, 107, 71, 0.4); margin-top: 2px;
+}
 
         .card-actions { display: flex; gap: 4px; align-items: center; }
-        .card-action-btn {
-            background: none; border: none;
-            color: rgba(212, 175, 55, 0.35);
-            width: 32px; height: 32px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.3s ease;
-            font-size: 0.9rem; position: relative;
-        }
-        .card-action-btn:hover {
-            color: var(--gold-mid);
-            background: rgba(212, 175, 55, 0.08);
-        }
-        .card-action-btn.bookmarked { color: var(--gold-mid); }
+.card-action-btn {
+    background: none; border: none;
+    color: rgba(13, 107, 71, 0.35);
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.3s ease;
+    font-size: 0.9rem; position: relative;
+}
+.card-action-btn:hover {
+    color: var(--emerald-light);
+    background: rgba(13, 107, 71, 0.1);
+}
+.card-action-btn.bookmarked { color: var(--gold-mid); }
 
-        .expand-icon {
-            transition: transform 0.3s ease;
-            color: rgba(212, 175, 55, 0.3); font-size: 0.8rem;
-        }
-        .dua-card.expanded .expand-icon { transform: rotate(180deg); }
+.expand-icon {
+    transition: transform 0.3s ease;
+    color: rgba(13, 107, 71, 0.3); font-size: 0.8rem;
+}
+.dua-card.expanded .expand-icon { transform: rotate(180deg); }
 
         /* Card Body */
         .card-body {
@@ -535,34 +540,34 @@
 
         /* Ornamental divider */
         .ornament-divider {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            margin: 8px 0 16px; opacity: 0.3;
-        }
-        .ornament-divider .line {
-            flex: 1; height: 1px; max-width: 60px;
-            background: linear-gradient(to right, transparent, var(--gold-dark));
-        }
-        .ornament-divider .line:last-child {
-            background: linear-gradient(to left, transparent, var(--gold-dark));
-        }
-        .ornament-divider .diamond {
-            width: 5px; height: 5px; background: var(--gold-dark);
-            transform: rotate(45deg);
-        }
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    margin: 8px 0 16px; opacity: 0.3;
+}
+.ornament-divider .line {
+    flex: 1; height: 1px; max-width: 60px;
+    background: linear-gradient(to right, transparent, var(--emerald-light));
+}
+.ornament-divider .line:last-child {
+    background: linear-gradient(to left, transparent, var(--emerald-light));
+}
+.ornament-divider .diamond {
+    width: 5px; height: 5px; background: var(--emerald-light);
+    transform: rotate(45deg);
+}
 
         /* Arabic Text */
         .arabic-container {
-            background: linear-gradient(135deg, rgba(253, 251, 245, 0.03), rgba(248, 243, 230, 0.02));
-            border: 1px solid rgba(212, 175, 55, 0.08);
-            border-radius: var(--radius-md);
-            padding: 20px 16px; margin-bottom: 12px;
-            position: relative; overflow: hidden;
-        }
-        .arabic-container::before {
-            content: '❝'; position: absolute; top: 8px; right: 12px;
-            font-size: 2rem; color: rgba(212, 175, 55, 0.06);
-            font-family: serif; line-height: 1;
-        }
+    background: linear-gradient(135deg, rgba(13, 107, 71, 0.05), rgba(10, 22, 16, 0.04));
+    border: 1px solid rgba(13, 107, 71, 0.1);
+    border-radius: var(--radius-md);
+    padding: 20px 16px; margin-bottom: 12px;
+    position: relative; overflow: hidden;
+}
+.arabic-container::before {
+    content: '❝'; position: absolute; top: 8px; right: 12px;
+    font-size: 2rem; color: rgba(13, 107, 71, 0.08);
+    font-family: serif; line-height: 1;
+}
 
         .arabic-text {
             font-family: var(--font-arabic);
@@ -573,14 +578,13 @@
 
         /* Transliteration */
         .transliteration {
-            font-family: var(--font-amiri);
-            font-size: calc(0.92rem * var(--font-scale));
-            color: rgba(212, 175, 55, 0.55); font-style: italic;
-            line-height: 1.8; padding: 10px 0;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.06);
-            margin-bottom: 10px;
-        }
-
+    font-family: var(--font-amiri);
+    font-size: calc(0.92rem * var(--font-scale));
+    color: rgba(13, 107, 71, 0.5); font-style: italic;
+    line-height: 1.8; padding: 10px 0;
+    border-bottom: 1px solid rgba(13, 107, 71, 0.08);
+    margin-bottom: 10px;
+}
         /* Translation */
         .translation {
             font-family: var(--font-text);
@@ -591,421 +595,457 @@
 
         /* Source/Reference */
         .reference {
-            display: flex; align-items: center; gap: 8px;
-            margin-top: 12px; padding-top: 10px;
-            border-top: 1px solid rgba(212, 175, 55, 0.06);
-        }
-        .ref-icon { font-size: 0.8rem; color: rgba(212, 175, 55, 0.3); }
-        .ref-text {
-            font-family: var(--font-title); font-size: 0.55rem;
-            letter-spacing: 1px; text-transform: uppercase;
-            color: rgba(212, 175, 55, 0.35);
-        }
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid rgba(13, 107, 71, 0.08);
+}
+.ref-icon { font-size: 0.8rem; color: rgba(13, 107, 71, 0.35); }
+.ref-text {
+    font-family: var(--font-title); font-size: 0.55rem;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: rgba(13, 107, 71, 0.4);
+}
 
         /* Virtue/Benefit Tag */
         .virtue-tag {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: linear-gradient(135deg, rgba(10, 77, 51, 0.2), rgba(10, 77, 51, 0.08));
-            border: 1px solid rgba(13, 107, 71, 0.2);
-            border-radius: 50px; padding: 6px 14px; margin-top: 10px;
-            font-family: var(--font-text); font-size: 0.75rem;
-            color: rgba(13, 180, 100, 0.7); font-style: italic;
-        }
-        .virtue-tag .gem { font-size: 0.7rem; }
+    display: inline-flex; align-items: center; gap: 6px;
+    background: linear-gradient(135deg, rgba(184, 150, 62, 0.1), rgba(184, 150, 62, 0.04));
+    border: 1px solid rgba(184, 150, 62, 0.15);
+    border-radius: 50px; padding: 6px 14px; margin-top: 10px;
+    font-family: var(--font-text); font-size: 0.75rem;
+    color: rgba(184, 150, 62, 0.7); font-style: italic;
+}
+.virtue-tag .gem { font-size: 0.7rem; }
 
         /* How-to box */
         .how-to-box {
-            background: rgba(212, 175, 55, 0.04);
-            border: 1px solid rgba(212, 175, 55, 0.1);
-            border-radius: var(--radius-md);
-            padding: 12px 14px; margin-top: 10px;
-            font-family: var(--font-text); font-size: 0.8rem;
-            color: rgba(252, 246, 186, 0.6); line-height: 1.8;
-        }
-        .how-to-box strong { color: var(--gold-mid); }
-
+    background: rgba(13, 107, 71, 0.06);
+    border: 1px solid rgba(13, 107, 71, 0.12);
+    border-radius: var(--radius-md);
+    padding: 12px 14px; margin-top: 10px;
+    font-family: var(--font-text); font-size: 0.8rem;
+    color: rgba(208, 225, 193, 0.6); line-height: 1.8;
+}
+.how-to-box strong { color: var(--emerald-light); }
         /* Action Buttons Row */
         .copy-row {
             display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap;
         }
         .action-btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 6px 14px; border-radius: 50px;
-            background: rgba(212, 175, 55, 0.06);
-            border: 1px solid rgba(212, 175, 55, 0.12);
-            color: rgba(212, 175, 55, 0.5);
-            font-family: var(--font-title); font-size: 0.5rem;
-            letter-spacing: 1px; text-transform: uppercase;
-            cursor: pointer; transition: all 0.3s ease;
-        }
-        .action-btn:hover {
-            background: rgba(212, 175, 55, 0.12);
-            color: var(--gold-mid); border-color: rgba(212, 175, 55, 0.3);
-        }
-        .action-btn.copied, .action-btn.read {
-            background: rgba(10, 77, 51, 0.2);
-            border-color: rgba(13, 107, 71, 0.3);
-            color: rgba(13, 180, 100, 0.8);
-        }
-
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 50px;
+    background: rgba(13, 107, 71, 0.06);
+    border: 1px solid rgba(13, 107, 71, 0.15);
+    color: rgba(13, 107, 71, 0.5);
+    font-family: var(--font-title); font-size: 0.5rem;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s ease;
+}
+.action-btn:hover {
+    background: rgba(13, 107, 71, 0.15);
+    color: var(--emerald-light); border-color: rgba(13, 107, 71, 0.35);
+}
+.action-btn.copied, .action-btn.read {
+    background: rgba(184, 150, 62, 0.12);
+    border-color: rgba(184, 150, 62, 0.25);
+    color: rgba(184, 150, 62, 0.8);
+}
         /* ============================================ */
         /* ===== SECTION DIVIDERS ===== */
         /* ============================================ */
-        .section-header {
-            text-align: center; margin: 2.5rem 0 1.5rem;
-            position: relative;
-        }
-        .section-header .section-ornament {
-            display: flex; align-items: center; justify-content: center; gap: 16px;
-            margin-bottom: 8px;
-        }
-        .section-header .orn-line {
-            width: 40px; height: 1px;
-            background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.3));
-        }
-        .section-header .orn-line:last-child {
-            background: linear-gradient(to left, transparent, rgba(212, 175, 55, 0.3));
-        }
-        .section-header .orn-center {
-            font-size: 1.2rem; color: var(--gold-dark); opacity: 0.6;
-        }
-        .section-title {
-            font-family: var(--font-title); font-size: 0.8rem;
-            letter-spacing: 3px; text-transform: uppercase;
-            color: var(--gold-mid); font-weight: 600;
-        }
-        .section-subtitle {
-            font-family: var(--font-text); font-size: 0.8rem;
-            color: rgba(252, 246, 186, 0.35); font-style: italic;
-            margin-top: 4px;
-        }
+     .section-header {
+    text-align: center; margin: 2.5rem 0 1.5rem;
+    position: relative;
+}
+.section-header .section-ornament {
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+    margin-bottom: 8px;
+}
+.section-header .orn-line {
+    width: 40px; height: 1px;
+    background: linear-gradient(to right, transparent, rgba(13, 107, 71, 0.35));
+}
+.section-header .orn-line:last-child {
+    background: linear-gradient(to left, transparent, rgba(13, 107, 71, 0.35));
+}
+.section-header .orn-center {
+    font-size: 1.2rem; color: var(--emerald-light); opacity: 0.6;
+}
+.section-title {
+    font-family: var(--font-title); font-size: 0.8rem;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--emerald-light); font-weight: 600;
+}
+.section-subtitle {
+    font-family: var(--font-text); font-size: 0.8rem;
+    color: rgba(208, 225, 193, 0.35); font-style: italic;
+    margin-top: 4px;
+}
 
         /* ============================================ */
         /* ===== ETIQUETTE PANEL ===== */
         /* ============================================ */
-        .etiquette-panel {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(7, 10, 19, 0.97);
-            z-index: 2000; display: none; overflow-y: auto;
-            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
-            backdrop-filter: blur(20px);
-        }
-        .etiquette-panel.active { display: block; }
-        .etiquette-close {
-            position: fixed; top: calc(var(--safe-top) + 16px); right: 16px;
-            background: rgba(13, 18, 32, 0.8); border: 1px solid rgba(212, 175, 55, 0.25);
-            color: var(--gold-mid); width: 44px; height: 44px;
-            border-radius: 50%; font-size: 1.2rem;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            z-index: 2001;
-        }
-        .etiquette-content {
-            max-width: 500px; margin: 0 auto; padding-top: 20px;
-        }
-        .etiquette-content h2 {
-            font-family: var(--font-title); font-size: 1rem;
-            letter-spacing: 3px; text-transform: uppercase;
-            color: var(--gold-mid); text-align: center; margin-bottom: 1.5rem;
-        }
-        .etiquette-item {
-            display: flex; gap: 12px; margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.06);
-        }
-        .etiquette-num {
-            width: 28px; height: 28px; border-radius: 50%;
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            display: flex; align-items: center; justify-content: center;
-            font-family: var(--font-title); font-size: 0.65rem;
-            color: var(--gold-mid); flex-shrink: 0;
-        }
-        .etiquette-text {
-            font-family: var(--font-text); font-size: 0.85rem;
-            color: rgba(252, 246, 186, 0.7); line-height: 1.8;
-        }
-        .etiquette-text strong { color: var(--gold-light); }
-        .etiquette-text .ref {
-            font-size: 0.7rem; color: rgba(212, 175, 55, 0.35);
-            font-style: italic;
-        }
+       /* ===== PANELS & OVERLAYS ===== */
+.etiquette-panel {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(6, 13, 8, 0.97);
+    z-index: 2000; display: none; overflow-y: auto;
+    padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
+    backdrop-filter: blur(20px);
+}
+.etiquette-panel.active { display: block; }
+.etiquette-close {
+    position: fixed; top: calc(var(--safe-top) + 16px); right: 16px;
+    background: rgba(10, 22, 16, 0.8); border: 1px solid rgba(13, 107, 71, 0.3);
+    color: var(--emerald-light); width: 44px; height: 44px;
+    border-radius: 50%; font-size: 1.2rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    z-index: 2001;
+}
+.etiquette-content {
+    max-width: 500px; margin: 0 auto; padding-top: 20px;
+}
+.etiquette-content h2 {
+    font-family: var(--font-title); font-size: 1rem;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--emerald-light); text-align: center; margin-bottom: 1.5rem;
+}
+.etiquette-item {
+    display: flex; gap: 12px; margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(13, 107, 71, 0.08);
+}
+.etiquette-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(13, 107, 71, 0.12);
+    border: 1px solid rgba(13, 107, 71, 0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-title); font-size: 0.65rem;
+    color: var(--emerald-light); flex-shrink: 0;
+}
+.etiquette-text {
+    font-family: var(--font-text); font-size: 0.85rem;
+    color: rgba(208, 225, 193, 0.7); line-height: 1.8;
+}
+.etiquette-text strong { color: var(--gold-light); }
+.etiquette-text .ref {
+    font-size: 0.7rem; color: rgba(13, 107, 71, 0.4);
+    font-style: italic;
+}
 
-        /* ============================================ */
-        /* ===== DAILY ROUTINE PANEL ===== */
-        /* ============================================ */
-        .routine-panel {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(7, 10, 19, 0.97);
-            z-index: 2000; display: none; overflow-y: auto;
-            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
-            backdrop-filter: blur(20px);
-        }
-        .routine-panel.active { display: block; }
-        .routine-content {
-            max-width: 500px; margin: 0 auto; padding-top: 20px;
-        }
-        .routine-content h2 {
-            font-family: var(--font-title); font-size: 1rem;
-            letter-spacing: 3px; text-transform: uppercase;
-            color: var(--gold-mid); text-align: center; margin-bottom: 1.5rem;
-        }
-        .routine-item {
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.06);
-        }
-        .routine-time {
-            font-family: var(--font-title); font-size: 0.65rem;
-            letter-spacing: 1.5px; text-transform: uppercase;
-            color: var(--gold-mid); margin-bottom: 4px;
-        }
-        .routine-desc {
-            font-family: var(--font-text); font-size: 0.85rem;
-            color: rgba(252, 246, 186, 0.6); line-height: 1.8;
-        }
-        .routine-desc .dua-ref {
-            color: rgba(212, 175, 55, 0.5); font-size: 0.75rem;
-            cursor: pointer; text-decoration: underline;
-            text-decoration-color: rgba(212, 175, 55, 0.2);
-        }
-        .routine-desc .dua-ref:hover { color: var(--gold-mid); }
+/* Routine Panel */
+.routine-panel {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(6, 13, 8, 0.97);
+    z-index: 2000; display: none; overflow-y: auto;
+    padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
+    backdrop-filter: blur(20px);
+}
+.routine-panel.active { display: block; }
+.routine-content {
+    max-width: 500px; margin: 0 auto; padding-top: 20px;
+}
+.routine-content h2 {
+    font-family: var(--font-title); font-size: 1rem;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--emerald-light); text-align: center; margin-bottom: 1.5rem;
+}
+.routine-item {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(13, 107, 71, 0.08);
+}
+.routine-time {
+    font-family: var(--font-title); font-size: 0.65rem;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--emerald-light); margin-bottom: 4px;
+}
+.routine-desc {
+    font-family: var(--font-text); font-size: 0.85rem;
+    color: rgba(208, 225, 193, 0.6); line-height: 1.8;
+}
+.routine-desc .dua-ref {
+    color: rgba(184, 150, 62, 0.6); font-size: 0.75rem;
+    cursor: pointer; text-decoration: underline;
+    text-decoration-color: rgba(184, 150, 62, 0.2);
+}
+.routine-desc .dua-ref:hover { color: var(--gold-mid); }
 
-        /* ============================================ */
-        /* ===== TASBEEH COUNTER ===== */
-        /* ============================================ */
-        .tasbeeh-panel {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(7, 10, 19, 0.97);
-            z-index: 2000; display: none; flex-direction: column;
-            align-items: center; justify-content: center;
-            padding: 2rem; backdrop-filter: blur(20px);
-        }
-        .tasbeeh-panel.active { display: flex; }
-        .tasbeeh-close {
-            position: absolute; top: calc(var(--safe-top) + 16px); right: 16px;
-            background: none; border: 1px solid rgba(212, 175, 55, 0.25);
-            color: var(--gold-mid); width: 44px; height: 44px;
-            border-radius: 50%; font-size: 1.2rem;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
-        .tasbeeh-title {
-            font-family: var(--font-title); font-size: 0.7rem;
-            letter-spacing: 3px; text-transform: uppercase;
-            color: rgba(212, 175, 55, 0.5); margin-bottom: 1rem;
-        }
-        .tasbeeh-arabic {
-            font-family: var(--font-arabic);
-            font-size: calc(1.6rem * var(--font-scale));
-            color: var(--gold-light); direction: rtl;
-            text-align: center; line-height: 2;
-            margin-bottom: 2rem; max-width: 90%;
-        }
-        .tasbeeh-count-display {
-            font-family: var(--font-title);
-            font-size: 4.5rem; font-weight: 800;
-            color: var(--gold-mid); line-height: 1;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
-        }
-        .tasbeeh-target {
-            font-family: var(--font-title); font-size: 0.6rem;
-            letter-spacing: 2px; text-transform: uppercase;
-            color: rgba(212, 175, 55, 0.35); margin-bottom: 2rem;
-        }
-        .tasbeeh-tap-btn {
-            width: 140px; height: 140px; border-radius: 50%;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.04));
-            border: 2px solid rgba(212, 175, 55, 0.3);
-            color: var(--gold-mid); font-family: var(--font-title);
-            font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
-            cursor: pointer; transition: all 0.15s ease;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.05);
-            -webkit-user-select: none; user-select: none;
-        }
-        .tasbeeh-tap-btn:active {
-            transform: scale(0.92);
-            background: rgba(212, 175, 55, 0.2);
-            box-shadow: 0 0 50px rgba(212, 175, 55, 0.15);
-        }
-        .tasbeeh-controls {
-            display: flex; gap: 12px; margin-top: 1.5rem;
-        }
-        .tasbeeh-ctrl-btn {
-            padding: 8px 20px; border-radius: 50px;
-            background: rgba(13, 18, 32, 0.8);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            color: rgba(212, 175, 55, 0.5);
-            font-family: var(--font-title); font-size: 0.55rem;
-            letter-spacing: 1.5px; text-transform: uppercase;
-            cursor: pointer; transition: all 0.3s ease;
-        }
-        .tasbeeh-ctrl-btn:hover {
-            background: rgba(212, 175, 55, 0.1); color: var(--gold-mid);
-        }
-        .tasbeeh-presets {
-            display: flex; gap: 8px; margin-top: 1rem;
-        }
-        .tasbeeh-preset {
-            padding: 6px 14px; border-radius: 50px;
-            background: rgba(13, 18, 32, 0.6);
-            border: 1px solid rgba(212, 175, 55, 0.1);
-            color: rgba(212, 175, 55, 0.4);
-            font-family: var(--font-title); font-size: 0.55rem;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .tasbeeh-preset:hover, .tasbeeh-preset.active {
-            border-color: var(--gold-mid); color: var(--gold-mid);
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.2); }
-            70% { box-shadow: 0 0 0 20px rgba(212, 175, 55, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
-        }
-        .tasbeeh-tap-btn.pulse { animation: pulse 0.6s ease-out; }
+/* Tasbeeh Panel */
+.tasbeeh-panel {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(6, 13, 8, 0.97);
+    z-index: 2000; display: none; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2rem; backdrop-filter: blur(20px);
+}
+.tasbeeh-panel.active { display: flex; }
+.tasbeeh-close {
+    position: absolute; top: calc(var(--safe-top) + 16px); right: 16px;
+    background: none; border: 1px solid rgba(13, 107, 71, 0.3);
+    color: var(--emerald-light); width: 44px; height: 44px;
+    border-radius: 50%; font-size: 1.2rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.tasbeeh-title {
+    font-family: var(--font-title); font-size: 0.7rem;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(13, 107, 71, 0.5); margin-bottom: 1rem;
+}
+.tasbeeh-arabic {
+    font-family: var(--font-arabic);
+    font-size: calc(1.6rem * var(--font-scale));
+    color: var(--gold-light); direction: rtl;
+    text-align: center; line-height: 2;
+    margin-bottom: 2rem; max-width: 90%;
+}
+.tasbeeh-count-display {
+    font-family: var(--font-title);
+    font-size: 4.5rem; font-weight: 800;
+    color: var(--emerald-light); line-height: 1;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 40px rgba(13, 107, 71, 0.25);
+}
+.tasbeeh-target {
+    font-family: var(--font-title); font-size: 0.6rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(13, 107, 71, 0.4); margin-bottom: 2rem;
+}
+.tasbeeh-tap-btn {
+    width: 140px; height: 140px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(13, 107, 71, 0.15), rgba(13, 107, 71, 0.05));
+    border: 2px solid rgba(13, 107, 71, 0.35);
+    color: var(--emerald-light); font-family: var(--font-title);
+    font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.15s ease;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 30px rgba(13, 107, 71, 0.08);
+    -webkit-user-select: none; user-select: none;
+}
+.tasbeeh-tap-btn:active {
+    transform: scale(0.92);
+    background: rgba(13, 107, 71, 0.25);
+    box-shadow: 0 0 50px rgba(13, 107, 71, 0.2);
+}
+.tasbeeh-controls {
+    display: flex; gap: 12px; margin-top: 1.5rem;
+}
+.tasbeeh-ctrl-btn {
+    padding: 8px 20px; border-radius: 50px;
+    background: rgba(10, 22, 16, 0.8);
+    border: 1px solid rgba(13, 107, 71, 0.2);
+    color: rgba(13, 107, 71, 0.5);
+    font-family: var(--font-title); font-size: 0.55rem;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s ease;
+}
+.tasbeeh-ctrl-btn:hover {
+    background: rgba(13, 107, 71, 0.12); color: var(--emerald-light);
+}
+.tasbeeh-presets {
+    display: flex; gap: 8px; margin-top: 1rem;
+}
+.tasbeeh-preset {
+    padding: 6px 14px; border-radius: 50px;
+    background: rgba(10, 22, 16, 0.6);
+    border: 1px solid rgba(13, 107, 71, 0.12);
+    color: rgba(13, 107, 71, 0.4);
+    font-family: var(--font-title); font-size: 0.55rem;
+    cursor: pointer; transition: all 0.2s;
+}
+.tasbeeh-preset:hover, .tasbeeh-preset.active {
+    border-color: var(--emerald-light); color: var(--emerald-light);
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(13, 107, 71, 0.25); }
+    70% { box-shadow: 0 0 0 20px rgba(13, 107, 71, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(13, 107, 71, 0); }
+}
+.tasbeeh-tap-btn.pulse { animation: pulse 0.6s ease-out; }
 
-        /* ============================================ */
-        /* ===== BACK TO TOP ===== */
-        /* ============================================ */
-        .back-to-top {
-            position: fixed;
-            bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 16px);
-            right: 16px; width: 44px; height: 44px;
-            background: rgba(13, 18, 32, 0.9);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            color: var(--gold-mid); font-size: 1.1rem;
-            cursor: pointer; z-index: 500;
-            opacity: 0; transform: translateY(20px);
-            transition: all 0.3s ease; backdrop-filter: blur(10px);
-        }
-        .back-to-top.visible { opacity: 1; transform: translateY(0); }
-        .back-to-top:hover {
-            background: rgba(212, 175, 55, 0.1);
-            border-color: var(--gold-mid);
-        }
+/* Back to Top */
+.back-to-top {
+    position: fixed;
+    bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 16px);
+    right: 16px; width: 44px; height: 44px;
+    background: rgba(10, 22, 16, 0.9);
+    border: 1px solid rgba(13, 107, 71, 0.25);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: var(--emerald-light); font-size: 1.1rem;
+    cursor: pointer; z-index: 500;
+    opacity: 0; transform: translateY(20px);
+    transition: all 0.3s ease; backdrop-filter: blur(10px);
+}
+.back-to-top.visible { opacity: 1; transform: translateY(0); }
+.back-to-top:hover {
+    background: rgba(13, 107, 71, 0.12);
+    border-color: var(--emerald-light);
+}
 
-        /* ============================================ */
-        /* ===== TOAST NOTIFICATION ===== */
-        /* ============================================ */
-        .toast {
-            position: fixed;
-            bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px);
-            left: 50%; transform: translateX(-50%) translateY(100px);
-            background: rgba(13, 18, 32, 0.95);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 12px 24px; border-radius: 50px;
-            color: var(--gold-light); font-family: var(--font-text);
-            font-size: 0.85rem; z-index: 3000;
-            backdrop-filter: blur(20px);
-            opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-        }
-        .toast.show {
-            transform: translateX(-50%) translateY(0); opacity: 1;
-        }
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px);
+    left: 50%; transform: translateX(-50%) translateY(100px);
+    background: rgba(10, 22, 16, 0.95);
+    border: 1px solid rgba(13, 107, 71, 0.25);
+    padding: 12px 24px; border-radius: 50px;
+    color: var(--gold-light); font-family: var(--font-text);
+    font-size: 0.85rem; z-index: 3000;
+    backdrop-filter: blur(20px);
+    opacity: 0; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.toast.show {
+    transform: translateX(-50%) translateY(0); opacity: 1;
+}
 
-        /* ============================================ */
-        /* ===== BOOKMARKS PANEL ===== */
-        /* ============================================ */
-        .overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7); z-index: 1500;
-            opacity: 0; visibility: hidden; transition: all 0.3s ease;
-        }
-        .overlay.active { opacity: 1; visibility: visible; }
+/* Overlay & Side Panel */
+.overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7); z-index: 1500;
+    opacity: 0; visibility: hidden; transition: all 0.3s ease;
+}
+.overlay.active { opacity: 1; visibility: visible; }
 
-        .side-panel {
-            position: fixed; top: 0; right: -320px; bottom: 0;
-            width: 300px; max-width: 85vw;
-            background: var(--bg-card);
-            border-left: 1px solid rgba(212, 175, 55, 0.12);
-            z-index: 1600; padding: 24px 16px;
-            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto;
-        }
-        .side-panel.active { right: 0; }
+.side-panel {
+    position: fixed; top: 0; right: -320px; bottom: 0;
+    width: 300px; max-width: 85vw;
+    background: var(--bg-card);
+    border-left: 1px solid rgba(13, 107, 71, 0.15);
+    z-index: 1600; padding: 24px 16px;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+}
+.side-panel.active { right: 0; }
 
-        .panel-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding-bottom: 12px;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-        }
-        .panel-title {
-            font-family: var(--font-title); font-size: 0.75rem;
-            letter-spacing: 2px; text-transform: uppercase;
-            color: var(--gold-mid);
-        }
-        .panel-close {
-            background: none; border: none; color: var(--gold-mid);
-            font-size: 1.2rem; cursor: pointer; padding: 4px;
-        }
-        .panel-empty {
-            text-align: center; padding: 3rem 1rem;
-            color: rgba(252, 246, 186, 0.3);
-            font-style: italic; font-size: 0.9rem;
-        }
-        .panel-item {
-            padding: 12px; border-radius: var(--radius-md);
-            border: 1px solid rgba(212, 175, 55, 0.08);
-            margin-bottom: 8px; cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .panel-item:hover {
-            background: rgba(212, 175, 55, 0.05);
-            border-color: rgba(212, 175, 55, 0.15);
-        }
-        .panel-item-title {
-            font-family: var(--font-title); font-size: 0.65rem;
-            letter-spacing: 1px; text-transform: uppercase;
-            color: var(--gold-light); margin-bottom: 4px;
-        }
-        .panel-item-arabic {
-            font-family: var(--font-arabic); font-size: 1rem;
-            color: var(--gold-lightest); direction: rtl; text-align: right;
-            line-height: 1.8; white-space: nowrap; overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
+.panel-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; padding-bottom: 12px;
+    border-bottom: 1px solid rgba(13, 107, 71, 0.12);
+}
+.panel-title {
+    font-family: var(--font-title); font-size: 0.75rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: var(--emerald-light);
+}
+.panel-close {
+    background: none; border: none; color: var(--emerald-light);
+    font-size: 1.2rem; cursor: pointer; padding: 4px;
+}
+.panel-empty {
+    text-align: center; padding: 3rem 1rem;
+    color: rgba(208, 225, 193, 0.3);
+    font-style: italic; font-size: 0.9rem;
+}
+.panel-item {
+    padding: 12px; border-radius: var(--radius-md);
+    border: 1px solid rgba(13, 107, 71, 0.1);
+    margin-bottom: 8px; cursor: pointer;
+    transition: all 0.3s ease;
+}
+.panel-item:hover {
+    background: rgba(13, 107, 71, 0.06);
+    border-color: rgba(13, 107, 71, 0.2);
+}
+.panel-item-title {
+    font-family: var(--font-title); font-size: 0.65rem;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--gold-light); margin-bottom: 4px;
+}
+.panel-item-arabic {
+    font-family: var(--font-arabic); font-size: 1rem;
+    color: var(--gold-lightest); direction: rtl; text-align: right;
+    line-height: 1.8; white-space: nowrap; overflow: hidden;
+    text-overflow: ellipsis;
+}
         /* ============================================ */
         /* ===== FOOTER ===== */
         /* ============================================ */
         .footer {
-            text-align: center; padding: 3rem 1rem 1rem;
-            margin-top: 2rem;
-        }
-        .footer-ornament {
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            margin-bottom: 1.5rem; opacity: 0.3;
-        }
-        .footer-ornament .line {
-            width: 50px; height: 1px;
-            background: linear-gradient(to right, transparent, var(--gold-dark));
-        }
-        .footer-ornament .line:last-child {
-            background: linear-gradient(to left, transparent, var(--gold-dark));
-        }
-        .footer-text {
-            font-family: var(--font-title); font-size: 0.55rem;
-            letter-spacing: 2px; text-transform: uppercase;
-            color: rgba(252, 246, 186, 0.25); line-height: 2;
-        }
-        .footer-arabic {
-            font-family: var(--font-arabic); font-size: 1.2rem;
-            color: rgba(212, 175, 55, 0.3); margin-top: 12px;
-            direction: rtl;
-        }
+    text-align: center; padding: 3rem 1rem 1rem;
+    margin-top: 2rem;
+}
+.footer-ornament {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-bottom: 1.5rem; opacity: 0.3;
+}
+.footer-ornament .line {
+    width: 50px; height: 1px;
+    background: linear-gradient(to right, transparent, var(--emerald-light));
+}
+.footer-ornament .line:last-child {
+    background: linear-gradient(to left, transparent, var(--emerald-light));
+}
+.footer-text {
+    font-family: var(--font-title); font-size: 0.55rem;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(208, 225, 193, 0.25); line-height: 2;
+}
+.footer-arabic {
+    font-family: var(--font-arabic); font-size: 1.2rem;
+    color: rgba(13, 107, 71, 0.3); margin-top: 12px;
+    direction: rtl;
+}
 
         /* ===== NO RESULTS ===== */
         .no-results {
-            text-align: center; padding: 3rem 1rem; display: none;
-        }
-        .no-results.visible { display: block; }
-        .no-results-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3; }
-        .no-results-text {
-            font-family: var(--font-text); font-size: 0.95rem;
-            color: rgba(252, 246, 186, 0.4); font-style: italic;
-        }
+    text-align: center; padding: 3rem 1rem; display: none;
+}
+.no-results.visible { display: block; }
+.no-results-icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3; }
+.no-results-text {
+    font-family: var(--font-text); font-size: 0.95rem;
+    color: rgba(208, 225, 193, 0.4); font-style: italic;
+}
+/* ===== KEYBOARD & ACCESSIBILITY ===== */
+.card-header:focus-visible {
+    outline: 2px solid rgba(13, 107, 71, 0.5);
+    outline-offset: -2px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
 
+.card-action-btn:focus-visible,
+.nav-btn:focus-visible,
+.font-btn:focus-visible,
+.toolbar-btn:focus-visible,
+.pill:focus-visible,
+.action-btn:focus-visible,
+.bottom-nav-item:focus-visible,
+.tasbeeh-tap-btn:focus-visible,
+.tasbeeh-preset:focus-visible,
+.tasbeeh-ctrl-btn:focus-visible {
+    outline: 2px solid rgba(13, 107, 71, 0.5);
+    outline-offset: 2px;
+}
+
+/* Skip to content link for screen readers */
+.skip-link {
+    position: absolute; top: -100px; left: 16px;
+    background: var(--emerald-light); color: var(--bg-dark);
+    padding: 8px 16px; border-radius: var(--radius-md);
+    font-family: var(--font-title); font-size: 0.75rem;
+    letter-spacing: 1px; text-transform: uppercase;
+    z-index: 9999; transition: top 0.3s ease;
+    text-decoration: none;
+}
+.skip-link:focus {
+    top: calc(var(--safe-top) + 8px);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .dua-card.visible {
+        transition: none;
+    }
+    .gold-text {
+        animation: none;
+    }
+}
         /* ============================================ */
         /* ===== RESPONSIVE ===== */
         /* ============================================ */
@@ -1025,13 +1065,6 @@
             .container { padding-left: 24px; padding-right: 24px; }
         }
 
-        /* ===== STAGGERED ANIMATIONS ===== */
-        .dua-card:nth-child(1) { animation-delay: 0.05s; }
-        .dua-card:nth-child(2) { animation-delay: 0.1s; }
-        .dua-card:nth-child(3) { animation-delay: 0.15s; }
-        .dua-card:nth-child(4) { animation-delay: 0.2s; }
-        .dua-card:nth-child(5) { animation-delay: 0.25s; }
-
         /* ===== PRINT ===== */
         @media print {
             .top-nav, .bottom-nav, .progress-bar, .back-to-top,
@@ -1049,7 +1082,11 @@
         }
     </style>
 </head>
-<body>  <!-- ===== TOP NAVIGATION ===== -->
+<body>
+<!-- Skip to content for accessibility -->
+<a href="#mainContainer" class="skip-link">Skip to Duas</a>
+
+<!-- ===== TOP NAVIGATION ===== -->
 <nav class="top-nav" id="topNav">
     <span class="nav-title">Essential Duas</span>
     <div class="nav-actions">
@@ -1186,7 +1223,7 @@
 
     <!-- DUA 1: Al-Fatiha -->
     <div class="dua-card" data-categories="quran,prayer" data-keywords="fatiha opening guidance path straight mother quran greatest surah worship help" data-id="1">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">1</div>
                 <div class="card-title-group">
@@ -1223,7 +1260,7 @@
 
     <!-- DUA 2: Ayatul Kursi -->
     <div class="dua-card" data-categories="quran,protection" data-keywords="ayatul kursi throne verse greatest protection after prayer sleep" data-id="2">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">2</div>
                 <div class="card-title-group">
@@ -1260,7 +1297,7 @@
 
     <!-- DUA 3: Dua of Yunus -->
     <div class="dua-card" data-categories="quran,wellbeing,prophets" data-keywords="yunus jonah whale distress darkness never rejected wrongdoers" data-id="3">
-        <div class="card-header" onclick="toggleCard(this)">
+        
             <div class="card-header-left">
                 <div class="dua-number">3</div>
                 <div class="card-title-group">
@@ -1297,7 +1334,7 @@
 
     <!-- DUA 4: Mercy for Parents -->
     <div class="dua-card" data-categories="quran,family" data-keywords="parents mercy mother father raised young compassion childhood" data-id="4">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">4</div>
                 <div class="card-title-group">
@@ -1334,7 +1371,7 @@
 
     <!-- DUA 5: Last Two Verses of Al-Baqarah -->
     <div class="dua-card" data-categories="quran,protection" data-keywords="baqarah last two verses night suffice protection forgive burden" data-id="5">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">5</div>
                 <div class="card-title-group">
@@ -1371,7 +1408,7 @@
 
     <!-- DUA 6: The Three Quls -->
     <div class="dua-card" data-categories="quran,protection" data-keywords="three quls ikhlas falaq nas nightly shield protection evil envy magic" data-id="6">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">6</div>
                 <div class="card-title-group">
@@ -1419,7 +1456,7 @@
 
     <!-- DUA 7: Rabbana Atina -->
     <div class="dua-card" data-categories="quran,provision" data-keywords="rabbana atina good world hereafter fire hasanah comprehensive most frequent prophet" data-id="7">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">7</div>
                 <div class="card-title-group">
@@ -1456,7 +1493,7 @@
 
     <!-- DUA 8: Do Not Let Hearts Deviate (3:8) -->
     <div class="dua-card" data-categories="quran,guidance" data-keywords="hearts deviate guided mercy bestower wahhab steadfast imam ahmad" data-id="8">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">8</div>
                 <div class="card-title-group">
@@ -1493,7 +1530,7 @@
 
     <!-- DUA 9: Dua of Adam (7:23) -->
     <div class="dua-card" data-categories="quran,forgiveness" data-keywords="adam hawa wronged soul forgive mercy losers first repentance" data-id="9">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">9</div>
                 <div class="card-title-group">
@@ -1530,7 +1567,7 @@
 
     <!-- DUA 10: Increase in Knowledge (20:114) -->
     <div class="dua-card" data-categories="quran,guidance" data-keywords="knowledge increase learning study wisdom rabbi zidni only thing commanded more" data-id="10">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">10</div>
                 <div class="card-title-group">
@@ -1580,7 +1617,7 @@
 
     <!-- DUA 11: Refuge in Perfect Words -->
     <div class="dua-card" data-categories="protection" data-keywords="perfect words refuge evil created night travel stay place" data-id="11">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">11</div>
                 <div class="card-title-group">
@@ -1617,7 +1654,7 @@
 
     <!-- DUA 12: Bismillah Protection (Morning/Evening) -->
     <div class="dua-card" data-categories="protection,morning-evening" data-keywords="bismillah name harm nothing earth heaven hearing knowing morning evening three times" data-id="12">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">12</div>
                 <div class="card-title-group">
@@ -1654,7 +1691,7 @@
 
     <!-- DUA 13: Four Great Trials -->
     <div class="dua-card" data-categories="protection,prayer" data-keywords="refuge four trials hellfire grave life death dajjal tashahhud before salam commanded" data-id="13">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">13</div>
                 <div class="card-title-group">
@@ -1694,7 +1731,7 @@
 
     <!-- DUA 14: Contentment with Allah -->
     <div class="dua-card" data-categories="protection,morning-evening" data-keywords="pleased lord islam religion muhammad prophet contentment radhitu morning evening" data-id="14">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">14</div>
                 <div class="card-title-group">
@@ -1731,7 +1768,7 @@
 
     <!-- DUA 15: Entering the Restroom -->
     <div class="dua-card" data-categories="protection" data-keywords="bathroom toilet restroom entering evil devils jinn khubuthi" data-id="15">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">15</div>
                 <div class="card-title-group">
@@ -1780,7 +1817,7 @@
 
     <!-- DUA 16: Sayyid al-Istighfar -->
     <div class="dua-card" data-categories="forgiveness,morning-evening" data-keywords="sayyid istighfar master forgiveness morning evening paradise guaranteed covenant promise" data-id="16">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">16</div>
                 <div class="card-title-group">
@@ -1817,7 +1854,7 @@
 
     <!-- DUA 17: Comprehensive Forgiveness -->
     <div class="dua-card" data-categories="forgiveness" data-keywords="forgiveness all sins first last open secret small great comprehensive complete" data-id="17">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">17</div>
                 <div class="card-title-group">
@@ -1853,7 +1890,7 @@
 
     <!-- DUA 18: Laylatul Qadr -->
     <div class="dua-card" data-categories="forgiveness" data-keywords="laylatul qadr night power decree pardon forgive love afuwwun ramadan aisha" data-id="18">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">18</div>
                 <div class="card-title-group">
@@ -1901,7 +1938,7 @@
 
     <!-- DUA 19: Turner of Hearts -->
     <div class="dua-card" data-categories="guidance" data-keywords="hearts turner steadfast firm faith religion muqallib most frequent dua prophet" data-id="19">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">19</div>
                 <div class="card-title-group">
@@ -1938,7 +1975,7 @@
 
     <!-- DUA 20: Purification of the Soul -->
     <div class="dua-card" data-categories="guidance" data-keywords="taqwa purify soul best purifier protector guardian nafs tazkiyah" data-id="20">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">20</div>
                 <div class="card-title-group">
@@ -1975,7 +2012,7 @@
 
     <!-- DUA 21: Istikhara -->
     <div class="dua-card" data-categories="guidance" data-keywords="istikhara guidance decision choose best matter equated quran importance marriage job" data-id="21">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">21</div>
                 <div class="card-title-group">
@@ -2015,7 +2052,7 @@
 
     <!-- DUA 22: Perfect My Character -->
     <div class="dua-card" data-categories="guidance" data-keywords="character akhlaq perfected form outward beauty inward khuluq heaviest scale" data-id="22">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">22</div>
                 <div class="card-title-group">
@@ -2065,7 +2102,7 @@
 
     <!-- DUA 23: 'Afiyah -->
     <div class="dua-card" data-categories="wellbeing,morning-evening" data-keywords="afiyah wellbeing safety pardon permanent wellness religion world hereafter best gift" data-id="23">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">23</div>
                 <div class="card-title-group">
@@ -2102,7 +2139,7 @@
 
     <!-- DUA 24: Anxiety & Distress -->
     <div class="dua-card" data-categories="wellbeing" data-keywords="anxiety worry sadness grief depression distress quran spring heart light chest joy replace" data-id="24">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">24</div>
                 <div class="card-title-group">
@@ -2139,7 +2176,7 @@
 
     <!-- DUA 25: Refuge from 8 Afflictions -->
     <div class="dua-card" data-categories="wellbeing" data-keywords="anxiety sorrow weakness laziness miserliness cowardice debt overpowered eight afflictions" data-id="25">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">25</div>
                 <div class="card-title-group">
@@ -2176,7 +2213,7 @@
 
     <!-- DUA 26: In Great Distress -->
     <div class="dua-card" data-categories="wellbeing" data-keywords="distress great affliction calamity la ilaha supreme forbearing throne magnificent" data-id="26">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">26</div>
                 <div class="card-title-group">
@@ -2213,7 +2250,7 @@
 
     <!-- DUA 27: La Sahla -->
     <div class="dua-card" data-categories="wellbeing" data-keywords="nothing easy except difficulty hardship grief exam impossible situation nawawi" data-id="27">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">27</div>
                 <div class="card-title-group">
@@ -2250,7 +2287,7 @@
 
     <!-- DUA 28: Jibril's Healing Dua -->
     <div class="dua-card" data-categories="wellbeing" data-keywords="healing sick illness cure shifa doctor hospital ruqyah jibril final illness" data-id="28">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">28</div>
                 <div class="card-title-group">
@@ -2300,7 +2337,7 @@
 
     <!-- DUA 29: Musa - Expand My Chest -->
     <div class="dua-card" data-categories="prophets,quran" data-keywords="musa moses expand chest ease task tongue speech exam presentation meeting" data-id="29">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">29</div>
                 <div class="card-title-group">
@@ -2337,7 +2374,7 @@
 
     <!-- DUA 30: Ibrahim - Establish Prayer -->
     <div class="dua-card" data-categories="prophets,quran,prayer" data-keywords="ibrahim abraham prayer offspring descendants accept dua establish salah" data-id="30">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">30</div>
                 <div class="card-title-group">
@@ -2373,7 +2410,7 @@
 
     <!-- DUA 31: Sulaiman - Gratitude -->
     <div class="dua-card" data-categories="prophets,quran" data-keywords="sulaiman solomon gratitude parents righteous inspire favor blessings thankful" data-id="31">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">31</div>
                 <div class="card-title-group">
@@ -2409,7 +2446,7 @@
 
     <!-- DUA 32: Ayyub - In Affliction -->
     <div class="dua-card" data-categories="prophets,quran,wellbeing" data-keywords="ayyub job illness sickness harm affliction patience most merciful responded immediately" data-id="32">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">32</div>
                 <div class="card-title-group">
@@ -2446,7 +2483,7 @@
 
     <!-- DUA 33: Zakariyya - Righteous Offspring -->
     <div class="dua-card" data-categories="prophets,quran,family" data-keywords="zakariyya zechariah offspring child righteous heir good children hearer supplication" data-id="33">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">33</div>
                 <div class="card-title-group">
@@ -2495,7 +2532,7 @@
 
     <!-- DUA 34: Morning Remembrance -->
     <div class="dua-card" data-categories="morning-evening" data-keywords="morning evening asbahna dominion praise sovereignty kingdom capable power" data-id="34">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">34</div>
                 <div class="card-title-group">
@@ -2532,7 +2569,7 @@
 
     <!-- DUA 35: Hasbiyallah - Tawakkul -->
     <div class="dua-card" data-categories="morning-evening" data-keywords="hasbiyallah sufficient trust rely tawakkul throne great seven times" data-id="35">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">35</div>
                 <div class="card-title-group">
@@ -2569,7 +2606,7 @@
 
     <!-- DUA 36: Tahlil 100x Daily -->
     <div class="dua-card" data-categories="morning-evening" data-keywords="tahlil la ilaha illallah 100 times daily slaves protection shaytan paradise sincerely" data-id="36">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">36</div>
                 <div class="card-title-group">
@@ -2623,7 +2660,7 @@
 
     <!-- DUA 37: Freedom from Debt -->
     <div class="dua-card" data-categories="provision" data-keywords="debt freedom halal haram provision wealth suffice independent bounty mountain" data-id="37">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">37</div>
                 <div class="card-title-group">
@@ -2660,7 +2697,7 @@
 
     <!-- DUA 38: Beneficial Knowledge -->
     <div class="dua-card" data-categories="provision" data-keywords="beneficial knowledge good provision accepted deeds after fajr morning useful rizq" data-id="38">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">38</div>
                 <div class="card-title-group">
@@ -2697,7 +2734,7 @@
 
     <!-- DUA 39: Before Eating -->
     <div class="dua-card" data-categories="provision" data-keywords="eating food meal before bismillah barakah blessings shaytan prevents sharing" data-id="39">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">39</div>
                 <div class="card-title-group">
@@ -2734,7 +2771,7 @@
 
     <!-- DUA 40: Forgiveness for Parents & Believers -->
     <div class="dua-card" data-categories="family,forgiveness" data-keywords="forgiveness parents believers day account ibrahim dua offspring covering" data-id="40">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">40</div>
                 <div class="card-title-group">
@@ -2782,7 +2819,7 @@
 
     <!-- DUA 41: Ism al-A'zam — The Greatest Name of Allah -->
     <div class="dua-card" data-categories="prayer,scholars" data-keywords="ism azam greatest name allah gives answers mannaan badi jalal ikram hayy qayyum" data-id="41">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">41</div>
                 <div class="card-title-group">
@@ -2819,7 +2856,7 @@
 
     <!-- DUA 42: Ism al-A'zam with Surah al-Ikhlas -->
     <div class="dua-card" data-categories="prayer,scholars" data-keywords="ism azam greatest name ikhlas ahad samad testify witness" data-id="42">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">42</div>
                 <div class="card-title-group">
@@ -2856,7 +2893,7 @@
 
     <!-- DUA 43: Praise That Fills the Heavens -->
     <div class="dua-card" data-categories="prayer" data-keywords="praise fills heavens earth ruku rising angels competed record abundant pure blessed" data-id="43">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">43</div>
                 <div class="card-title-group">
@@ -2893,7 +2930,7 @@
 
     <!-- DUA 44: Dua of Tawhid — Ibn Taymiyyah's Lifelong Sujud Dua -->
     <div class="dua-card" data-categories="prayer,scholars" data-keywords="tawhid sujud prostration ibn taymiyyah submitted believed relied forgive advanced delayed secret open" data-id="44">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">44</div>
                 <div class="card-title-group">
@@ -2930,7 +2967,7 @@
 
     <!-- DUA 45: The Mother of All Duas -->
     <div class="dua-card" data-categories="prayer" data-keywords="jannah paradise fire ask best decree good every speech deed aisha comprehensive mother" data-id="45">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">45</div>
                 <div class="card-title-group">
@@ -2967,7 +3004,7 @@
 
     <!-- DUA 46: Ibrahimic Salawat -->
     <div class="dua-card" data-categories="prayer" data-keywords="salawat blessings prophet muhammad ibrahim prayer tashahhud key dua ascend" data-id="46">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">46</div>
                 <div class="card-title-group">
@@ -3004,7 +3041,7 @@
 
     <!-- DUA 47: Ali & Fatimah's Night Dua -->
     <div class="dua-card" data-categories="prayer,protection" data-keywords="ali fatimah night dua awwal akhir zahir batin debt poverty seven heavens throne better servant" data-id="47">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">47</div>
                 <div class="card-title-group">
@@ -3041,7 +3078,7 @@
 
     <!-- DUA 48: Four Evils -->
     <div class="dua-card" data-categories="prayer,guidance" data-keywords="four evils knowledge benefit heart humble soul satisfied dua answered roots corruption" data-id="48">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">48</div>
                 <div class="card-title-group">
@@ -3091,7 +3128,7 @@
 
     <!-- DUA 49: Before Sleeping (Full Version) -->
     <div class="dua-card" data-categories="travel,protection" data-keywords="sleep night before bed rest fitrah die protect forgive soul created" data-id="49">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">49</div>
                 <div class="card-title-group">
@@ -3128,7 +3165,7 @@
 
     <!-- DUA 50: Dua for Travel -->
     <div class="dua-card" data-categories="travel" data-keywords="travel journey ride transport vehicle subhana subjected return lord" data-id="50">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">50</div>
                 <div class="card-title-group">
@@ -3164,7 +3201,7 @@
 
     <!-- DUA 51: Entering the Masjid -->
     <div class="dua-card" data-categories="travel" data-keywords="masjid mosque entering doors mercy open" data-id="51">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">51</div>
                 <div class="card-title-group">
@@ -3200,7 +3237,7 @@
 
     <!-- DUA 52: Extravagance in Sin (3:147) -->
     <div class="dua-card" data-categories="forgiveness,quran" data-keywords="forgiveness excess extravagant sins steady feet victory firm" data-id="52">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">52</div>
                 <div class="card-title-group">
@@ -3249,7 +3286,7 @@
 
     <!-- DUA 53: Dua of al-Khadir -->
     <div class="dua-card" data-categories="scholars" data-keywords="khadir khidr green prophet abandon sins mercy concern discernment pleases awliya" data-id="53">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">53</div>
                 <div class="card-title-group">
@@ -3289,7 +3326,7 @@
 
     <!-- DUA 54: Dua of Ta'if -->
     <div class="dua-card" data-categories="scholars" data-keywords="taif weakness complaint humiliation strength resources mercy merciful weak lord entrust angry wrath refuge light face tawakkul" data-id="54">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">54</div>
                 <div class="card-title-group">
@@ -3329,7 +3366,7 @@
 
     <!-- DUA 55: The Master Key Dua -->
     <div class="dua-card" data-categories="scholars,prayer" data-keywords="master key comprehensive catch-all every good prophet asked refuge evil sought encompasses entire lifetime ibn majah hasan" data-id="55">
-        <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">55</div>
                 <div class="card-title-group">
