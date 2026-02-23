@@ -3874,31 +3874,38 @@
         if (els.searchClear) els.searchClear.classList.remove('visible');
     };
 
-    window.filterCategory = function(cat, btn) {
-        if (els.pills) els.pills.forEach(p => p.classList.remove('active'));
-        if (btn && btn.classList.contains('pill')) btn.classList.add('active');
-        let visibleCount = 0;
-        els.cards.forEach(card => {
-            const cats = card.getAttribute('data-categories').split(',');
-            const isMatch = cat === 'all' || cats.includes(cat);
-            card.classList.toggle('hidden-card', !isMatch);
-            card.style.display = isMatch ? '' : 'none';
-            if (isMatch) visibleCount++;
-        });
-        // Also expand all collapsed sections when filtering
-        document.querySelectorAll('.section-header.collapsed').forEach(sh => {
-            sh.classList.remove('collapsed');
-            const hint = sh.querySelector('.section-collapse-hint');
-            if (hint) hint.textContent = 'tap to collapse';
-            let next = sh.nextElementSibling;
-            while (next && !next.classList.contains('section-header')) {
-                if (next.classList.contains('dua-card')) next.style.display = '';
-                next = next.nextElementSibling;
+window.filterCategory = function(cat, btn) {
+    if (els.pills) els.pills.forEach(p => p.classList.remove('active'));
+    if (btn && btn.classList.contains('pill')) btn.classList.add('active');
+
+    let visibleCount = 0;
+    els.cards.forEach(card => {
+        const cats = card.getAttribute('data-categories').split(',');
+        const isMatch = cat === 'all' || cats.includes(cat);
+        card.classList.toggle('hidden-card', !isMatch);
+        card.style.display = '';  // ✅ always clear any stuck inline style
+        if (isMatch) visibleCount++;
+    });
+
+    // Expand all collapsed sections when filtering
+    document.querySelectorAll('.section-header.collapsed').forEach(sh => {
+        sh.classList.remove('collapsed');
+        const hint = sh.querySelector('.section-collapse-hint');
+        if (hint) hint.textContent = 'tap to collapse';
+
+        let next = sh.nextElementSibling;
+        while (next && !next.classList.contains('section-header')) {
+            if (next.classList.contains('dua-card')) {
+                next.style.display = ''; 
             }
-        });
-        if (els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+            next = next.nextElementSibling;
+        }
+    });
+
+    if (els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
     // ===== BOOKMARKS PANEL =====
     window.toggleBookmarksPanel = function() {
         let panel = document.getElementById('bookmarksPanel');
