@@ -1046,6 +1046,73 @@
         animation: none;
     }
 }
+    /* ===== READING PROGRESS ===== */
+
+/* Read checkmark on dua number */
+.dua-card.read-card .dua-number {
+    background: linear-gradient(135deg, rgba(13, 107, 71, 0.25), rgba(13, 107, 71, 0.1));
+    border-color: rgba(13, 107, 71, 0.4);
+    color: var(--emerald-light);
+    position: relative;
+}
+.dua-card.read-card .dua-number::after {
+    content: '✓';
+    position: absolute;
+    bottom: -4px; right: -4px;
+    width: 16px; height: 16px;
+    background: var(--emerald-light);
+    color: var(--bg-dark);
+    border-radius: 50%;
+    font-size: 0.5rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    line-height: 1;
+}
+
+/* Read card subtle styling */
+.dua-card.read-card {
+    border-left: 3px solid rgba(13, 107, 71, 0.5);
+    opacity: 0.85;
+}
+.dua-card.read-card:hover {
+    opacity: 1;
+}
+
+/* Mark Read button state on reload */
+.dua-card.read-card .action-btn[onclick*="markRead"] {
+    background: rgba(13, 107, 71, 0.15);
+    border-color: rgba(13, 107, 71, 0.3);
+    color: var(--emerald-light);
+    pointer-events: none;
+}
+
+/* Progress ring in hero stats */
+.stat-progress {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.stat-progress svg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    width: 52px; height: 52px;
+}
+.stat-progress .progress-ring-bg {
+    fill: none;
+    stroke: rgba(13, 107, 71, 0.1);
+    stroke-width: 3;
+}
+.stat-progress .progress-ring-fill {
+    fill: none;
+    stroke: var(--emerald-light);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 138.23;
+    stroke-dashoffset: 138.23;
+    transition: stroke-dashoffset 1s ease;
+}
         /* ============================================ */
         /* ===== RESPONSIVE ===== */
         /* ============================================ */
@@ -1144,13 +1211,16 @@
                     <div class="stat-number" id="bookmarkCount">0</div>
                     <div class="stat-label">Saved</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="readCount">0</div>
-                    <div class="stat-label">Read</div>
-                </div>
-            </div>
-        </div>
-    </section>
+               <div class="stat-item">
+    <div class="stat-progress">
+        <svg viewBox="0 0 48 48">
+            <circle class="progress-ring-bg" cx="24" cy="24" r="22"/>
+            <circle class="progress-ring-fill" id="readProgressRing" cx="24" cy="24" r="22"/>
+        </svg>
+        <div class="stat-number" id="readCount">0</div>
+    </div>
+    <div class="stat-label">Read</div>
+</div>
 
     <!-- ===== STREAK BANNER ===== -->
     <div class="streak-banner" id="streakBanner">
@@ -3470,10 +3540,19 @@
         });
 
         // Restore read UI
-        STATE.read.forEach(id => {
-            const card = document.querySelector(`.dua-card[data-id="${id}"]`);
-            if (card) card.classList.add('read-card');
-        });
+       // Restore read UI
+STATE.read.forEach(id => {
+    const card = document.querySelector(`.dua-card[data-id="${id}"]`);
+    if (card) {
+        card.classList.add('read-card');
+        // Also update the Mark Read button text
+        const readBtn = card.querySelector('.action-btn[onclick*="markRead"]');
+        if (readBtn) {
+            readBtn.classList.add('read');
+            readBtn.innerHTML = '✓ Read';
+        }
+    }
+});
 
         // --- Intersection Observer for Card Animations ---
         const observerOptions = {
@@ -3581,17 +3660,19 @@
     };
 
     // ===== MARK READ =====
-    window.markRead = function(btn, id) {
-        if (!STATE.read.includes(id)) {
-            STATE.read.push(id);
-            localStorage.setItem('crown_read', JSON.stringify(STATE.read));
-            const card = document.querySelector(`.dua-card[data-id="${id}"]`);
-            if (card) card.classList.add('read-card');
-            if (btn) { btn.classList.add('read'); btn.innerHTML = '✓ Read'; }
-            updateStats();
-            showToast('Marked as Read');
-        }
-    };
+   window.markRead = function(btn, id) {
+    if (!STATE.read.includes(id)) {
+        STATE.read.push(id);
+        localStorage.setItem('crown_read', JSON.stringify(STATE.read));
+        const card = document.querySelector(`.dua-card[data-id="${id}"]`);
+        if (card) card.classList.add('read-card');
+        if (btn) { btn.classList.add('read'); btn.innerHTML = '✓ Read'; }
+        updateStats();
+        showToast(`Marked as Read (${STATE.read.length}/55)`);
+    } else {
+        showToast('Already marked as read');
+    }
+};
 
     // ===== COPY TEXT =====
     window.copyText = function(btn, text) {
@@ -3896,9 +3977,19 @@
 
     // ===== UTILITIES =====
     function updateStats() {
-        if (els.bookmarkCount) els.bookmarkCount.innerText = STATE.bookmarks.length;
-        if (els.readCount) els.readCount.innerText = STATE.read.length;
+    if (els.bookmarkCount) els.bookmarkCount.innerText = STATE.bookmarks.length;
+    if (els.readCount) els.readCount.innerText = STATE.read.length;
+
+    // Update progress ring
+    const ring = document.getElementById('readProgressRing');
+    if (ring) {
+        const total = 55;
+        const read = STATE.read.length;
+        const circumference = 2 * Math.PI * 22; // r=22
+        const offset = circumference - (read / total) * circumference;
+        ring.style.strokeDashoffset = offset;
     }
+}
 
     function showToast(msg) {
         if (!els.toast) return;
