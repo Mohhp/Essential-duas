@@ -3407,7 +3407,7 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <script>
-    //State Management
+    // ===== STATE MANAGEMENT =====
     const STATE = {
         bookmarks: JSON.parse(localStorage.getItem('crown_bookmarks')) || [],
         read: JSON.parse(localStorage.getItem('crown_read')) || [],
@@ -3416,7 +3416,7 @@
         fontSize: parseFloat(localStorage.getItem('crown_font_size')) || 1
     };
 
-    // DOM Elements
+    // ===== DOM ELEMENTS =====
     const els = {
         cards: document.querySelectorAll('.dua-card'),
         searchInput: document.getElementById('searchInput'),
@@ -3428,73 +3428,151 @@
         streakCount: document.getElementById('streakCount'),
         lastVisit: document.getElementById('lastVisit'),
         progressBar: document.getElementById('progressFill'),
-        tasbeehPanel: document.querySelector('.tasbeeh-panel'),
-        etiquettePanel: document.querySelector('.etiquette-panel'),
-        routinePanel: document.querySelector('.routine-panel'),
         toast: document.getElementById('toast'),
         dailyArabic: document.getElementById('dailyArabic'),
         dailyTranslation: document.getElementById('dailyTranslation'),
         nav: document.getElementById('topNav')
     };
 
+    // ===== INITIALIZATION =====
     function init() {
         updateStats();
         checkStreak();
         loadDailyDua();
         applyFontSize(STATE.fontSize);
         renderBookmarksPanel();
-        
-        if(els.searchInput) els.searchInput.addEventListener('input', (e) => filterDuas(e.target.value));
-        
+
+        // Search listener
+        if (els.searchInput) {
+            els.searchInput.addEventListener('input', (e) => filterDuas(e.target.value));
+        }
+
+        // Scroll listener
         window.addEventListener('scroll', () => {
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             const scrolled = (winScroll / height) * 100;
-            if(els.progressBar) els.progressBar.style.width = scrolled + "%";
-            
-            const btn = document.querySelector('.back-to-top');
-            if(btn) btn.classList.toggle('visible', winScroll > 500);
-            if(els.nav) {
+            if (els.progressBar) els.progressBar.style.width = scrolled + "%";
+
+            const backBtn = document.querySelector('.back-to-top');
+            if (backBtn) backBtn.classList.toggle('visible', winScroll > 500);
+
+            if (els.nav) {
                 if (winScroll > 50) els.nav.classList.add('scrolled');
                 else els.nav.classList.remove('scrolled');
             }
         });
 
+        // Restore bookmarks UI
         STATE.bookmarks.forEach(id => {
             const btn = document.querySelector(`.dua-card[data-id="${id}"] .bookmark-btn`);
             if (btn) { btn.classList.add('bookmarked'); btn.innerHTML = '★'; }
         });
 
+        // Restore read UI
         STATE.read.forEach(id => {
             const card = document.querySelector(`.dua-card[data-id="${id}"]`);
             if (card) card.classList.add('read-card');
         });
+
+        // --- Intersection Observer for Card Animations ---
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px 0px -50px 0px',
+            threshold: 0.1
+        };
+
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 60);
+                    cardObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        els.cards.forEach(card => {
+            cardObserver.observe(card);
+        });
+
+        // --- Keyboard Accessibility ---
+        document.addEventListener('keydown', (e) => {
+            // Escape closes any open panel
+            if (e.key === 'Escape') {
+                const tp = document.querySelector('.tasbeeh-panel.active');
+                if (tp) { closeTasbeeh(); return; }
+
+                const ep = document.querySelector('.etiquette-panel.active');
+                if (ep) { closeEtiquette(); return; }
+
+                const rp = document.querySelector('.routine-panel.active');
+                if (rp) { closeRoutine(); return; }
+
+                const bp = document.getElementById('bookmarksPanel');
+                if (bp && bp.classList.contains('active')) { toggleBookmarksPanel(); return; }
+
+                if (els.searchInput && els.searchInput.value) {
+                    clearSearch();
+                    els.searchInput.blur();
+                    return;
+                }
+            }
+        });
+
+        // Keyboard support for card headers
+        document.addEventListener('keydown', function(e) {
+            const target = e.target;
+            if (target.classList.contains('card-header')) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleCard(target);
+                }
+            }
+        });
     }
 
-    window.toggleCard = function(header) { header.closest('.dua-card').classList.toggle('expanded'); };
+    // ===== CARD TOGGLE =====
+    window.toggleCard = function(header) {
+        const card = header.closest('.dua-card');
+        const isExpanded = card.classList.toggle('expanded');
+        header.setAttribute('aria-expanded', isExpanded);
+    };
+
     window.toggleAllCards = function(expand) {
-        els.cards.forEach(card => expand ? card.classList.add('expanded') : card.classList.remove('expanded'));
+        els.cards.forEach(card => {
+            if (expand) card.classList.add('expanded');
+            else card.classList.remove('expanded');
+            const header = card.querySelector('.card-header');
+            if (header) header.setAttribute('aria-expanded', expand);
+        });
         showToast(expand ? 'All Expanded' : 'All Collapsed');
     };
 
+    // ===== FONT SIZE =====
     window.adjustFontSize = function(delta) {
         let newSize = Math.max(0.8, Math.min(1.6, STATE.fontSize + delta));
         STATE.fontSize = newSize;
         localStorage.setItem('crown_font_size', newSize);
         applyFontSize(newSize);
     };
-    function applyFontSize(size) { document.documentElement.style.setProperty('--font-scale', size); }
 
+    function applyFontSize(size) {
+        document.documentElement.style.setProperty('--font-scale', size);
+    }
+
+    // ===== BOOKMARKING =====
     window.toggleBookmark = function(id) {
         const index = STATE.bookmarks.indexOf(id);
         const btn = document.querySelector(`.dua-card[data-id="${id}"] .bookmark-btn`);
         if (index === -1) {
             STATE.bookmarks.push(id);
-            if(btn) { btn.classList.add('bookmarked'); btn.innerHTML = '★'; }
+            if (btn) { btn.classList.add('bookmarked'); btn.innerHTML = '★'; }
             showToast('Added to Bookmarks');
         } else {
             STATE.bookmarks.splice(index, 1);
-            if(btn) { btn.classList.remove('bookmarked'); btn.innerHTML = '☆'; }
+            if (btn) { btn.classList.remove('bookmarked'); btn.innerHTML = '☆'; }
             showToast('Removed from Bookmarks');
         }
         localStorage.setItem('crown_bookmarks', JSON.stringify(STATE.bookmarks));
@@ -3502,69 +3580,87 @@
         renderBookmarksPanel();
     };
 
+    // ===== MARK READ =====
     window.markRead = function(btn, id) {
         if (!STATE.read.includes(id)) {
             STATE.read.push(id);
             localStorage.setItem('crown_read', JSON.stringify(STATE.read));
             const card = document.querySelector(`.dua-card[data-id="${id}"]`);
-            if(card) card.classList.add('read-card');
-            if(btn) { btn.classList.add('read'); btn.innerHTML = '✓ Read'; }
+            if (card) card.classList.add('read-card');
+            if (btn) { btn.classList.add('read'); btn.innerHTML = '✓ Read'; }
             updateStats();
             showToast('Marked as Read');
         }
     };
 
+    // ===== COPY TEXT =====
     window.copyText = function(btn, text) {
         navigator.clipboard.writeText(text).then(() => {
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '✓ Copied!';
-            btn.classList.add('copied');
+            if (btn) {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✓ Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.innerHTML = originalText; btn.classList.remove('copied'); }, 2000);
+            }
             showToast('Copied to clipboard');
-            setTimeout(() => { btn.innerHTML = originalText; btn.classList.remove('copied'); }, 2000);
-        }).catch(err => showToast('Failed to copy'));
+        }).catch(() => showToast('Failed to copy'));
     };
 
+    // ===== SEARCH & FILTER =====
     function filterDuas(query) {
         query = query.toLowerCase();
         let visibleCount = 0;
-        if(els.searchClear) els.searchClear.classList.toggle('visible', query.length > 0);
+        if (els.searchClear) els.searchClear.classList.toggle('visible', query.length > 0);
         els.cards.forEach(card => {
-            const isMatch = card.textContent.toLowerCase().includes(query) || (card.getAttribute('data-keywords') || "").includes(query);
+            const isMatch = card.textContent.toLowerCase().includes(query) ||
+                           (card.getAttribute('data-keywords') || "").includes(query);
             card.classList.toggle('hidden-card', !isMatch);
-            if(isMatch) visibleCount++;
+            if (isMatch) visibleCount++;
         });
-        if(els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
+        if (els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
     }
 
     window.clearSearch = function() {
-        if(els.searchInput) els.searchInput.value = '';
+        if (els.searchInput) els.searchInput.value = '';
         filterDuas('');
-        if(els.searchClear) els.searchClear.classList.remove('visible');
+        if (els.searchClear) els.searchClear.classList.remove('visible');
     };
 
     window.filterCategory = function(cat, btn) {
-        if(els.pills) els.pills.forEach(p => p.classList.remove('active'));
-        if(btn && btn.classList.contains('pill')) btn.classList.add('active');
+        if (els.pills) els.pills.forEach(p => p.classList.remove('active'));
+        if (btn && btn.classList.contains('pill')) btn.classList.add('active');
         let visibleCount = 0;
         els.cards.forEach(card => {
             const cats = card.getAttribute('data-categories').split(',');
             const isMatch = cat === 'all' || cats.includes(cat);
             card.classList.toggle('hidden-card', !isMatch);
-            if(isMatch) visibleCount++;
+            if (isMatch) {
+                visibleCount++;
+                if (!card.classList.contains('visible')) {
+                    card.classList.remove('visible');
+                    setTimeout(() => card.classList.add('visible'), 50);
+                }
+            }
         });
-        if(els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
-        window.scrollTo({top: 0, behavior: 'smooth'});
+        if (els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // ===== BOOKMARKS PANEL =====
     window.toggleBookmarksPanel = function() {
         let panel = document.getElementById('bookmarksPanel');
-        if(!panel) {
+        if (!panel) {
             const div = document.createElement('div');
             div.id = 'bookmarksPanel';
             div.className = 'side-panel';
-            div.innerHTML = `<div class="panel-header"><div class="panel-title">Your Saved Duas</div><button class="panel-close" onclick="toggleBookmarksPanel()">✕</button></div><div id="bookmarkListContainer"></div>`;
+            div.innerHTML = `
+                <div class="panel-header">
+                    <div class="panel-title">Your Saved Duas</div>
+                    <button class="panel-close" onclick="toggleBookmarksPanel()">✕</button>
+                </div>
+                <div id="bookmarkListContainer"></div>`;
             document.body.appendChild(div);
-            if(!document.querySelector('.overlay')) {
+            if (!document.querySelector('.overlay')) {
                 const ov = document.createElement('div');
                 ov.className = 'overlay';
                 ov.onclick = toggleBookmarksPanel;
@@ -3578,7 +3674,7 @@
 
     function renderBookmarksPanel() {
         const container = document.getElementById('bookmarkListContainer');
-        if(!container) return;
+        if (!container) return;
         if (STATE.bookmarks.length === 0) {
             container.innerHTML = '<div class="panel-empty">No bookmarks yet.<br>Tap the star icon to save duas here.</div>';
             return;
@@ -3586,145 +3682,226 @@
         let html = '';
         STATE.bookmarks.forEach(id => {
             const card = document.querySelector(`.dua-card[data-id="${id}"]`);
-            if(card) {
+            if (card) {
                 const title = card.querySelector('.dua-title').textContent;
                 const arabic = card.querySelector('.arabic-text').textContent;
-                html += `<div class="panel-item" onclick="scrollToDua(${id}); toggleBookmarksPanel()"><div class="panel-item-title">${title}</div><div class="panel-item-arabic">${arabic}</div></div>`;
+                html += `<div class="panel-item" onclick="scrollToDua(${id}); toggleBookmarksPanel()">
+                    <div class="panel-item-title">${title}</div>
+                    <div class="panel-item-arabic">${arabic}</div>
+                </div>`;
             }
         });
         container.innerHTML = html;
     }
 
+    // ===== SCROLL TO DUA =====
     window.scrollToDua = function(id) {
         const card = document.querySelector(`.dua-card[data-id="${id}"]`);
-        if(card) {
+        if (card) {
             card.classList.remove('hidden-card');
-            card.scrollIntoView({behavior: 'smooth', block: 'center'});
+            card.classList.add('visible');
             card.classList.add('expanded');
-            card.style.borderColor = 'var(--gold-mid)';
-            setTimeout(() => card.style.borderColor = '', 2000);
+            const header = card.querySelector('.card-header');
+            if (header) header.setAttribute('aria-expanded', 'true');
+            setTimeout(() => {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+            card.style.borderColor = 'var(--emerald-light)';
+            card.style.boxShadow = '0 0 20px rgba(13, 107, 71, 0.15)';
+            setTimeout(() => {
+                card.style.borderColor = '';
+                card.style.boxShadow = '';
+            }, 2500);
         }
     };
 
-    window.scrollToTop = function() { window.scrollTo({top: 0, behavior: 'smooth'}); };
+    window.scrollToTop = function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
+    // ===== TASBEEH =====
     let tasbeehCount = 0;
     let tasbeehTarget = 33;
-    
+
     window.openTasbeeh = function() {
-        let tp = document.querySelector('.tasbeeh-panel');
-        if(tp) tp.classList.add('active');
+        const tp = document.querySelector('.tasbeeh-panel');
+        if (tp) tp.classList.add('active');
         resetTasbeeh();
     };
-    
+
     window.openTasbeehWith = function(target) {
         openTasbeeh();
         tasbeehTarget = (target === 36) ? 100 : 33;
         const tt = document.querySelector('.tasbeeh-target');
-        if(tt) tt.innerText = `TARGET: ${tasbeehTarget}`;
+        if (tt) tt.innerText = `TARGET: ${tasbeehTarget}`;
     };
-    
+
     window.closeTasbeeh = function() {
-        let tp = document.querySelector('.tasbeeh-panel');
-        if(tp) tp.classList.remove('active');
+        const tp = document.querySelector('.tasbeeh-panel');
+        if (tp) tp.classList.remove('active');
     };
-    
+
     window.tapTasbeeh = function() {
         tasbeehCount++;
         const display = document.querySelector('.tasbeeh-count-display');
         const btn = document.querySelector('.tasbeeh-tap-btn');
-        if(display) display.innerText = tasbeehCount;
-        if(btn) {
+        if (display) display.innerText = tasbeehCount;
+        if (btn) {
             btn.classList.add('pulse');
             setTimeout(() => btn.classList.remove('pulse'), 100);
         }
-        if(navigator.vibrate) navigator.vibrate(5);
-        if (tasbeehCount === tasbeehTarget) {
-            if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
-            showToast('Target Reached!');
+        if (navigator.vibrate) navigator.vibrate(5);
+        if (tasbeehCount === tasbeehTarget && tasbeehTarget !== 0) {
+            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            showToast('Target Reached! ✨');
         }
     };
-    
+
     window.resetTasbeeh = function() {
         tasbeehCount = 0;
         const display = document.querySelector('.tasbeeh-count-display');
-        if(display) display.innerText = '0';
+        if (display) display.innerText = '0';
     };
-    
+
     window.setTasbeehTarget = function(t) {
         tasbeehTarget = t;
         const tt = document.querySelector('.tasbeeh-target');
-        if(tt) tt.innerText = t === 0 ? 'OPEN COUNT' : `TARGET: ${t}`;
+        if (tt) tt.innerText = t === 0 ? 'OPEN COUNT' : `TARGET: ${t}`;
         resetTasbeeh();
+        // Update active preset
+        document.querySelectorAll('.tasbeeh-preset').forEach(p => p.classList.remove('active'));
+        const activePreset = document.querySelector(`.tasbeeh-preset[onclick="setTasbeehTarget(${t})"]`);
+        if (activePreset) activePreset.classList.add('active');
     };
 
+    // ===== ETIQUETTE PANEL =====
     window.openEtiquette = function() {
-        let ep = document.querySelector('.etiquette-panel');
-        if(!ep) return;
-        if(!ep.querySelector('.etiquette-content').innerHTML.trim()) {
-            ep.querySelector('.etiquette-content').innerHTML = `<h2>The Etiquette of Dua</h2><div class="etiquette-item"><div class="etiquette-num">1</div><div class="etiquette-text">Start with praise of Allah and Salawat upon the Prophet ﷺ.</div></div><div class="etiquette-item"><div class="etiquette-num">2</div><div class="etiquette-text">Have certainty (Yaqīn) that Allah will answer.</div></div><div class="etiquette-item"><div class="etiquette-num">3</div><div class="etiquette-text">Persist and do not be hasty.</div></div><div class="etiquette-item"><div class="etiquette-num">4</div><div class="etiquette-text">Presence of heart. Allah does not accept dua from a heedless heart.</div></div><div class="etiquette-item"><div class="etiquette-num">5</div><div class="etiquette-text">Face the Qiblah and raise hands.</div></div>`;
+        const ep = document.querySelector('.etiquette-panel');
+        if (!ep) return;
+        if (!ep.querySelector('.etiquette-content').innerHTML.trim()) {
+            ep.querySelector('.etiquette-content').innerHTML = `
+                <h2>The Etiquette of Dua</h2>
+                <div class="etiquette-item"><div class="etiquette-num">1</div><div class="etiquette-text"><strong>Begin with praise of Allah</strong> and send Salawat upon the Prophet ﷺ. <span class="ref">(Tirmidhi 3477)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">2</div><div class="etiquette-text"><strong>Have absolute certainty (Yaqīn)</strong> that Allah will answer. The Prophet ﷺ said: "Call upon Allah with certainty that He will respond." <span class="ref">(Tirmidhi 3479)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">3</div><div class="etiquette-text"><strong>Be persistent — never give up.</strong> "Your dua is answered as long as you do not say: 'I prayed but was not answered.'" <span class="ref">(Bukhari 6340)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">4</div><div class="etiquette-text"><strong>Presence of heart.</strong> Allah does not accept dua from a heedless, distracted heart. <span class="ref">(Tirmidhi 3479)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">5</div><div class="etiquette-text"><strong>Face the Qiblah</strong> and raise your hands. The Prophet ﷺ was shy to return empty hands that were raised to Him. <span class="ref">(Abu Dawud 1488)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">6</div><div class="etiquette-text"><strong>Be in a state of wudu</strong> (ablution) when possible. Purity elevates the dua.</div></div>
+                <div class="etiquette-item"><div class="etiquette-num">7</div><div class="etiquette-text"><strong>Use Allah's Beautiful Names</strong> that match your request. Asking for mercy? Use "Yā Raḥmān." Asking for provision? Use "Yā Razzāq." <span class="ref">(Quran 7:180)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">8</div><div class="etiquette-text"><strong>Seek the blessed times:</strong> Last third of the night, between Adhan and Iqamah, while prostrating, while fasting, while travelling, on Friday. <span class="ref">(Muslim 757, Abu Dawud 521)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">9</div><div class="etiquette-text"><strong>Admit your sins and need</strong> before asking. Acknowledge your weakness — as in the Dua of Yunus and Adam عليهما السلام.</div></div>
+                <div class="etiquette-item"><div class="etiquette-num">10</div><div class="etiquette-text"><strong>End with Salawat</strong> upon the Prophet ﷺ. "Every dua is suspended between heaven and earth until you send Salawat upon the Prophet ﷺ." <span class="ref">(Tirmidhi 486)</span></div></div>`;
         }
         ep.classList.add('active');
     };
-    
-    window.closeEtiquette = function() { let ep = document.querySelector('.etiquette-panel'); if(ep) ep.classList.remove('active'); };
 
+    window.closeEtiquette = function() {
+        const ep = document.querySelector('.etiquette-panel');
+        if (ep) ep.classList.remove('active');
+    };
+
+    // ===== ROUTINE PANEL =====
     window.openRoutine = function() {
-        let rp = document.querySelector('.routine-panel');
-        if(!rp) return;
-        if(!rp.querySelector('.routine-content').innerHTML.trim()) {
-            rp.querySelector('.routine-content').innerHTML = `<h2>Recommended Daily Routine</h2><div class="routine-item"><div class="routine-time">MORNING (After Fajr)</div><div class="routine-desc">1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">Ayatul Kursi</span><br>2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">3 Quls (3x)</span><br>3. <span class="dua-ref" onclick="scrollToDua(12);closeRoutine()">Bismillah (3x)</span><br>4. <span class="dua-ref" onclick="scrollToDua(16);closeRoutine()">Sayyid al-Istighfar</span></div></div><div class="routine-item"><div class="routine-time">EVENING (After Asr/Maghrib)</div><div class="routine-desc">Same as morning, plus <span class="dua-ref" onclick="scrollToDua(48);closeRoutine()">Refuge from 4 Evils</span>.</div></div><div class="routine-item"><div class="routine-time">BEFORE SLEEP</div><div class="routine-desc">1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">Ayatul Kursi</span><br>2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">3 Quls (Blow & Wipe)</span><br>3. <span class="dua-ref" onclick="scrollToDua(49);closeRoutine()">Sleep Dua</span></div></div>`;
+        const rp = document.querySelector('.routine-panel');
+        if (!rp) return;
+        if (!rp.querySelector('.routine-content').innerHTML.trim()) {
+            rp.querySelector('.routine-content').innerHTML = `
+                <h2>Recommended Daily Routine</h2>
+                <div class="routine-item">
+                    <div class="routine-time">🌅 MORNING (After Fajr)</div>
+                    <div class="routine-desc">
+                        1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">Ayatul Kursi</span><br>
+                        2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">3 Quls (3x each)</span><br>
+                        3. <span class="dua-ref" onclick="scrollToDua(12);closeRoutine()">Bismillah Protection (3x)</span><br>
+                        4. <span class="dua-ref" onclick="scrollToDua(16);closeRoutine()">Sayyid al-Istighfar</span><br>
+                        5. <span class="dua-ref" onclick="scrollToDua(14);closeRoutine()">Contentment with Allah (3x)</span><br>
+                        6. <span class="dua-ref" onclick="scrollToDua(35);closeRoutine()">Hasbiyallah (7x)</span><br>
+                        7. <span class="dua-ref" onclick="scrollToDua(38);closeRoutine()">Beneficial Knowledge</span><br>
+                        8. <span class="dua-ref" onclick="scrollToDua(34);closeRoutine()">Morning Remembrance</span>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-time">🌇 EVENING (After Asr/Maghrib)</div>
+                    <div class="routine-desc">
+                        Same as morning adhkar, plus:<br>
+                        • <span class="dua-ref" onclick="scrollToDua(23);closeRoutine()">Asking for 'Afiyah</span><br>
+                        • <span class="dua-ref" onclick="scrollToDua(48);closeRoutine()">Protection from Four Evils</span>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-time">🕌 IN EVERY PRAYER</div>
+                    <div class="routine-desc">
+                        • <span class="dua-ref" onclick="scrollToDua(1);closeRoutine()">Al-Fatiha</span><br>
+                        • <span class="dua-ref" onclick="scrollToDua(13);closeRoutine()">Four Refuges (before salam)</span><br>
+                        • <span class="dua-ref" onclick="scrollToDua(7);closeRoutine()">Rabbana Atina</span><br>
+                        • <span class="dua-ref" onclick="scrollToDua(46);closeRoutine()">Ibrahimic Salawat</span>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-time">🌙 BEFORE SLEEP</div>
+                    <div class="routine-desc">
+                        1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">Ayatul Kursi</span><br>
+                        2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">3 Quls (Blow & Wipe 3x)</span><br>
+                        3. <span class="dua-ref" onclick="scrollToDua(5);closeRoutine()">Last 2 Verses of Al-Baqarah</span><br>
+                        4. <span class="dua-ref" onclick="scrollToDua(49);closeRoutine()">Sleep Dua</span><br>
+                        5. <span class="dua-ref" onclick="scrollToDua(36);closeRoutine()">Tahlil (before sleeping)</span>
+                    </div>
+                </div>
+                <div class="routine-item">
+                    <div class="routine-time">📿 DAILY DHIKR</div>
+                    <div class="routine-desc">
+                        • <span class="dua-ref" onclick="scrollToDua(36);closeRoutine()">Tahlil 100x</span> — Use the Tasbeeh counter<br>
+                        • SubhanAllah 33x, Alhamdulillah 33x, Allahu Akbar 34x after each prayer<br>
+                        • <span class="dua-ref" onclick="scrollToDua(19);closeRoutine()">Ya Muqallibal Qulub</span> — as often as possible
+                    </div>
+                </div>`;
         }
         rp.classList.add('active');
     };
-    
-    window.closeRoutine = function() { let rp = document.querySelector('.routine-panel'); if(rp) rp.classList.remove('active'); };
 
-    window.sharePage = function() {
-    if (navigator.share) {
-        navigator.share({
-            title: 'Essential Duas - The Crown Collection',
-            text: '55 Essential Islamic Duas from Quran & Sunnah',
-            url: window.location.href
-        });
-    } else {
-        navigator.clipboard.writeText(window.location.href).then(() => {
-            showToast('Link copied to clipboard');
-        }).catch(() => showToast('Failed to copy'));
-    }
-};
-
-window.shareDua = function(id) {
-    const card = document.querySelector(`.dua-card[data-id="${id}"]`);
-    if(!card) return;
-    const title = card.querySelector('.dua-title').textContent;
-    const arabic = card.querySelector('.arabic-text').textContent;
-    const text = `${title}\n\n${arabic}\n\nFrom: Essential Duas — The Crown Collection\n${window.location.href}`;
-    if (navigator.share) {
-        navigator.share({ title: title, text: text });
-    } else {
-        navigator.clipboard.writeText(text).then(() => {
-            showToast('Dua copied to clipboard');
-        }).catch(() => showToast('Failed to copy'));
-    }
-};
-    
-    window.shareDua = function(id) {
-        const card = document.querySelector(`.dua-card[data-id="${id}"]`);
-        const title = card.querySelector('.dua-title').textContent;
-        const arabic = card.querySelector('.arabic-text').textContent;
-        const text = `${title}\n\n${arabic}\n\nRead more at: ${window.location.href}`;
-        if (navigator.share) { navigator.share({ title: title, text: text });
-        } else { copyText(null, text); showToast('Copied to clipboard'); }
+    window.closeRoutine = function() {
+        const rp = document.querySelector('.routine-panel');
+        if (rp) rp.classList.remove('active');
     };
 
+    // ===== SHARE =====
+    window.sharePage = function() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Essential Duas - The Crown Collection',
+                text: '55 Essential Islamic Duas from Quran & Sunnah',
+                url: window.location.href
+            });
+        } else {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                showToast('Link copied to clipboard');
+            }).catch(() => showToast('Failed to copy'));
+        }
+    };
+
+    window.shareDua = function(id) {
+        const card = document.querySelector(`.dua-card[data-id="${id}"]`);
+        if (!card) return;
+        const title = card.querySelector('.dua-title').textContent;
+        const arabic = card.querySelector('.arabic-text').textContent;
+        const text = `${title}\n\n${arabic}\n\nFrom: Essential Duas — The Crown Collection\n${window.location.href}`;
+        if (navigator.share) {
+            navigator.share({ title: title, text: text });
+        } else {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Dua copied to clipboard');
+            }).catch(() => showToast('Failed to copy'));
+        }
+    };
+
+    // ===== UTILITIES =====
     function updateStats() {
-        if(els.bookmarkCount) els.bookmarkCount.innerText = STATE.bookmarks.length;
-        if(els.readCount) els.readCount.innerText = STATE.read.length;
+        if (els.bookmarkCount) els.bookmarkCount.innerText = STATE.bookmarks.length;
+        if (els.readCount) els.readCount.innerText = STATE.read.length;
     }
 
     function showToast(msg) {
-        if(!els.toast) return;
+        if (!els.toast) return;
         els.toast.innerText = msg;
         els.toast.classList.add('show');
         setTimeout(() => els.toast.classList.remove('show'), 3000);
@@ -3741,8 +3918,8 @@ window.shareDua = function(id) {
             localStorage.setItem('crown_streak', STATE.streak);
             localStorage.setItem('crown_last_visit', today);
         }
-        if(els.streakCount) els.streakCount.innerText = STATE.streak;
-        if(els.lastVisit) els.lastVisit.innerText = 'Today';
+        if (els.streakCount) els.streakCount.innerText = STATE.streak;
+        if (els.lastVisit) els.lastVisit.innerText = 'Today';
     }
 
     function loadDailyDua() {
@@ -3750,46 +3927,48 @@ window.shareDua = function(id) {
         const duaIndex = (dayOfYear % 55) + 1;
         setTimeout(() => {
             const card = document.querySelector(`.dua-card[data-id="${duaIndex}"]`);
-            if(card && els.dailyArabic) {
+            if (card && els.dailyArabic) {
                 els.dailyArabic.innerText = card.querySelector('.arabic-text').innerText;
                 els.dailyTranslation.innerText = card.querySelector('.translation').innerText.substring(0, 80) + '...';
-                document.getElementById('dailyDua').onclick = function() { scrollToDua(duaIndex); }
+                document.getElementById('dailyDua').onclick = function() { scrollToDua(duaIndex); };
             }
         }, 500);
     }
 
-   // Bottom Nav Handler (Bug Fix #1)
-window.handleBottomNav = function(action, btn) {
-    // Update bottom nav active state
-    document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    // ===== BOTTOM NAV HANDLER =====
+    window.handleBottomNav = function(action, btn) {
+        document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
 
-    switch(action) {
-        case 'home':
-            // Also update the category pills
-            els.pills.forEach(p => p.classList.remove('active'));
-            const allPill = document.querySelector('.pill[data-category="all"]');
-            if(allPill) allPill.classList.add('active');
-            // Show all cards
-            els.cards.forEach(card => card.classList.remove('hidden-card'));
-            if(els.noResults) els.noResults.classList.remove('visible');
-            // Clear search
-            if(els.searchInput) els.searchInput.value = '';
-            if(els.searchClear) els.searchClear.classList.remove('visible');
-            window.scrollTo({top: 0, behavior: 'smooth'});
-            break;
-        case 'routine':
-            openRoutine();
-            break;
-        case 'tasbeeh':
-            openTasbeeh();
-            break;
-        case 'saved':
-            toggleBookmarksPanel();
-            break;
-    }
-};
+        switch (action) {
+            case 'home':
+                els.pills.forEach(p => p.classList.remove('active'));
+                const allPill = document.querySelector('.pill[data-category="all"]');
+                if (allPill) allPill.classList.add('active');
+                els.cards.forEach(card => {
+                    card.classList.remove('hidden-card');
+                    if (!card.classList.contains('visible')) {
+                        setTimeout(() => card.classList.add('visible'), 50);
+                    }
+                });
+                if (els.noResults) els.noResults.classList.remove('visible');
+                if (els.searchInput) els.searchInput.value = '';
+                if (els.searchClear) els.searchClear.classList.remove('visible');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                break;
+            case 'routine':
+                openRoutine();
+                break;
+            case 'tasbeeh':
+                openTasbeeh();
+                break;
+            case 'saved':
+                toggleBookmarksPanel();
+                break;
+        }
+    };
 
+    // ===== START =====
     document.addEventListener('DOMContentLoaded', init);
 </script>
 
@@ -3825,9 +4004,6 @@ window.handleBottomNav = function(action, btn) {
     <button class="etiquette-close" onclick="closeRoutine()">✕</button>
     <div class="routine-content"></div>
 </div>
-
-<!-- Back To Top -->
-<button class="back-to-top" onclick="scrollToTop()">↑</button>
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
