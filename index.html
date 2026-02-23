@@ -3390,19 +3390,15 @@
         streakCount: document.getElementById('streakCount'),
         lastVisit: document.getElementById('lastVisit'),
         progressBar: document.getElementById('progressFill'),
-        sidePanel: document.querySelector('.side-panel'),
-        overlay: document.querySelector('.overlay'),
         tasbeehPanel: document.querySelector('.tasbeeh-panel'),
         etiquettePanel: document.querySelector('.etiquette-panel'),
         routinePanel: document.querySelector('.routine-panel'),
         toast: document.getElementById('toast'),
-        bookmarkList: document.getElementById('bookmarkList'), // Needs to be created dynamically if missing
         dailyArabic: document.getElementById('dailyArabic'),
         dailyTranslation: document.getElementById('dailyTranslation'),
         nav: document.getElementById('topNav')
     };
 
-    // --- 1. INITIALIZATION ---
     function init() {
         updateStats();
         checkStreak();
@@ -3410,76 +3406,50 @@
         applyFontSize(STATE.fontSize);
         renderBookmarksPanel();
         
-        // Setup Search
-        els.searchInput.addEventListener('input', (e) => filterDuas(e.target.value));
+        if(els.searchInput) els.searchInput.addEventListener('input', (e) => filterDuas(e.target.value));
         
-        // Setup Scroll Progress & Nav
         window.addEventListener('scroll', () => {
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             const scrolled = (winScroll / height) * 100;
-            els.progressBar.style.width = scrolled + "%";
+            if(els.progressBar) els.progressBar.style.width = scrolled + "%";
             
-            // Back to top
             const btn = document.querySelector('.back-to-top');
             if(btn) btn.classList.toggle('visible', winScroll > 500);
-            
-            // Nav transparency
-            if (winScroll > 50) els.nav.classList.add('scrolled');
-            else els.nav.classList.remove('scrolled');
-        });
-
-        // Initialize Bookmarks UI on cards
-        STATE.bookmarks.forEach(id => {
-            const btn = document.querySelector(`.dua-card[data-id="${id}"] .bookmark-btn`);
-            if (btn) {
-                btn.classList.add('bookmarked');
-                btn.innerHTML = '★';
+            if(els.nav) {
+                if (winScroll > 50) els.nav.classList.add('scrolled');
+                else els.nav.classList.remove('scrolled');
             }
         });
 
-        // Initialize Read UI
+        STATE.bookmarks.forEach(id => {
+            const btn = document.querySelector(`.dua-card[data-id="${id}"] .bookmark-btn`);
+            if (btn) { btn.classList.add('bookmarked'); btn.innerHTML = '★'; }
+        });
+
         STATE.read.forEach(id => {
             const card = document.querySelector(`.dua-card[data-id="${id}"]`);
             if (card) card.classList.add('read-card');
         });
     }
 
-    // --- 2. CORE FEATURES ---
-
-    // Toggle Card Expansion
-    window.toggleCard = function(header) {
-        const card = header.closest('.dua-card');
-        card.classList.toggle('expanded');
-    };
-
+    window.toggleCard = function(header) { header.closest('.dua-card').classList.toggle('expanded'); };
     window.toggleAllCards = function(expand) {
-        els.cards.forEach(card => {
-            if(expand) card.classList.add('expanded');
-            else card.classList.remove('expanded');
-        });
+        els.cards.forEach(card => expand ? card.classList.add('expanded') : card.classList.remove('expanded'));
         showToast(expand ? 'All Expanded' : 'All Collapsed');
     };
 
-    // Font Size Adjustment
     window.adjustFontSize = function(delta) {
-        let newSize = STATE.fontSize + delta;
-        if (newSize < 0.8) newSize = 0.8;
-        if (newSize > 1.6) newSize = 1.6;
+        let newSize = Math.max(0.8, Math.min(1.6, STATE.fontSize + delta));
         STATE.fontSize = newSize;
         localStorage.setItem('crown_font_size', newSize);
         applyFontSize(newSize);
     };
+    function applyFontSize(size) { document.documentElement.style.setProperty('--font-scale', size); }
 
-    function applyFontSize(size) {
-        document.documentElement.style.setProperty('--font-scale', size);
-    }
-
-    // Bookmarking
     window.toggleBookmark = function(id) {
         const index = STATE.bookmarks.indexOf(id);
         const btn = document.querySelector(`.dua-card[data-id="${id}"] .bookmark-btn`);
-        
         if (index === -1) {
             STATE.bookmarks.push(id);
             if(btn) { btn.classList.add('bookmarked'); btn.innerHTML = '★'; }
@@ -3489,120 +3459,73 @@
             if(btn) { btn.classList.remove('bookmarked'); btn.innerHTML = '☆'; }
             showToast('Removed from Bookmarks');
         }
-        
         localStorage.setItem('crown_bookmarks', JSON.stringify(STATE.bookmarks));
         updateStats();
         renderBookmarksPanel();
     };
 
-    // Mark as Read
     window.markRead = function(btn, id) {
         if (!STATE.read.includes(id)) {
             STATE.read.push(id);
             localStorage.setItem('crown_read', JSON.stringify(STATE.read));
             const card = document.querySelector(`.dua-card[data-id="${id}"]`);
             if(card) card.classList.add('read-card');
-            if(btn) {
-                btn.classList.add('read');
-                btn.innerHTML = '✓ Read';
-            }
+            if(btn) { btn.classList.add('read'); btn.innerHTML = '✓ Read'; }
             updateStats();
             showToast('Marked as Read');
         }
     };
 
-    // Copy Text
     window.copyText = function(btn, text) {
         navigator.clipboard.writeText(text).then(() => {
             const originalText = btn.innerHTML;
             btn.innerHTML = '✓ Copied!';
             btn.classList.add('copied');
             showToast('Copied to clipboard');
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.classList.remove('copied');
-            }, 2000);
-        }).catch(err => {
-            showToast('Failed to copy');
-        });
+            setTimeout(() => { btn.innerHTML = originalText; btn.classList.remove('copied'); }, 2000);
+        }).catch(err => showToast('Failed to copy'));
     };
 
-    // Search & Filter
     function filterDuas(query) {
         query = query.toLowerCase();
         let visibleCount = 0;
-        
-        if(query.length > 0) els.searchClear.classList.add('visible');
-        else els.searchClear.classList.remove('visible');
-
+        if(els.searchClear) els.searchClear.classList.toggle('visible', query.length > 0);
         els.cards.forEach(card => {
-            const text = card.textContent.toLowerCase();
-            const keywords = card.getAttribute('data-keywords') || "";
-            const isMatch = text.includes(query) || keywords.includes(query);
-            
-            if (isMatch) {
-                card.classList.remove('hidden-card');
-                visibleCount++;
-            } else {
-                card.classList.add('hidden-card');
-            }
+            const isMatch = card.textContent.toLowerCase().includes(query) || (card.getAttribute('data-keywords') || "").includes(query);
+            card.classList.toggle('hidden-card', !isMatch);
+            if(isMatch) visibleCount++;
         });
-
-        if (visibleCount === 0) els.noResults.classList.add('visible');
-        else els.noResults.classList.remove('visible');
+        if(els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
     }
 
     window.clearSearch = function() {
-        els.searchInput.value = '';
+        if(els.searchInput) els.searchInput.value = '';
         filterDuas('');
-        els.searchClear.classList.remove('visible');
+        if(els.searchClear) els.searchClear.classList.remove('visible');
     };
 
     window.filterCategory = function(cat, btn) {
-        // Update Pills
-        els.pills.forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-
-        // Filter
+        if(els.pills) els.pills.forEach(p => p.classList.remove('active'));
+        if(btn && btn.classList.contains('pill')) btn.classList.add('active');
         let visibleCount = 0;
         els.cards.forEach(card => {
             const cats = card.getAttribute('data-categories').split(',');
-            if (cat === 'all' || cats.includes(cat)) {
-                card.classList.remove('hidden-card');
-                visibleCount++;
-            } else {
-                card.classList.add('hidden-card');
-            }
+            const isMatch = cat === 'all' || cats.includes(cat);
+            card.classList.toggle('hidden-card', !isMatch);
+            if(isMatch) visibleCount++;
         });
-        
-        if(visibleCount === 0) els.noResults.classList.add('visible');
-        else els.noResults.classList.remove('visible');
-        
+        if(els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
-    // --- 3. PANELS & MODALS ---
-
-    // Bookmarks Panel
     window.toggleBookmarksPanel = function() {
-        // Create panel structure if it doesn't exist in HTML
         let panel = document.getElementById('bookmarksPanel');
         if(!panel) {
             const div = document.createElement('div');
             div.id = 'bookmarksPanel';
             div.className = 'side-panel';
-            div.innerHTML = `
-                <div class="panel-header">
-                    <div class="panel-title">Your Saved Duas</div>
-                    <button class="panel-close" onclick="toggleBookmarksPanel()">✕</button>
-                </div>
-                <div id="bookmarkListContainer"></div>
-            `;
+            div.innerHTML = `<div class="panel-header"><div class="panel-title">Your Saved Duas</div><button class="panel-close" onclick="toggleBookmarksPanel()">✕</button></div><div id="bookmarkListContainer"></div>`;
             document.body.appendChild(div);
-            // Re-select
-            panel = div;
-            
-            // Create overlay if not exists
             if(!document.querySelector('.overlay')) {
                 const ov = document.createElement('div');
                 ov.className = 'overlay';
@@ -3610,34 +3533,25 @@
                 document.body.appendChild(ov);
             }
         }
-        
         renderBookmarksPanel();
-        panel.classList.toggle('active');
+        document.getElementById('bookmarksPanel').classList.toggle('active');
         document.querySelector('.overlay').classList.toggle('active');
     };
 
     function renderBookmarksPanel() {
         const container = document.getElementById('bookmarkListContainer');
         if(!container) return;
-        
         if (STATE.bookmarks.length === 0) {
             container.innerHTML = '<div class="panel-empty">No bookmarks yet.<br>Tap the star icon to save duas here.</div>';
             return;
         }
-
         let html = '';
         STATE.bookmarks.forEach(id => {
-            // Find data from the existing cards
             const card = document.querySelector(`.dua-card[data-id="${id}"]`);
             if(card) {
                 const title = card.querySelector('.dua-title').textContent;
                 const arabic = card.querySelector('.arabic-text').textContent;
-                html += `
-                    <div class="panel-item" onclick="scrollToDua(${id}); toggleBookmarksPanel()">
-                        <div class="panel-item-title">${title}</div>
-                        <div class="panel-item-arabic">${arabic}</div>
-                    </div>
-                `;
+                html += `<div class="panel-item" onclick="scrollToDua(${id}); toggleBookmarksPanel()"><div class="panel-item-title">${title}</div><div class="panel-item-arabic">${arabic}</div></div>`;
             }
         });
         container.innerHTML = html;
@@ -3646,152 +3560,109 @@
     window.scrollToDua = function(id) {
         const card = document.querySelector(`.dua-card[data-id="${id}"]`);
         if(card) {
-            card.classList.remove('hidden-card'); // Ensure it's visible
+            card.classList.remove('hidden-card');
             card.scrollIntoView({behavior: 'smooth', block: 'center'});
             card.classList.add('expanded');
-            // Highlight effect
             card.style.borderColor = 'var(--gold-mid)';
             setTimeout(() => card.style.borderColor = '', 2000);
         }
     };
 
-    window.scrollToTop = function() {
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    };
+    window.scrollToTop = function() { window.scrollTo({top: 0, behavior: 'smooth'}); };
 
-    // Tasbeeh
     let tasbeehCount = 0;
     let tasbeehTarget = 33;
-
+    
     window.openTasbeeh = function() {
-        els.tasbeehPanel.classList.add('active');
+        let tp = document.querySelector('.tasbeeh-panel');
+        if(tp) tp.classList.add('active');
         resetTasbeeh();
     };
     
     window.openTasbeehWith = function(target) {
         openTasbeeh();
-        tasbeehTarget = (target === 36) ? 100 : 33; // Logic for Dua 36 (100x)
-        document.querySelector('.tasbeeh-target').innerText = `TARGET: ${tasbeehTarget}`;
+        tasbeehTarget = (target === 36) ? 100 : 33;
+        const tt = document.querySelector('.tasbeeh-target');
+        if(tt) tt.innerText = `TARGET: ${tasbeehTarget}`;
     };
-
+    
     window.closeTasbeeh = function() {
-        els.tasbeehPanel.classList.remove('active');
+        let tp = document.querySelector('.tasbeeh-panel');
+        if(tp) tp.classList.remove('active');
     };
-
+    
     window.tapTasbeeh = function() {
         tasbeehCount++;
         const display = document.querySelector('.tasbeeh-count-display');
         const btn = document.querySelector('.tasbeeh-tap-btn');
-        
-        display.innerText = tasbeehCount;
-        btn.classList.add('pulse');
-        setTimeout(() => btn.classList.remove('pulse'), 100);
-
-        // Haptic feedback
+        if(display) display.innerText = tasbeehCount;
+        if(btn) {
+            btn.classList.add('pulse');
+            setTimeout(() => btn.classList.remove('pulse'), 100);
+        }
         if(navigator.vibrate) navigator.vibrate(5);
-
         if (tasbeehCount === tasbeehTarget) {
             if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
             showToast('Target Reached!');
         }
     };
-
+    
     window.resetTasbeeh = function() {
         tasbeehCount = 0;
-        document.querySelector('.tasbeeh-count-display').innerText = '0';
+        const display = document.querySelector('.tasbeeh-count-display');
+        if(display) display.innerText = '0';
     };
-
+    
     window.setTasbeehTarget = function(t) {
         tasbeehTarget = t;
-        document.querySelector('.tasbeeh-target').innerText = t === 0 ? 'OPEN COUNT' : `TARGET: ${t}`;
+        const tt = document.querySelector('.tasbeeh-target');
+        if(tt) tt.innerText = t === 0 ? 'OPEN COUNT' : `TARGET: ${t}`;
         resetTasbeeh();
     };
 
-    // Etiquette & Routine Modals
     window.openEtiquette = function() {
-        // Populate if empty (Using innerHTML for brevity, ideally this is in HTML)
-        if(!els.etiquettePanel.querySelector('.etiquette-content').innerHTML.trim()) {
-             els.etiquettePanel.querySelector('.etiquette-content').innerHTML = `
-                <h2>The Etiquette of Dua</h2>
-                <div class="etiquette-item"><div class="etiquette-num">1</div><div class="etiquette-text">Start with praise of Allah and Salawat upon the Prophet ﷺ.</div></div>
-                <div class="etiquette-item"><div class="etiquette-num">2</div><div class="etiquette-text">Have certainty (Yaqīn) that Allah will answer.</div></div>
-                <div class="etiquette-item"><div class="etiquette-num">3</div><div class="etiquette-text">Persist and do not be hasty. "It is answered as long as one does not say: 'I prayed but was not answered'."</div></div>
-                <div class="etiquette-item"><div class="etiquette-num">4</div><div class="etiquette-text">Presence of heart. Allah does not accept dua from a heedless heart.</div></div>
-                <div class="etiquette-item"><div class="etiquette-num">5</div><div class="etiquette-text">Face the Qiblah and raise hands.</div></div>
-             `;
+        let ep = document.querySelector('.etiquette-panel');
+        if(!ep) return;
+        if(!ep.querySelector('.etiquette-content').innerHTML.trim()) {
+            ep.querySelector('.etiquette-content').innerHTML = `<h2>The Etiquette of Dua</h2><div class="etiquette-item"><div class="etiquette-num">1</div><div class="etiquette-text">Start with praise of Allah and Salawat upon the Prophet ﷺ.</div></div><div class="etiquette-item"><div class="etiquette-num">2</div><div class="etiquette-text">Have certainty (Yaqīn) that Allah will answer.</div></div><div class="etiquette-item"><div class="etiquette-num">3</div><div class="etiquette-text">Persist and do not be hasty.</div></div><div class="etiquette-item"><div class="etiquette-num">4</div><div class="etiquette-text">Presence of heart. Allah does not accept dua from a heedless heart.</div></div><div class="etiquette-item"><div class="etiquette-num">5</div><div class="etiquette-text">Face the Qiblah and raise hands.</div></div>`;
         }
-        els.etiquettePanel.classList.add('active');
+        ep.classList.add('active');
     };
-    window.closeEtiquette = function() { els.etiquettePanel.classList.remove('active'); };
+    
+    window.closeEtiquette = function() { let ep = document.querySelector('.etiquette-panel'); if(ep) ep.classList.remove('active'); };
 
     window.openRoutine = function() {
-        // Populate routine content
-        if(!els.routinePanel.querySelector('.routine-content').innerHTML.trim()) {
-             els.routinePanel.querySelector('.routine-content').innerHTML = `
-                <h2>Recommended Daily Routine</h2>
-                <div class="routine-item">
-                    <div class="routine-time">MORNING (After Fajr)</div>
-                    <div class="routine-desc">
-                        1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">Ayatul Kursi</span><br>
-                        2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">3 Quls (3x)</span><br>
-                        3. <span class="dua-ref" onclick="scrollToDua(12);closeRoutine()">Bismillah (3x)</span><br>
-                        4. <span class="dua-ref" onclick="scrollToDua(16);closeRoutine()">Sayyid al-Istighfar</span>
-                    </div>
-                </div>
-                <div class="routine-item">
-                    <div class="routine-time">EVENING (After Asr/Maghrib)</div>
-                    <div class="routine-desc">Same as morning, plus <span class="dua-ref" onclick="scrollToDua(15);closeRoutine()">Refuge from 4 Evils</span>.</div>
-                </div>
-                <div class="routine-item">
-                    <div class="routine-time">BEFORE SLEEP</div>
-                    <div class="routine-desc">
-                        1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">Ayatul Kursi</span><br>
-                        2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">3 Quls (Blow & Wipe)</span><br>
-                        3. <span class="dua-ref" onclick="scrollToDua(49);closeRoutine()">Sleep Dua</span>
-                    </div>
-                </div>
-             `;
+        let rp = document.querySelector('.routine-panel');
+        if(!rp) return;
+        if(!rp.querySelector('.routine-content').innerHTML.trim()) {
+            rp.querySelector('.routine-content').innerHTML = `<h2>Recommended Daily Routine</h2><div class="routine-item"><div class="routine-time">MORNING (After Fajr)</div><div class="routine-desc">1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">Ayatul Kursi</span><br>2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">3 Quls (3x)</span><br>3. <span class="dua-ref" onclick="scrollToDua(12);closeRoutine()">Bismillah (3x)</span><br>4. <span class="dua-ref" onclick="scrollToDua(16);closeRoutine()">Sayyid al-Istighfar</span></div></div><div class="routine-item"><div class="routine-time">EVENING (After Asr/Maghrib)</div><div class="routine-desc">Same as morning, plus <span class="dua-ref" onclick="scrollToDua(15);closeRoutine()">Refuge from 4 Evils</span>.</div></div><div class="routine-item"><div class="routine-time">BEFORE SLEEP</div><div class="routine-desc">1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">Ayatul Kursi</span><br>2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">3 Quls (Blow & Wipe)</span><br>3. <span class="dua-ref" onclick="scrollToDua(49);closeRoutine()">Sleep Dua</span></div></div>`;
         }
-        els.routinePanel.classList.add('active');
+        rp.classList.add('active');
     };
-    window.closeRoutine = function() { els.routinePanel.classList.remove('active'); };
+    
+    window.closeRoutine = function() { let rp = document.querySelector('.routine-panel'); if(rp) rp.classList.remove('active'); };
 
-    // Share API
     window.sharePage = function() {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Essential Duas - The Crown Collection',
-                text: '55 Essential Islamic Duas from Quran & Sunnah',
-                url: window.location.href
-            });
-        } else {
-            copyText(null, window.location.href);
-            showToast('Link copied to clipboard');
-        }
+        if (navigator.share) { navigator.share({ title: 'Essential Duas', text: '55 Essential Islamic Duas', url: window.location.href });
+        } else { copyText(null, window.location.href); showToast('Link copied'); }
     };
-
+    
     window.shareDua = function(id) {
         const card = document.querySelector(`.dua-card[data-id="${id}"]`);
         const title = card.querySelector('.dua-title').textContent;
         const arabic = card.querySelector('.arabic-text').textContent;
         const text = `${title}\n\n${arabic}\n\nRead more at: ${window.location.href}`;
-        
-        if (navigator.share) {
-            navigator.share({ title: title, text: text });
-        } else {
-            copyText(null, text);
-            showToast('Dua copied to clipboard');
-        }
+        if (navigator.share) { navigator.share({ title: title, text: text });
+        } else { copyText(null, text); showToast('Copied to clipboard'); }
     };
 
-    // --- 4. UTILITIES ---
-
     function updateStats() {
-        els.bookmarkCount.innerText = STATE.bookmarks.length;
-        els.readCount.innerText = STATE.read.length;
+        if(els.bookmarkCount) els.bookmarkCount.innerText = STATE.bookmarks.length;
+        if(els.readCount) els.readCount.innerText = STATE.read.length;
     }
 
     function showToast(msg) {
+        if(!els.toast) return;
         els.toast.innerText = msg;
         els.toast.classList.add('show');
         setTimeout(() => els.toast.classList.remove('show'), 3000);
@@ -3802,51 +3673,35 @@
         if (STATE.lastVisit !== today) {
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
-            
-            if (STATE.lastVisit === yesterday.toDateString()) {
-                STATE.streak++;
-            } else {
-                STATE.streak = 1; // Reset or Start
-            }
-            
+            if (STATE.lastVisit === yesterday.toDateString()) STATE.streak++;
+            else STATE.streak = 1;
             STATE.lastVisit = today;
             localStorage.setItem('crown_streak', STATE.streak);
             localStorage.setItem('crown_last_visit', today);
         }
-        
-        els.streakCount.innerText = STATE.streak;
-        els.lastVisit.innerText = 'Today';
+        if(els.streakCount) els.streakCount.innerText = STATE.streak;
+        if(els.lastVisit) els.lastVisit.innerText = 'Today';
     }
 
     function loadDailyDua() {
-        // Simple rotation based on date
         const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-        const duaIndex = (dayOfYear % 55) + 1; // 1 to 55
-        
-        // Find data from HTML to populate banner (prevents data duplication)
-        // We wait for DOM to be ready
+        const duaIndex = (dayOfYear % 55) + 1;
         setTimeout(() => {
             const card = document.querySelector(`.dua-card[data-id="${duaIndex}"]`);
-            if(card) {
+            if(card && els.dailyArabic) {
                 els.dailyArabic.innerText = card.querySelector('.arabic-text').innerText;
                 els.dailyTranslation.innerText = card.querySelector('.translation').innerText.substring(0, 80) + '...';
-                
-                // Click to go to it
-                document.getElementById('dailyDua').onclick = function() {
-                    scrollToDua(duaIndex);
-                }
+                document.getElementById('dailyDua').onclick = function() { scrollToDua(duaIndex); }
             }
         }, 500);
     }
 
-    // Run Init
-    document.addEventListener('DOMContentLoaded', init);
-
-</script>
-        window.highlightIcon = function(clickedBtn) {
+    window.highlightIcon = function(clickedBtn) {
         document.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
-        clickedBtn.classList.add('active');
+        if(clickedBtn) clickedBtn.classList.add('active');
     };
+
+    document.addEventListener('DOMContentLoaded', init);
 </script>
 
 <!-- Close the Panels/Overlays -->
@@ -3870,13 +3725,13 @@
     </div>
 </div>
 
-<!-- ===== ETIQUETTE PANEL (The Book Icon) ===== -->
+<!-- ===== ETIQUETTE PANEL ===== -->
 <div class="etiquette-panel" onclick="if(event.target === this) closeEtiquette()">
     <button class="etiquette-close" onclick="closeEtiquette()">✕</button>
     <div class="etiquette-content"></div>
 </div>
 
-<!-- ===== ROUTINE PANEL (The Clock Icon) ===== -->
+<!-- ===== ROUTINE PANEL ===== -->
 <div class="routine-panel" onclick="if(event.target === this) closeRoutine()">
     <button class="etiquette-close" onclick="closeRoutine()">✕</button>
     <div class="routine-content"></div>
@@ -3907,6 +3762,15 @@
         <span>Saved</span>
     </button>
 </nav>
+
+<footer class="footer">
+    <div class="footer-ornament">
+        <span class="line"></span>
+        <span>✦</span>
+        <span class="line"></span>
+    </div>
+    <div class="footer-text">The Crown Collection</div>
+</footer>
 
 </body>
 </html>
