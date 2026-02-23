@@ -3644,9 +3644,33 @@
     window.closeRoutine = function() { let rp = document.querySelector('.routine-panel'); if(rp) rp.classList.remove('active'); };
 
     window.sharePage = function() {
-        if (navigator.share) { navigator.share({ title: 'Essential Duas', text: '55 Essential Islamic Duas', url: window.location.href });
-        } else { copyText(null, window.location.href); showToast('Link copied'); }
-    };
+    if (navigator.share) {
+        navigator.share({
+            title: 'Essential Duas - The Crown Collection',
+            text: '55 Essential Islamic Duas from Quran & Sunnah',
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            showToast('Link copied to clipboard');
+        }).catch(() => showToast('Failed to copy'));
+    }
+};
+
+window.shareDua = function(id) {
+    const card = document.querySelector(`.dua-card[data-id="${id}"]`);
+    if(!card) return;
+    const title = card.querySelector('.dua-title').textContent;
+    const arabic = card.querySelector('.arabic-text').textContent;
+    const text = `${title}\n\n${arabic}\n\nFrom: Essential Duas — The Crown Collection\n${window.location.href}`;
+    if (navigator.share) {
+        navigator.share({ title: title, text: text });
+    } else {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('Dua copied to clipboard');
+        }).catch(() => showToast('Failed to copy'));
+    }
+};
     
     window.shareDua = function(id) {
         const card = document.querySelector(`.dua-card[data-id="${id}"]`);
