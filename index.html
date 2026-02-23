@@ -1082,8 +1082,10 @@
                 <span class="line"></span>
             </div>
 
-            <h1 class="gold-text">Essential Duas</h1>
-            <div class="subtitle">The Crown Collection from Quran & Sunnah</div>
+           <h1 class="gold-text">Essential Duas</h1>
+<div class="subtitle">The Crown Collection — A Sadaqah Jariyah by Mohammad H Falah</div>
+
+
 
             <p class="intro-text">
                 A meticulously curated treasury of the most powerful supplications
@@ -3841,12 +3843,16 @@
     document.addEventListener('DOMContentLoaded', init);
 
 </script>
+        window.highlightIcon = function(clickedBtn) {
+        document.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
+        clickedBtn.classList.add('active');
+    };
+</script>
 
-<!-- Close the Panels/Overlays (Add these if missed in Part 2) -->
+<!-- Close the Panels/Overlays -->
 <div class="overlay" onclick="toggleBookmarksPanel()"></div>
 
-<!-- Add the Panels if missed in Part 2 or define them here for safety -->
-<!-- (The JS generates the bookmark panel dynamically, but we need the empty containers for Tasbeeh/Etiquette if not in Part 2) -->
+<!-- ===== TASBEEH PANEL ===== -->
 <div class="tasbeeh-panel" onclick="if(event.target === this) closeTasbeeh()">
     <button class="tasbeeh-close" onclick="closeTasbeeh()">✕</button>
     <div class="tasbeeh-title">DIGITAL TASBEEH</div>
@@ -3864,11 +3870,13 @@
     </div>
 </div>
 
+<!-- ===== ETIQUETTE PANEL (The Book Icon) ===== -->
 <div class="etiquette-panel" onclick="if(event.target === this) closeEtiquette()">
     <button class="etiquette-close" onclick="closeEtiquette()">✕</button>
     <div class="etiquette-content"></div>
 </div>
 
+<!-- ===== ROUTINE PANEL (The Clock Icon) ===== -->
 <div class="routine-panel" onclick="if(event.target === this) closeRoutine()">
     <button class="etiquette-close" onclick="closeRoutine()">✕</button>
     <div class="routine-content"></div>
@@ -3882,19 +3890,19 @@
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-    <button class="bottom-nav-item active" onclick="filterCategory('all', this)">
+    <button class="bottom-nav-item active" onclick="filterCategory('all', document.querySelector('.bottom-nav-item')); highlightIcon(this)">
         <span class="icon">🏠</span>
         <span>Home</span>
     </button>
-    <button class="bottom-nav-item" onclick="openRoutine()">
+    <button class="bottom-nav-item" onclick="openRoutine(); highlightIcon(this)">
         <span class="icon">📅</span>
         <span>Routine</span>
     </button>
-    <button class="bottom-nav-item" onclick="openTasbeeh()">
+    <button class="bottom-nav-item" onclick="openTasbeeh(); highlightIcon(this)">
         <span class="icon">📿</span>
         <span>Tasbeeh</span>
     </button>
-    <button class="bottom-nav-item" onclick="toggleBookmarksPanel()">
+    <button class="bottom-nav-item" onclick="toggleBookmarksPanel(); highlightIcon(this)">
         <span class="icon">★</span>
         <span>Saved</span>
     </button>
