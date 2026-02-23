@@ -585,12 +585,12 @@
             letter-spacing: 1px; text-transform: uppercase;
             color: var(--gold-lightest); font-weight: 600; line-height: 1.4;
         }
-        }
         .dua-category-tag {
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 1.5px; text-transform: uppercase;
             color: rgba(13, 107, 71, 0.4); margin-top: 2px;
         }
+
 
         .card-actions { display: flex; gap: 4px; align-items: center; }
         .card-action-btn {
@@ -1464,7 +1464,7 @@
 
     <!-- DUA 3: Dua of Yunus -->
     <div class="dua-card" data-categories="quran,wellbeing,prophets" data-keywords="yunus jonah whale distress darkness never rejected wrongdoers" data-id="3">
-        
+        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
             <div class="card-header-left">
                 <div class="dua-number">3</div>
                 <div class="card-title-group">
@@ -1498,6 +1498,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- DUA 4: Mercy for Parents -->
     <div class="dua-card" data-categories="quran,family" data-keywords="parents mercy mother father raised young compassion childhood" data-id="4">
