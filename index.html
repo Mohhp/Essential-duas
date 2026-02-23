@@ -3795,7 +3795,24 @@ window.handleBottomNav = function(action, btn) {
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
-<!-- BOTTOM NAV -->
+<!-- FOOTER (moved here - before bottom nav) -->
+<footer class="footer">
+    <div class="footer-ornament">
+        <span class="line"></span>
+        <span>✦</span>
+        <span class="line"></span>
+    </div>
+    <div class="footer-text">
+        The Crown Collection<br>
+        55 Essential Duas from Quran & Sunnah
+    </div>
+    <div class="footer-arabic">سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا أَنْتَ أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ</div>
+</footer>
+
+<!-- Back To Top -->
+<button class="back-to-top" onclick="scrollToTop()">↑</button>
+
+<!-- BOTTOM NAV (always last before </body>) -->
 <nav class="bottom-nav" id="bottomNav">
     <button class="bottom-nav-item active" data-nav="home" onclick="handleBottomNav('home', this)">
         <span class="icon">🏠</span>
@@ -3814,15 +3831,6 @@ window.handleBottomNav = function(action, btn) {
         <span>Saved</span>
     </button>
 </nav>
-
-<footer class="footer">
-    <div class="footer-ornament">
-        <span class="line"></span>
-        <span>✦</span>
-        <span class="line"></span>
-    </div>
-    <div class="footer-text">The Crown Collection</div>
-</footer>
 
 </body>
 </html>
