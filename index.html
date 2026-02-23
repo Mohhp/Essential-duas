@@ -472,17 +472,13 @@
                 /* ============================================ */
         /* ===== DUA CARDS ===== */
         /* ============================================ */
-               .dua-card {
+        .dua-card {
             background: var(--bg-card);
             border: 1px solid rgba(13, 107, 71, 0.1);
             border-radius: var(--radius-lg);
             margin-bottom: 16px; overflow: hidden;
             transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.4s ease, box-shadow 0.4s ease;
             position: relative;
-            opacity: 0; transform: translateY(20px);
-        }
-        .dua-card.visible {
-            opacity: 1; transform: translateY(0);
         }
         .dua-card.hidden-card { display: none; }
         .dua-card.read-card { border-left: 3px solid rgba(13, 107, 71, 0.5); }
@@ -513,25 +509,6 @@
         .dua-card:hover {
             border-color: rgba(13, 107, 71, 0.25);
             box-shadow: var(--shadow-glow);
-        }
-
-        .dua-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(13, 107, 71, 0.25), transparent);
-        }
-
-        .dua-card:focus-within {
-            border-color: rgba(13, 107, 71, 0.4);
-            box-shadow: 0 0 0 2px rgba(13, 107, 71, 0.15), var(--shadow-glow);
-        }
-        .dua-card.hidden-card { display: none; }
-        .dua-card.read-card { border-left: 3px solid rgba(13, 107, 71, 0.5); opacity: 0.85; }
-        .dua-card.read-card:hover { opacity: 1; }
-
-        .dua-card:hover {
-            border-color: rgba(13, 107, 71, 0.25);
-            box-shadow: var(--shadow-glow);
-            transform: translateY(-2px);
         }
 
         .dua-card::before {
@@ -3701,7 +3678,7 @@
             }
         });
 
-                // Restore collapsed sections
+        // Restore collapsed sections
         const collapsedSections = JSON.parse(localStorage.getItem('crown_collapsed_sections') || '[]');
         collapsedSections.forEach(sectionName => {
             const header = document.querySelector(`.section-header[data-section="${sectionName}"]`);
@@ -3710,7 +3687,6 @@
                 const hint = header.querySelector('.section-collapse-hint');
                 if (hint) hint.textContent = 'tap to expand';
 
-                // Hide cards in this section
                 let nextElement = header.nextElementSibling;
                 while (nextElement) {
                     if (nextElement.classList.contains('section-header')) break;
@@ -3723,10 +3699,11 @@
         });
 
         // --- Intersection Observer for Card Animations ---
+    
         if ('IntersectionObserver' in window) {
             const observerOptions = {
                 root: null,
-                rootMargin: '0px 0px -30px 0px',
+                rootMargin: '0px',
                 threshold: 0.05
             };
 
@@ -3742,9 +3719,6 @@
             els.cards.forEach(card => {
                 cardObserver.observe(card);
             });
-        } else {
-            // Fallback: show all cards immediately
-            els.cards.forEach(card => card.classList.add('visible'));
         }
 
         // --- Keyboard Accessibility ---
@@ -3907,18 +3881,23 @@
             const cats = card.getAttribute('data-categories').split(',');
             const isMatch = cat === 'all' || cats.includes(cat);
             card.classList.toggle('hidden-card', !isMatch);
-            if (isMatch) {
-                visibleCount++;
-                if (!card.classList.contains('visible')) {
-                    card.classList.remove('visible');
-                    setTimeout(() => card.classList.add('visible'), 50);
-                }
+            card.style.display = isMatch ? '' : 'none';
+            if (isMatch) visibleCount++;
+        });
+        // Also expand all collapsed sections when filtering
+        document.querySelectorAll('.section-header.collapsed').forEach(sh => {
+            sh.classList.remove('collapsed');
+            const hint = sh.querySelector('.section-collapse-hint');
+            if (hint) hint.textContent = 'tap to collapse';
+            let next = sh.nextElementSibling;
+            while (next && !next.classList.contains('section-header')) {
+                if (next.classList.contains('dua-card')) next.style.display = '';
+                next = next.nextElementSibling;
             }
         });
         if (els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
-
     // ===== BOOKMARKS PANEL =====
     window.toggleBookmarksPanel = function() {
         let panel = document.getElementById('bookmarksPanel');
@@ -3980,11 +3959,11 @@
     }
 
     // ===== SCROLL TO DUA =====
-    window.scrollToDua = function(id) {
+       window.scrollToDua = function(id) {
         const card = document.querySelector(`.dua-card[data-id="${id}"]`);
         if (card) {
             card.classList.remove('hidden-card');
-            card.classList.add('visible');
+            card.style.display = '';
             card.classList.add('expanded');
             const header = card.querySelector('.card-header');
             if (header) header.setAttribute('aria-expanded', 'true');
@@ -3999,11 +3978,6 @@
             }, 2500);
         }
     };
-
-    window.scrollToTop = function() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
     // ===== TASBEEH =====
     let tasbeehCount = 0;
     let tasbeehTarget = 33;
@@ -4241,16 +4215,15 @@
 
         // ===== RANDOM DUA =====
     window.showRandomDua = function() {
-        // Get all visible (non-hidden) cards
-        const visibleCards = Array.from(els.cards).filter(c => !c.classList.contains('hidden-card'));
+        const visibleCards = Array.from(els.cards).filter(c => 
+            !c.classList.contains('hidden-card') && c.style.display !== 'none'
+        );
         if (visibleCards.length === 0) {
             showToast('No duas available');
             return;
         }
 
-        // Pick a random card
         const randomCard = visibleCards[Math.floor(Math.random() * visibleCards.length)];
-        const id = parseInt(randomCard.getAttribute('data-id'));
 
         // Collapse all first
         els.cards.forEach(card => {
@@ -4259,20 +4232,15 @@
             if (header) header.setAttribute('aria-expanded', 'false');
         });
 
-        // Make sure it's visible
-        randomCard.classList.remove('hidden-card');
-        randomCard.classList.add('visible');
+        // Expand random card
         randomCard.classList.add('expanded');
-
         const header = randomCard.querySelector('.card-header');
         if (header) header.setAttribute('aria-expanded', 'true');
 
-        // Scroll to it
         setTimeout(() => {
             randomCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 100);
 
-        // Add glow effect
         randomCard.classList.add('random-glow');
         randomCard.style.borderColor = 'var(--emerald-light)';
         randomCard.style.boxShadow = '0 0 25px rgba(13, 107, 71, 0.2)';
@@ -4283,7 +4251,6 @@
             randomCard.style.boxShadow = '';
         }, 3000);
 
-        // Get the dua number for the toast
         const duaNum = randomCard.querySelector('.dua-number').textContent;
         const duaTitle = randomCard.querySelector('.dua-title').textContent.substring(0, 40);
         showToast(`🎲 Dua #${duaNum}: ${duaTitle}...`);
@@ -4365,22 +4332,24 @@
 
         // Now open the requested panel
         switch (action) {
-            case 'home':
+                      case 'home':
                 els.pills.forEach(p => p.classList.remove('active'));
                 const allPill = document.querySelector('.pill[data-category="all"]');
                 if (allPill) allPill.classList.add('active');
                 els.cards.forEach(card => {
                     card.classList.remove('hidden-card');
                     card.style.display = '';
-                    if (!card.classList.contains('visible')) {
-                        setTimeout(() => card.classList.add('visible'), 50);
-                    }
                 });
-                // Also expand all collapsed sections
+                // Expand all collapsed sections
                 document.querySelectorAll('.section-header.collapsed').forEach(sh => {
                     sh.classList.remove('collapsed');
                     const hint = sh.querySelector('.section-collapse-hint');
                     if (hint) hint.textContent = 'tap to collapse';
+                    let next = sh.nextElementSibling;
+                    while (next && !next.classList.contains('section-header')) {
+                        if (next.classList.contains('dua-card')) next.style.display = '';
+                        next = next.nextElementSibling;
+                    }
                 });
                 if (els.noResults) els.noResults.classList.remove('visible');
                 if (els.searchInput) els.searchInput.value = '';
