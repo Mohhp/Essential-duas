@@ -7,6 +7,17 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="The Crown Collection — 55 essential Islamic duas from the Quran and Sunnah, with tasbeeh counter, bookmarks, daily routines, and scholarly authentication.">
+    <meta property="og:title" content="Essential Duas by فلاح — The Crown Collection">
+    <meta property="og:description" content="55 essential Islamic duas from Quran & Sunnah — curated with full scholarly authentication, tasbeeh counter, prayer times, and memorization tools.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mohhp.github.io/Essential-duas/">
+    <meta property="og:image" content="https://mohhp.github.io/Essential-duas/icon-512.png">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Essential Duas by فلاح — The Crown Collection">
+    <meta name="twitter:description" content="55 essential Islamic duas from Quran & Sunnah with full scholarly authentication.">
+    <meta name="twitter:image" content="https://mohhp.github.io/Essential-duas/icon-512.png">
+    <link rel="canonical" href="https://mohhp.github.io/Essential-duas/">
     <title>Essential Duas by فلاح — The Crown Collection</title>
 
     <link rel="manifest" href="manifest.json">
@@ -16,8 +27,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
 
     <style>
         /* ============================================ */
@@ -2347,7 +2358,7 @@
 </div>
 
 <!-- Skip to content for accessibility -->
-<a href="#mainContainer" class="skip-link">Skip to Duas</a>
+<a href="#mainContainer" class="skip-link" id="skipLink">Skip to Duas</a>
 
 <!-- ===== TOP NAVIGATION ===== -->
 <nav class="top-nav" id="topNav">
@@ -2367,8 +2378,8 @@
             <span id="langPS">پښتو</span>
         </div>
         <div class="font-controls">
-            <button class="font-btn" onclick="adjustFontSize(-0.1)" title="Smaller text">A-</button>
-            <button class="font-btn" onclick="adjustFontSize(0.1)" title="Larger text">A+</button>
+            <button class="font-btn" onclick="adjustFontSize(-0.1)" title="Smaller text" aria-label="Decrease font size">A-</button>
+            <button class="font-btn" onclick="adjustFontSize(0.1)" title="Larger text" aria-label="Increase font size">A+</button>
         </div>
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" aria-label="Toggle theme" id="themeToggle">☀</button>
         <button class="nav-btn" onclick="openEtiquette()" title="Dua Etiquette" aria-label="Etiquette of Dua">📖</button>
@@ -4758,7 +4769,7 @@
             setTimeout(() => {
                 splash.classList.add('hidden');
                 setTimeout(() => splash.remove(), 1000);
-            }, 2200);
+            }, 1200);
         }
 
         updateStats();
@@ -4888,7 +4899,7 @@
             }
         });
 
-        // Keyboard support for card headers
+        // Keyboard support for card headers and section headers
         document.addEventListener('keydown', function(e) {
             const target = e.target;
             if (target.classList.contains('card-header')) {
@@ -4897,6 +4908,18 @@
                     toggleCard(target);
                 }
             }
+            if (target.classList.contains('section-header')) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleSection(target);
+                }
+            }
+        });
+
+        // Add a11y attributes to section headers
+        document.querySelectorAll('.section-header').forEach(header => {
+            header.setAttribute('role', 'button');
+            header.setAttribute('tabindex', '0');
         });
 
         // Handle hash-based deep links (manifest shortcuts)
@@ -4907,7 +4930,7 @@
             else if (hash === '#routine') openRoutine();
             else if (hash === '#prayer') openPrayer();
             window.location.hash = '';
-        }, 2500); // After splash screen
+        }, 1500); // After splash screen
     }
 
     // ===== CARD TOGGLE =====
@@ -5839,7 +5862,7 @@ window.filterCategory = function(cat, btn) {
         const readPct = Math.round((readCount / total) * 100);
         const bookmarkCount = STATE.bookmarks.length;
         const streak = parseInt(localStorage.getItem('crown_streak') || '0');
-        const daysActive = parseInt(localStorage.getItem('crown_days_active') || '0');
+        const daysActive = JSON.parse(localStorage.getItem('crown_activity') || '[]').length;
 
         // Build achievements summary
         const achievements = [
@@ -6992,6 +7015,10 @@ window.filterCategory = function(cat, btn) {
 
     function wrapArabicWords() {
         document.querySelectorAll('.arabic-text').forEach(el => {
+            // Ensure proper lang/dir for Arabic content
+            if (!el.hasAttribute('lang')) el.setAttribute('lang', 'ar');
+            if (!el.hasAttribute('dir')) el.setAttribute('dir', 'rtl');
+
             if (el.dataset.wordsWrapped) return;
             const text = el.textContent;
             // Split on whitespace, preserving decorative symbols as separate tokens
@@ -7111,11 +7138,18 @@ window.filterCategory = function(cat, btn) {
 
     function calculateAndRenderPrayers(lat, lng) {
         if (typeof adhan === 'undefined') {
+            if (!calculateAndRenderPrayers._retries) calculateAndRenderPrayers._retries = 0;
+            if (calculateAndRenderPrayers._retries++ > 10) {
+                const grid = document.getElementById('prayerTimesGrid');
+                if (grid) grid.innerHTML = '<div style="text-align:center;padding:20px;opacity:0.6;">Prayer library failed to load. Please refresh.</div>';
+                return;
+            }
             const grid = document.getElementById('prayerTimesGrid');
             if (grid) grid.innerHTML = '<div style="text-align:center;padding:20px;opacity:0.6;">Prayer library loading...</div>';
             setTimeout(() => calculateAndRenderPrayers(lat, lng), 500);
             return;
         }
+        calculateAndRenderPrayers._retries = 0;
 
         const coordinates = new adhan.Coordinates(lat, lng);
         const params = adhan.CalculationMethod.MuslimWorldLeague();
@@ -7228,8 +7262,14 @@ window.filterCategory = function(cat, btn) {
         const s = Math.floor((diff % 60000) / 1000);
         timeEl.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
-        // Also re-render grid to update current/next highlighting
-        renderPrayerGrid();
+        // Re-render grid only when current/next prayer changes
+        const newCurrent = getCurrentPrayer(new Date());
+        const newNext = getNextPrayer(new Date());
+        if (newCurrent !== _lastCurrentPrayer || newNext !== _lastNextPrayer) {
+            _lastCurrentPrayer = newCurrent;
+            _lastNextPrayer = newNext;
+            renderPrayerGrid();
+        }
     }
 
     function formatTime(date) {
@@ -7241,8 +7281,11 @@ window.filterCategory = function(cat, btn) {
         return `${h}:${m} ${ampm}`;
     }
 
+    // Track current/next prayer for efficient re-render
+    let _lastCurrentPrayer = null;
+    let _lastNextPrayer = null;
+
     // --- Enhanced getTimePeriod using real prayer times ---
-    const _originalGetTimePeriod = typeof getTimePeriod === 'function' ? getTimePeriod : null;
     function getTimePeriodFromPrayers() {
         if (!prayerTimesData) return null;
         const now = new Date();
@@ -7416,6 +7459,11 @@ window.filterCategory = function(cat, btn) {
     // ===== REGISTER SERVICE WORKER =====
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').catch(() => {});
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'SW_UPDATED') {
+                showToast('App updated! Refresh for the latest version.');
+            }
+        });
     }
 
     // ===== START =====
@@ -7497,7 +7545,7 @@ window.filterCategory = function(cat, btn) {
 </div>
 
 <!-- ===== TOAST ===== -->
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
 <!-- ===== FOOTER ===== -->
 <footer class="footer">

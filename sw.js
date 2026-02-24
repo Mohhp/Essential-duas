@@ -29,13 +29,18 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate — clean up old caches
+// Activate — clean up old caches and notify clients
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
       );
+    }).then(() => {
+      // Notify all open clients that a new version is active
+      return self.clients.matchAll({ type: 'window' }).then(clients => {
+        clients.forEach(client => client.postMessage({ type: 'SW_UPDATED' }));
+      });
     })
   );
   self.clients.claim();
