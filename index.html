@@ -28,10 +28,10 @@
         }
 
         :root {
-            --bg-dark: #060d0a;
-            --bg-card: rgba(12, 24, 18, 0.72);
-            --bg-surface: #0e1f16;
-            --bg-glass: rgba(14, 28, 20, 0.65);
+            --bg-dark: #0c1a13;
+            --bg-card: rgba(18, 35, 26, 0.72);
+            --bg-surface: #142a20;
+            --bg-glass: rgba(22, 40, 30, 0.65);
             --gold-lightest: #f0f4e8;
             --gold-light: #dce8c8;
             --gold-mid: #c9a84c;
@@ -216,7 +216,7 @@
             background:
                 radial-gradient(ellipse at 15% 0%, rgba(46, 196, 122, 0.07) 0%, transparent 45%),
                 radial-gradient(ellipse at 85% 100%, rgba(201, 168, 76, 0.04) 0%, transparent 45%),
-                radial-gradient(ellipse at 50% 40%, rgba(14, 31, 22, 0.7) 0%, var(--bg-dark) 65%);
+                radial-gradient(ellipse at 50% 40%, rgba(20, 42, 30, 0.6) 0%, var(--bg-dark) 65%);
             z-index: -2; pointer-events: none;
         }
 
@@ -276,7 +276,7 @@
         /* ===== SPLASH SCREEN ===== */
         .splash-screen {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(ellipse at center, #0a1a13 0%, #060d0a 70%);
+            background: radial-gradient(ellipse at center, #122b1e 0%, #0c1a13 70%);
             z-index: 10000;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
@@ -380,7 +380,7 @@
             position: fixed; top: 0; left: 0; right: 0;
             height: calc(var(--nav-height) + var(--safe-top));
             padding-top: var(--safe-top);
-            background: rgba(6, 13, 10, 0.75);
+            background: rgba(12, 26, 19, 0.75);
             backdrop-filter: blur(24px) saturate(200%);
             -webkit-backdrop-filter: blur(24px) saturate(200%);
             border-bottom: 1px solid rgba(46, 196, 122, 0.08);
@@ -391,7 +391,7 @@
         }
         .top-nav.hidden { transform: translateY(-100%); }
         .top-nav.scrolled {
-            background: rgba(6, 13, 10, 0.92);
+            background: rgba(12, 26, 19, 0.92);
             box-shadow: 0 1px 20px rgba(0,0,0,0.3);
             border-bottom-color: rgba(46, 196, 122, 0.12);
         }
@@ -465,7 +465,7 @@
             position: fixed; bottom: 0; left: 0; right: 0;
             height: calc(var(--bottom-nav-height) + var(--safe-bottom));
             padding-bottom: var(--safe-bottom);
-            background: rgba(6, 13, 10, 0.82);
+            background: rgba(12, 26, 19, 0.82);
             backdrop-filter: blur(24px) saturate(200%);
             -webkit-backdrop-filter: blur(24px) saturate(200%);
             border-top: 1px solid rgba(46, 196, 122, 0.06);
@@ -696,7 +696,7 @@
         .search-input:focus {
             border-color: rgba(46, 196, 122, 0.3);
             box-shadow: 0 0 0 3px rgba(46, 196, 122, 0.06), var(--shadow-card);
-            background: rgba(14, 28, 20, 0.7);
+            background: rgba(22, 40, 30, 0.7);
         }
         .search-icon {
             position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
@@ -936,7 +936,7 @@
 
         /* Arabic Text */
         .arabic-container {
-            background: linear-gradient(135deg, rgba(46, 196, 122, 0.05), rgba(6, 13, 10, 0.4));
+            background: linear-gradient(135deg, rgba(46, 196, 122, 0.05), rgba(12, 26, 19, 0.4));
             border: 1px solid rgba(46, 196, 122, 0.08);
             border-radius: var(--radius-md);
             padding: 22px 18px; margin-bottom: 14px;
@@ -1073,7 +1073,7 @@
         /* Etiquette Panel */
         .etiquette-panel {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(6, 13, 10, 0.96);
+            background: rgba(12, 26, 19, 0.96);
             z-index: 2000; overflow-y: auto;
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
             backdrop-filter: blur(24px) saturate(150%);
@@ -1125,7 +1125,7 @@
         /* Routine Panel */
         .routine-panel {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(6, 13, 10, 0.96);
+            background: rgba(12, 26, 19, 0.96);
             z-index: 2000; overflow-y: auto;
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
             backdrop-filter: blur(24px) saturate(150%);
@@ -1165,7 +1165,7 @@
         /* Tasbeeh Panel */
         .tasbeeh-panel {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(6, 13, 10, 0.96);
+            background: rgba(12, 26, 19, 0.96);
             z-index: 2000;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
@@ -1329,7 +1329,7 @@
             position: fixed;
             bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 16px);
             right: 16px; width: 40px; height: 40px;
-            background: rgba(6, 13, 10, 0.8);
+            background: rgba(12, 26, 19, 0.8);
             border: 1px solid rgba(46, 196, 122, 0.12);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             color: var(--emerald-light); font-size: 1rem;
@@ -1351,7 +1351,7 @@
             position: fixed;
             bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px);
             left: 50%; transform: translateX(-50%) translateY(100px);
-            background: rgba(6, 13, 10, 0.88);
+            background: rgba(12, 26, 19, 0.88);
             border: 1px solid rgba(46, 196, 122, 0.12);
             padding: 11px 22px; border-radius: 50px;
             color: var(--gold-light); font-family: var(--font-text);
@@ -1638,7 +1638,7 @@
         /* ===== PROGRESS PANEL ===== */
         .progress-panel {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(6, 13, 10, 0.96);
+            background: rgba(12, 26, 19, 0.96);
             z-index: 2000; overflow-y: auto;
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
             backdrop-filter: blur(24px) saturate(150%);
@@ -5594,7 +5594,7 @@ window.filterCategory = function(cat, btn) {
         wrap.style.cssText = `
             position:fixed; left:-9999px; top:0;
             width:600px; padding:48px 40px;
-            background: linear-gradient(145deg, #060d0a, #0f1e16);
+            background: linear-gradient(145deg, #0c1a13, #142a20);
             border-radius:24px; font-family:serif;
             border: 1px solid rgba(46,196,122,0.2);
         `;
@@ -5622,7 +5622,7 @@ window.filterCategory = function(cat, btn) {
                 return;
             }
             const canvas = await html2canvas(wrap, {
-                backgroundColor: '#060d0a',
+                backgroundColor: '#0c1a13',
                 scale: 2,
                 useCORS: true,
                 logging: false
