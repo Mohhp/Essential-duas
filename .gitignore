@@ -1,0 +1,8 @@
+# Screenshots & temp files
+*.png
+!icon-192.png
+!icon-512.png
+.playwright-mcp/
+.vscode/
+chrome
+node_modules/

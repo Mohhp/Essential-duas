@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="theme-color" content="#060d0a">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="The Crown Collection — 55 essential Islamic duas from the Quran and Sunnah, with tasbeeh counter, bookmarks, daily routines, and scholarly authentication.">
     <meta property="og:title" content="Essential Duas by فلاح — The Crown Collection">
@@ -122,6 +123,8 @@
         [data-theme="light"] body::after { opacity: 0.02; }
         [data-theme="light"] .top-nav,
         [data-theme="light"] .bottom-nav { background: rgba(247, 245, 239, 0.88); backdrop-filter: blur(24px) saturate(200%); }
+        [data-theme="light"] .top-nav { border-bottom-color: rgba(13, 123, 80, 0.1); }
+        [data-theme="light"] .bottom-nav { border-top: 1px solid rgba(13, 123, 80, 0.08); }
         [data-theme="light"] .top-nav.scrolled { background: rgba(247, 245, 239, 0.95); box-shadow: 0 1px 12px rgba(0,0,0,0.06); }
         [data-theme="light"] .search-input { background: rgba(255, 255, 255, 0.8); color: #2d2d1a; border-color: rgba(13, 123, 80, 0.12); }
         [data-theme="light"] .toast { background: rgba(255, 255, 255, 0.92); color: #2d2d1a; border-color: rgba(13, 123, 80, 0.15); backdrop-filter: blur(20px); }
@@ -143,6 +146,8 @@
         [data-theme="light"] .streak-banner,
         [data-theme="light"] .daily-dua-banner { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); }
         [data-theme="light"] .pill { background: rgba(255, 255, 255, 0.6); }
+        [data-theme="light"] .pill.active { background: rgba(13, 123, 80, 0.1); border-color: rgba(13, 123, 80, 0.3); color: #0d7b50; }
+        [data-theme="light"] .pill:hover { background: rgba(13, 123, 80, 0.06); }
         [data-theme="light"] .toolbar-btn { background: rgba(255, 255, 255, 0.5); }
         [data-theme="light"] .font-controls { background: rgba(255, 255, 255, 0.5); }
         [data-theme="light"] .footer { background: transparent; }
@@ -690,7 +695,7 @@
             background: var(--bg-glass);
             border: 1px solid rgba(201, 168, 76, 0.1);
             border-radius: var(--radius-lg);
-            padding: 1.5rem 1.2rem; margin: 1.2rem 0 2.2rem;
+            padding: 1.2rem 1rem; margin: 1rem 0 1.8rem;
             text-align: center; position: relative; overflow: hidden;
             cursor: pointer;
             transition: all 0.4s var(--transition-smooth);
@@ -719,8 +724,9 @@
             line-height: 2.3; margin: 0.5rem 0;
         }
         .daily-translation {
-            font-family: var(--font-text); font-size: 0.9rem;
+            font-family: var(--font-text); font-size: 0.95rem;
             color: var(--text-muted); font-style: italic;
+            line-height: 1.7; margin-top: 4px;
         }
         .daily-share-btn {
             display: inline-block; margin-top: 12px;
@@ -1095,7 +1101,7 @@
             font-family: var(--font-amiri);
             font-size: calc(0.9rem * var(--font-scale));
             color: var(--text-subtle); font-style: italic;
-            line-height: 2.0; padding: 10px 0;
+            line-height: 2.3; padding: 10px 0;
             border-bottom: 1px solid rgba(46, 196, 122, 0.05);
             margin-bottom: 10px;
         }
@@ -2227,6 +2233,43 @@
             background: rgba(46, 196, 122, 0.1);
             border-color: rgba(46, 196, 122, 0.3); color: var(--emerald-light); transform: scale(1.08);
         }
+        /* ===== NAV OVERFLOW MENU (MOBILE) ===== */
+        .nav-overflow-toggle {
+            display: none;
+            background: rgba(46, 196, 122, 0.04);
+            border: 1px solid rgba(46, 196, 122, 0.12);
+            color: var(--text-muted); width: 34px; height: 34px;
+            border-radius: 50%; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s var(--transition-smooth); font-size: 1rem;
+        }
+        .nav-overflow-toggle:hover {
+            background: rgba(46, 196, 122, 0.1);
+            border-color: rgba(46, 196, 122, 0.3); color: var(--emerald-light);
+        }
+        .nav-overflow-menu {
+            display: none; position: absolute; top: calc(100% + 4px); right: 0;
+            background: rgba(12, 26, 19, 0.95);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(46, 196, 122, 0.12);
+            border-radius: var(--radius-md); padding: 6px;
+            min-width: 150px; z-index: 1001;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            flex-direction: column; gap: 2px;
+        }
+        .nav-overflow-menu.open { display: flex; }
+        .nav-overflow-menu .nav-btn {
+            width: 100%; border-radius: 8px; justify-content: flex-start;
+            gap: 10px; padding: 10px 14px; font-size: 0.78rem;
+            font-family: var(--font-title); letter-spacing: 1px;
+        }
+        .nav-overflow-menu .nav-btn .overflow-label {
+            font-size: 0.68rem; letter-spacing: 1.2px; text-transform: uppercase;
+        }
+        [data-theme="light"] .nav-overflow-menu {
+            background: rgba(247, 245, 239, 0.96);
+            border-color: rgba(13, 123, 80, 0.12);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
         /* ============================================ */
         @media (max-width: 420px) {
             h1 { font-size: 1.5rem; }
@@ -2236,6 +2279,15 @@
             .container { padding-left: 8px; padding-right: 8px; }
             .tasbeeh-count-display { font-size: 3.5rem; }
             .tasbeeh-tap-btn { width: 120px; height: 120px; }
+
+            /* Nav overflow: hide etiquette, progress, share; show hamburger */
+            .nav-overflow-toggle { display: flex; }
+            .nav-actions > .nav-btn { display: none; }
+            .nav-actions { position: relative; }
+
+            /* Category pills: wrap instead of scroll on small screens */
+            .category-pills { flex-wrap: wrap; overflow-x: visible; padding-bottom: 8px; }
+            .pill { padding: 8px 14px; font-size: 0.65rem; letter-spacing: 1px; }
         }
 
         @media (min-width: 768px) {
@@ -2385,6 +2437,13 @@
         <button class="nav-btn" onclick="openEtiquette()" title="Dua Etiquette" aria-label="Etiquette of Dua">📖</button>
         <button class="nav-btn" onclick="openProgress()" title="Your Progress" aria-label="View progress stats">📊</button>
         <button class="nav-btn" onclick="sharePage()" title="Share" aria-label="Share this collection">↗</button>
+        <!-- Mobile overflow menu -->
+        <button class="nav-overflow-toggle" onclick="toggleNavOverflow(event)" title="More options" aria-label="More options" aria-expanded="false" id="navOverflowBtn">⋮</button>
+        <div class="nav-overflow-menu" id="navOverflowMenu" role="menu">
+            <button class="nav-btn" role="menuitem" onclick="openEtiquette(); closeNavOverflow()">📖 <span class="overflow-label">Etiquette</span></button>
+            <button class="nav-btn" role="menuitem" onclick="openProgress(); closeNavOverflow()">📊 <span class="overflow-label">Progress</span></button>
+            <button class="nav-btn" role="menuitem" onclick="sharePage(); closeNavOverflow()">↗ <span class="overflow-label">Share</span></button>
+        </div>
     </div>
 </nav>
 
@@ -5444,8 +5503,18 @@ window.filterCategory = function(cat, btn) {
 
     // ===== UTILITIES =====
     function updateStats() {
-        if (els.bookmarkCount) els.bookmarkCount.innerText = STATE.bookmarks.length;
-        if (els.readCount) els.readCount.innerText = STATE.read.length;
+        if (els.bookmarkCount) {
+            const saved = STATE.bookmarks.length;
+            els.bookmarkCount.innerText = saved || '—';
+            const savedLabel = els.bookmarkCount.closest('.stat-item')?.querySelector('.stat-label');
+            if (savedLabel) savedLabel.innerText = saved ? (STATE.lang === 'ps' ? 'خوندي' : 'Saved') : (STATE.lang === 'ps' ? 'خوندي کړئ' : 'Tap ♡');
+        }
+        if (els.readCount) {
+            const read = STATE.read.length;
+            els.readCount.innerText = read || '—';
+            const readLabel = els.readCount.closest('.stat-item')?.querySelector('.stat-label');
+            if (readLabel) readLabel.innerText = read ? (STATE.lang === 'ps' ? 'لوستل شوي' : 'Read') : (STATE.lang === 'ps' ? 'پیل کړئ' : 'Start');
+        }
 
         // Update progress ring
         const ring = document.getElementById('readProgressRing');
@@ -6151,6 +6220,29 @@ window.filterCategory = function(cat, btn) {
         if (btn) btn.innerHTML = isLight ? '☀' : '🌙';
         showToast(isLight ? 'Dark Mode' : 'Light Mode');
     };
+
+    // ===== NAV OVERFLOW MENU =====
+    window.toggleNavOverflow = function(e) {
+        e.stopPropagation();
+        const menu = document.getElementById('navOverflowMenu');
+        const btn = document.getElementById('navOverflowBtn');
+        const isOpen = menu.classList.toggle('open');
+        btn.setAttribute('aria-expanded', isOpen);
+    };
+    window.closeNavOverflow = function() {
+        const menu = document.getElementById('navOverflowMenu');
+        const btn = document.getElementById('navOverflowBtn');
+        if (menu) menu.classList.remove('open');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    };
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('navOverflowMenu');
+        const btn = document.getElementById('navOverflowBtn');
+        if (menu && !menu.contains(e.target) && e.target !== btn) {
+            menu.classList.remove('open');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+    });
 
     // ===== MEMORIZATION MODE =====
     window.toggleMemorizeMode = function() {
