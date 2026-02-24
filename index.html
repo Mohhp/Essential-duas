@@ -5455,18 +5455,23 @@ window.filterCategory = function(cat, btn) {
         }
     });
 
-    // Hide section headers that have zero visible cards beneath them
+    // Hide section headers: hide ALL when filtering a specific category,
+    // only hide empty ones when showing "all"
     document.querySelectorAll('.section-header').forEach(sh => {
-        let hasVisible = false;
-        let next = sh.nextElementSibling;
-        while (next && !next.classList.contains('section-header')) {
-            if (next.classList.contains('dua-card') && !next.classList.contains('hidden-card')) {
-                hasVisible = true;
-                break;
+        if (cat !== 'all') {
+            sh.style.display = 'none';
+        } else {
+            let hasVisible = false;
+            let next = sh.nextElementSibling;
+            while (next && !next.classList.contains('section-header')) {
+                if (next.classList.contains('dua-card') && !next.classList.contains('hidden-card')) {
+                    hasVisible = true;
+                    break;
+                }
+                next = next.nextElementSibling;
             }
-            next = next.nextElementSibling;
+            sh.style.display = hasVisible ? '' : 'none';
         }
-        sh.style.display = hasVisible ? '' : 'none';
     });
 
     if (els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
