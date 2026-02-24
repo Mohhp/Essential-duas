@@ -5508,6 +5508,10 @@ window.filterCategory = function(cat, btn) {
         document.getElementById('cdhSubtitle').textContent = (isPashto && psUI && psUI.catCardSubtitles[cat]) ? psUI.catCardSubtitles[cat] : meta.subtitle;
         detailHeader.classList.add('visible');
 
+        // Hide category pills — the user already chose a category
+        const pillsRow = document.getElementById('categoryPills');
+        if (pillsRow) pillsRow.style.display = 'none';
+
         // Filter cards to this category
         const pill = document.querySelector(`.pill[data-category="${cat}"]`);
         filterCategory(cat, pill);
@@ -5528,6 +5532,10 @@ window.filterCategory = function(cat, btn) {
         grid.classList.remove('hidden-grid');
         duaList.classList.add('hidden-list');
         detailHeader.classList.remove('visible');
+
+        // Restore category pills
+        const pillsRow = document.getElementById('categoryPills');
+        if (pillsRow) pillsRow.style.display = '';
 
         // Reset all card visibility
         els.cards.forEach(card => {
