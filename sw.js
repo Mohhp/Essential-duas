@@ -1,21 +1,27 @@
-const CACHE_NAME = 'essential-duas-v4';
+const CACHE_NAME = 'essential-duas-v5';
+const OFFLINE_PAGE = './offline.html';
+
 const ASSETS = [
   './',
   './index.html',
+  './offline.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './favicon.svg',
   'https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap'
 ];
 
-// Install — cache all core assets
+// Install — pre-cache all core assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS).catch(() => {
-        // If some assets fail (e.g. Google Fonts), that's OK
-        return cache.addAll(['./index.html', './manifest.json']);
-      });
+      // Always cache the offline page first
+      return cache.addAll([OFFLINE_PAGE, './index.html', './manifest.json', './favicon.svg', './icon-192.png', './icon-512.png'])
+        .then(() => {
+          // Then try to cache everything else (fonts may fail, that's OK)
+          return cache.addAll(ASSETS).catch(() => {});
+        });
     })
   );
   self.skipWaiting();
@@ -33,26 +39,38 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch — network first, fall back to cache (stale-while-revalidate)
+// Fetch — network first, cache fallback, offline page as last resort
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
   if (event.request.method !== 'GET') return;
 
+  // For navigation requests (HTML pages)
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => {
+          return caches.match(event.request)
+            .then((cached) => cached || caches.match('./index.html'))
+            .then((cached) => cached || caches.match(OFFLINE_PAGE));
+        })
+    );
+    return;
+  }
+
+  // For all other assets (CSS, JS, images, fonts)
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Cache the fresh response
         const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, clone);
-        });
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         return response;
       })
       .catch(() => {
-        // Network failed — serve from cache
-        return caches.match(event.request).then((cached) => {
-          return cached || caches.match('./index.html');
-        });
+        return caches.match(event.request);
       })
   );
 });

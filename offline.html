@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a1210">
+    <title>فلاح — Offline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cinzel:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;1,400&family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: #0a1210; color: #e0eccc;
+            font-family: 'Playfair Display', serif;
+            overflow: hidden; position: relative;
+        }
+
+        /* Subtle background pattern */
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(ellipse at 30% 20%, rgba(13,107,71,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(184,150,62,0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .offline-container {
+            position: relative; z-index: 1;
+            text-align: center; padding: 40px 24px;
+            max-width: 420px;
+        }
+
+        /* Logo */
+        .offline-logo {
+            position: relative; width: 120px; height: 120px;
+            margin: 0 auto 32px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .offline-crescent {
+            position: absolute; width: 110px; height: 110px;
+            border: 2.5px solid transparent; border-radius: 50%;
+            background: conic-gradient(from 200deg, #1a9a6a, #d4a843, #1a9a6a) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            opacity: 0.5;
+            animation: crescentSpin 8s linear infinite;
+        }
+
+        .offline-fa {
+            font-family: 'Noto Naskh Arabic', 'Amiri', serif;
+            font-size: 4rem; font-weight: 700; color: #1a9a6a;
+            position: relative; z-index: 1; line-height: 1;
+            text-shadow: 0 0 40px rgba(13,107,71,0.4);
+            animation: faPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes crescentSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes faPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.85; }
+        }
+
+        /* Text */
+        .offline-brand {
+            font-family: 'Cinzel', serif; font-size: 0.7rem;
+            letter-spacing: 4px; text-transform: uppercase;
+            color: #1a9a6a; margin-bottom: 6px;
+        }
+
+        .offline-arabic-name {
+            font-family: 'Noto Naskh Arabic', 'Amiri', serif;
+            font-size: 1.3rem; color: #d4a843; opacity: 0.6;
+            margin-bottom: 28px;
+        }
+
+        .offline-ornament {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; margin-bottom: 28px;
+        }
+        .offline-ornament .line {
+            width: 50px; height: 1px;
+            background: linear-gradient(to right, transparent, rgba(13,107,71,0.4));
+        }
+        .offline-ornament .line:last-child {
+            background: linear-gradient(to left, transparent, rgba(13,107,71,0.4));
+        }
+        .offline-ornament span:nth-child(2) {
+            color: #d4a843; font-size: 0.8rem; opacity: 0.5;
+        }
+
+        .offline-message {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; font-style: italic;
+            color: rgba(224,238,210,0.7); line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .offline-hint {
+            font-family: 'Cinzel', serif; font-size: 0.5rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: rgba(224,238,210,0.3); margin-bottom: 36px;
+        }
+
+        /* Retry button */
+        .offline-retry {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 14px 36px; border-radius: 50px;
+            background: rgba(13,107,71,0.1);
+            border: 1px solid rgba(13,107,71,0.3);
+            color: #1a9a6a; font-family: 'Cinzel', serif;
+            font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .offline-retry:hover {
+            background: rgba(13,107,71,0.2);
+            border-color: #1a9a6a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(13,107,71,0.15);
+        }
+
+        /* Dua at bottom */
+        .offline-dua {
+            margin-top: 48px; padding: 20px;
+            background: rgba(13,107,71,0.04);
+            border: 1px solid rgba(13,107,71,0.1);
+            border-radius: 16px; max-width: 360px;
+        }
+        .offline-dua-arabic {
+            font-family: 'Noto Naskh Arabic', 'Amiri', serif;
+            font-size: 1.3rem; line-height: 2.2; direction: rtl;
+            color: rgba(224,238,210,0.8); margin-bottom: 10px;
+        }
+        .offline-dua-translation {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.82rem; font-style: italic;
+            color: rgba(224,238,210,0.45); line-height: 1.6;
+        }
+        .offline-dua-ref {
+            font-family: 'Cinzel', serif; font-size: 0.4rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            color: rgba(224,238,210,0.2); margin-top: 10px;
+        }
+
+        /* Footer credit */
+        .offline-footer {
+            position: fixed; bottom: 20px; left: 0; right: 0;
+            text-align: center;
+            font-family: 'Cinzel', serif; font-size: 0.4rem;
+            letter-spacing: 1.5px; color: rgba(224,238,210,0.15);
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed; border-radius: 50%;
+            background: rgba(13,107,71,0.15);
+            pointer-events: none; z-index: 0;
+            animation: float linear infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles -->
+    <div class="particle" style="width:4px;height:4px;left:15%;animation-duration:12s;animation-delay:0s;"></div>
+    <div class="particle" style="width:3px;height:3px;left:45%;animation-duration:16s;animation-delay:2s;"></div>
+    <div class="particle" style="width:5px;height:5px;left:75%;animation-duration:14s;animation-delay:4s;"></div>
+    <div class="particle" style="width:3px;height:3px;left:30%;animation-duration:18s;animation-delay:6s;"></div>
+    <div class="particle" style="width:4px;height:4px;left:60%;animation-duration:15s;animation-delay:1s;"></div>
+    <div class="particle" style="width:3px;height:3px;left:85%;animation-duration:13s;animation-delay:3s;"></div>
+
+    <div class="offline-container">
+        <!-- Logo -->
+        <div class="offline-logo">
+            <div class="offline-crescent"></div>
+            <span class="offline-fa">ف</span>
+        </div>
+
+        <div class="offline-brand">Essential Duas</div>
+        <div class="offline-arabic-name">فلاح</div>
+
+        <div class="offline-ornament">
+            <span class="line"></span>
+            <span>✦</span>
+            <span class="line"></span>
+        </div>
+
+        <div class="offline-message">
+            You are currently offline.<br>
+            The full app will load once your<br>
+            connection is restored, in shā' Allāh.
+        </div>
+
+        <div class="offline-hint">Check your connection and try again</div>
+
+        <a href="./" class="offline-retry" onclick="location.reload(); return false;">
+            ↻ Reconnect
+        </a>
+
+        <!-- A dua to read while waiting -->
+        <div class="offline-dua">
+            <div class="offline-dua-arabic">حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ</div>
+            <div class="offline-dua-translation">"Sufficient for us is Allah, and He is the best Disposer of affairs."</div>
+            <div class="offline-dua-ref">Quran 3:173 · Sahih al-Bukhari 4563</div>
+        </div>
+    </div>
+
+    <div class="offline-footer">© 2025 فلاح · Engineer Mohammad Falah</div>
+
+    <script>
+        // Auto-retry when connection comes back
+        window.addEventListener('online', () => {
+            location.reload();
+        });
+    </script>
+</body>
+</html>
