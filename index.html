@@ -29,9 +29,9 @@
 
         :root {
             --bg-dark: #060d0a;
-            --bg-card: rgba(12, 24, 18, 0.65);
+            --bg-card: rgba(12, 24, 18, 0.72);
             --bg-surface: #0e1f16;
-            --bg-glass: rgba(14, 28, 20, 0.55);
+            --bg-glass: rgba(14, 28, 20, 0.65);
             --gold-lightest: #f0f4e8;
             --gold-light: #dce8c8;
             --gold-mid: #c9a84c;
@@ -50,10 +50,10 @@
             --green-mid: #4cad52;
             --green-dark: #1b5e20;
             --green-deep: #0a3d0a;
-            --text-primary: rgba(220, 232, 200, 0.92);
-            --text-muted: rgba(170, 215, 185, 0.68);
-            --text-subtle: rgba(150, 200, 175, 0.55);
-            --text-faint: rgba(140, 195, 165, 0.42);
+            --text-primary: rgba(235, 245, 220, 0.96);
+            --text-muted: rgba(200, 225, 210, 0.85);
+            --text-subtle: rgba(180, 215, 195, 0.75);
+            --text-faint: rgba(170, 210, 190, 0.65);
             --font-arabic: 'Noto Naskh Arabic', 'Amiri', serif;
             --font-amiri: 'Amiri', serif;
             --font-title: 'Cinzel', serif;
@@ -92,10 +92,10 @@
             --green-lightest: #0a3d0a;
             --green-light: #2e7d32;
             --green-mid: #1b5e20;
-            --text-primary: rgba(20, 50, 35, 0.92);
-            --text-muted: rgba(30, 70, 50, 0.68);
-            --text-subtle: rgba(30, 70, 50, 0.5);
-            --text-faint: rgba(30, 70, 50, 0.35);
+            --text-primary: rgba(15, 40, 28, 0.95);
+            --text-muted: rgba(25, 60, 42, 0.82);
+            --text-subtle: rgba(25, 60, 42, 0.7);
+            --text-faint: rgba(25, 60, 42, 0.58);
             --shadow-soft: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
             --shadow-card: 0 2px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
             --shadow-elevated: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.05);
@@ -216,7 +216,7 @@
         }
         .fallah-sub {
             font-family: var(--font-arabic); font-size: 0.5rem;
-            color: var(--gold-mid); opacity: 0.5; margin-top: -1px;
+            color: var(--gold-mid); opacity: 0.7; margin-top: -1px;
         }
 
         /* ===== SPLASH SCREEN ===== */
@@ -314,11 +314,11 @@
         .footer-credit-text {
             font-family: var(--font-title); font-size: 0.38rem;
             letter-spacing: 2.5px; text-transform: uppercase;
-            color: var(--text-faint);
+            color: var(--text-subtle);
         }
         .footer-copyright {
             font-family: var(--font-title); font-size: 0.38rem;
-            letter-spacing: 2px; color: rgba(140, 195, 160, 0.2);
+            letter-spacing: 2px; color: rgba(170, 210, 190, 0.4);
             margin-top: 8px;
         }
 
@@ -423,9 +423,7 @@
             display: flex; flex-direction: column; align-items: center; gap: 4px;
             padding: 8px 14px; border-radius: var(--radius-md); cursor: pointer;
             transition: all 0.3s var(--transition-smooth); border: none; background: none;
-            color: var(--text-faint);
-            font-family: var(--font-title); font-size: 0.48rem;
-            letter-spacing: 1.2px; text-transform: uppercase; min-width: 56px;
+            color: var(--text-subtle);
             position: relative;
         }
         .bottom-nav-item.active {
@@ -494,7 +492,7 @@
 
         .hero-ornament {
             display: flex; align-items: center; justify-content: center; gap: 14px;
-            margin: 0.8rem 0; color: var(--emerald-light); font-size: 0.7rem; opacity: 0.4;
+            margin: 0.8rem 0; color: var(--emerald-light); font-size: 0.7rem; opacity: 0.55;
         }
         .hero-ornament .line {
             width: 60px; height: 1px;
@@ -512,7 +510,7 @@
 
         .subtitle {
             font-family: var(--font-title); font-size: 0.6rem; letter-spacing: 5px;
-            color: var(--text-subtle); text-transform: uppercase;
+            color: var(--text-muted); text-transform: uppercase;
             margin-bottom: 1.5rem;
         }
 
@@ -536,7 +534,7 @@
         .stat-label {
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 2.5px; text-transform: uppercase;
-            color: var(--text-faint); margin-top: 4px;
+            color: var(--text-subtle); margin-top: 4px;
         }
 
         /* Reading Progress Ring */
@@ -578,7 +576,7 @@
             padding: 10px 18px; margin: 0 0 1rem;
             font-family: var(--font-title); font-size: 0.55rem;
             letter-spacing: 1.8px; text-transform: uppercase;
-            color: var(--text-faint);
+            color: var(--text-subtle);
             backdrop-filter: blur(8px);
         }
         .streak-fire { font-size: 1.1rem; }
@@ -610,7 +608,7 @@
         .daily-label {
             font-family: var(--font-title); font-size: 0.55rem;
             letter-spacing: 4px; text-transform: uppercase;
-            color: rgba(201, 168, 76, 0.6); margin-bottom: 0.5rem;
+            color: rgba(201, 168, 76, 0.8); margin-bottom: 0.5rem;
         }
         .daily-label .sparkle { margin: 0 6px; }
         .daily-arabic {
@@ -639,7 +637,7 @@
             backdrop-filter: blur(12px);
             box-shadow: var(--shadow-soft);
         }
-        .search-input::placeholder { color: var(--text-faint); }
+        .search-input::placeholder { color: var(--text-subtle); }
         .search-input:focus {
             border-color: rgba(46, 196, 122, 0.3);
             box-shadow: 0 0 0 3px rgba(46, 196, 122, 0.06), var(--shadow-card);
@@ -647,11 +645,11 @@
         }
         .search-icon {
             position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
-            color: var(--text-faint); font-size: 1rem;
+            color: var(--text-subtle); font-size: 1rem;
         }
         .search-clear {
             position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; color: var(--text-faint);
+            background: none; border: none; color: var(--text-subtle);
             cursor: pointer; font-size: 1rem; display: none;
             transition: color 0.25s;
         }
@@ -670,7 +668,7 @@
             padding: 7px 14px; border-radius: 50px;
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.08);
-            color: var(--text-faint);
+            color: var(--text-subtle);
             font-family: var(--font-title); font-size: 0.48rem;
             letter-spacing: 1.8px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s var(--transition-smooth); white-space: nowrap;
@@ -693,14 +691,14 @@
             flex-shrink: 0; padding: 8px 16px; border-radius: 50px;
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.08);
-            color: var(--text-faint);
+            color: var(--text-subtle);
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 1.8px; text-transform: uppercase;
             cursor: pointer; transition: all 0.35s var(--transition-smooth); white-space: nowrap;
         }
         .pill:hover {
             background: rgba(46, 196, 122, 0.08);
-            border-color: rgba(46, 196, 122, 0.2); color: var(--text-muted);
+            border-color: rgba(46, 196, 122, 0.2); color: var(--text-primary);
         }
         .pill.active {
             background: linear-gradient(135deg, rgba(46, 196, 122, 0.12), rgba(46, 196, 122, 0.06));
@@ -718,7 +716,7 @@
         /* ============================================ */
         .dua-card {
             background: var(--bg-glass);
-            border: 1px solid rgba(46, 196, 122, 0.06);
+            border: 1px solid rgba(46, 196, 122, 0.1);
             border-radius: var(--radius-lg);
             margin-bottom: 14px; overflow: hidden;
             transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.4s ease, box-shadow 0.4s ease;
@@ -837,14 +835,14 @@
         .dua-category-tag {
             font-family: var(--font-title); font-size: 0.45rem;
             letter-spacing: 1.8px; text-transform: uppercase;
-            color: var(--text-faint); margin-top: 3px;
+            color: var(--text-subtle); margin-top: 3px;
         }
 
 
         .card-actions { display: flex; gap: 3px; align-items: center; }
         .card-action-btn {
             background: none; border: none;
-            color: var(--text-faint);
+            color: var(--text-subtle);
             width: 30px; height: 30px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.3s var(--transition-smooth);
@@ -858,7 +856,7 @@
 
         .expand-icon {
             transition: transform 0.35s var(--transition-smooth);
-            color: var(--text-faint); font-size: 0.75rem;
+            color: var(--text-subtle); font-size: 0.75rem;
         }
         .dua-card.expanded .expand-icon { transform: rotate(180deg); }
 
@@ -867,7 +865,7 @@
         /* Ornamental divider */
         .ornament-divider {
             display: flex; align-items: center; justify-content: center; gap: 12px;
-            margin: 6px 0 14px; opacity: 0.25;
+            margin: 6px 0 14px; opacity: 0.4;
         }
         .ornament-divider .line {
             flex: 1; height: 1px; max-width: 50px;
@@ -883,8 +881,8 @@
 
         /* Arabic Text */
         .arabic-container {
-            background: linear-gradient(135deg, rgba(46, 196, 122, 0.03), rgba(6, 13, 10, 0.3));
-            border: 1px solid rgba(46, 196, 122, 0.06);
+            background: linear-gradient(135deg, rgba(46, 196, 122, 0.05), rgba(6, 13, 10, 0.4));
+            border: 1px solid rgba(46, 196, 122, 0.08);
             border-radius: var(--radius-md);
             padding: 22px 18px; margin-bottom: 14px;
             position: relative; overflow: hidden;
@@ -926,11 +924,11 @@
             margin-top: 14px; padding-top: 12px;
             border-top: 1px solid rgba(46, 196, 122, 0.05);
         }
-        .ref-icon { font-size: 0.75rem; color: var(--text-faint); }
+        .ref-icon { font-size: 0.75rem; color: var(--text-subtle); }
         .ref-text {
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 1.2px; text-transform: uppercase;
-            color: var(--text-faint);
+            color: var(--text-subtle);
         }
 
         /* Virtue/Benefit Tag */
@@ -964,7 +962,7 @@
             padding: 7px 14px; border-radius: 50px;
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.1);
-            color: var(--text-faint);
+            color: var(--text-subtle);
             font-family: var(--font-title); font-size: 0.48rem;
             letter-spacing: 1.2px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s var(--transition-smooth);
@@ -978,7 +976,7 @@
         .action-btn.copied, .action-btn.read {
             background: rgba(201, 168, 76, 0.08);
             border-color: rgba(201, 168, 76, 0.18);
-            color: rgba(201, 168, 76, 0.75);
+            color: rgba(201, 168, 76, 0.85);
         }
 
         /* ============================================ */
@@ -1009,7 +1007,7 @@
         }
         .section-subtitle {
             font-family: var(--font-text); font-size: 0.78rem;
-            color: var(--text-faint); font-style: italic;
+            color: var(--text-muted); font-style: italic;
             margin-top: 4px;
         }
 
@@ -1061,11 +1059,11 @@
         }
         .etiquette-text {
             font-family: var(--font-text); font-size: 0.85rem;
-            color: rgba(224, 238, 210, 0.8); line-height: 1.8;
+            color: rgba(230, 242, 218, 0.88); line-height: 1.8;
         }
         .etiquette-text strong { color: var(--gold-light); }
         .etiquette-text .ref {
-            font-size: 0.7rem; color: rgba(46, 196, 122, 0.4);
+            font-size: 0.7rem; color: rgba(46, 196, 122, 0.6);
             font-style: italic;
         }
 
@@ -1134,7 +1132,7 @@
         .tasbeeh-title {
             font-family: var(--font-title); font-size: 0.7rem;
             letter-spacing: 3px; text-transform: uppercase;
-            color: rgba(46, 196, 122, 0.5); margin-bottom: 1rem;
+            color: rgba(46, 196, 122, 0.7); margin-bottom: 1rem;
         }
         .tasbeeh-arabic {
             font-family: var(--font-arabic);
@@ -1153,7 +1151,7 @@
         .tasbeeh-target {
             font-family: var(--font-title); font-size: 0.6rem;
             letter-spacing: 2px; text-transform: uppercase;
-            color: rgba(46, 196, 122, 0.4); margin-bottom: 2rem;
+            color: rgba(46, 196, 122, 0.7); margin-bottom: 2rem;
         }
         .tasbeeh-tap-btn {
             width: 130px; height: 130px; border-radius: 50%;
@@ -1178,7 +1176,7 @@
             padding: 8px 18px; border-radius: 50px;
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.1);
-            color: var(--text-faint);
+            color: var(--text-subtle);
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 2px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s var(--transition-smooth);
@@ -1193,7 +1191,7 @@
             padding: 6px 14px; border-radius: 50px;
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.08);
-            color: var(--text-faint);
+            color: var(--text-subtle);
             font-family: var(--font-title); font-size: 0.5rem;
             cursor: pointer; transition: all 0.25s var(--transition-smooth);
         }
@@ -1243,18 +1241,17 @@
         /* Dhikr virtue hint */
         .tasbeeh-virtue {
             font-family: var(--font-text); font-size: 0.65rem;
-            color: var(--text-faint); font-style: italic;
+            color: var(--text-subtle); font-style: italic;
             text-align: center; max-width: 300px;
             margin-bottom: 1.5rem; line-height: 1.5;
-            opacity: 0.7; transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease;
         }
 
         /* Lifetime total */
         .tasbeeh-lifetime {
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 1.5px; text-transform: uppercase;
-            color: var(--text-faint); margin-top: 1.2rem;
-            opacity: 0.5;
+            color: var(--text-subtle); margin-top: 1.2rem;
         }
         .tasbeeh-lifetime span { color: var(--gold-mid); }
 
@@ -1469,11 +1466,11 @@
             font-size: 0.45rem;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: var(--text-faint);
+            color: var(--text-subtle);
             margin-top: 4px;
         }
         .section-header:hover .section-collapse-hint {
-            color: rgba(46, 196, 122, 0.4);
+            color: rgba(46, 196, 122, 0.6);
         }
 
         /* ============================================ */
@@ -1902,7 +1899,7 @@
 
             <h1 class="gold-text">Essential Duas</h1>
             <div class="subtitle">The Crown Collection from Quran & Sunnah</div>
-            <div style="font-family:var(--font-arabic);font-size:0.8rem;color:var(--gold-mid);opacity:0.55;margin-top:4px;">by المهندس محمد فلاح</div>
+            <div style="font-family:var(--font-arabic);font-size:0.8rem;color:var(--gold-mid);opacity:0.75;margin-top:4px;">by المهندس محمد فلاح</div>
 
             <p class="intro-text">
                 A meticulously curated treasury of the most powerful supplications
