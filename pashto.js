@@ -571,6 +571,8 @@ function toggleLanguage() {
     const lang = getCurrentLang() === 'en' ? 'ps' : 'en';
     localStorage.setItem('crown_lang', lang);
     applyLanguage(lang);
+    // Re-run updateStats so stat labels reflect the new language
+    if (typeof updateStats === 'function') updateStats();
 }
 
 function applyLanguage(lang) {
@@ -597,11 +599,11 @@ function applyLanguage(lang) {
 
     // Hero section
     const h1 = document.querySelector('.gold-text');
-    if (h1) h1.textContent = PS_UI.heroTitle;
+    if (h1) { if (!h1.getAttribute('data-en')) h1.setAttribute('data-en', h1.textContent); h1.textContent = PS_UI.heroTitle; }
     const sub = document.querySelector('.subtitle');
-    if (sub) sub.textContent = PS_UI.heroSubtitle;
-    const sadaqa = document.querySelector('.hero-section [style*="font-style:italic"]');
-    if (sadaqa) { sadaqa.setAttribute('data-en', sadaqa.textContent); sadaqa.textContent = PS_UI.sadaqaJariya; }
+    if (sub) { if (!sub.getAttribute('data-en')) sub.setAttribute('data-en', sub.textContent); sub.textContent = PS_UI.heroSubtitle; }
+    const sadaqa = document.querySelector('.hero [style*="font-style:italic"]');
+    if (sadaqa) { if (!sadaqa.getAttribute('data-en')) sadaqa.setAttribute('data-en', sadaqa.textContent); sadaqa.textContent = PS_UI.sadaqaJariya; }
     const intro = document.querySelector('.intro-text');
     if (intro) { if (!intro.getAttribute('data-en')) intro.setAttribute('data-en', intro.textContent); intro.textContent = PS_UI.introText; }
 
@@ -609,10 +611,10 @@ function applyLanguage(lang) {
     document.querySelectorAll('.stat-label').forEach(el => {
         if (!el.getAttribute('data-en')) el.setAttribute('data-en', el.textContent);
         const t = el.textContent.trim();
-        if (t === 'Duas') el.textContent = PS_UI.statDuas;
-        else if (t === 'Categories') el.textContent = PS_UI.statCategories;
-        else if (t === 'Saved') el.textContent = PS_UI.statSaved;
-        else if (t === 'Read') el.textContent = PS_UI.statRead;
+        if (t === 'Duas' || t === 'دعاګانې') el.textContent = PS_UI.statDuas;
+        else if (t === 'Categories' || t === 'کټګورۍ') el.textContent = PS_UI.statCategories;
+        else if (t === 'Saved' || t === 'Tap ♡' || t === 'خوندي' || t === 'خوندي کړئ') el.textContent = PS_UI.statSaved;
+        else if (t === 'Read' || t === 'Start' || t === 'لوستل شوي' || t === 'پیل کړئ') el.textContent = PS_UI.statRead;
     });
 
     // Streak banner

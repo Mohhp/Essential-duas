@@ -5507,13 +5507,15 @@ window.filterCategory = function(cat, btn) {
             const saved = STATE.bookmarks.length;
             els.bookmarkCount.innerText = saved || '—';
             const savedLabel = els.bookmarkCount.closest('.stat-item')?.querySelector('.stat-label');
-            if (savedLabel) savedLabel.innerText = saved ? (STATE.lang === 'ps' ? 'خوندي' : 'Saved') : (STATE.lang === 'ps' ? 'خوندي کړئ' : 'Tap ♡');
+            const isPS = (typeof getCurrentLang === 'function' ? getCurrentLang() : localStorage.getItem('crown_lang') || 'en') === 'ps';
+            if (savedLabel) savedLabel.innerText = saved ? (isPS ? 'خوندي' : 'Saved') : (isPS ? 'خوندي کړئ' : 'Tap ♡');
         }
         if (els.readCount) {
             const read = STATE.read.length;
             els.readCount.innerText = read || '—';
             const readLabel = els.readCount.closest('.stat-item')?.querySelector('.stat-label');
-            if (readLabel) readLabel.innerText = read ? (STATE.lang === 'ps' ? 'لوستل شوي' : 'Read') : (STATE.lang === 'ps' ? 'پیل کړئ' : 'Start');
+            const isPS = (typeof getCurrentLang === 'function' ? getCurrentLang() : localStorage.getItem('crown_lang') || 'en') === 'ps';
+            if (readLabel) readLabel.innerText = read ? (isPS ? 'لوستل شوي' : 'Read') : (isPS ? 'پیل کړئ' : 'Start');
         }
 
         // Update progress ring
@@ -5526,6 +5528,7 @@ window.filterCategory = function(cat, btn) {
             ring.style.strokeDashoffset = offset;
         }
     }
+    window.updateStats = updateStats;
 
     function showToast(msg) {
         // toast lives after the <script> tag, so cache it lazily on first use
