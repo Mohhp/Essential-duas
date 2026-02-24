@@ -1966,6 +1966,79 @@
             .arabic-text { color: #1a1a1a; }
             .translation { color: #333; }
         }
+
+        /* ============================================ */
+        /* ===== PASHTO / LANGUAGE TOGGLE ===== */
+        /* ============================================ */
+
+        /* --- Language toggle button --- */
+        .lang-toggle {
+            display: flex; align-items: center; gap: 0;
+            background: rgba(46, 196, 122, 0.08);
+            border: 1px solid rgba(46, 196, 122, 0.18);
+            border-radius: 20px; overflow: hidden;
+            font-size: 0.68rem; cursor: pointer;
+            margin-right: 4px;
+        }
+        .lang-toggle span {
+            padding: 5px 10px; transition: all 0.3s ease;
+            color: var(--text-muted); font-weight: 500;
+            white-space: nowrap;
+        }
+        .lang-toggle span.active-lang {
+            background: var(--emerald-light); color: #fff;
+            border-radius: 20px;
+        }
+        [data-theme="light"] .lang-toggle {
+            background: rgba(13, 123, 80, 0.06);
+            border-color: rgba(13, 123, 80, 0.15);
+        }
+        [data-theme="light"] .lang-toggle span.active-lang {
+            background: var(--emerald-light); color: #fff;
+        }
+
+        /* --- Pashto translation element --- */
+        .translation-ps {
+            font-family: var(--font-arabic);
+            font-size: calc(1rem * var(--font-scale));
+            line-height: 2;
+            color: var(--text-primary);
+            direction: rtl;
+            text-align: right;
+            padding: 12px 0 4px;
+        }
+
+        .virtue-tag-ps {
+            font-family: var(--font-arabic);
+            font-size: calc(0.82rem * var(--font-scale));
+            line-height: 1.9;
+            color: var(--gold-mid);
+            direction: rtl;
+            text-align: right;
+            padding: 6px 0 2px;
+            font-style: italic;
+        }
+        .virtue-tag-ps .gem { font-style: normal; }
+
+        /* --- Default: English mode — hide Pashto elements --- */
+        .translation-ps,
+        .virtue-tag-ps { display: none; }
+
+        /* --- Pashto mode --- */
+        .lang-ps .transliteration { display: none !important; }
+        .lang-ps .translation { display: none !important; }
+        .lang-ps .translation-ps { display: block; }
+        .lang-ps .virtue-tag { display: none !important; }
+        .lang-ps .virtue-tag-ps { display: flex; }
+
+        /* RTL adjustments for Pashto mode */
+        .lang-ps .section-title,
+        .lang-ps .section-subtitle,
+        .lang-ps .section-collapse-hint,
+        .lang-ps .dua-title,
+        .lang-ps .dua-category-tag {
+            font-family: var(--font-arabic);
+        }
     </style>
 </head>
 
@@ -1997,6 +2070,10 @@
         </div>
     </div>
     <div class="nav-actions">
+        <div class="lang-toggle" id="langToggle" onclick="toggleLanguage()" title="Switch language" aria-label="Toggle language">
+            <span id="langEN" class="active-lang">EN</span>
+            <span id="langPS">پښتو</span>
+        </div>
         <div class="font-controls">
             <button class="font-btn" onclick="adjustFontSize(-0.1)" title="Smaller text">A-</button>
             <button class="font-btn" onclick="adjustFontSize(0.1)" title="Larger text">A+</button>
@@ -4347,6 +4424,9 @@
 
 </div> <!-- ===== END .container ===== -->
 
+<!-- ===== PASHTO LANGUAGE SUPPORT ===== -->
+<script src="pashto.js"></script>
+
 <!-- ══════════════════════════════════════════ -->
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
@@ -4400,6 +4480,9 @@
         trackDailyActivity();
         renderBookmarksPanel();
         wrapArabicWords();
+
+        // Apply saved language preference
+        if (typeof applyLanguage === 'function') applyLanguage();
 
         // Search listener
         if (els.searchInput) {
