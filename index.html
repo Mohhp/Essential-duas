@@ -5373,6 +5373,24 @@
             if (isMatch) visibleCount++;
         });
         if (els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
+
+        // Hide section headers with no visible cards beneath them
+        document.querySelectorAll('.section-header').forEach(sh => {
+            if (query) {
+                let hasVisible = false;
+                let next = sh.nextElementSibling;
+                while (next && !next.classList.contains('section-header')) {
+                    if (next.classList.contains('dua-card') && !next.classList.contains('hidden-card')) {
+                        hasVisible = true;
+                        break;
+                    }
+                    next = next.nextElementSibling;
+                }
+                sh.style.display = hasVisible ? '' : 'none';
+            } else {
+                sh.style.display = '';
+            }
+        });
     }
 
     window.clearSearch = function() {
@@ -5452,15 +5470,18 @@ window.filterCategory = function(cat, btn) {
         'scholars':        { icon: '📚', title: 'Treasures of the Scholars', subtitle: 'Gems with honest transparent authentication' }
     };
 
-    window.openCategory = function(cat) {
+    window.openCategory = function(cat, opts) {
+        opts = opts || {};
         const grid = document.getElementById('categoryGrid');
         const duaList = document.getElementById('duaListSection');
         const detailHeader = document.getElementById('categoryDetailHeader');
         const meta = CATEGORY_META[cat] || { icon: '📿', title: cat, subtitle: '' };
 
-        // Hide the grid, show dua list
+        // Hide the grid and hero, show dua list
         grid.classList.add('hidden-grid');
         duaList.classList.remove('hidden-list');
+        const hero = document.querySelector('.hero');
+        if (hero) hero.style.display = 'none';
 
         // Set detail header (language-aware)
         document.getElementById('cdhIcon').textContent = meta.icon;
@@ -5479,7 +5500,9 @@ window.filterCategory = function(cat, btn) {
         filterCategory(cat, pill);
 
         // Scroll to the dua list so user sees cards immediately
-        duaList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (!opts.skipScroll) {
+            duaList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
         // Save state
         localStorage.setItem('crown_active_category', cat);
@@ -5490,10 +5513,12 @@ window.filterCategory = function(cat, btn) {
         const duaList = document.getElementById('duaListSection');
         const detailHeader = document.getElementById('categoryDetailHeader');
 
-        // Show grid, hide dua list
+        // Show grid and hero, hide dua list
         grid.classList.remove('hidden-grid');
         duaList.classList.add('hidden-list');
         detailHeader.classList.remove('visible');
+        const hero = document.querySelector('.hero');
+        if (hero) hero.style.display = '';
 
         // Restore category pills
         const pillsRow = document.getElementById('categoryPills');
@@ -5530,7 +5555,12 @@ window.filterCategory = function(cat, btn) {
             searchInput.addEventListener('focus', function() {
                 const grid = document.getElementById('categoryGrid');
                 if (grid && !grid.classList.contains('hidden-grid')) {
-                    openCategory('all');
+                    openCategory('all', { skipScroll: true });
+                    // Scroll to search bar so it stays visible with results below
+                    const searchContainer = document.querySelector('.search-container');
+                    if (searchContainer) {
+                        searchContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 }
             });
         }
