@@ -17,6 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer></script>
 
     <style>
         /* ============================================ */
@@ -119,7 +120,8 @@
         [data-theme="light"] .arabic-container { background: linear-gradient(135deg, rgba(13, 123, 80, 0.03), rgba(255,255,255,0.6)); border-color: rgba(13, 123, 80, 0.06); }
         [data-theme="light"] .etiquette-panel,
         [data-theme="light"] .routine-panel,
-        [data-theme="light"] .tasbeeh-panel { background: rgba(247, 245, 239, 0.97); }
+        [data-theme="light"] .tasbeeh-panel,
+        [data-theme="light"] .prayer-panel { background: rgba(247, 245, 239, 0.97); }
         [data-theme="light"] .side-panel { background: #fff; }
         [data-theme="light"] .overlay { background: rgba(0,0,0,0.2); }
         [data-theme="light"] .nav-title {
@@ -676,6 +678,17 @@
             font-family: var(--font-text); font-size: 0.9rem;
             color: var(--text-muted); font-style: italic;
         }
+        .daily-share-btn {
+            display: inline-block; margin-top: 12px;
+            font-family: var(--font-title); font-size: 0.6rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            padding: 6px 18px; border-radius: 20px;
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            background: rgba(201, 168, 76, 0.06);
+            color: var(--gold-light); cursor: pointer;
+            transition: all 0.3s;
+        }
+        .daily-share-btn:hover { background: rgba(201, 168, 76, 0.12); border-color: rgba(201, 168, 76, 0.35); }
 
         /* ============================================ */
         /* ===== SEARCH BAR ===== */
@@ -1238,6 +1251,209 @@
         }
         .routine-desc .dua-ref:hover { color: var(--gold-mid); }
 
+        /* Prayer Panel */
+        .prayer-panel {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(12, 26, 19, 0.96);
+            z-index: 2000; overflow-y: auto;
+            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
+            backdrop-filter: blur(24px) saturate(150%);
+            opacity: 0; visibility: hidden; transform: translateY(20px);
+            pointer-events: none;
+            transition: opacity 0.45s ease, visibility 0.45s ease, transform 0.45s var(--transition-smooth);
+        }
+        .prayer-panel.active { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+        .prayer-panel-content {
+            max-width: 500px; margin: 0 auto; padding-top: 20px;
+        }
+        .prayer-panel-content h2 {
+            font-family: var(--font-title); font-size: 1rem;
+            letter-spacing: 3px; text-transform: uppercase;
+            color: var(--emerald-light); text-align: center; margin-bottom: 1.5rem;
+        }
+        .prayer-location-bar {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-bottom: 1.2rem; padding: 10px 16px;
+            background: rgba(46, 196, 122, 0.04);
+            border: 1px solid rgba(46, 196, 122, 0.08);
+            border-radius: var(--radius-md);
+        }
+        .prayer-location-bar .loc-icon { font-size: 1rem; }
+        .prayer-location-bar .loc-text {
+            font-family: var(--font-text); font-size: 0.8rem;
+            color: rgba(224, 238, 210, 0.7);
+        }
+        .prayer-location-bar .loc-refresh {
+            background: none; border: none; color: var(--emerald-light);
+            cursor: pointer; font-size: 0.85rem; padding: 4px 8px;
+            border-radius: var(--radius-sm); transition: all 0.3s;
+        }
+        .prayer-location-bar .loc-refresh:hover { background: rgba(46, 196, 122, 0.1); }
+        .prayer-countdown-card {
+            text-align: center; padding: 16px;
+            background: rgba(46, 196, 122, 0.06);
+            border: 1px solid rgba(46, 196, 122, 0.12);
+            border-radius: var(--radius-lg); margin-bottom: 1.2rem;
+        }
+        .prayer-countdown-label {
+            font-family: var(--font-title); font-size: 0.6rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: rgba(46, 196, 122, 0.6); margin-bottom: 4px;
+        }
+        .prayer-countdown-name {
+            font-family: var(--font-title); font-size: 1.1rem;
+            color: var(--emerald-light); margin-bottom: 2px;
+        }
+        .prayer-countdown-time {
+            font-family: var(--font-title); font-size: 1.8rem;
+            color: var(--gold-light); letter-spacing: 2px;
+        }
+        .prayer-times-grid {
+            display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem;
+        }
+        .prayer-time-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(46, 196, 122, 0.03);
+            border: 1px solid rgba(46, 196, 122, 0.06);
+            border-radius: var(--radius-md);
+            transition: all 0.3s;
+        }
+        .prayer-time-row.active-prayer {
+            background: rgba(46, 196, 122, 0.1);
+            border-color: rgba(46, 196, 122, 0.25);
+            box-shadow: 0 0 12px rgba(46, 196, 122, 0.08);
+        }
+        .prayer-time-row.active-prayer .prayer-name { color: var(--emerald-light); }
+        .prayer-time-row.passed-prayer { opacity: 0.45; }
+        .prayer-name {
+            font-family: var(--font-title); font-size: 0.75rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: rgba(224, 238, 210, 0.8);
+        }
+        .prayer-time-val {
+            font-family: var(--font-title); font-size: 0.85rem;
+            color: var(--gold-light); letter-spacing: 1px;
+        }
+        /* Qibla Compass */
+        .qibla-section {
+            text-align: center; margin-top: 1.5rem; margin-bottom: 1.5rem;
+            padding: 20px;
+            background: rgba(46, 196, 122, 0.03);
+            border: 1px solid rgba(46, 196, 122, 0.08);
+            border-radius: var(--radius-lg);
+        }
+        .qibla-title {
+            font-family: var(--font-title); font-size: 0.65rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: rgba(46, 196, 122, 0.6); margin-bottom: 16px;
+        }
+        .qibla-compass {
+            width: 180px; height: 180px; margin: 0 auto 12px;
+            position: relative;
+            border-radius: 50%;
+            border: 2px solid rgba(46, 196, 122, 0.15);
+            background: rgba(12, 26, 19, 0.6);
+        }
+        .qibla-compass .compass-rose {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 0.55rem;
+            color: rgba(224, 238, 210, 0.3); letter-spacing: 1px;
+        }
+        .qibla-compass .compass-n { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); color: rgba(46, 196, 122, 0.5); font-size: 0.6rem; font-family: var(--font-title); }
+        .qibla-compass .compass-s { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); color: rgba(224,238,210,0.2); font-size: 0.6rem; font-family: var(--font-title); }
+        .qibla-compass .compass-e { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: rgba(224,238,210,0.2); font-size: 0.6rem; font-family: var(--font-title); }
+        .qibla-compass .compass-w { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: rgba(224,238,210,0.2); font-size: 0.6rem; font-family: var(--font-title); }
+        .qibla-arrow {
+            position: absolute; top: 50%; left: 50%;
+            width: 4px; height: 70px;
+            margin-left: -2px; margin-top: -60px;
+            background: linear-gradient(to bottom, var(--emerald-light), transparent);
+            border-radius: 2px;
+            transform-origin: bottom center;
+            transition: transform 0.5s ease;
+        }
+        .qibla-arrow::before {
+            content: '🕋'; position: absolute; top: -16px; left: 50%;
+            transform: translateX(-50%); font-size: 1.1rem;
+        }
+        .qibla-degree {
+            font-family: var(--font-title); font-size: 0.8rem;
+            color: rgba(224, 238, 210, 0.6); letter-spacing: 1px;
+        }
+        .qibla-status {
+            font-family: var(--font-text); font-size: 0.72rem;
+            color: rgba(224, 238, 210, 0.4); margin-top: 6px;
+        }
+        /* Notification toggle */
+        .prayer-notify-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px; margin-top: 1rem;
+            background: rgba(46, 196, 122, 0.03);
+            border: 1px solid rgba(46, 196, 122, 0.08);
+            border-radius: var(--radius-md);
+        }
+        .prayer-notify-label {
+            font-family: var(--font-title); font-size: 0.7rem;
+            letter-spacing: 1px; color: rgba(224, 238, 210, 0.7);
+        }
+        .toggle-switch {
+            position: relative; width: 44px; height: 24px; cursor: pointer;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; inset: 0;
+            background: rgba(46, 196, 122, 0.12);
+            border-radius: 24px; transition: 0.3s;
+        }
+        .toggle-slider::before {
+            content: ''; position: absolute; height: 18px; width: 18px;
+            left: 3px; bottom: 3px; background: rgba(224,238,210,0.5);
+            border-radius: 50%; transition: 0.3s;
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: rgba(46, 196, 122, 0.4);
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+            background: var(--emerald-light);
+        }
+        /* Prayer grid dynamic classes */
+        .prayer-time-icon { font-size: 1rem; width: 28px; }
+        .prayer-time-name {
+            font-family: var(--font-title); font-size: 0.75rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: rgba(224, 238, 210, 0.8); flex: 1;
+        }
+        .prayer-time-value {
+            font-family: var(--font-title); font-size: 0.85rem;
+            color: var(--gold-light); letter-spacing: 1px;
+        }
+        .prayer-time-row.current-prayer {
+            background: rgba(46, 196, 122, 0.12);
+            border-color: rgba(46, 196, 122, 0.3);
+            box-shadow: 0 0 16px rgba(46, 196, 122, 0.1);
+        }
+        .prayer-time-row.current-prayer .prayer-time-name { color: var(--emerald-light); font-weight: 600; }
+        .prayer-time-row.next-prayer {
+            background: rgba(46, 196, 122, 0.06);
+            border-color: rgba(46, 196, 122, 0.15);
+        }
+        .prayer-now-badge, .prayer-next-badge {
+            font-family: var(--font-title); font-size: 0.5rem;
+            letter-spacing: 1px; padding: 2px 8px;
+            border-radius: 20px; margin-left: 8px;
+        }
+        .prayer-now-badge {
+            background: rgba(46, 196, 122, 0.2); color: var(--emerald-light);
+            border: 1px solid rgba(46, 196, 122, 0.3);
+        }
+        .prayer-next-badge {
+            background: rgba(212, 175, 55, 0.12); color: var(--gold-light);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
         /* Tasbeeh Panel */
         .tasbeeh-panel {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -1686,6 +1902,34 @@
         .dua-card.memorize-mode .arabic-text.revealed + * {
             opacity: 1; /* sibling hint removed once revealed */
         }
+        /* Spaced Repetition */
+        .sr-rating-row {
+            display: flex; gap: 8px; justify-content: center;
+            margin-top: 8px; padding: 8px 0;
+            opacity: 0; max-height: 0; overflow: hidden;
+            transition: opacity 0.3s ease, max-height 0.3s ease;
+        }
+        .sr-rating-row.visible { opacity: 1; max-height: 60px; }
+        .sr-rating-btn {
+            font-family: var(--font-title); font-size: 0.6rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            padding: 6px 20px; border-radius: 20px;
+            border: 1px solid rgba(46, 196, 122, 0.15);
+            background: rgba(46, 196, 122, 0.06);
+            color: rgba(224, 238, 210, 0.7);
+            cursor: pointer; transition: all 0.3s;
+        }
+        .sr-rating-btn:hover { background: rgba(46, 196, 122, 0.12); color: var(--emerald-light); }
+        .sr-rating-btn.sr-easy { border-color: rgba(46, 196, 122, 0.2); }
+        .sr-rating-btn.sr-hard { border-color: rgba(212, 175, 55, 0.2); }
+        .sr-review-badge {
+            font-family: var(--font-title); font-size: 0.45rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            padding: 2px 8px; border-radius: 20px;
+            background: rgba(212, 175, 55, 0.12); color: var(--gold-light);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            margin-left: 8px; vertical-align: middle;
+        }
 
         /* ============================================ */
         /* ===== CARD ENTRANCE ANIMATIONS ===== */
@@ -1776,6 +2020,18 @@
         .progress-reset-btn:hover {
             background: rgba(122, 46, 59, 0.12);
             border-color: rgba(122, 46, 59, 0.25);
+        }
+        .progress-share-btn {
+            display: block; margin: 12px auto 0; padding: 10px 24px;
+            border-radius: 50px; background: rgba(46, 196, 122, 0.06);
+            border: 1px solid rgba(46, 196, 122, 0.12);
+            color: var(--emerald-light); font-family: var(--font-title);
+            font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.3s var(--transition-smooth);
+        }
+        .progress-share-btn:hover {
+            background: rgba(46, 196, 122, 0.12);
+            border-color: rgba(46, 196, 122, 0.25);
         }
 
         /* ===== AUDIO RECITATION BUTTON ===== */
@@ -2155,6 +2411,7 @@
         <div class="daily-label"><span class="sparkle">✦</span> Dua of the Day <span class="sparkle">✦</span></div>
         <div class="daily-arabic" id="dailyArabic"></div>
         <div class="daily-translation" id="dailyTranslation"></div>
+        <button class="daily-share-btn" onclick="event.stopPropagation(); shareDailyDua()">↗ Share Today's Dua</button>
     </div>
 
     <!-- ===== TIME-BASED SUGGESTION ===== -->
@@ -4582,6 +4839,9 @@
                 const rp = document.querySelector('.routine-panel.active');
                 if (rp) { closeRoutine(); return; }
 
+                const prayerp = document.querySelector('.prayer-panel.active');
+                if (prayerp) { closePrayer(); return; }
+
                 const bp = document.getElementById('bookmarksPanel');
                 if (bp && bp.classList.contains('active')) { toggleBookmarksPanel(); return; }
 
@@ -4603,6 +4863,16 @@
                 }
             }
         });
+
+        // Handle hash-based deep links (manifest shortcuts)
+        setTimeout(() => {
+            const hash = window.location.hash;
+            if (hash === '#daily') scrollToDailyDua();
+            else if (hash === '#tasbeeh') openTasbeeh();
+            else if (hash === '#routine') openRoutine();
+            else if (hash === '#prayer') openPrayer();
+            window.location.hash = '';
+        }, 2500); // After splash screen
     }
 
     // ===== CARD TOGGLE =====
@@ -5276,6 +5546,9 @@ window.filterCategory = function(cat, btn) {
         const rp = document.querySelector('.routine-panel.active');
         if (rp) { rp.classList.remove('active'); unlockScroll(); }
 
+        const pp = document.querySelector('.prayer-panel.active');
+        if (pp) { pp.classList.remove('active'); unlockScroll(); }
+
         const bp = document.getElementById('bookmarksPanel');
         const ov = document.querySelector('.overlay');
         if (bp && bp.classList.contains('active')) {
@@ -5344,6 +5617,9 @@ window.filterCategory = function(cat, btn) {
                     overlay.classList.add('active');
                     lockScroll();
                 }, 50);
+                break;
+            case 'prayer':
+                setTimeout(() => openPrayer(), 50);
                 break;
         }
     };
@@ -5515,8 +5791,118 @@ window.filterCategory = function(cat, btn) {
             </div>
 
             <button class="progress-reset-btn" onclick="if(confirm('Reset all reading progress? Bookmarks will be kept.')) { STATE.read=[]; localStorage.setItem('crown_read',JSON.stringify([])); document.querySelectorAll('.dua-card').forEach(c=>{c.classList.remove('read-card');const b=c.querySelector('.action-btn[onclick*=markRead]');if(b){b.classList.remove('read');b.innerHTML='\u2713 Mark Read';}}); updateStats(); renderProgressPanel(); showToast('Progress reset'); }">\u26a0 Reset Reading Progress</button>
+
+            <button class="progress-share-btn" onclick="shareProgress()">📤 Share Your Progress</button>
         `;
     }
+
+    window.shareProgress = async function() {
+        showToast('Generating image...');
+
+        const total = 55;
+        const readCount = STATE.read.length;
+        const readPct = Math.round((readCount / total) * 100);
+        const bookmarkCount = STATE.bookmarks.length;
+        const streak = parseInt(localStorage.getItem('crown_streak') || '0');
+        const daysActive = parseInt(localStorage.getItem('crown_days_active') || '0');
+
+        // Build achievements summary
+        const achievements = [
+            { name: 'First Step', icon: '🌱', req: 1 },
+            { name: 'Bookworm', icon: '📖', req: 5 },
+            { name: 'On Fire', icon: '🔥', req: 10 },
+            { name: 'Dedicated', icon: '⭐', req: 20 },
+            { name: 'Explorer', icon: '🌍', req: 30 },
+            { name: 'Halfway', icon: '💪', req: 28 },
+            { name: 'Crown Master', icon: '🏆', req: 55 },
+            { name: 'Scholar', icon: '🔮', req: 55 }
+        ];
+        const earned = achievements.filter(a => readCount >= a.req).map(a => a.icon).join(' ');
+
+        // Milestone text
+        let milestone = '';
+        if (readCount >= 55) milestone = '🏆 Completed the entire Crown Collection!';
+        else if (readPct >= 40) milestone = '⭐ Nearly there — a true seeker of knowledge!';
+        else if (readPct >= 25) milestone = '💪 Halfway hero — keep going!';
+        else if (readPct >= 10) milestone = '🌱 Beautiful growth — 10+ duas learned!';
+        else if (readCount >= 1) milestone = '✨ Every journey starts with a single step.';
+        else milestone = '📖 Start your journey today!';
+
+        const wrap = document.createElement('div');
+        wrap.style.cssText = `
+            position:fixed; left:-9999px; top:0;
+            width:500px; padding:40px 36px;
+            background: linear-gradient(145deg, #0c1a13, #142a20);
+            border-radius:24px; font-family:serif;
+            border: 1px solid rgba(46,196,122,0.2);
+        `;
+        wrap.innerHTML = `
+            <div style="text-align:center;margin-bottom:20px;">
+                <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:16px;color:#2ec47a;margin-bottom:4px;">ف</div>
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#2ec47a;margin-bottom:6px;">Essential Duas by فلاح</div>
+                <div style="font-family:'Cinzel',serif;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:#e0eccc;font-weight:600;">My Journey</div>
+            </div>
+            <div style="display:flex;gap:12px;margin-bottom:16px;">
+                <div style="flex:1;background:rgba(46,196,122,0.06);border:1px solid rgba(46,196,122,0.12);border-radius:14px;padding:16px;text-align:center;">
+                    <div style="font-family:'Cinzel',serif;font-size:24px;color:#d4af37;">${readCount}<span style="font-size:14px;color:rgba(224,238,210,0.5);">/${total}</span></div>
+                    <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Duas Read</div>
+                </div>
+                <div style="flex:1;background:rgba(46,196,122,0.06);border:1px solid rgba(46,196,122,0.12);border-radius:14px;padding:16px;text-align:center;">
+                    <div style="font-family:'Cinzel',serif;font-size:24px;color:#d4af37;">${streak}</div>
+                    <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Day Streak</div>
+                </div>
+                <div style="flex:1;background:rgba(46,196,122,0.06);border:1px solid rgba(46,196,122,0.12);border-radius:14px;padding:16px;text-align:center;">
+                    <div style="font-family:'Cinzel',serif;font-size:24px;color:#d4af37;">${bookmarkCount}</div>
+                    <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Saved</div>
+                </div>
+            </div>
+            ${earned ? `<div style="text-align:center;font-size:1.4rem;margin-bottom:12px;letter-spacing:4px;">${earned}</div>` : ''}
+            <div style="text-align:center;font-family:'Playfair Display',serif;font-size:14px;color:rgba(224,238,210,0.85);margin-bottom:16px;">${milestone}</div>
+            <div style="display:flex;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(46,196,122,0.1);">
+                <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.55);">${readPct}% Complete</span>
+                <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.35);">فلاح · mohhp.github.io/Essential-duas</span>
+            </div>
+        `;
+        document.body.appendChild(wrap);
+
+        try {
+            if (typeof html2canvas === 'undefined') {
+                showToast('Image library loading, try again...');
+                document.body.removeChild(wrap);
+                return;
+            }
+            const canvas = await html2canvas(wrap, {
+                backgroundColor: '#0c1a13',
+                scale: 2,
+                useCORS: true,
+                logging: false
+            });
+            document.body.removeChild(wrap);
+
+            canvas.toBlob(async (blob) => {
+                if (!blob) { showToast('Failed to generate'); return; }
+                if (navigator.canShare && navigator.canShare({ files: [new File([blob], 'progress.png', { type: 'image/png' })] })) {
+                    try {
+                        await navigator.share({
+                            files: [new File([blob], 'progress.png', { type: 'image/png' })],
+                            title: 'My Dua Journey',
+                            text: 'From Essential Duas by فلاح'
+                        });
+                        showToast('Shared!');
+                        return;
+                    } catch(e) { /* fallthrough */ }
+                }
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = 'my-dua-journey.png';
+                a.click(); URL.revokeObjectURL(url);
+                showToast('Image downloaded!');
+            }, 'image/png');
+        } catch(e) {
+            document.body.removeChild(wrap);
+            showToast('Failed to generate image');
+        }
+    };
 
     // ===== AUDIO RECITATION (Web Speech API) =====
     let currentUtterance = null;
@@ -5676,6 +6062,12 @@ window.filterCategory = function(cat, btn) {
         scrollToDua(duaIndex);
     };
 
+    window.shareDailyDua = function() {
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+        const duaIndex = (dayOfYear % 55) + 1;
+        shareAsImage(duaIndex);
+    };
+
     // ===== THEME TOGGLE (LIGHT/DARK) =====
     function applyTheme() {
         const saved = localStorage.getItem('crown_theme') || 'dark';
@@ -5710,19 +6102,115 @@ window.filterCategory = function(cat, btn) {
             if (isActive) {
                 card.classList.add('memorize-mode');
                 card.querySelectorAll('.arabic-text').forEach(t => t.classList.remove('revealed'));
+                // Remove any existing rating rows
+                card.querySelectorAll('.sr-rating-row').forEach(r => r.remove());
             } else {
                 card.classList.remove('memorize-mode');
+                card.querySelectorAll('.sr-rating-row').forEach(r => r.remove());
             }
         });
+        if (isActive) updateSRBadges();
         showToast(isActive ? 'Memorize Mode ON — tap Arabic to reveal' : 'Memorize Mode OFF');
     };
 
-    // Arabic reveal on tap (delegated)
+    // Arabic reveal on tap (delegated) — enhanced with SR rating
     document.addEventListener('click', function(e) {
         const arabicEl = e.target.closest('.memorize-mode .arabic-text');
         if (arabicEl) {
+            const wasRevealed = arabicEl.classList.contains('revealed');
             arabicEl.classList.toggle('revealed');
+
+            if (!wasRevealed) {
+                // Show rating buttons
+                const card = arabicEl.closest('.dua-card');
+                if (card && !card.querySelector('.sr-rating-row')) {
+                    const id = parseInt(card.getAttribute('data-id'));
+                    const container = arabicEl.closest('.arabic-container') || arabicEl.parentElement;
+                    const row = document.createElement('div');
+                    row.className = 'sr-rating-row';
+                    row.innerHTML = `
+                        <button class="sr-rating-btn sr-easy" onclick="rateSR(${id}, 'easy', this)">✓ Easy</button>
+                        <button class="sr-rating-btn sr-hard" onclick="rateSR(${id}, 'hard', this)">✗ Hard</button>`;
+                    container.after(row);
+                    requestAnimationFrame(() => row.classList.add('visible'));
+                }
+            }
         }
+    });
+
+    // ===== SPACED REPETITION SYSTEM =====
+    function getSRData() {
+        try { return JSON.parse(localStorage.getItem('crown_sr') || '{}'); } catch(e) { return {}; }
+    }
+    function saveSRData(data) {
+        localStorage.setItem('crown_sr', JSON.stringify(data));
+    }
+
+    window.rateSR = function(duaId, rating, btn) {
+        const sr = getSRData();
+        const entry = sr[duaId] || { interval: 1, easeFactor: 2.0, nextReview: 0 };
+
+        if (rating === 'easy') {
+            entry.interval = Math.min(entry.interval * entry.easeFactor, 365);
+            entry.easeFactor = Math.min(entry.easeFactor + 0.1, 3.0);
+        } else {
+            entry.interval = 1;
+            entry.easeFactor = Math.max(entry.easeFactor - 0.2, 1.3);
+        }
+        entry.nextReview = Date.now() + (entry.interval * 86400000);
+        sr[duaId] = entry;
+        saveSRData(sr);
+
+        // Remove rating row
+        const row = btn.closest('.sr-rating-row');
+        if (row) {
+            row.classList.remove('visible');
+            setTimeout(() => row.remove(), 300);
+        }
+
+        const days = Math.round(entry.interval);
+        showToast(rating === 'easy' ? `Next review in ${days} day${days > 1 ? 's' : ''}` : 'Will review again tomorrow');
+        updateSRBadges();
+    };
+
+    function getDueCount() {
+        const sr = getSRData();
+        const now = Date.now();
+        return Object.values(sr).filter(e => e.nextReview <= now).length;
+    }
+
+    function updateSRBadges() {
+        const sr = getSRData();
+        const now = Date.now();
+
+        // Update memorize button text with due count
+        const btn = document.getElementById('memorizeToggle');
+        if (btn) {
+            const due = getDueCount();
+            btn.textContent = due > 0 ? `🧠 Memorize (${due} due)` : '🧠 Memorize';
+        }
+
+        // Add/remove review badges on cards
+        els.cards.forEach(card => {
+            const id = parseInt(card.getAttribute('data-id'));
+            const existing = card.querySelector('.sr-review-badge');
+            if (existing) existing.remove();
+
+            if (sr[id] && sr[id].nextReview <= now) {
+                const titleEl = card.querySelector('.dua-title');
+                if (titleEl) {
+                    const badge = document.createElement('span');
+                    badge.className = 'sr-review-badge';
+                    badge.textContent = 'Review Due';
+                    titleEl.appendChild(badge);
+                }
+            }
+        });
+    }
+
+    // Update SR badges on load
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(updateSRBadges, 1000);
     });
 
     // ===== SHARE AS IMAGE =====
@@ -6507,6 +6995,389 @@ window.filterCategory = function(cat, btn) {
     });
     window.addEventListener('scroll', dismissWordPopup, { passive: true });
 
+    // ===== PRAYER TIMES & QIBLA =====
+    const PRAYER_NAMES = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'];
+    const PRAYER_LABELS = { fajr: 'Fajr', sunrise: 'Sunrise', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
+    const PRAYER_ICONS = { fajr: '🌅', sunrise: '☀️', dhuhr: '🕛', asr: '🌤', maghrib: '🌇', isha: '🌙' };
+    const KAABA_LAT = 21.4225;
+    const KAABA_LNG = 39.8262;
+
+    let prayerTimesData = null;
+    let countdownInterval = null;
+    let compassWatchId = null;
+    let userQibla = null;
+
+    window.openPrayer = function() {
+        const pp = document.querySelector('.prayer-panel');
+        if (pp) pp.classList.add('active');
+        lockScroll();
+        setBottomNavActive('prayer');
+        // Auto-detect location if not cached
+        const cached = localStorage.getItem('crown_location');
+        if (cached) {
+            const loc = JSON.parse(cached);
+            onLocationReady(loc.lat, loc.lng, loc.city || '');
+        } else {
+            requestLocation();
+        }
+    };
+
+    window.closePrayer = function() {
+        const pp = document.querySelector('.prayer-panel');
+        if (pp) pp.classList.remove('active');
+        unlockScroll();
+        setBottomNavActive('home');
+        if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+    };
+
+    window.requestLocation = function() {
+        const locText = document.getElementById('prayerLocText');
+        if (locText) locText.textContent = 'Detecting location...';
+
+        if (!navigator.geolocation) {
+            if (locText) locText.textContent = 'Geolocation not supported';
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                let city = '';
+                // Reverse geocode for city name
+                try {
+                    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=10`);
+                    const data = await resp.json();
+                    city = data.address?.city || data.address?.town || data.address?.village || data.address?.state || '';
+                } catch(e) { /* offline — no city name */ }
+
+                localStorage.setItem('crown_location', JSON.stringify({ lat, lng, city }));
+                onLocationReady(lat, lng, city);
+            },
+            (err) => {
+                if (locText) locText.textContent = 'Location denied — tap ↻ to retry';
+            },
+            { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
+        );
+    };
+
+    function onLocationReady(lat, lng, city) {
+        const locText = document.getElementById('prayerLocText');
+        if (locText) locText.textContent = city || `${lat.toFixed(2)}°, ${lng.toFixed(2)}°`;
+
+        calculateAndRenderPrayers(lat, lng);
+        calculateQibla(lat, lng);
+        initCompass();
+
+        // Restore notification toggle
+        const toggle = document.getElementById('notifyToggle');
+        if (toggle) toggle.checked = localStorage.getItem('crown_notifications') === 'true';
+    }
+
+    function calculateAndRenderPrayers(lat, lng) {
+        if (typeof adhan === 'undefined') {
+            const grid = document.getElementById('prayerTimesGrid');
+            if (grid) grid.innerHTML = '<div style="text-align:center;padding:20px;opacity:0.6;">Prayer library loading...</div>';
+            setTimeout(() => calculateAndRenderPrayers(lat, lng), 500);
+            return;
+        }
+
+        const coordinates = new adhan.Coordinates(lat, lng);
+        const params = adhan.CalculationMethod.MuslimWorldLeague();
+        params.madhab = adhan.Madhab.Hanafi;
+        const date = new Date();
+        const pt = new adhan.PrayerTimes(coordinates, date, params);
+
+        prayerTimesData = {
+            fajr: pt.fajr,
+            sunrise: pt.sunrise,
+            dhuhr: pt.dhuhr,
+            asr: pt.asr,
+            maghrib: pt.maghrib,
+            isha: pt.isha
+        };
+
+        renderPrayerGrid();
+        startCountdown();
+    }
+
+    function renderPrayerGrid() {
+        const grid = document.getElementById('prayerTimesGrid');
+        if (!grid || !prayerTimesData) return;
+
+        const now = new Date();
+        const current = getCurrentPrayer(now);
+        const next = getNextPrayer(now);
+
+        grid.innerHTML = PRAYER_NAMES.map(name => {
+            const time = prayerTimesData[name];
+            const timeStr = formatTime(time);
+            const isCurrent = current === name;
+            const isNext = next === name;
+            const cls = isCurrent ? ' current-prayer' : isNext ? ' next-prayer' : '';
+            return `<div class="prayer-time-row${cls}">
+                <span class="prayer-time-icon">${PRAYER_ICONS[name]}</span>
+                <span class="prayer-time-name">${PRAYER_LABELS[name]}</span>
+                <span class="prayer-time-value">${timeStr}</span>
+                ${isCurrent ? '<span class="prayer-now-badge">NOW</span>' : ''}
+                ${isNext ? '<span class="prayer-next-badge">NEXT</span>' : ''}
+            </div>`;
+        }).join('');
+    }
+
+    function getCurrentPrayer(now) {
+        if (!prayerTimesData) return null;
+        // Work backwards: if now >= isha, current is isha; if now >= maghrib, current is maghrib; etc.
+        for (let i = PRAYER_NAMES.length - 1; i >= 0; i--) {
+            if (now >= prayerTimesData[PRAYER_NAMES[i]]) return PRAYER_NAMES[i];
+        }
+        return null; // Before fajr
+    }
+
+    function getNextPrayer(now) {
+        if (!prayerTimesData) return null;
+        for (let i = 0; i < PRAYER_NAMES.length; i++) {
+            if (now < prayerTimesData[PRAYER_NAMES[i]]) return PRAYER_NAMES[i];
+        }
+        return 'fajr'; // After isha — next is fajr tomorrow
+    }
+
+    function startCountdown() {
+        if (countdownInterval) clearInterval(countdownInterval);
+        updateCountdown();
+        countdownInterval = setInterval(updateCountdown, 1000);
+    }
+
+    function updateCountdown() {
+        if (!prayerTimesData) return;
+        const now = new Date();
+        const next = getNextPrayer(now);
+        const nameEl = document.getElementById('nextPrayerName');
+        const timeEl = document.getElementById('nextPrayerCountdown');
+        if (!nameEl || !timeEl) return;
+
+        nameEl.textContent = PRAYER_LABELS[next] || '--';
+
+        let target = prayerTimesData[next];
+        if (!target || now >= target) {
+            // Next is tomorrow's fajr
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const cached = localStorage.getItem('crown_location');
+            if (cached && typeof adhan !== 'undefined') {
+                const loc = JSON.parse(cached);
+                const coords = new adhan.Coordinates(loc.lat, loc.lng);
+                const params = adhan.CalculationMethod.MuslimWorldLeague();
+                params.madhab = adhan.Madhab.Hanafi;
+                const tpt = new adhan.PrayerTimes(coords, tomorrow, params);
+                target = tpt.fajr;
+            } else {
+                timeEl.textContent = '--:--:--';
+                return;
+            }
+        }
+
+        const diff = target - now;
+        if (diff <= 0) {
+            // Just passed — re-render grid and recalculate
+            const cached = localStorage.getItem('crown_location');
+            if (cached) {
+                const loc = JSON.parse(cached);
+                calculateAndRenderPrayers(loc.lat, loc.lng);
+            }
+            return;
+        }
+
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        timeEl.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+        // Also re-render grid to update current/next highlighting
+        renderPrayerGrid();
+    }
+
+    function formatTime(date) {
+        if (!date) return '--:--';
+        let h = date.getHours();
+        const m = String(date.getMinutes()).padStart(2, '0');
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return `${h}:${m} ${ampm}`;
+    }
+
+    // --- Enhanced getTimePeriod using real prayer times ---
+    const _originalGetTimePeriod = typeof getTimePeriod === 'function' ? getTimePeriod : null;
+    function getTimePeriodFromPrayers() {
+        if (!prayerTimesData) return null;
+        const now = new Date();
+        if (now < prayerTimesData.fajr) return 'latenight';
+        if (now < prayerTimesData.sunrise) return 'fajr';
+        if (now < prayerTimesData.dhuhr) return 'morning';
+        if (now < prayerTimesData.asr) return 'dhuhr';
+        if (now < prayerTimesData.maghrib) return 'asr';
+        if (now < prayerTimesData.isha) return 'maghrib';
+        const cutoff = new Date(prayerTimesData.isha);
+        cutoff.setHours(cutoff.getHours() + 2);
+        if (now < cutoff) return 'isha';
+        return 'latenight';
+    }
+
+    // ===== QIBLA COMPASS =====
+    function calculateQibla(lat, lng) {
+        const latR = lat * Math.PI / 180;
+        const lngR = lng * Math.PI / 180;
+        const kLatR = KAABA_LAT * Math.PI / 180;
+        const kLngR = KAABA_LNG * Math.PI / 180;
+        const dLng = kLngR - lngR;
+
+        const x = Math.sin(dLng);
+        const y = Math.cos(latR) * Math.tan(kLatR) - Math.sin(latR) * Math.cos(dLng);
+        let qibla = Math.atan2(x, y) * 180 / Math.PI;
+        if (qibla < 0) qibla += 360;
+
+        userQibla = qibla;
+
+        const degEl = document.getElementById('qiblaDegree');
+        const statusEl = document.getElementById('qiblaStatus');
+        if (degEl) degEl.textContent = `${Math.round(qibla)}° from North`;
+        if (statusEl) statusEl.textContent = 'Point your phone — arrow shows Qibla';
+
+        // Static fallback: rotate arrow to qibla bearing
+        const arrow = document.getElementById('qiblaArrow');
+        if (arrow) arrow.style.transform = `translate(-50%, -100%) rotate(${qibla}deg)`;
+    }
+
+    function initCompass() {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            // iOS 13+ — needs explicit permission
+            const statusEl = document.getElementById('qiblaStatus');
+            if (statusEl && !sessionStorage.getItem('compass_requested')) {
+                statusEl.innerHTML = '<button class="loc-refresh" onclick="requestCompassPermission()" style="font-size:0.85rem;padding:8px 16px;">Enable Compass</button>';
+            }
+        } else if ('ondeviceorientationabsolute' in window) {
+            window.addEventListener('deviceorientationabsolute', handleCompass, true);
+        } else if ('ondeviceorientation' in window) {
+            window.addEventListener('deviceorientation', handleCompass, true);
+        }
+    }
+
+    window.requestCompassPermission = function() {
+        sessionStorage.setItem('compass_requested', 'true');
+        DeviceOrientationEvent.requestPermission().then(state => {
+            if (state === 'granted') {
+                window.addEventListener('deviceorientation', handleCompass, true);
+                const statusEl = document.getElementById('qiblaStatus');
+                if (statusEl) statusEl.textContent = 'Compass active — point your phone';
+            }
+        }).catch(() => {});
+    };
+
+    function handleCompass(e) {
+        let heading = e.webkitCompassHeading || (e.alpha != null ? (360 - e.alpha) : null);
+        if (heading == null || userQibla == null) return;
+
+        const arrow = document.getElementById('qiblaArrow');
+        const compass = document.getElementById('qiblaCompass');
+        if (arrow) {
+            const rotation = userQibla - heading;
+            arrow.style.transform = `translate(-50%, -100%) rotate(${rotation}deg)`;
+        }
+        if (compass) {
+            compass.style.transform = `rotate(${-heading}deg)`;
+        }
+    }
+
+    // ===== PRAYER NOTIFICATIONS =====
+    let notificationTimeouts = [];
+
+    window.togglePrayerNotifications = function(enabled) {
+        localStorage.setItem('crown_notifications', enabled ? 'true' : 'false');
+        if (enabled) {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission().then(perm => {
+                    if (perm !== 'granted') {
+                        const toggle = document.getElementById('notifyToggle');
+                        if (toggle) toggle.checked = false;
+                        localStorage.setItem('crown_notifications', 'false');
+                        showToast('Notification permission denied');
+                    } else {
+                        schedulePrayerNotifications();
+                    }
+                });
+            } else if ('Notification' in window && Notification.permission === 'granted') {
+                schedulePrayerNotifications();
+                showToast('Prayer alerts enabled');
+            } else {
+                const toggle = document.getElementById('notifyToggle');
+                if (toggle) toggle.checked = false;
+                localStorage.setItem('crown_notifications', 'false');
+                showToast('Notifications not supported');
+            }
+        } else {
+            clearPrayerNotifications();
+            showToast('Prayer alerts disabled');
+        }
+    };
+
+    function schedulePrayerNotifications() {
+        clearPrayerNotifications();
+        if (!prayerTimesData) return;
+        const now = new Date();
+
+        PRAYER_NAMES.forEach(name => {
+            if (name === 'sunrise') return; // Don't notify for sunrise
+            const time = prayerTimesData[name];
+            if (!time || time <= now) return;
+            const delay = time - now;
+            if (delay > 0 && delay < 86400000) { // Within 24 hours
+                const tid = setTimeout(() => {
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification(`${PRAYER_ICONS[name]} ${PRAYER_LABELS[name]} Time`, {
+                            body: `It's time for ${PRAYER_LABELS[name]} prayer`,
+                            icon: 'icon-192.png',
+                            tag: `prayer-${name}`,
+                            renotify: true
+                        });
+                    }
+                }, delay);
+                notificationTimeouts.push(tid);
+            }
+        });
+    }
+
+    function clearPrayerNotifications() {
+        notificationTimeouts.forEach(tid => clearTimeout(tid));
+        notificationTimeouts = [];
+    }
+
+    // Re-schedule notifications on visibility change
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && localStorage.getItem('crown_notifications') === 'true' && prayerTimesData) {
+            schedulePrayerNotifications();
+        }
+    });
+
+    // Auto-calculate prayer times on load if location is cached (for time banner enhancement)
+    document.addEventListener('DOMContentLoaded', function() {
+        const cached = localStorage.getItem('crown_location');
+        if (cached && typeof adhan !== 'undefined') {
+            const loc = JSON.parse(cached);
+            const coordinates = new adhan.Coordinates(loc.lat, loc.lng);
+            const params = adhan.CalculationMethod.MuslimWorldLeague();
+            params.madhab = adhan.Madhab.Hanafi;
+            const pt = new adhan.PrayerTimes(coordinates, new Date(), params);
+            prayerTimesData = {
+                fajr: pt.fajr, sunrise: pt.sunrise, dhuhr: pt.dhuhr,
+                asr: pt.asr, maghrib: pt.maghrib, isha: pt.isha
+            };
+            // Schedule notifications if enabled
+            if (localStorage.getItem('crown_notifications') === 'true') {
+                schedulePrayerNotifications();
+            }
+        }
+    });
+
     // ===== REGISTER SERVICE WORKER =====
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -6550,6 +7421,44 @@ window.filterCategory = function(cat, btn) {
 <div class="routine-panel" onclick="if(event.target === this) closeRoutine()">
     <button class="etiquette-close" onclick="closeRoutine()">✕</button>
     <div class="routine-content"></div>
+</div>
+
+<!-- ===== PRAYER PANEL ===== -->
+<div class="prayer-panel" onclick="if(event.target === this) closePrayer()">
+    <button class="etiquette-close" onclick="closePrayer()">✕</button>
+    <div class="prayer-panel-content" id="prayerPanelContent">
+        <h2>Prayer Times</h2>
+        <div class="prayer-location-bar" id="prayerLocationBar">
+            <span class="loc-icon">📍</span>
+            <span class="loc-text" id="prayerLocText">Tap to detect location</span>
+            <button class="loc-refresh" onclick="requestLocation()" title="Refresh location">↻</button>
+        </div>
+        <div class="prayer-countdown-card" id="prayerCountdown">
+            <div class="prayer-countdown-label">Next Prayer</div>
+            <div class="prayer-countdown-name" id="nextPrayerName">--</div>
+            <div class="prayer-countdown-time" id="nextPrayerCountdown">--:--:--</div>
+        </div>
+        <div class="prayer-times-grid" id="prayerTimesGrid"></div>
+        <div class="qibla-section" id="qiblaSection">
+            <div class="qibla-title">Qibla Direction</div>
+            <div class="qibla-compass" id="qiblaCompass">
+                <span class="compass-n">N</span>
+                <span class="compass-s">S</span>
+                <span class="compass-e">E</span>
+                <span class="compass-w">W</span>
+                <div class="qibla-arrow" id="qiblaArrow"></div>
+            </div>
+            <div class="qibla-degree" id="qiblaDegree">--°</div>
+            <div class="qibla-status" id="qiblaStatus">Enable location to see Qibla</div>
+        </div>
+        <div class="prayer-notify-row">
+            <span class="prayer-notify-label">🔔 Prayer Alerts</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="notifyToggle" onchange="togglePrayerNotifications(this.checked)">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+    </div>
 </div>
 
 <!-- ===== TOAST ===== -->
@@ -6597,6 +7506,10 @@ window.filterCategory = function(cat, btn) {
     <button class="bottom-nav-item" data-nav="saved" onclick="handleBottomNav('saved', this)">
         <span class="icon">★</span>
         <span>Saved</span>
+    </button>
+    <button class="bottom-nav-item" data-nav="prayer" onclick="handleBottomNav('prayer', this)">
+        <span class="icon">🕌</span>
+        <span>Prayer</span>
     </button>
 </nav>
 

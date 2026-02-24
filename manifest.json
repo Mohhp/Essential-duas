@@ -33,6 +33,16 @@
       "name": "Daily Routine",
       "short_name": "Routine",
       "url": "./#routine"
+    },
+    {
+      "name": "Dua of the Day",
+      "short_name": "Daily Dua",
+      "url": "./#daily"
+    },
+    {
+      "name": "Prayer Times",
+      "short_name": "Prayer",
+      "url": "./#prayer"
     }
   ]
 }

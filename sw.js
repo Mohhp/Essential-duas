@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essential-duas-v12';
+const CACHE_NAME = 'essential-duas-v13';
 const OFFLINE_PAGE = './offline.html';
 
 const ASSETS = [
@@ -9,6 +9,8 @@ const ASSETS = [
   './icon-192.png',
   './icon-512.png',
   './favicon.svg',
+  './pashto.js',
+  'https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js',
   'https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap'
 ];
 
@@ -72,5 +74,18 @@ self.addEventListener('fetch', (event) => {
       .catch(() => {
         return caches.match(event.request);
       })
+  );
+});
+
+// Notification click — open app
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      if (clientList.length > 0) {
+        return clientList[0].focus();
+      }
+      return clients.openWindow('./');
+    })
   );
 });

@@ -149,7 +149,17 @@ const PS_UI = {
         'Dua copied to clipboard': 'دعا کلپ بورډ ته کاپي شوه',
         'Progress reset': 'پرمختګ بیا تنظیم شو',
         'Arabic voice not available on this device — trying default': 'عربي غږ شتون نلري — ډیفالټ هڅه کوي',
-        'Audio playback failed': 'غږ غبرګون ناکام شو'
+        'Audio playback failed': 'غږ غبرګون ناکام شو',
+        'Prayer alerts enabled': 'د لمونځ خبرتیاوې فعالې شوې',
+        'Prayer alerts disabled': 'د لمونځ خبرتیاوې غیر فعالې شوې',
+        'Notification permission denied': 'د خبرتیا اجازه رد شوه',
+        'Notifications not supported': 'خبرتیاوې نه ملاتړ کوي',
+        'Generating image...': 'انځور جوړېږي...',
+        'Shared!': 'شریک شو!',
+        'Image downloaded!': 'انځور ډاونلوډ شو!',
+        'Memorize Mode ON — tap Arabic to reveal': 'حفظ حالت فعال — عربي ښکاره کولو لپاره ټک وکړئ',
+        'Memorize Mode OFF': 'حفظ حالت غیر فعال',
+        'Will review again tomorrow': 'سبا بیا بیاکتنه'
     },
     // Time banner
     timeBanner: {
@@ -165,6 +175,36 @@ const PS_UI = {
     // Footer
     footerText: 'تاج ټولګه',
     footerSub: 'د قرآن او سنت څخه ۵۵ اساسي دعاګانې',
+    // Prayer panel
+    prayerNav: 'لمونځ',
+    prayerTimesTitle: 'د لمونځ وختونه',
+    tapToDetect: 'د ځای پیژندلو لپاره ټک وکړئ',
+    detectingLocation: 'ځای پیژندل کېږي...',
+    locationDenied: 'ځای رد شو — د بیا هڅې لپاره ↻ ټک وکړئ',
+    nextPrayer: 'راتلونکی لمونځ',
+    prayerNames: { fajr: 'فجر', sunrise: 'لمر خاته', dhuhr: 'غرمه', asr: 'ماسپښین', maghrib: 'ماښام', isha: 'ماخستن' },
+    qiblaTitle: 'د قبلې لوری',
+    qiblaFromNorth: 'شمال ته درجې',
+    qiblaPointPhone: 'خپل ټیلیفون وګرځوئ — تیر قبله ښیي',
+    enableQibla: 'د ځای فعالول چې قبله وګورئ',
+    enableCompass: 'قطب نما فعاله کړئ',
+    prayerAlerts: '🔔 د لمونځ خبرتیاوې',
+    alertsEnabled: 'د لمونځ خبرتیاوې فعالې شوې',
+    alertsDisabled: 'د لمونځ خبرتیاوې غیر فعالې شوې',
+    now: 'اوس',
+    next: 'بل',
+    // Spaced Repetition
+    srEasy: '✓ اسانه',
+    srHard: '✗ سخته',
+    srReviewDue: 'بیاکتنه پکار ده',
+    srNextReview: 'بله بیاکتنه په',
+    srDays: 'ورځو کې',
+    srTomorrow: 'سبا بیا بیاکتنه',
+    srDue: 'پکار',
+    // Daily dua share
+    shareDailyDua: '↗ د نن دعا شریکه کړئ',
+    // Progress share
+    shareProgress: '📤 خپل پرمختګ شریک کړئ',
     // Dua card titles (Pashto)
     duaTitles: {
         1: 'سورة الفاتحه - د قرآن مور',
@@ -718,6 +758,7 @@ function applyLanguage(lang) {
         else if (nav === 'routine') label.textContent = PS_UI.routine;
         else if (nav === 'tasbeeh') label.textContent = PS_UI.tasbeehNav;
         else if (nav === 'saved') label.textContent = PS_UI.saved;
+        else if (nav === 'prayer') label.textContent = PS_UI.prayerNav;
     });
 
     // Tasbeeh panel
@@ -746,6 +787,65 @@ function applyLanguage(lang) {
     if (footerText) {
         if (!footerText.getAttribute('data-en')) footerText.setAttribute('data-en', footerText.innerHTML);
         footerText.innerHTML = PS_UI.footerText + '<br>' + PS_UI.footerSub;
+    }
+
+    // Prayer panel
+    const prayerTitle = document.querySelector('.prayer-panel-content h2');
+    if (prayerTitle) { if (!prayerTitle.getAttribute('data-en')) prayerTitle.setAttribute('data-en', prayerTitle.textContent); prayerTitle.textContent = PS_UI.prayerTimesTitle; }
+    const prayerLocText = document.getElementById('prayerLocText');
+    if (prayerLocText) {
+        const t = prayerLocText.textContent;
+        if (t === 'Tap to detect location') prayerLocText.textContent = PS_UI.tapToDetect;
+        else if (t === 'Detecting location...') prayerLocText.textContent = PS_UI.detectingLocation;
+        else if (t.includes('denied')) prayerLocText.textContent = PS_UI.locationDenied;
+    }
+    const countdownLabel = document.querySelector('.prayer-countdown-label');
+    if (countdownLabel) { if (!countdownLabel.getAttribute('data-en')) countdownLabel.setAttribute('data-en', countdownLabel.textContent); countdownLabel.textContent = PS_UI.nextPrayer; }
+    // Translate prayer names in grid
+    document.querySelectorAll('.prayer-time-name').forEach(el => {
+        if (!el.getAttribute('data-en')) el.setAttribute('data-en', el.textContent);
+        const key = el.textContent.trim().toLowerCase();
+        if (PS_UI.prayerNames[key]) el.textContent = PS_UI.prayerNames[key];
+    });
+    // Prayer badges
+    document.querySelectorAll('.prayer-now-badge').forEach(el => el.textContent = PS_UI.now);
+    document.querySelectorAll('.prayer-next-badge').forEach(el => el.textContent = PS_UI.next);
+    // Qibla
+    const qiblaTitle = document.querySelector('.qibla-title');
+    if (qiblaTitle) { if (!qiblaTitle.getAttribute('data-en')) qiblaTitle.setAttribute('data-en', qiblaTitle.textContent); qiblaTitle.textContent = PS_UI.qiblaTitle; }
+    const qiblaDeg = document.getElementById('qiblaDegree');
+    if (qiblaDeg && qiblaDeg.textContent.includes('from North')) {
+        qiblaDeg.textContent = qiblaDeg.textContent.replace('from North', PS_UI.qiblaFromNorth);
+    }
+    const qiblaStatus = document.getElementById('qiblaStatus');
+    if (qiblaStatus) {
+        if (qiblaStatus.textContent === 'Enable location to see Qibla') qiblaStatus.textContent = PS_UI.enableQibla;
+        else if (qiblaStatus.textContent.includes('Point your phone')) qiblaStatus.textContent = PS_UI.qiblaPointPhone;
+    }
+    // Notification toggle label
+    const notifyLabel = document.querySelector('.prayer-notify-label');
+    if (notifyLabel) { if (!notifyLabel.getAttribute('data-en')) notifyLabel.setAttribute('data-en', notifyLabel.textContent); notifyLabel.textContent = PS_UI.prayerAlerts; }
+
+    // Daily share button
+    const dailyShareBtn = document.querySelector('.daily-share-btn');
+    if (dailyShareBtn) { if (!dailyShareBtn.getAttribute('data-en')) dailyShareBtn.setAttribute('data-en', dailyShareBtn.textContent); dailyShareBtn.textContent = PS_UI.shareDailyDua; }
+
+    // Progress share button
+    const progressShareBtn = document.querySelector('.progress-share-btn');
+    if (progressShareBtn) { if (!progressShareBtn.getAttribute('data-en')) progressShareBtn.setAttribute('data-en', progressShareBtn.textContent); progressShareBtn.textContent = PS_UI.shareProgress; }
+
+    // SR badges
+    document.querySelectorAll('.sr-review-badge').forEach(el => el.textContent = PS_UI.srReviewDue);
+    document.querySelectorAll('.sr-rating-btn.sr-easy').forEach(el => el.textContent = PS_UI.srEasy);
+    document.querySelectorAll('.sr-rating-btn.sr-hard').forEach(el => el.textContent = PS_UI.srHard);
+    // Memorize button with due count
+    const memBtn = document.getElementById('memorizeToggle');
+    if (memBtn) {
+        if (!memBtn.getAttribute('data-en')) memBtn.setAttribute('data-en', memBtn.textContent);
+        const t = memBtn.textContent;
+        const match = t.match(/\((\d+) due\)/);
+        if (match) memBtn.textContent = PS_UI.memorize + ' (' + match[1] + ' ' + PS_UI.srDue + ')';
+        else memBtn.textContent = PS_UI.memorize;
     }
 }
 
