@@ -1383,6 +1383,139 @@
             border-color: rgba(122, 46, 59, 0.4);
         }
 
+        /* ===== AUDIO RECITATION BUTTON ===== */
+        .audio-btn {
+            position: relative; overflow: hidden;
+        }
+        .audio-btn.playing {
+            background: rgba(13, 107, 71, 0.18) !important;
+            border-color: var(--emerald-light) !important;
+            color: var(--emerald-light) !important;
+        }
+        .audio-btn.playing::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 120%; height: 120%; border-radius: 50%;
+            background: rgba(13, 107, 71, 0.1);
+            transform: translate(-50%, -50%) scale(0);
+            animation: audioPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes audioPulse {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+        }
+
+        /* ===== TIME-BASED SUGGESTION BANNER ===== */
+        .time-banner {
+            background: linear-gradient(135deg, rgba(13, 107, 71, 0.08), rgba(184, 150, 62, 0.06));
+            border: 1px solid rgba(13, 107, 71, 0.18);
+            border-radius: var(--radius-lg); padding: 16px 18px;
+            margin: 0 0 14px; cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .time-banner:hover { border-color: rgba(13, 107, 71, 0.35); transform: translateY(-1px); }
+        .time-banner-header {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+        }
+        .time-banner-icon { font-size: 1.5rem; }
+        .time-banner-title {
+            font-family: var(--font-title); font-size: 0.6rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--emerald-light);
+        }
+        .time-banner-period {
+            font-family: var(--font-text); font-size: 0.85rem;
+            color: var(--gold-light); font-style: italic; margin-bottom: 10px;
+        }
+        .time-banner-duas {
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .time-dua-chip {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 5px 12px; border-radius: 50px;
+            background: rgba(13, 107, 71, 0.08);
+            border: 1px solid rgba(13, 107, 71, 0.15);
+            font-family: var(--font-text); font-size: 0.72rem;
+            color: var(--text-muted); cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .time-dua-chip:hover {
+            background: rgba(13, 107, 71, 0.15);
+            border-color: var(--emerald-light); color: var(--emerald-light);
+        }
+        [data-theme="light"] .time-banner {
+            background: linear-gradient(135deg, rgba(13, 107, 71, 0.05), rgba(184, 150, 62, 0.04));
+        }
+
+        /* ===== ENHANCED DASHBOARD ===== */
+        .progress-week-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr);
+            gap: 4px; margin-top: 10px;
+        }
+        .progress-day-cell {
+            aspect-ratio: 1; border-radius: 4px;
+            background: rgba(13, 107, 71, 0.06);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-family: var(--font-title); font-size: 0.4rem;
+            letter-spacing: 1px; color: var(--text-faint);
+            transition: all 0.3s ease;
+        }
+        .progress-day-cell.active {
+            background: rgba(13, 107, 71, 0.2);
+            border: 1px solid rgba(13, 107, 71, 0.3);
+            color: var(--emerald-light);
+        }
+        .progress-day-cell.today {
+            border: 1px solid var(--emerald-light);
+            box-shadow: 0 0 8px rgba(13, 107, 71, 0.2);
+        }
+        .progress-achievements {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+            margin-top: 12px;
+        }
+        .achievement-badge {
+            background: rgba(13, 107, 71, 0.04);
+            border: 1px solid rgba(13, 107, 71, 0.1);
+            border-radius: var(--radius-md); padding: 12px;
+            text-align: center; transition: all 0.3s ease;
+        }
+        .achievement-badge.earned {
+            background: rgba(13, 107, 71, 0.1);
+            border-color: rgba(13, 107, 71, 0.25);
+        }
+        .achievement-badge.locked {
+            opacity: 0.4; filter: grayscale(0.8);
+        }
+        .achievement-icon { font-size: 1.5rem; margin-bottom: 4px; }
+        .achievement-name {
+            font-family: var(--font-title); font-size: 0.45rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .progress-category-bar {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 6px;
+        }
+        .progress-cat-label {
+            font-family: var(--font-title); font-size: 0.4rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            color: var(--text-subtle); width: 70px; flex-shrink: 0;
+            text-align: right;
+        }
+        .progress-cat-bar {
+            flex: 1; height: 5px; border-radius: 3px;
+            background: rgba(13, 107, 71, 0.08); overflow: hidden;
+        }
+        .progress-cat-fill {
+            height: 100%; border-radius: 3px;
+            background: var(--emerald-light);
+            transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+        }
+        .progress-cat-count {
+            font-family: var(--font-title); font-size: 0.4rem;
+            color: var(--text-faint); width: 24px;
+        }
+
         /* ===== THEME TOGGLE IN NAV ===== */
         .theme-toggle {
             background: none; border: 1px solid rgba(13, 107, 71, 0.3);
@@ -1528,6 +1661,9 @@
         <div class="daily-arabic" id="dailyArabic"></div>
         <div class="daily-translation" id="dailyTranslation"></div>
     </div>
+
+    <!-- ===== TIME-BASED SUGGESTION ===== -->
+    <div id="timeBanner"></div>
 
     <!-- ===== SEARCH ===== -->
     <div class="search-container">
@@ -3832,6 +3968,9 @@
         applyFontSize(STATE.fontSize);
         applyTheme();
         injectShareImageButtons();
+        injectAudioButtons();
+        renderTimeBanner();
+        trackDailyActivity();
         renderBookmarksPanel();
 
         // Search listener
@@ -3920,6 +4059,9 @@
         // --- Keyboard Accessibility ---
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                const pp = document.querySelector('.progress-panel.active');
+                if (pp) { closeProgress(); return; }
+
                 const tp = document.querySelector('.tasbeeh-panel.active');
                 if (tp) { closeTasbeeh(); return; }
 
@@ -4631,28 +4773,93 @@ window.filterCategory = function(cat, btn) {
         const bookmarkCount = STATE.bookmarks.length;
         const readPct = Math.round((readCount / total) * 100);
 
-        // Calculate categories explored
-        const catSet = new Set();
+        // Calculate categories explored with counts
+        const allCats = ['quran','protection','forgiveness','guidance','wellbeing','prophets','morning-evening','provision','prayer','family','travel','scholars'];
+        const catMap = {};
+        allCats.forEach(c => catMap[c] = 0);
         STATE.read.forEach(id => {
             const card = document.querySelector(`.dua-card[data-id="${id}"]`);
             if (card) {
-                (card.getAttribute('data-categories') || '').split(',').forEach(c => catSet.add(c.trim()));
+                (card.getAttribute('data-categories') || '').split(',').forEach(c => {
+                    const key = c.trim();
+                    if (key in catMap) catMap[key]++;
+                });
             }
         });
+        const catSet = new Set(Object.keys(catMap).filter(k => catMap[k] > 0));
 
-        // Milestones
+        // Category totals
+        const catTotals = {};
+        allCats.forEach(c => catTotals[c] = 0);
+        document.querySelectorAll('.dua-card').forEach(card => {
+            (card.getAttribute('data-categories') || '').split(',').forEach(c => {
+                const key = c.trim();
+                if (key in catTotals) catTotals[key]++;
+            });
+        });
+
+        // Weekly activity
+        const activity = JSON.parse(localStorage.getItem('crown_activity') || '[]');
+        const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        let weekHTML = '';
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().slice(0, 10);
+            const isActive = activity.includes(dateStr);
+            const isToday = i === 0;
+            weekHTML += `<div class="progress-day-cell${isActive ? ' active' : ''}${isToday ? ' today' : ''}">
+                <div>${dayNames[d.getDay()]}</div>
+                <div style="font-size:0.8rem;margin-top:2px;">${isActive ? '\u2713' : '\u00b7'}</div>
+            </div>`;
+        }
+        const totalDays = activity.length;
+
+        // Category bars
+        let catBarsHTML = '';
+        allCats.forEach(cat => {
+            const count = catMap[cat] || 0;
+            const catTotal = catTotals[cat] || 1;
+            const pct = Math.round((count / catTotal) * 100);
+            const label = cat.charAt(0).toUpperCase() + cat.slice(1).replace('-', ' ');
+            catBarsHTML += `<div class="progress-category-bar">
+                <div class="progress-cat-label">${label}</div>
+                <div class="progress-cat-bar"><div class="progress-cat-fill" style="width:${pct}%"></div></div>
+                <div class="progress-cat-count">${count}/${catTotal}</div>
+            </div>`;
+        });
+
+        // Achievements
+        const achievements = [
+            { icon: '\U0001f331', name: 'First Step', earned: readCount >= 1, desc: 'Read your first dua' },
+            { icon: '\U0001f4d6', name: 'Bookworm', earned: bookmarkCount >= 5, desc: 'Bookmark 5 duas' },
+            { icon: '\U0001f525', name: 'On Fire', earned: STATE.streak >= 3, desc: '3-day streak' },
+            { icon: '\u2b50', name: 'Dedicated', earned: STATE.streak >= 7, desc: '7-day streak' },
+            { icon: '\U0001f30d', name: 'Explorer', earned: catSet.size >= 6, desc: 'Explore 6 categories' },
+            { icon: '\U0001f4aa', name: 'Halfway', earned: readCount >= 28, desc: 'Read 28+ duas' },
+            { icon: '\U0001f3c6', name: 'Crown Master', earned: readCount >= 55, desc: 'All 55 duas' },
+            { icon: '\U0001f52e', name: 'Scholar', earned: catSet.size >= 12, desc: 'All 12 categories' },
+        ];
+        const earnedCount = achievements.filter(a => a.earned).length;
+        let achieveHTML = achievements.map(a => `
+            <div class="achievement-badge ${a.earned ? 'earned' : 'locked'}" title="${a.desc}">
+                <div class="achievement-icon">${a.icon}</div>
+                <div class="achievement-name">${a.name}</div>
+            </div>`).join('');
+
+        // Milestone
         let milestone = '';
-        if (readCount >= 55) milestone = '🏆 Completed the entire Crown Collection!';
-        else if (readCount >= 40) milestone = '⭐ Almost there — a true seeker of knowledge!';
-        else if (readCount >= 25) milestone = '💪 Halfway champion — keep going!';
-        else if (readCount >= 10) milestone = '🌱 Growing beautifully — 10+ duas learned!';
-        else if (readCount >= 1) milestone = '✨ The journey of a thousand miles begins with one step.';
-        else milestone = '📖 Start your journey — tap “Mark Read” on any dua!';
+        if (readCount >= 55) milestone = '\U0001f3c6 Completed the entire Crown Collection!';
+        else if (readCount >= 40) milestone = '\u2b50 Almost there \u2014 a true seeker of knowledge!';
+        else if (readCount >= 25) milestone = '\U0001f4aa Halfway champion \u2014 keep going!';
+        else if (readCount >= 10) milestone = '\U0001f331 Growing beautifully \u2014 10+ duas learned!';
+        else if (readCount >= 1) milestone = '\u2728 The journey of a thousand miles begins with one step.';
+        else milestone = '\U0001f4d6 Start your journey \u2014 tap "Mark Read" on any dua!';
 
         container.innerHTML = `
             <h2>Your Journey</h2>
+
             <div class="progress-stat-card">
-                <div class="progress-stat-icon">📖</div>
+                <div class="progress-stat-icon">\U0001f4d6</div>
                 <div class="progress-stat-info">
                     <div class="progress-stat-label">Duas Read</div>
                     <div class="progress-stat-value">${readCount} / ${total}</div>
@@ -4662,35 +4869,192 @@ window.filterCategory = function(cat, btn) {
                     <div class="progress-stat-sub">${readPct}% complete</div>
                 </div>
             </div>
+
             <div class="progress-stat-card">
-                <div class="progress-stat-icon">⭐</div>
+                <div class="progress-stat-icon">\U0001f525</div>
+                <div class="progress-stat-info">
+                    <div class="progress-stat-label">Current Streak</div>
+                    <div class="progress-stat-value">${STATE.streak} days</div>
+                    <div class="progress-stat-sub">Total days active: ${totalDays}</div>
+                </div>
+            </div>
+
+            <div class="progress-stat-card" style="flex-direction:column;">
+                <div class="progress-stat-label" style="margin-bottom:8px;">This Week</div>
+                <div class="progress-week-grid">${weekHTML}</div>
+            </div>
+
+            <div class="progress-stat-card">
+                <div class="progress-stat-icon">\u2b50</div>
                 <div class="progress-stat-info">
                     <div class="progress-stat-label">Bookmarked</div>
                     <div class="progress-stat-value">${bookmarkCount}</div>
                     <div class="progress-stat-sub">Your favourite duas saved for quick access</div>
                 </div>
             </div>
-            <div class="progress-stat-card">
-                <div class="progress-stat-icon">🔥</div>
-                <div class="progress-stat-info">
-                    <div class="progress-stat-label">Current Streak</div>
-                    <div class="progress-stat-value">${STATE.streak} days</div>
-                    <div class="progress-stat-sub">Keep visiting daily to grow your streak!</div>
-                </div>
+
+            <div class="progress-stat-card" style="flex-direction:column;">
+                <div class="progress-stat-label" style="margin-bottom:8px;">Category Breakdown</div>
+                ${catBarsHTML}
             </div>
-            <div class="progress-stat-card">
-                <div class="progress-stat-icon">🌍</div>
-                <div class="progress-stat-info">
-                    <div class="progress-stat-label">Categories Explored</div>
-                    <div class="progress-stat-value">${catSet.size} / 12</div>
-                    <div class="progress-stat-sub">${catSet.size >= 12 ? 'All categories covered!' : 'Read duas from different categories to explore more'}</div>
-                </div>
+
+            <div class="progress-stat-card" style="flex-direction:column;">
+                <div class="progress-stat-label" style="margin-bottom:8px;">Achievements (${earnedCount}/${achievements.length})</div>
+                <div class="progress-achievements">${achieveHTML}</div>
             </div>
+
             <div class="progress-stat-card" style="text-align:center;justify-content:center;flex-direction:column;">
                 <div style="font-size:1.2rem;margin-bottom:8px;">${milestone}</div>
             </div>
-            <button class="progress-reset-btn" onclick="if(confirm('Reset all reading progress? Bookmarks will be kept.')) { STATE.read=[]; localStorage.setItem('crown_read',JSON.stringify([])); document.querySelectorAll('.dua-card').forEach(c=>{c.classList.remove('read-card');const b=c.querySelector('.action-btn[onclick*=markRead]');if(b){b.classList.remove('read');b.innerHTML='\u2713 Mark Read';}}); updateStats(); renderProgressPanel(); showToast('Progress reset'); }">⚠ Reset Reading Progress</button>
+
+            <button class="progress-reset-btn" onclick="if(confirm('Reset all reading progress? Bookmarks will be kept.')) { STATE.read=[]; localStorage.setItem('crown_read',JSON.stringify([])); document.querySelectorAll('.dua-card').forEach(c=>{c.classList.remove('read-card');const b=c.querySelector('.action-btn[onclick*=markRead]');if(b){b.classList.remove('read');b.innerHTML='\u2713 Mark Read';}}); updateStats(); renderProgressPanel(); showToast('Progress reset'); }">\u26a0 Reset Reading Progress</button>
         `;
+    }
+
+    // ===== AUDIO RECITATION (Web Speech API) =====
+    let currentUtterance = null;
+    let currentAudioBtn = null;
+
+    function injectAudioButtons() {
+        document.querySelectorAll('.copy-row').forEach(row => {
+            const card = row.closest('.dua-card');
+            if (!card) return;
+            const id = card.getAttribute('data-id');
+            const btn = document.createElement('button');
+            btn.className = 'action-btn audio-btn';
+            btn.innerHTML = '🔊 Listen';
+            btn.onclick = function() { toggleAudio(id, btn); };
+            row.insertBefore(btn, row.firstChild);
+        });
+    }
+
+    window.toggleAudio = function(id, btn) {
+        // If already playing this dua, stop it
+        if (currentAudioBtn === btn && speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            btn.classList.remove('playing');
+            btn.innerHTML = '🔊 Listen';
+            currentAudioBtn = null;
+            currentUtterance = null;
+            return;
+        }
+
+        // Stop any currently playing
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            if (currentAudioBtn) {
+                currentAudioBtn.classList.remove('playing');
+                currentAudioBtn.innerHTML = '🔊 Listen';
+            }
+        }
+
+        const card = document.querySelector(`.dua-card[data-id="${id}"]`);
+        if (!card) return;
+        const arabic = card.querySelector('.arabic-text')?.textContent;
+        if (!arabic) return;
+
+        // Check for Arabic voice
+        const voices = speechSynthesis.getVoices();
+        const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
+
+        if (!arabicVoice && voices.length > 0) {
+            showToast('Arabic voice not available on this device — trying default');
+        }
+
+        const utterance = new SpeechSynthesisUtterance(arabic);
+        utterance.lang = 'ar-SA';
+        utterance.rate = 0.8;
+        utterance.pitch = 1;
+        if (arabicVoice) utterance.voice = arabicVoice;
+
+        btn.classList.add('playing');
+        btn.innerHTML = '⏹ Stop';
+        currentAudioBtn = btn;
+        currentUtterance = utterance;
+
+        utterance.onend = function() {
+            btn.classList.remove('playing');
+            btn.innerHTML = '🔊 Listen';
+            currentAudioBtn = null;
+            currentUtterance = null;
+        };
+
+        utterance.onerror = function() {
+            btn.classList.remove('playing');
+            btn.innerHTML = '🔊 Listen';
+            currentAudioBtn = null;
+            currentUtterance = null;
+            showToast('Audio playback failed');
+        };
+
+        speechSynthesis.speak(utterance);
+    };
+
+    // Pre-load voices (some browsers need this)
+    if ('speechSynthesis' in window) {
+        speechSynthesis.getVoices();
+        speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+    }
+
+    // ===== TIME-BASED DUA SUGGESTIONS =====
+    const TIME_DUA_MAP = {
+        fajr:    { icon: '🌅', label: 'Fajr / Early Morning', period: 'Start your day with these blessed supplications', ids: [12, 14, 16, 23, 34, 35, 36, 38] },
+        morning: { icon: '☀️', label: 'Morning Adhkar', period: 'The Prophet ﷺ never missed his morning remembrance', ids: [12, 14, 16, 23, 34, 35, 36] },
+        dhuhr:   { icon: '🕐', label: 'Midday Remembrance', period: 'Take a moment to reconnect in the middle of your day', ids: [1, 7, 10, 19, 20, 41] },
+        asr:     { icon: '🌤', label: 'Afternoon Reflection', period: 'The Prophet ﷺ sought refuge from the trials of the day', ids: [13, 25, 27, 29, 42] },
+        maghrib: { icon: '🌆', label: 'Evening Adhkar', period: 'As the sun sets, renew your protection', ids: [12, 14, 16, 23, 34, 35, 36] },
+        isha:    { icon: '🌙', label: 'Night Supplications', period: 'Prepare for sleep with these powerful duas', ids: [2, 5, 6, 11, 47, 18] },
+        latenight: { icon: '🌌', label: 'Late Night / Tahajjud', period: 'The last third of the night — when duas are answered', ids: [9, 16, 17, 18, 24, 26, 3] }
+    };
+
+    function getTimePeriod() {
+        const h = new Date().getHours();
+        if (h >= 4 && h < 6) return 'fajr';
+        if (h >= 6 && h < 11) return 'morning';
+        if (h >= 11 && h < 14) return 'dhuhr';
+        if (h >= 14 && h < 16) return 'asr';
+        if (h >= 16 && h < 19) return 'maghrib';
+        if (h >= 19 && h < 22) return 'isha';
+        return 'latenight';
+    }
+
+    function renderTimeBanner() {
+        const container = document.getElementById('timeBanner');
+        if (!container) return;
+
+        const period = getTimePeriod();
+        const data = TIME_DUA_MAP[period];
+        if (!data) return;
+
+        const chips = data.ids.map(id => {
+            const card = document.querySelector(`.dua-card[data-id="${id}"]`);
+            if (!card) return '';
+            const title = card.querySelector('.dua-title')?.textContent?.split('—')[0]?.trim() || `Dua #${id}`;
+            const short = title.length > 30 ? title.substring(0, 28) + '…' : title;
+            return `<span class="time-dua-chip" onclick="scrollToDua(${id})">#${id} ${short}</span>`;
+        }).join('');
+
+        container.innerHTML = `
+            <div class="time-banner">
+                <div class="time-banner-header">
+                    <span class="time-banner-icon">${data.icon}</span>
+                    <span class="time-banner-title">Suggested Now — ${data.label}</span>
+                </div>
+                <div class="time-banner-period">${data.period}</div>
+                <div class="time-banner-duas">${chips}</div>
+            </div>
+        `;
+    }
+
+    // ===== DAILY ACTIVITY TRACKING =====
+    function trackDailyActivity() {
+        const today = new Date().toISOString().slice(0, 10);
+        let activity = JSON.parse(localStorage.getItem('crown_activity') || '[]');
+        if (!activity.includes(today)) {
+            activity.push(today);
+            if (activity.length > 90) activity = activity.slice(-90);
+            localStorage.setItem('crown_activity', JSON.stringify(activity));
+        }
     }
 
     // ===== SCROLL TO TOP =====
