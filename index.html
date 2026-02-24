@@ -477,9 +477,9 @@
         }
         .bottom-nav-item {
             display: flex; flex-direction: column; align-items: center; gap: 4px;
-            padding: 8px 14px; border-radius: var(--radius-md); cursor: pointer;
+            padding: 8px 10px; border-radius: var(--radius-md); cursor: pointer;
             transition: all 0.3s var(--transition-smooth); border: none; background: none;
-            color: var(--text-subtle); font-size: 0.6rem;
+            color: var(--text-subtle); font-size: 0.62rem;
             font-family: var(--font-title); letter-spacing: 0.5px;
             position: relative;
         }
@@ -680,15 +680,15 @@
         }
         .daily-share-btn {
             display: inline-block; margin-top: 12px;
-            font-family: var(--font-title); font-size: 0.6rem;
+            font-family: var(--font-title); font-size: 0.68rem;
             letter-spacing: 1.5px; text-transform: uppercase;
             padding: 6px 18px; border-radius: 20px;
-            border: 1px solid rgba(201, 168, 76, 0.2);
-            background: rgba(201, 168, 76, 0.06);
+            border: 1px solid rgba(201, 168, 76, 0.35);
+            background: rgba(201, 168, 76, 0.12);
             color: var(--gold-light); cursor: pointer;
             transition: all 0.3s;
         }
-        .daily-share-btn:hover { background: rgba(201, 168, 76, 0.12); border-color: rgba(201, 168, 76, 0.35); }
+        .daily-share-btn:hover { background: rgba(201, 168, 76, 0.18); border-color: rgba(201, 168, 76, 0.45); }
 
         /* ============================================ */
         /* ===== SEARCH BAR ===== */
@@ -1296,9 +1296,9 @@
             border-radius: var(--radius-lg); margin-bottom: 1.2rem;
         }
         .prayer-countdown-label {
-            font-family: var(--font-title); font-size: 0.6rem;
+            font-family: var(--font-title); font-size: 0.7rem;
             letter-spacing: 2px; text-transform: uppercase;
-            color: rgba(46, 196, 122, 0.6); margin-bottom: 4px;
+            color: rgba(46, 196, 122, 0.8); margin-bottom: 4px;
         }
         .prayer-countdown-name {
             font-family: var(--font-title); font-size: 1.1rem;
@@ -1325,7 +1325,7 @@
             box-shadow: 0 0 12px rgba(46, 196, 122, 0.08);
         }
         .prayer-time-row.active-prayer .prayer-name { color: var(--emerald-light); }
-        .prayer-time-row.passed-prayer { opacity: 0.45; }
+        .prayer-time-row.passed-prayer { opacity: 0.6; }
         .prayer-name {
             font-family: var(--font-title); font-size: 0.75rem;
             letter-spacing: 1px; text-transform: uppercase;
@@ -1346,7 +1346,7 @@
         .qibla-title {
             font-family: var(--font-title); font-size: 0.65rem;
             letter-spacing: 2px; text-transform: uppercase;
-            color: rgba(46, 196, 122, 0.6); margin-bottom: 16px;
+            color: rgba(46, 196, 122, 0.8); margin-bottom: 16px;
         }
         .qibla-compass {
             width: 180px; height: 180px; margin: 0 auto 12px;
@@ -1358,13 +1358,13 @@
         .qibla-compass .compass-rose {
             position: absolute; inset: 0;
             display: flex; align-items: center; justify-content: center;
-            font-family: var(--font-title); font-size: 0.55rem;
-            color: rgba(224, 238, 210, 0.3); letter-spacing: 1px;
+            font-family: var(--font-title); font-size: 0.65rem;
+            color: rgba(224, 238, 210, 0.5); letter-spacing: 1px;
         }
-        .qibla-compass .compass-n { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); color: rgba(46, 196, 122, 0.5); font-size: 0.6rem; font-family: var(--font-title); }
-        .qibla-compass .compass-s { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); color: rgba(224,238,210,0.2); font-size: 0.6rem; font-family: var(--font-title); }
-        .qibla-compass .compass-e { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: rgba(224,238,210,0.2); font-size: 0.6rem; font-family: var(--font-title); }
-        .qibla-compass .compass-w { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: rgba(224,238,210,0.2); font-size: 0.6rem; font-family: var(--font-title); }
+        .qibla-compass .compass-n { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); color: rgba(46, 196, 122, 0.8); font-size: 0.7rem; font-family: var(--font-title); }
+        .qibla-compass .compass-s { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); color: rgba(224,238,210,0.55); font-size: 0.7rem; font-family: var(--font-title); }
+        .qibla-compass .compass-e { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: rgba(224,238,210,0.55); font-size: 0.7rem; font-family: var(--font-title); }
+        .qibla-compass .compass-w { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: rgba(224,238,210,0.55); font-size: 0.7rem; font-family: var(--font-title); }
         .qibla-arrow {
             position: absolute; top: 50%; left: 50%;
             width: 4px; height: 70px;
@@ -1380,11 +1380,11 @@
         }
         .qibla-degree {
             font-family: var(--font-title); font-size: 0.8rem;
-            color: rgba(224, 238, 210, 0.6); letter-spacing: 1px;
+            color: rgba(224, 238, 210, 0.8); letter-spacing: 1px;
         }
         .qibla-status {
-            font-family: var(--font-text); font-size: 0.72rem;
-            color: rgba(224, 238, 210, 0.4); margin-top: 6px;
+            font-family: var(--font-text); font-size: 0.78rem;
+            color: rgba(224, 238, 210, 0.6); margin-top: 6px;
         }
         /* Notification toggle */
         .prayer-notify-row {
@@ -1441,16 +1441,16 @@
             border-color: rgba(46, 196, 122, 0.15);
         }
         .prayer-now-badge, .prayer-next-badge {
-            font-family: var(--font-title); font-size: 0.5rem;
-            letter-spacing: 1px; padding: 2px 8px;
+            font-family: var(--font-title); font-size: 0.65rem;
+            letter-spacing: 1px; padding: 3px 10px;
             border-radius: 20px; margin-left: 8px;
         }
         .prayer-now-badge {
-            background: rgba(46, 196, 122, 0.2); color: var(--emerald-light);
+            background: rgba(46, 196, 122, 0.25); color: var(--emerald-light);
             border: 1px solid rgba(46, 196, 122, 0.3);
         }
         .prayer-next-badge {
-            background: rgba(212, 175, 55, 0.12); color: var(--gold-light);
+            background: rgba(212, 175, 55, 0.18); color: var(--gold-light);
             border: 1px solid rgba(212, 175, 55, 0.2);
         }
 
@@ -1914,18 +1914,18 @@
             font-family: var(--font-title); font-size: 0.6rem;
             letter-spacing: 1px; text-transform: uppercase;
             padding: 6px 20px; border-radius: 20px;
-            border: 1px solid rgba(46, 196, 122, 0.15);
-            background: rgba(46, 196, 122, 0.06);
-            color: rgba(224, 238, 210, 0.7);
+            border: 1px solid rgba(46, 196, 122, 0.25);
+            background: rgba(46, 196, 122, 0.1);
+            color: rgba(224, 238, 210, 0.85);
             cursor: pointer; transition: all 0.3s;
         }
         .sr-rating-btn:hover { background: rgba(46, 196, 122, 0.12); color: var(--emerald-light); }
         .sr-rating-btn.sr-easy { border-color: rgba(46, 196, 122, 0.2); }
         .sr-rating-btn.sr-hard { border-color: rgba(212, 175, 55, 0.2); }
         .sr-review-badge {
-            font-family: var(--font-title); font-size: 0.45rem;
+            font-family: var(--font-title); font-size: 0.62rem;
             letter-spacing: 1px; text-transform: uppercase;
-            padding: 2px 8px; border-radius: 20px;
+            padding: 3px 10px; border-radius: 20px;
             background: rgba(212, 175, 55, 0.12); color: var(--gold-light);
             border: 1px solid rgba(212, 175, 55, 0.2);
             margin-left: 8px; vertical-align: middle;
@@ -2023,15 +2023,15 @@
         }
         .progress-share-btn {
             display: block; margin: 12px auto 0; padding: 10px 24px;
-            border-radius: 50px; background: rgba(46, 196, 122, 0.06);
-            border: 1px solid rgba(46, 196, 122, 0.12);
+            border-radius: 50px; background: rgba(46, 196, 122, 0.12);
+            border: 1px solid rgba(46, 196, 122, 0.25);
             color: var(--emerald-light); font-family: var(--font-title);
-            font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase;
+            font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s var(--transition-smooth);
         }
         .progress-share-btn:hover {
-            background: rgba(46, 196, 122, 0.12);
-            border-color: rgba(46, 196, 122, 0.25);
+            background: rgba(46, 196, 122, 0.18);
+            border-color: rgba(46, 196, 122, 0.35);
         }
 
         /* ===== AUDIO RECITATION BUTTON ===== */
