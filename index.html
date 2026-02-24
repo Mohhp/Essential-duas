@@ -5433,7 +5433,10 @@ window.filterCategory = function(cat, btn) {
     document.querySelectorAll('.section-header.collapsed').forEach(sh => {
         sh.classList.remove('collapsed');
         const hint = sh.querySelector('.section-collapse-hint');
-        if (hint) hint.textContent = 'tap to collapse';
+        if (hint) {
+            const isPashto = typeof getCurrentLang === 'function' && getCurrentLang() === 'ps';
+            hint.textContent = isPashto ? (typeof PS_UI !== 'undefined' ? PS_UI.tapCollapse : 'tap to collapse') : 'tap to collapse';
+        }
 
         let next = sh.nextElementSibling;
         while (next && !next.classList.contains('section-header')) {
@@ -5442,6 +5445,20 @@ window.filterCategory = function(cat, btn) {
             }
             next = next.nextElementSibling;
         }
+    });
+
+    // Hide section headers that have zero visible cards beneath them
+    document.querySelectorAll('.section-header').forEach(sh => {
+        let hasVisible = false;
+        let next = sh.nextElementSibling;
+        while (next && !next.classList.contains('section-header')) {
+            if (next.classList.contains('dua-card') && !next.classList.contains('hidden-card')) {
+                hasVisible = true;
+                break;
+            }
+            next = next.nextElementSibling;
+        }
+        sh.style.display = hasVisible ? '' : 'none';
     });
 
     if (els.noResults) els.noResults.classList.toggle('visible', visibleCount === 0);
@@ -5475,10 +5492,12 @@ window.filterCategory = function(cat, btn) {
         grid.classList.add('hidden-grid');
         duaList.classList.remove('hidden-list');
 
-        // Set detail header
+        // Set detail header (language-aware)
         document.getElementById('cdhIcon').textContent = meta.icon;
-        document.getElementById('cdhTitle').textContent = meta.title;
-        document.getElementById('cdhSubtitle').textContent = meta.subtitle;
+        const isPashto = typeof getCurrentLang === 'function' && getCurrentLang() === 'ps';
+        const psUI = typeof PS_UI !== 'undefined' ? PS_UI : null;
+        document.getElementById('cdhTitle').textContent = (isPashto && psUI && psUI.catCardTitles[cat]) ? psUI.catCardTitles[cat] : meta.title;
+        document.getElementById('cdhSubtitle').textContent = (isPashto && psUI && psUI.catCardSubtitles[cat]) ? psUI.catCardSubtitles[cat] : meta.subtitle;
         detailHeader.classList.add('visible');
 
         // Filter cards to this category
@@ -5506,6 +5525,11 @@ window.filterCategory = function(cat, btn) {
         els.cards.forEach(card => {
             card.classList.remove('hidden-card');
             card.style.display = '';
+        });
+
+        // Restore all section headers
+        document.querySelectorAll('.section-header').forEach(sh => {
+            sh.style.display = '';
         });
 
         // Reset pills

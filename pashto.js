@@ -94,6 +94,39 @@ const PS_UI = {
     openCount: 'خلاص شمېرنه',
     // Etiquette
     etiquetteTitle: 'د دعا آداب',
+    // Category grid UI
+    backToCategories: '← بېرته کټګورۍ ته',
+    duasSuffix: 'دعاګانې',
+    catCardTitles: {
+        'all': 'ټولې دعاګانې',
+        'quran': 'قرآني بنسټ',
+        'protection': 'ساتنه او پناه',
+        'forgiveness': 'بښنه',
+        'guidance': 'لارښوونه او ایمان',
+        'wellbeing': 'تندرستي او آرامتیا',
+        'prophets': 'د پیغمبرانو دعاګانې',
+        'morning-evening': 'سهار او ماښام',
+        'provision': 'رزق',
+        'prayer': 'لمونځ',
+        'family': 'کورنۍ',
+        'travel': 'سفر او پوهه',
+        'scholars': 'د علماوو خزانې'
+    },
+    catCardSubtitles: {
+        'all': 'د ۵۵ اساسي دعاګانو بشپړه ټولګه',
+        'quran': 'د الله تعالی کلام — ترټولو لوړ واک',
+        'protection': 'د الله او رسول ﷺ د کلامو سره ځان وساتئ',
+        'forgiveness': 'د دې پیاوړو دعاګانو سره الله ته ستنېدل',
+        'guidance': 'له الله څخه لار او ثبات وغوښتئ',
+        'wellbeing': 'د سنت څخه شفا، اسانتیا او آرامتیا',
+        'prophets': 'د پیغمبرانو علیهم السلام دعاګانې',
+        'morning-evening': 'د ساتنې او برکت ورځنی اذکار',
+        'provision': 'له الله څخه روزي او برکت وغوښتئ',
+        'prayer': 'د اسم اعظم او لمونځ غوره دعاګانې',
+        'family': 'د والدینو، ملګري او اولاد لپاره دعاګانې',
+        'travel': 'د سفر او د علم غوښتنې دعاګانې',
+        'scholars': 'د لوی علماوو غوره شوې دعاګانې'
+    },
     // Routine
     routineTitle: 'وړاندیز شوی ورځنی معمول',
     routineMorning: '🌅 سهار (د فجر وروسته)',
@@ -617,6 +650,44 @@ function applyLanguage(lang) {
         else if (t === 'Read' || t === 'Start' || t === 'لوستل شوي' || t === 'پیل کړئ') el.textContent = PS_UI.statRead;
     });
 
+    // Category grid cards
+    document.querySelectorAll('.cat-card').forEach(card => {
+        const cat = card.getAttribute('data-cat');
+        if (!cat) return;
+        const nameEl = card.querySelector('.cat-card-name');
+        const countEl = card.querySelector('.cat-card-count');
+        if (nameEl) {
+            if (!nameEl.getAttribute('data-en')) nameEl.setAttribute('data-en', nameEl.textContent);
+            if (PS_UI.catCardTitles[cat]) nameEl.textContent = PS_UI.catCardTitles[cat];
+        }
+        if (countEl) {
+            if (!countEl.getAttribute('data-en')) countEl.setAttribute('data-en', countEl.textContent);
+            const num = countEl.textContent.replace(/[^0-9]/g, '');
+            countEl.textContent = num + ' ' + PS_UI.duasSuffix;
+        }
+    });
+
+    // Back to categories button
+    const backBtn = document.getElementById('backToGrid');
+    if (backBtn) {
+        if (!backBtn.getAttribute('data-en')) backBtn.setAttribute('data-en', backBtn.textContent);
+        backBtn.textContent = PS_UI.backToCategories;
+    }
+
+    // Category detail header (dynamic — update if currently visible)
+    const cdhTitle = document.getElementById('cdhTitle');
+    const cdhSubtitle = document.getElementById('cdhSubtitle');
+    if (cdhTitle && cdhTitle.textContent) {
+        // Find the current category from localStorage or active state
+        const activeCat = localStorage.getItem('crown_active_category');
+        if (activeCat && PS_UI.catCardTitles[activeCat]) {
+            cdhTitle.textContent = PS_UI.catCardTitles[activeCat];
+        }
+        if (activeCat && PS_UI.catCardSubtitles[activeCat]) {
+            cdhSubtitle.textContent = PS_UI.catCardSubtitles[activeCat];
+        }
+    }
+
     // Streak banner
     const streakBanner = document.getElementById('streakBanner');
     if (streakBanner) {
@@ -864,6 +935,15 @@ function restoreEnglish() {
         const sh = hint.closest('.section-header');
         if (sh) hint.textContent = sh.classList.contains('collapsed') ? 'tap to expand' : 'tap to collapse';
     });
+    // Restore category detail header to English if a category is open
+    const activeCat = localStorage.getItem('crown_active_category');
+    if (activeCat && typeof CATEGORY_META !== 'undefined' && CATEGORY_META[activeCat]) {
+        const meta = CATEGORY_META[activeCat];
+        const cdhTitle = document.getElementById('cdhTitle');
+        const cdhSubtitle = document.getElementById('cdhSubtitle');
+        if (cdhTitle) cdhTitle.textContent = meta.title;
+        if (cdhSubtitle) cdhSubtitle.textContent = meta.subtitle;
+    }
 }
 
 // Patch showToast for Pashto — deferred until showToast exists
