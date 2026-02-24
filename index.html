@@ -134,6 +134,60 @@
         [data-theme="light"] .font-controls { background: rgba(255, 255, 255, 0.5); }
         [data-theme="light"] .footer { background: transparent; }
 
+        /* ===== COMPREHENSIVE LIGHT MODE OVERRIDES ===== */
+        /* Critical: Text that would be invisible on light bg */
+        [data-theme="light"] .etiquette-text { color: rgba(25, 60, 42, 0.85); }
+        [data-theme="light"] .routine-desc { color: rgba(25, 60, 42, 0.72); }
+        [data-theme="light"] .routine-desc .dua-ref { color: var(--gold-mid); }
+        [data-theme="light"] .footer-text { color: rgba(25, 60, 42, 0.5); }
+        [data-theme="light"] .footer-copyright { color: rgba(25, 60, 42, 0.35); }
+        [data-theme="light"] .daily-label { color: var(--gold-mid); }
+
+        /* Critical: Auth badges — darken neon colors for readability */
+        [data-theme="light"] .badge-quran { background: rgba(106, 27, 128, 0.1); color: #6a1b80; border-color: rgba(106, 27, 128, 0.25); }
+        [data-theme="light"] .badge-sahih { background: rgba(13, 123, 80, 0.08); color: #0d7b50; border-color: rgba(13, 123, 80, 0.2); }
+        [data-theme="light"] .badge-jayyid { background: rgba(14, 107, 122, 0.1); color: #0e6b7a; border-color: rgba(14, 107, 122, 0.25); }
+        [data-theme="light"] .badge-sirah { background: rgba(139, 32, 32, 0.08); color: #8b2020; border-color: rgba(139, 32, 32, 0.2); }
+        [data-theme="light"] .badge-hasan { background: rgba(138, 109, 43, 0.1); color: #6b5420; border-color: rgba(138, 109, 43, 0.22); }
+
+        /* Critical: Focus/interactive states with hardcoded dark backgrounds */
+        [data-theme="light"] .search-input:focus { background: rgba(255, 255, 255, 0.95); border-color: rgba(13, 123, 80, 0.4); box-shadow: 0 0 0 3px rgba(13, 123, 80, 0.08), var(--shadow-card); }
+        [data-theme="light"] .back-to-top { background: rgba(255, 255, 255, 0.9); border-color: rgba(13, 123, 80, 0.15); box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); color: var(--emerald-light); }
+        [data-theme="light"] .back-to-top:hover { background: rgba(255, 255, 255, 1); border-color: rgba(13, 123, 80, 0.3); }
+
+        /* High: Buttons with poor contrast in light mode */
+        [data-theme="light"] .memorize-btn { background: rgba(106, 27, 128, 0.06); border-color: rgba(106, 27, 128, 0.18); color: #5e35b1; }
+        [data-theme="light"] .memorize-btn.memorized { background: rgba(106, 27, 128, 0.12); border-color: #7e57c2; color: #5e35b1; }
+        [data-theme="light"] .progress-reset-btn { background: rgba(198, 40, 40, 0.05); border-color: rgba(198, 40, 40, 0.15); color: #c62828; }
+        [data-theme="light"] .progress-reset-btn:hover { background: rgba(198, 40, 40, 0.1); border-color: rgba(198, 40, 40, 0.3); }
+
+        /* High: Action buttons & interactive elements — boost visibility on light bg */
+        [data-theme="light"] .action-btn { background: rgba(13, 123, 80, 0.05); border-color: rgba(13, 123, 80, 0.15); }
+        [data-theme="light"] .action-btn:hover { background: rgba(13, 123, 80, 0.1); border-color: rgba(13, 123, 80, 0.25); }
+        [data-theme="light"] .dua-number { background: linear-gradient(135deg, rgba(13, 123, 80, 0.08), rgba(13, 123, 80, 0.03)); border-color: rgba(13, 123, 80, 0.18); }
+        [data-theme="light"] .section-toggle { background: rgba(13, 123, 80, 0.08); border-color: rgba(13, 123, 80, 0.2); }
+        [data-theme="light"] .section-toggle.collapsed { background: rgba(13, 123, 80, 0.04); }
+
+        /* High: Tasbeeh elements */
+        [data-theme="light"] .tasbeeh-tap-btn { background: linear-gradient(135deg, rgba(13, 123, 80, 0.08), rgba(13, 123, 80, 0.03)); border-color: rgba(13, 123, 80, 0.25); box-shadow: 0 0 30px rgba(13, 123, 80, 0.06); }
+        [data-theme="light"] .tasbeeh-tap-btn:active { background: linear-gradient(135deg, rgba(13, 123, 80, 0.15), rgba(13, 123, 80, 0.06)); }
+        [data-theme="light"] .tasbeeh-ctrl-btn { background: rgba(13, 123, 80, 0.05); border-color: rgba(13, 123, 80, 0.15); }
+        [data-theme="light"] .tasbeeh-ctrl-btn:hover { background: rgba(13, 123, 80, 0.1); color: var(--emerald-light); }
+        [data-theme="light"] .tasbeeh-preset { background: rgba(13, 123, 80, 0.04); border-color: rgba(13, 123, 80, 0.12); }
+        [data-theme="light"] .tasbeeh-preset:hover,
+        [data-theme="light"] .tasbeeh-preset.active { background: rgba(13, 123, 80, 0.08); border-color: rgba(13, 123, 80, 0.25); }
+        [data-theme="light"] .tasbeeh-count-display { text-shadow: none; }
+        [data-theme="light"] .tasbeeh-target { color: rgba(13, 123, 80, 0.6); }
+
+        /* Moderate: Surfaces & containers */
+        [data-theme="light"] .how-to-box { background: rgba(13, 123, 80, 0.04); border-color: rgba(13, 123, 80, 0.1); }
+        [data-theme="light"] .time-dua-chip { background: rgba(13, 123, 80, 0.04); border-color: rgba(13, 123, 80, 0.12); }
+        [data-theme="light"] .progress-bar-visual { background: rgba(13, 123, 80, 0.1); }
+        [data-theme="light"] .progress-stat-card { border-color: rgba(13, 123, 80, 0.12); }
+        [data-theme="light"] .progress-day-cell { background: rgba(13, 123, 80, 0.03); }
+        [data-theme="light"] .progress-day-cell.active { background: rgba(13, 123, 80, 0.1); border-color: rgba(13, 123, 80, 0.2); }
+        [data-theme="light"] .progress-day-cell.today { border-color: var(--emerald-light); }
+
         html { scroll-behavior: smooth; overflow-x: hidden; font-size: 16px; }
 
         body {
@@ -312,13 +366,13 @@
             position: relative; z-index: 1; opacity: 0.5;
         }
         .footer-credit-text {
-            font-family: var(--font-title); font-size: 0.38rem;
-            letter-spacing: 2.5px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.55rem;
+            letter-spacing: 2px; text-transform: uppercase;
             color: var(--text-subtle);
         }
         .footer-copyright {
-            font-family: var(--font-title); font-size: 0.38rem;
-            letter-spacing: 2px; color: rgba(170, 210, 190, 0.4);
+            font-family: var(--font-title); font-size: 0.5rem;
+            letter-spacing: 1.5px; color: rgba(170, 210, 190, 0.4);
             margin-top: 8px;
         }
 
@@ -372,9 +426,9 @@
         }
         .font-btn {
             background: none; border: none;
-            color: var(--text-muted); width: 26px; height: 26px;
+            color: var(--text-muted); width: 36px; height: 36px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-family: var(--font-title); font-size: 0.65rem;
+            cursor: pointer; font-family: var(--font-title); font-size: 0.7rem;
             font-weight: 700; transition: all 0.25s var(--transition-smooth);
         }
         .font-btn:hover { background: rgba(46, 196, 122, 0.1); color: var(--emerald-light); }
@@ -423,7 +477,8 @@
             display: flex; flex-direction: column; align-items: center; gap: 4px;
             padding: 8px 14px; border-radius: var(--radius-md); cursor: pointer;
             transition: all 0.3s var(--transition-smooth); border: none; background: none;
-            color: var(--text-subtle);
+            color: var(--text-subtle); font-size: 0.6rem;
+            font-family: var(--font-title); letter-spacing: 0.5px;
             position: relative;
         }
         .bottom-nav-item.active {
@@ -509,7 +564,7 @@
         }
 
         .subtitle {
-            font-family: var(--font-title); font-size: 0.6rem; letter-spacing: 5px;
+            font-family: var(--font-title); font-size: 0.72rem; letter-spacing: 3px;
             color: var(--text-muted); text-transform: uppercase;
             margin-bottom: 1.5rem;
         }
@@ -532,8 +587,8 @@
             letter-spacing: 0.5px;
         }
         .stat-label {
-            font-family: var(--font-title); font-size: 0.5rem;
-            letter-spacing: 2.5px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.62rem;
+            letter-spacing: 2px; text-transform: uppercase;
             color: var(--text-subtle); margin-top: 4px;
         }
 
@@ -574,8 +629,8 @@
             border: 1px solid rgba(46, 196, 122, 0.08);
             border-radius: var(--radius-lg);
             padding: 10px 18px; margin: 0 0 1rem;
-            font-family: var(--font-title); font-size: 0.55rem;
-            letter-spacing: 1.8px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.7rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
             color: var(--text-subtle);
             backdrop-filter: blur(8px);
         }
@@ -606,8 +661,8 @@
             background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.3), transparent);
         }
         .daily-label {
-            font-family: var(--font-title); font-size: 0.55rem;
-            letter-spacing: 4px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.7rem;
+            letter-spacing: 2.5px; text-transform: uppercase;
             color: rgba(201, 168, 76, 0.8); margin-bottom: 0.5rem;
         }
         .daily-label .sparkle { margin: 0 6px; }
@@ -618,7 +673,7 @@
             line-height: 2.3; margin: 0.5rem 0;
         }
         .daily-translation {
-            font-family: var(--font-text); font-size: 0.85rem;
+            font-family: var(--font-text); font-size: 0.9rem;
             color: var(--text-muted); font-style: italic;
         }
 
@@ -669,8 +724,8 @@
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.08);
             color: var(--text-subtle);
-            font-family: var(--font-title); font-size: 0.48rem;
-            letter-spacing: 1.8px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.7rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s var(--transition-smooth); white-space: nowrap;
         }
         .toolbar-btn:hover, .toolbar-btn.active {
@@ -688,12 +743,12 @@
         }
         .category-pills::-webkit-scrollbar { display: none; }
         .pill {
-            flex-shrink: 0; padding: 8px 16px; border-radius: 50px;
+            flex-shrink: 0; padding: 10px 18px; border-radius: 50px;
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.08);
             color: var(--text-subtle);
-            font-family: var(--font-title); font-size: 0.5rem;
-            letter-spacing: 1.8px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.7rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
             cursor: pointer; transition: all 0.35s var(--transition-smooth); white-space: nowrap;
         }
         .pill:hover {
@@ -708,7 +763,7 @@
         .pill .count {
             display: inline-block; margin-left: 6px;
             background: rgba(46, 196, 122, 0.1);
-            padding: 1px 7px; border-radius: 10px; font-size: 0.45rem;
+            padding: 1px 7px; border-radius: 10px; font-size: 0.6rem;
         }
 
                 /* ============================================ */
@@ -718,7 +773,7 @@
             background: var(--bg-glass);
             border: 1px solid rgba(46, 196, 122, 0.1);
             border-radius: var(--radius-lg);
-            margin-bottom: 14px; overflow: hidden;
+            margin-bottom: 18px; overflow: hidden;
             transition: opacity 0.5s ease, transform 0.5s ease, border-color 0.4s ease, box-shadow 0.4s ease;
             position: relative;
             backdrop-filter: blur(16px);
@@ -770,8 +825,8 @@
         /* ===== AUTHENTICATION BADGE ===== */
         .auth-badge {
             display: inline-block; font-family: var(--font-title);
-            font-size: 0.4rem; font-weight: 700;
-            padding: 2px 8px; border-radius: 50px;
+            font-size: 0.55rem; font-weight: 700;
+            padding: 3px 10px; border-radius: 50px;
             letter-spacing: 0.8px; text-transform: uppercase;
             vertical-align: middle; margin-left: 6px;
         }
@@ -793,7 +848,7 @@
             background: linear-gradient(135deg, rgba(46, 196, 122, 0.1), rgba(46, 196, 122, 0.03));
             border: 1px solid rgba(46, 196, 122, 0.15);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-family: var(--font-title); font-size: 0.65rem; font-weight: 700;
+            font-family: var(--font-title); font-size: 0.7rem; font-weight: 700;
             color: var(--emerald-light); flex-shrink: 0;
             position: relative;
             transition: all 0.3s var(--transition-smooth);
@@ -828,13 +883,13 @@
 
         .card-title-group { flex: 1; min-width: 0; }
         .dua-title {
-            font-family: var(--font-title); font-size: 0.68rem;
-            letter-spacing: 1.2px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: calc(0.78rem * var(--font-scale));
+            letter-spacing: 1px; text-transform: uppercase;
             color: var(--gold-lightest); font-weight: 600; line-height: 1.5;
         }
         .dua-category-tag {
-            font-family: var(--font-title); font-size: 0.45rem;
-            letter-spacing: 1.8px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.6rem;
+            letter-spacing: 1.2px; text-transform: uppercase;
             color: var(--text-subtle); margin-top: 3px;
         }
 
@@ -843,7 +898,7 @@
         .card-action-btn {
             background: none; border: none;
             color: var(--text-subtle);
-            width: 30px; height: 30px; border-radius: 50%;
+            width: 40px; height: 40px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.3s var(--transition-smooth);
             font-size: 0.85rem; position: relative;
@@ -926,8 +981,8 @@
         }
         .ref-icon { font-size: 0.75rem; color: var(--text-subtle); }
         .ref-text {
-            font-family: var(--font-title); font-size: 0.5rem;
-            letter-spacing: 1.2px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: calc(0.62rem * var(--font-scale));
+            letter-spacing: 1px; text-transform: uppercase;
             color: var(--text-subtle);
         }
 
@@ -948,7 +1003,7 @@
             border: 1px solid rgba(46, 196, 122, 0.06);
             border-radius: var(--radius-md);
             padding: 12px 14px; margin-top: 10px;
-            font-family: var(--font-text); font-size: 0.8rem;
+            font-family: var(--font-text); font-size: calc(0.85rem * var(--font-scale));
             color: var(--text-muted); line-height: 1.9;
         }
         .how-to-box strong { color: var(--emerald-light); }
@@ -959,11 +1014,11 @@
         }
         .action-btn {
             display: inline-flex; align-items: center; gap: 5px;
-            padding: 7px 14px; border-radius: 50px;
+            padding: 9px 16px; border-radius: 50px;
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.1);
             color: var(--text-subtle);
-            font-family: var(--font-title); font-size: 0.48rem;
+            font-family: var(--font-title); font-size: 0.62rem;
             letter-spacing: 1.2px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s var(--transition-smooth);
         }
@@ -1058,7 +1113,7 @@
             color: var(--emerald-light); flex-shrink: 0;
         }
         .etiquette-text {
-            font-family: var(--font-text); font-size: 0.85rem;
+            font-family: var(--font-text); font-size: calc(0.88rem * var(--font-scale));
             color: rgba(230, 242, 218, 0.88); line-height: 1.8;
         }
         .etiquette-text strong { color: var(--gold-light); }
@@ -1149,8 +1204,8 @@
             text-shadow: 0 0 40px rgba(46, 196, 122, 0.25);
         }
         .tasbeeh-target {
-            font-family: var(--font-title); font-size: 0.6rem;
-            letter-spacing: 2px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.68rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
             color: rgba(46, 196, 122, 0.7); margin-bottom: 2rem;
         }
         .tasbeeh-tap-btn {
@@ -1158,7 +1213,7 @@
             background: linear-gradient(135deg, rgba(46, 196, 122, 0.1), rgba(46, 196, 122, 0.03));
             border: 2px solid rgba(46, 196, 122, 0.25);
             color: var(--emerald-light); font-family: var(--font-title);
-            font-size: 0.65rem; letter-spacing: 2.5px; text-transform: uppercase;
+            font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;
             cursor: pointer; transition: all 0.15s var(--transition-smooth);
             display: flex; align-items: center; justify-content: center;
             box-shadow: 0 0 40px rgba(46, 196, 122, 0.06);
@@ -1173,12 +1228,12 @@
             display: flex; gap: 10px; margin-top: 1.5rem;
         }
         .tasbeeh-ctrl-btn {
-            padding: 8px 18px; border-radius: 50px;
+            padding: 12px 22px; border-radius: 50px;
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.1);
             color: var(--text-subtle);
-            font-family: var(--font-title); font-size: 0.5rem;
-            letter-spacing: 2px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.65rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s var(--transition-smooth);
         }
         .tasbeeh-ctrl-btn:hover {
@@ -1188,11 +1243,11 @@
             display: flex; gap: 6px; margin-top: 1rem;
         }
         .tasbeeh-preset {
-            padding: 6px 14px; border-radius: 50px;
+            padding: 10px 18px; border-radius: 50px;
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.08);
             color: var(--text-subtle);
-            font-family: var(--font-title); font-size: 0.5rem;
+            font-family: var(--font-title); font-size: 0.65rem;
             cursor: pointer; transition: all 0.25s var(--transition-smooth);
         }
         .tasbeeh-preset:hover, .tasbeeh-preset.active {
@@ -1232,7 +1287,7 @@
         }
         .dhikr-option.active .dhikr-option-ar { color: var(--emerald-light); }
         .dhikr-option-en {
-            font-family: var(--font-title); font-size: 0.42rem;
+            font-family: var(--font-title); font-size: 0.52rem;
             letter-spacing: 0.5px; text-transform: uppercase;
             color: var(--text-faint); white-space: nowrap;
         }
@@ -1240,7 +1295,7 @@
 
         /* Dhikr virtue hint */
         .tasbeeh-virtue {
-            font-family: var(--font-text); font-size: 0.65rem;
+            font-family: var(--font-text); font-size: 0.75rem;
             color: var(--text-subtle); font-style: italic;
             text-align: center; max-width: 300px;
             margin-bottom: 1.5rem; line-height: 1.5;
@@ -1395,8 +1450,8 @@
             background: linear-gradient(to left, transparent, var(--emerald-light));
         }
         .footer-text {
-            font-family: var(--font-title); font-size: 0.55rem;
-            letter-spacing: 2px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.7rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
             color: rgba(224, 238, 210, 0.4); line-height: 2;
         }
         .footer-arabic {
@@ -1447,7 +1502,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 24px; height: 24px;
+            width: 32px; height: 32px;
             border-radius: 50%;
             background: rgba(46, 196, 122, 0.1);
             border: 1px solid rgba(46, 196, 122, 0.2);
@@ -1463,8 +1518,8 @@
 
         .section-collapse-hint {
             font-family: var(--font-title);
-            font-size: 0.45rem;
-            letter-spacing: 1.5px;
+            font-size: 0.58rem;
+            letter-spacing: 1px;
             text-transform: uppercase;
             color: var(--text-subtle);
             margin-top: 4px;
@@ -1515,7 +1570,7 @@
             background: rgba(74, 26, 122, 0.08);
             border: 1px solid rgba(74, 26, 122, 0.2);
             color: #b388ff;
-            font-family: var(--font-title); font-size: 0.5rem;
+            font-family: var(--font-title); font-size: 0.62rem;
             letter-spacing: 1px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s ease;
         }
@@ -1613,8 +1668,8 @@
         .progress-stat-icon { font-size: 1.8rem; flex-shrink: 0; }
         .progress-stat-info { flex: 1; }
         .progress-stat-label {
-            font-family: var(--font-title); font-size: 0.55rem;
-            letter-spacing: 2px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.7rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
             color: var(--text-subtle); margin-bottom: 2px;
         }
         .progress-stat-value {
@@ -1639,7 +1694,7 @@
             border-radius: 50px; background: rgba(122, 46, 59, 0.06);
             border: 1px solid rgba(122, 46, 59, 0.12);
             color: #ef9a9a; font-family: var(--font-title);
-            font-size: 0.48rem; letter-spacing: 2px; text-transform: uppercase;
+            font-size: 0.62rem; letter-spacing: 1.5px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s var(--transition-smooth);
         }
         .progress-reset-btn:hover {
@@ -1684,8 +1739,8 @@
         }
         .time-banner-icon { font-size: 1.5rem; }
         .time-banner-title {
-            font-family: var(--font-title); font-size: 0.6rem;
-            letter-spacing: 2px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.72rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
             color: var(--emerald-light);
         }
         .time-banner-period {
@@ -1722,8 +1777,8 @@
             background: rgba(46, 196, 122, 0.03);
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
-            font-family: var(--font-title); font-size: 0.38rem;
-            letter-spacing: 1px; color: var(--text-faint);
+            font-family: var(--font-title); font-size: 0.52rem;
+            letter-spacing: 0.5px; color: var(--text-faint);
             transition: all 0.3s var(--transition-smooth);
         }
         .progress-day-cell.active {
@@ -1754,8 +1809,8 @@
         }
         .achievement-icon { font-size: 1.5rem; margin-bottom: 4px; }
         .achievement-name {
-            font-family: var(--font-title); font-size: 0.45rem;
-            letter-spacing: 1.5px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.6rem;
+            letter-spacing: 1px; text-transform: uppercase;
             color: var(--text-muted);
         }
         .progress-category-bar {
@@ -1763,8 +1818,8 @@
             margin-bottom: 6px;
         }
         .progress-cat-label {
-            font-family: var(--font-title); font-size: 0.4rem;
-            letter-spacing: 1px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: 0.55rem;
+            letter-spacing: 0.5px; text-transform: uppercase;
             color: var(--text-subtle); width: 70px; flex-shrink: 0;
             text-align: right;
         }
@@ -1778,8 +1833,8 @@
             transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
         }
         .progress-cat-count {
-            font-family: var(--font-title); font-size: 0.4rem;
-            color: var(--text-faint); width: 24px;
+            font-family: var(--font-title); font-size: 0.55rem;
+            color: var(--text-faint); width: 28px;
         }
 
         /* ===== THEME TOGGLE IN NAV ===== */
@@ -1798,7 +1853,7 @@
             h1 { font-size: 1.5rem; }
             .bismillah { font-size: calc(1.8rem * var(--font-scale)); }
             .arabic-text { font-size: calc(1.35rem * var(--font-scale)); }
-            .dua-title { font-size: 0.68rem; }
+            .dua-title { font-size: calc(0.72rem * var(--font-scale)); }
             .container { padding-left: 8px; padding-right: 8px; }
             .tasbeeh-count-display { font-size: 3.5rem; }
             .tasbeeh-tap-btn { width: 120px; height: 120px; }
