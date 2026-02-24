@@ -1201,6 +1201,68 @@
             border-color: rgba(46, 196, 122, 0.3); color: var(--emerald-light);
             background: rgba(46, 196, 122, 0.08);
         }
+
+        /* Dhikr Selector */
+        .dhikr-selector {
+            display: flex; gap: 8px; overflow-x: auto;
+            width: 100%; max-width: 400px;
+            padding: 4px 2px 12px; margin-bottom: 1.2rem;
+            scrollbar-width: none; -ms-overflow-style: none;
+            scroll-snap-type: x mandatory;
+        }
+        .dhikr-selector::-webkit-scrollbar { display: none; }
+        .dhikr-option {
+            flex-shrink: 0; scroll-snap-align: center;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 3px; padding: 10px 14px; border-radius: var(--radius-lg);
+            background: rgba(46, 196, 122, 0.03);
+            border: 1px solid rgba(46, 196, 122, 0.08);
+            cursor: pointer; transition: all 0.3s var(--transition-smooth);
+            min-width: 72px; text-align: center;
+            -webkit-user-select: none; user-select: none;
+        }
+        .dhikr-option:active { transform: scale(0.96); }
+        .dhikr-option.active {
+            background: linear-gradient(135deg, rgba(46, 196, 122, 0.12), rgba(46, 196, 122, 0.05));
+            border-color: rgba(46, 196, 122, 0.35);
+            box-shadow: 0 0 20px rgba(46, 196, 122, 0.08);
+        }
+        .dhikr-option-ar {
+            font-family: var(--font-arabic); font-size: 0.85rem;
+            color: var(--gold-light); direction: rtl; line-height: 1.4;
+            white-space: nowrap;
+        }
+        .dhikr-option.active .dhikr-option-ar { color: var(--emerald-light); }
+        .dhikr-option-en {
+            font-family: var(--font-title); font-size: 0.42rem;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            color: var(--text-faint); white-space: nowrap;
+        }
+        .dhikr-option.active .dhikr-option-en { color: rgba(46, 196, 122, 0.55); }
+
+        /* Dhikr virtue hint */
+        .tasbeeh-virtue {
+            font-family: var(--font-text); font-size: 0.65rem;
+            color: var(--text-faint); font-style: italic;
+            text-align: center; max-width: 300px;
+            margin-bottom: 1.5rem; line-height: 1.5;
+            opacity: 0.7; transition: opacity 0.3s ease;
+        }
+
+        /* Lifetime total */
+        .tasbeeh-lifetime {
+            font-family: var(--font-title); font-size: 0.5rem;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            color: var(--text-faint); margin-top: 1.2rem;
+            opacity: 0.5;
+        }
+        .tasbeeh-lifetime span { color: var(--gold-mid); }
+
+        [data-theme="light"] .dhikr-option { background: rgba(13, 123, 80, 0.04); border-color: rgba(13, 123, 80, 0.1); }
+        [data-theme="light"] .dhikr-option.active { background: rgba(13, 123, 80, 0.08); border-color: rgba(13, 123, 80, 0.25); }
+        [data-theme="light"] .dhikr-option-ar { color: #2d2d1a; }
+        [data-theme="light"] .dhikr-option.active .dhikr-option-ar { color: #1b5e20; }
+
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(46, 196, 122, 0.25); }
             70% { box-shadow: 0 0 0 20px rgba(46, 196, 122, 0); }
@@ -4561,25 +4623,107 @@ window.filterCategory = function(cat, btn) {
         }
     };
     // ===== TASBEEH =====
+    const DHIKR_LIST = [
+        { id: 'subhanallah', ar: 'سُبْحَانَ ٱللَّهِ', en: 'Subhanallah', virtue: '33× after every salah', defaultTarget: 33 },
+        { id: 'alhamdulillah', ar: 'ٱلْحَمْدُ لِلَّهِ', en: 'Alhamdulillah', virtue: '33× after every salah', defaultTarget: 33 },
+        { id: 'allahuakbar', ar: 'ٱللَّهُ أَكْبَرُ', en: 'Allahu Akbar', virtue: '34× after every salah', defaultTarget: 34 },
+        { id: 'lailaha', ar: 'لَا إِلَٰهَ إِلَّا ٱللَّهُ', en: 'La ilaha illallah', virtue: 'Best dhikr — Tirmidhi 3383', defaultTarget: 100 },
+        { id: 'astaghfirullah', ar: 'أَسْتَغْفِرُ ٱللَّهَ', en: 'Astaghfirullah', virtue: '100× daily — Muslim 2702', defaultTarget: 100 },
+        { id: 'subhanwabi', ar: 'سُبْحَانَ ٱللَّهِ وَبِحَمْدِهِ', en: 'Subhanallahi wa bihamdihi', virtue: 'Plants a tree in Jannah — Tirmidhi 3464', defaultTarget: 100 },
+        { id: 'lahawla', ar: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِٱللَّهِ', en: 'La hawla wala quwwata illa billah', virtue: 'A treasure of Jannah — Bukhari 6384', defaultTarget: 33 }
+    ];
+
     let tasbeehCount = 0;
     let tasbeehTarget = 33;
+    let currentDhikrIndex = 0;
+
+    // Load saved totals
+    function getDhikrTotals() {
+        try { return JSON.parse(localStorage.getItem('crown_dhikr_totals') || '{}'); } catch { return {}; }
+    }
+    function saveDhikrTotal(id, count) {
+        const totals = getDhikrTotals();
+        totals[id] = (totals[id] || 0) + count;
+        localStorage.setItem('crown_dhikr_totals', JSON.stringify(totals));
+    }
+    function getOverallTotal() {
+        const totals = getDhikrTotals();
+        return Object.values(totals).reduce((sum, v) => sum + v, 0);
+    }
+
+    function renderDhikrSelector() {
+        const container = document.getElementById('dhikrSelector');
+        if (!container) return;
+        container.innerHTML = DHIKR_LIST.map((d, i) => `
+            <div class="dhikr-option${i === currentDhikrIndex ? ' active' : ''}" onclick="selectDhikr(${i})">
+                <div class="dhikr-option-ar">${d.ar}</div>
+                <div class="dhikr-option-en">${d.en}</div>
+            </div>
+        `).join('');
+        // Scroll active into view
+        const active = container.querySelector('.dhikr-option.active');
+        if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+
+    function updateTasbeehUI() {
+        const d = DHIKR_LIST[currentDhikrIndex];
+        const arEl = document.getElementById('tasbeehArabic');
+        const virtueEl = document.getElementById('tasbeehVirtue');
+        const lifetimeEl = document.getElementById('tasbeehLifetime');
+        if (arEl) arEl.textContent = d.ar;
+        if (virtueEl) virtueEl.textContent = d.virtue;
+        if (lifetimeEl) lifetimeEl.innerHTML = `TOTAL: <span>${getOverallTotal().toLocaleString()}</span>`;
+    }
+
+    window.selectDhikr = function(index) {
+        // Save current session count before switching
+        if (tasbeehCount > 0) {
+            saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
+        }
+        currentDhikrIndex = index;
+        const d = DHIKR_LIST[index];
+        tasbeehTarget = d.defaultTarget;
+        tasbeehCount = 0;
+        const display = document.getElementById('tasbeehDisplay');
+        if (display) display.textContent = '0';
+        const tt = document.getElementById('tasbeehTargetLabel');
+        if (tt) tt.textContent = `TARGET: ${tasbeehTarget}`;
+        // Update preset active states
+        document.querySelectorAll('.tasbeeh-preset').forEach(p => p.classList.remove('active'));
+        updateTasbeehUI();
+        renderDhikrSelector();
+        localStorage.setItem('crown_dhikr_selected', index);
+    };
 
     window.openTasbeeh = function() {
         const tp = document.querySelector('.tasbeeh-panel');
         if (tp) tp.classList.add('active');
         lockScroll();
         setBottomNavActive('tasbeeh');
+        // Restore last selected dhikr
+        const saved = parseInt(localStorage.getItem('crown_dhikr_selected') || '0', 10);
+        currentDhikrIndex = (saved >= 0 && saved < DHIKR_LIST.length) ? saved : 0;
+        tasbeehTarget = DHIKR_LIST[currentDhikrIndex].defaultTarget;
         resetTasbeeh();
+        renderDhikrSelector();
+        updateTasbeehUI();
+        const tt = document.getElementById('tasbeehTargetLabel');
+        if (tt) tt.textContent = `TARGET: ${tasbeehTarget}`;
     };
 
     window.openTasbeehWith = function(target) {
         openTasbeeh();
         tasbeehTarget = (target === 36) ? 100 : 33;
-        const tt = document.querySelector('.tasbeeh-target');
-        if (tt) tt.innerText = `TARGET: ${tasbeehTarget}`;
+        const tt = document.getElementById('tasbeehTargetLabel');
+        if (tt) tt.textContent = `TARGET: ${tasbeehTarget}`;
     };
 
     window.closeTasbeeh = function() {
+        // Save session count on close
+        if (tasbeehCount > 0) {
+            saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
+            tasbeehCount = 0;
+        }
         const tp = document.querySelector('.tasbeeh-panel');
         if (tp) tp.classList.remove('active');
         unlockScroll();
@@ -4588,9 +4732,9 @@ window.filterCategory = function(cat, btn) {
 
     window.tapTasbeeh = function() {
         tasbeehCount++;
-        const display = document.querySelector('.tasbeeh-count-display');
+        const display = document.getElementById('tasbeehDisplay');
         const btn = document.querySelector('.tasbeeh-tap-btn');
-        if (display) display.innerText = tasbeehCount;
+        if (display) display.textContent = tasbeehCount;
         if (btn) {
             btn.classList.add('pulse');
             setTimeout(() => btn.classList.remove('pulse'), 100);
@@ -4598,20 +4742,33 @@ window.filterCategory = function(cat, btn) {
         if (navigator.vibrate) navigator.vibrate(5);
         if (tasbeehCount === tasbeehTarget && tasbeehTarget !== 0) {
             if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
-            showToast('Target Reached! ✨');
+            saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
+            tasbeehCount = 0;
+            showToast('Target reached! ✨ Count saved.');
+            // Auto-advance to next dhikr if user reached target
+            setTimeout(() => {
+                const display2 = document.getElementById('tasbeehDisplay');
+                if (display2) display2.textContent = '0';
+                updateTasbeehUI();
+            }, 300);
         }
     };
 
     window.resetTasbeeh = function() {
+        // Save partial count before reset
+        if (tasbeehCount > 0) {
+            saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
+        }
         tasbeehCount = 0;
-        const display = document.querySelector('.tasbeeh-count-display');
-        if (display) display.innerText = '0';
+        const display = document.getElementById('tasbeehDisplay');
+        if (display) display.textContent = '0';
+        updateTasbeehUI();
     };
 
     window.setTasbeehTarget = function(t) {
         tasbeehTarget = t;
-        const tt = document.querySelector('.tasbeeh-target');
-        if (tt) tt.innerText = t === 0 ? 'OPEN COUNT' : `TARGET: ${t}`;
+        const tt = document.getElementById('tasbeehTargetLabel');
+        if (tt) tt.textContent = t === 0 ? 'OPEN COUNT' : `TARGET: ${t}`;
         resetTasbeeh();
         document.querySelectorAll('.tasbeeh-preset').forEach(p => p.classList.remove('active'));
         const activePreset = document.querySelector(`.tasbeeh-preset[onclick="setTasbeehTarget(${t})"]`);
@@ -5465,9 +5622,11 @@ window.filterCategory = function(cat, btn) {
 <div class="tasbeeh-panel" onclick="if(event.target === this) closeTasbeeh()">
     <button class="tasbeeh-close" onclick="closeTasbeeh()">✕</button>
     <div class="tasbeeh-title">DIGITAL TASBEEH</div>
-    <div class="tasbeeh-arabic">سُبْحَانَ اللَّهِ</div>
-    <div class="tasbeeh-count-display">0</div>
-    <div class="tasbeeh-target">TARGET: 33</div>
+    <div class="dhikr-selector" id="dhikrSelector"></div>
+    <div class="tasbeeh-arabic" id="tasbeehArabic">سُبْحَانَ ٱللَّهِ</div>
+    <div class="tasbeeh-virtue" id="tasbeehVirtue">33× after every salah</div>
+    <div class="tasbeeh-count-display" id="tasbeehDisplay">0</div>
+    <div class="tasbeeh-target" id="tasbeehTargetLabel">TARGET: 33</div>
     <button class="tasbeeh-tap-btn" onclick="tapTasbeeh()">TAP</button>
     <div class="tasbeeh-controls">
         <button class="tasbeeh-ctrl-btn" onclick="resetTasbeeh()">RESET</button>
@@ -5477,6 +5636,7 @@ window.filterCategory = function(cat, btn) {
         <button class="tasbeeh-preset" onclick="setTasbeehTarget(100)">100</button>
         <button class="tasbeeh-preset" onclick="setTasbeehTarget(0)">∞</button>
     </div>
+    <div class="tasbeeh-lifetime" id="tasbeehLifetime">TOTAL: <span>0</span></div>
 </div>
 
 <!-- ===== ETIQUETTE PANEL ===== -->
