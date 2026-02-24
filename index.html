@@ -9,11 +9,13 @@
     <meta name="description" content="The Crown Collection — 55 essential Islamic duas from the Quran and Sunnah, with tasbeeh counter, bookmarks, daily routines, and scholarly authentication.">
     <title>Essential Duas — The Crown Collection</title>
 
-    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiRXNzZW50aWFsIER1YXMgLSBDcm93biBDb2xsZWN0aW9uIiwic2hvcnRfbmFtZSI6IkR1YXMiLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzA2MGQwOCIsInRoZW1lX2NvbG9yIjoiIzA2MGQwOCIsImljb25zIjpbXX0=">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer></script>
 
     <style>
         /* ============================================ */
@@ -30,12 +32,12 @@
             --bg-surface: #142a1e;
             --gold-lightest: #f5f9f0;
             --gold-light: #e0eccc;
-            --gold-mid: #b8963e;
+            --gold-mid: #d4a843;
             --gold-dark: #8a6d2b;
             --gold-deep: #4a3a15;
             --gold-glow: rgba(184, 150, 62, 0.15);
             --emerald: #0a4d33;
-            --emerald-light: #0d6b47;
+            --emerald-light: #1a9a6a;
             --emerald-glow: rgba(13, 107, 71, 0.12);
             --ruby: #7A2E3B;
             --sapphire: #1a3a5c;
@@ -43,9 +45,12 @@
             --purple: #4a1a7a;
             --green-lightest: #e8f5e9;
             --green-light: #81c784;
-            --green-mid: #2e7d32;
+            --green-mid: #4a9e50;
             --green-dark: #1b5e20;
             --green-deep: #0a3d0a;
+            --text-muted: rgba(160, 210, 180, 0.65);
+            --text-subtle: rgba(140, 195, 165, 0.55);
+            --text-faint: rgba(130, 195, 160, 0.55);
             --font-arabic: 'Noto Naskh Arabic', 'Amiri', serif;
             --font-amiri: 'Amiri', serif;
             --font-title: 'Cinzel', serif;
@@ -61,6 +66,54 @@
             --safe-top: env(safe-area-inset-top, 0px);
             --safe-bottom: env(safe-area-inset-bottom, 0px);
             --font-scale: 1;
+        }
+
+        /* ===== LIGHT MODE ===== */
+        [data-theme="light"] {
+            --bg-dark: #f5f2eb;
+            --bg-card: #ffffff;
+            --bg-surface: #f0ede4;
+            --gold-lightest: #1a1a0e;
+            --gold-light: #2d2d1a;
+            --gold-mid: #8a6d2b;
+            --gold-dark: #6b5420;
+            --gold-glow: rgba(138, 109, 43, 0.1);
+            --emerald: #e8f5e9;
+            --emerald-light: #0d6b47;
+            --emerald-glow: rgba(13, 107, 71, 0.08);
+            --green-lightest: #0a3d0a;
+            --green-light: #2e7d32;
+            --green-mid: #1b5e20;
+            --text-muted: rgba(30, 70, 50, 0.7);
+            --text-subtle: rgba(30, 70, 50, 0.55);
+            --text-faint: rgba(30, 70, 50, 0.4);
+            --shadow-card: 0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05);
+            --shadow-glow: 0 0 20px rgba(13, 107, 71, 0.06);
+        }
+        [data-theme="light"] body::before {
+            background:
+                radial-gradient(ellipse at 20% 0%, rgba(13, 107, 71, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 100%, rgba(184, 150, 62, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(240, 237, 228, 0.9) 0%, var(--bg-dark) 70%);
+        }
+        [data-theme="light"] body::after { opacity: 0.03; }
+        [data-theme="light"] .top-nav,
+        [data-theme="light"] .bottom-nav { background: rgba(245, 242, 235, 0.95); }
+        [data-theme="light"] .top-nav.scrolled { background: rgba(245, 242, 235, 0.98); box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        [data-theme="light"] .search-input { background: rgba(240, 237, 228, 0.9); color: #2d2d1a; }
+        [data-theme="light"] .toast { background: rgba(255, 255, 255, 0.95); color: #2d2d1a; border-color: rgba(13, 107, 71, 0.2); }
+        [data-theme="light"] .arabic-text { color: #1a1a0e; }
+        [data-theme="light"] .translation { color: #333; }
+        [data-theme="light"] .dua-card { border-color: rgba(13, 107, 71, 0.12); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        [data-theme="light"] .arabic-container { background: linear-gradient(135deg, rgba(13, 107, 71, 0.03), rgba(245,242,235,0.5)); }
+        [data-theme="light"] .etiquette-panel,
+        [data-theme="light"] .routine-panel,
+        [data-theme="light"] .tasbeeh-panel { background: rgba(245, 242, 235, 0.98); }
+        [data-theme="light"] .side-panel { background: #fff; }
+        [data-theme="light"] .overlay { background: rgba(0,0,0,0.3); }
+        [data-theme="light"] .nav-title {
+            background: linear-gradient(135deg, #1b5e20, #2e7d32, #0d6b47);
+            -webkit-background-clip: text; background-clip: text;
         }
 
         html { scroll-behavior: smooth; overflow-x: hidden; font-size: 16px; }
@@ -198,7 +251,7 @@
             display: flex; flex-direction: column; align-items: center; gap: 3px;
             padding: 6px 10px; border-radius: var(--radius-md); cursor: pointer;
             transition: all 0.3s ease; border: none; background: none;
-            color: rgba(13, 107, 71, 0.45);
+            color: var(--text-muted);
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 1px; text-transform: uppercase; min-width: 52px;
         }
@@ -400,7 +453,7 @@
             font-size: 0.9rem; outline: none;
             transition: all 0.3s ease;
         }
-        .search-input::placeholder { color: rgba(13, 107, 71, 0.35); }
+        .search-input::placeholder { color: var(--text-faint); }
         .search-input:focus {
             border-color: rgba(13, 107, 71, 0.5);
             box-shadow: 0 0 20px rgba(13, 107, 71, 0.1);
@@ -429,8 +482,8 @@
             display: inline-flex; align-items: center; gap: 6px;
             padding: 7px 14px; border-radius: 50px;
             background: rgba(10, 22, 16, 0.6);
-            border: 1px solid rgba(13, 107, 71, 0.15);
-            color: rgba(13, 107, 71, 0.5);
+            border: 1px solid rgba(13, 107, 71, 0.2);
+            color: var(--text-muted);
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 1.5px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s ease; white-space: nowrap;
@@ -452,8 +505,8 @@
         .pill {
             flex-shrink: 0; padding: 8px 16px; border-radius: 50px;
             background: rgba(10, 22, 16, 0.6);
-            border: 1px solid rgba(13, 107, 71, 0.15);
-            color: rgba(13, 107, 71, 0.5);
+            border: 1px solid rgba(13, 107, 71, 0.2);
+            color: var(--text-muted);
             font-family: var(--font-title); font-size: 0.55rem;
             letter-spacing: 1.5px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s ease; white-space: nowrap;
@@ -588,7 +641,7 @@
         .dua-category-tag {
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 1.5px; text-transform: uppercase;
-            color: rgba(13, 107, 71, 0.4); margin-top: 2px;
+            color: var(--text-subtle); margin-top: 2px;
         }
 
 
@@ -612,13 +665,6 @@
             color: rgba(13, 107, 71, 0.3); font-size: 0.8rem;
         }
         .dua-card.expanded .expand-icon { transform: rotate(180deg); }
-
-        /* Card Body */
-        .card-body {
-            max-height: 0; overflow: hidden;
-            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .dua-card.expanded .card-body { max-height: 4000px; }
 
         .card-body-inner { padding: 0 16px 16px; }
 
@@ -664,7 +710,7 @@
         .transliteration {
             font-family: var(--font-amiri);
             font-size: calc(0.92rem * var(--font-scale));
-            color: rgba(13, 107, 71, 0.5); font-style: italic;
+            color: var(--text-muted); font-style: italic;
             line-height: 1.8; padding: 10px 0;
             border-bottom: 1px solid rgba(13, 107, 71, 0.08);
             margin-bottom: 10px;
@@ -684,11 +730,11 @@
             margin-top: 12px; padding-top: 10px;
             border-top: 1px solid rgba(13, 107, 71, 0.08);
         }
-        .ref-icon { font-size: 0.8rem; color: rgba(13, 107, 71, 0.35); }
+        .ref-icon { font-size: 0.8rem; color: var(--text-subtle); }
         .ref-text {
             font-family: var(--font-title); font-size: 0.55rem;
             letter-spacing: 1px; text-transform: uppercase;
-            color: rgba(13, 107, 71, 0.4);
+            color: var(--text-subtle);
         }
 
         /* Virtue/Benefit Tag */
@@ -721,8 +767,8 @@
             display: inline-flex; align-items: center; gap: 6px;
             padding: 6px 14px; border-radius: 50px;
             background: rgba(13, 107, 71, 0.06);
-            border: 1px solid rgba(13, 107, 71, 0.15);
-            color: rgba(13, 107, 71, 0.5);
+            border: 1px solid rgba(13, 107, 71, 0.2);
+            color: var(--text-muted);
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 1px; text-transform: uppercase;
             cursor: pointer; transition: all 0.3s ease;
@@ -1158,7 +1204,7 @@
             font-size: 0.45rem;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: rgba(13, 107, 71, 0.25);
+            color: var(--text-faint);
             margin-top: 4px;
         }
         .section-header:hover .section-collapse-hint {
@@ -1199,7 +1245,90 @@
         .skip-link:focus { top: calc(var(--safe-top) + 8px); }
 
         /* ============================================ */
-        /* ===== RESPONSIVE ===== */
+        /* ===== MEMORIZATION MODE ===== */
+        /* ============================================ */
+        .memorize-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 50px;
+            background: rgba(74, 26, 122, 0.08);
+            border: 1px solid rgba(74, 26, 122, 0.2);
+            color: #b388ff;
+            font-family: var(--font-title); font-size: 0.5rem;
+            letter-spacing: 1px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .memorize-btn:hover {
+            background: rgba(74, 26, 122, 0.15);
+            border-color: rgba(74, 26, 122, 0.4);
+        }
+        .memorize-btn.active {
+            background: rgba(74, 26, 122, 0.2);
+            border-color: #b388ff;
+            color: #ce93d8;
+        }
+        .dua-card.memorize-mode .arabic-text {
+            filter: blur(12px);
+            transition: filter 0.4s ease;
+            cursor: pointer;
+        }
+        .dua-card.memorize-mode .arabic-text:hover,
+        .dua-card.memorize-mode .arabic-text.revealed {
+            filter: blur(0);
+        }
+        .dua-card.memorize-mode .arabic-container::after {
+            content: 'Tap to reveal';
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-title); font-size: 0.6rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: rgba(179, 136, 255, 0.7);
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 2;
+        }
+        .dua-card.memorize-mode .arabic-text.revealed ~ .arabic-container::after,
+        .dua-card.memorize-mode .arabic-container:hover::after {
+            opacity: 0;
+        }
+        .dua-card.memorize-mode .arabic-text.revealed + * {
+            /* sibling hint removed once revealed */
+        }
+
+        /* ============================================ */
+        /* ===== CARD ENTRANCE ANIMATIONS ===== */
+        /* ============================================ */
+        .dua-card {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .dua-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .dua-card:nth-child(odd).visible { transition-delay: 0.05s; }
+        .dua-card:nth-child(even).visible { transition-delay: 0.12s; }
+
+        /* Expand body with spring-like easing */
+        .card-body {
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+        }
+        .dua-card.expanded .card-body { max-height: 5000px; }
+
+        /* ===== THEME TOGGLE IN NAV ===== */
+        .theme-toggle {
+            background: none; border: 1px solid rgba(13, 107, 71, 0.3);
+            color: var(--green-mid); width: 36px; height: 36px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease; font-size: 1.05rem;
+        }
+        .theme-toggle:hover {
+            background: rgba(13, 107, 71, 0.12);
+            border-color: var(--emerald-light); transform: scale(1.05);
+        }
         /* ============================================ */
         @media (max-width: 420px) {
             h1 { font-size: 1.5rem; }
@@ -1257,6 +1386,7 @@
             <button class="font-btn" onclick="adjustFontSize(-0.1)" title="Smaller text">A-</button>
             <button class="font-btn" onclick="adjustFontSize(0.1)" title="Larger text">A+</button>
         </div>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" aria-label="Toggle theme" id="themeToggle">☀</button>
         <button class="nav-btn" onclick="openEtiquette()" title="Dua Etiquette" aria-label="Etiquette of Dua">📖</button>
         <button class="nav-btn" onclick="openRoutine()" title="Daily Routine" aria-label="Daily routine">🕐</button>
         <button class="nav-btn" onclick="toggleBookmarksPanel()" title="Bookmarks" aria-label="View bookmarks">★</button>
@@ -1350,6 +1480,7 @@
             <button class="toolbar-btn" onclick="toggleAllCards(false)">▴ Collapse All</button>
             <button class="toolbar-btn" onclick="openTasbeeh()">📿 Tasbeeh</button>
             <button class="toolbar-btn" onclick="showRandomDua()">🎲 Random Dua</button>
+            <button class="toolbar-btn memorize-btn" id="memorizeToggle" onclick="toggleMemorizeMode()">🧠 Memorize</button>
         </div>
     </div>
 
@@ -3634,6 +3765,8 @@
         checkStreak();
         loadDailyDua();
         applyFontSize(STATE.fontSize);
+        applyTheme();
+        injectShareImageButtons();
         renderBookmarksPanel();
 
         // Search listener
@@ -4412,6 +4545,153 @@ window.filterCategory = function(cat, btn) {
         const duaIndex = (dayOfYear % 55) + 1;
         scrollToDua(duaIndex);
     };
+
+    // ===== THEME TOGGLE (LIGHT/DARK) =====
+    function applyTheme() {
+        const saved = localStorage.getItem('crown_theme') || 'dark';
+        if (saved === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+        const btn = document.getElementById('themeToggle');
+        if (btn) btn.innerHTML = saved === 'light' ? '🌙' : '☀';
+    }
+
+    window.toggleTheme = function() {
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        if (isLight) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('crown_theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('crown_theme', 'light');
+        }
+        const btn = document.getElementById('themeToggle');
+        if (btn) btn.innerHTML = isLight ? '☀' : '🌙';
+        showToast(isLight ? 'Dark Mode' : 'Light Mode');
+    };
+
+    // ===== MEMORIZATION MODE =====
+    window.toggleMemorizeMode = function() {
+        const btn = document.getElementById('memorizeToggle');
+        const isActive = btn && btn.classList.toggle('active');
+        els.cards.forEach(card => {
+            if (isActive) {
+                card.classList.add('memorize-mode');
+                card.querySelectorAll('.arabic-text').forEach(t => t.classList.remove('revealed'));
+            } else {
+                card.classList.remove('memorize-mode');
+            }
+        });
+        showToast(isActive ? 'Memorize Mode ON — tap Arabic to reveal' : 'Memorize Mode OFF');
+    };
+
+    // Arabic reveal on tap (delegated)
+    document.addEventListener('click', function(e) {
+        const arabicEl = e.target.closest('.memorize-mode .arabic-text');
+        if (arabicEl) {
+            arabicEl.classList.toggle('revealed');
+        }
+    });
+
+    // ===== SHARE AS IMAGE =====
+    function injectShareImageButtons() {
+        document.querySelectorAll('.copy-row').forEach(row => {
+            const card = row.closest('.dua-card');
+            if (!card) return;
+            const id = card.getAttribute('data-id');
+            const btn = document.createElement('button');
+            btn.className = 'action-btn';
+            btn.innerHTML = '🖼 Share Image';
+            btn.onclick = function() { shareAsImage(id); };
+            row.appendChild(btn);
+        });
+    }
+
+    window.shareAsImage = async function(id) {
+        const card = document.querySelector(`.dua-card[data-id="${id}"]`);
+        if (!card) return;
+
+        showToast('Generating image...');
+
+        const title = card.querySelector('.dua-title')?.textContent || '';
+        const arabic = card.querySelector('.arabic-text')?.textContent || '';
+        const translation = card.querySelector('.translation')?.textContent || '';
+        const ref = card.querySelector('.ref-text')?.textContent || '';
+
+        // Build a clean off-screen card for rendering
+        const wrap = document.createElement('div');
+        wrap.style.cssText = `
+            position:fixed; left:-9999px; top:0;
+            width:600px; padding:48px 40px;
+            background: linear-gradient(145deg, #0a1210, #0f1e16);
+            border-radius:24px; font-family:serif;
+            border: 1px solid rgba(13,107,71,0.25);
+        `;
+        wrap.innerHTML = `
+            <div style="text-align:center;margin-bottom:24px;">
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a9a6a;margin-bottom:6px;">Essential Duas — The Crown Collection</div>
+                <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#e0eccc;font-weight:600;">${title.replace(/<[^>]*>/g,'')}</div>
+            </div>
+            <div style="background:rgba(13,107,71,0.06);border:1px solid rgba(13,107,71,0.15);border-radius:16px;padding:28px 24px;margin-bottom:20px;">
+                <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:24px;line-height:2.2;text-align:right;direction:rtl;color:#f5f9f0;word-spacing:4px;">${arabic}</div>
+            </div>
+            <div style="font-family:'Playfair Display',serif;font-size:15px;color:rgba(224,238,210,0.85);line-height:1.8;font-style:italic;margin-bottom:16px;">${translation}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(13,107,71,0.12);">
+                <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.55);">📖 ${ref}</span>
+                <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.35);">mohhp.github.io/Essential-duas</span>
+            </div>
+        `;
+        document.body.appendChild(wrap);
+
+        try {
+            if (typeof html2canvas === 'undefined') {
+                showToast('Image library loading, try again...');
+                document.body.removeChild(wrap);
+                return;
+            }
+            const canvas = await html2canvas(wrap, {
+                backgroundColor: '#0a1210',
+                scale: 2,
+                useCORS: true,
+                logging: false
+            });
+            document.body.removeChild(wrap);
+
+            canvas.toBlob(async (blob) => {
+                if (!blob) { showToast('Failed to generate'); return; }
+
+                // Try native share first
+                if (navigator.canShare && navigator.canShare({ files: [new File([blob], 'dua.png', { type: 'image/png' })] })) {
+                    try {
+                        await navigator.share({
+                            files: [new File([blob], 'dua.png', { type: 'image/png' })],
+                            title: title,
+                            text: 'From Essential Duas — The Crown Collection'
+                        });
+                        showToast('Shared!');
+                        return;
+                    } catch(e) { /* user cancelled or share failed, fall through to download */ }
+                }
+
+                // Fallback: download
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url; a.download = `dua-${id}.png`;
+                a.click(); URL.revokeObjectURL(url);
+                showToast('Image downloaded!');
+            }, 'image/png');
+        } catch(e) {
+            document.body.removeChild(wrap);
+            showToast('Failed to generate image');
+        }
+    };
+
+    // ===== REGISTER SERVICE WORKER =====
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
 
     // ===== START =====
     document.addEventListener('DOMContentLoaded', init);
