@@ -781,9 +781,10 @@
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
             backdrop-filter: blur(20px);
             opacity: 0; visibility: hidden; transform: translateY(20px);
+            pointer-events: none;
             transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .etiquette-panel.active { opacity: 1; visibility: visible; transform: translateY(0); }
+        .etiquette-panel.active { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
         .etiquette-close {
             position: fixed; top: calc(var(--safe-top) + 16px); right: 16px;
             background: rgba(10, 22, 16, 0.8); border: 1px solid rgba(13, 107, 71, 0.3);
@@ -831,9 +832,10 @@
             padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
             backdrop-filter: blur(20px);
             opacity: 0; visibility: hidden; transform: translateY(20px);
+            pointer-events: none;
             transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .routine-panel.active { opacity: 1; visibility: visible; transform: translateY(0); }
+        .routine-panel.active { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
         .routine-content {
             max-width: 500px; margin: 0 auto; padding-top: 20px;
         }
@@ -871,9 +873,10 @@
             align-items: center; justify-content: center;
             padding: 2rem; backdrop-filter: blur(20px);
             opacity: 0; visibility: hidden; transform: scale(0.95);
+            pointer-events: none;
             transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .tasbeeh-panel.active { opacity: 1; visibility: visible; transform: scale(1); }
+        .tasbeeh-panel.active { opacity: 1; visibility: visible; transform: scale(1); pointer-events: auto; }
         .tasbeeh-close {
             position: absolute; top: calc(var(--safe-top) + 16px); right: 16px;
             background: none; border: 1px solid rgba(13, 107, 71, 0.3);
@@ -1005,11 +1008,12 @@
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.7); z-index: 1500;
             opacity: 0; visibility: hidden;
+            pointer-events: none;
             transition: opacity 0.4s ease, visibility 0.4s ease;
             -webkit-backdrop-filter: blur(4px);
             backdrop-filter: blur(4px);
         }
-        .overlay.active { opacity: 1; visibility: visible; }
+        .overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
         .side-panel {
             position: fixed; top: 0; right: 0; bottom: 0;
