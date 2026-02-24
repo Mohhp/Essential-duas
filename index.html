@@ -2095,7 +2095,7 @@
                 </div>
             </div>
         </div>
-    </div>      <!-- ══════════════════════════════════════════ -->
+    </div>    <!-- ══════════════════════════════════════════ -->
     <!-- ===== SECTION 4: GUIDANCE & FAITH ===== -->
     <!-- ══════════════════════════════════════════ -->
        <div class="section-header" data-section="guidance" onclick="toggleSection(this)">
@@ -2986,7 +2986,7 @@
                 </div>
             </div>
         </div>
-    </div>      <!-- ══════════════════════════════════════════ -->
+    </div>    <!-- ══════════════════════════════════════════ -->
     <!-- ===== SECTION 9: THE GREATEST NAMES ===== -->
     <!-- ══════════════════════════════════════════ -->
        <div class="section-header" data-section="prayer" onclick="toggleSection(this)">
@@ -3599,13 +3599,6 @@
 <script>
     // ===== STATE MANAGEMENT =====
     const STATE = {
-
-<!-- ══════════════════════════════════════════ -->
-<!-- ===== JAVASCRIPT ENGINE ===== -->
-<!-- ══════════════════════════════════════════ -->
-<script>
-    // ===== STATE MANAGEMENT =====
-    const STATE = {
         bookmarks: JSON.parse(localStorage.getItem('crown_bookmarks')) || [],
         read: JSON.parse(localStorage.getItem('crown_read')) || [],
         streak: parseInt(localStorage.getItem('crown_streak')) || 0,
@@ -4187,6 +4180,8 @@ window.filterCategory = function(cat, btn) {
     }
 
     function showToast(msg) {
+        // toast lives after the <script> tag, so cache it lazily on first use
+        if (!els.toast) els.toast = document.getElementById('toast');
         if (!els.toast) return;
         els.toast.innerText = msg;
         els.toast.classList.add('show');
@@ -4400,6 +4395,18 @@ window.filterCategory = function(cat, btn) {
                 }, 50);
                 break;
         }
+    };
+
+    // ===== SCROLL TO TOP =====
+    window.scrollToTop = function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // ===== SCROLL TO DAILY DUA =====
+    window.scrollToDailyDua = function() {
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+        const duaIndex = (dayOfYear % 55) + 1;
+        scrollToDua(duaIndex);
     };
 
     // ===== START =====
