@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essential-duas-v3';
+const CACHE_NAME = 'essential-duas-v4';
 const ASSETS = [
   './',
   './index.html',

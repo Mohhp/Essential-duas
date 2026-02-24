@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="The Crown Collection — 55 essential Islamic duas from the Quran and Sunnah, with tasbeeh counter, bookmarks, daily routines, and scholarly authentication.">
-    <title>Essential Duas — The Crown Collection</title>
+    <title>Essential Duas by فلاح — The Crown Collection</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -158,6 +158,148 @@
         /* ============================================ */
         /* ===== TOP NAVIGATION ===== */
         /* ============================================ */
+
+        /* ===== FALLAH LOGO ===== */
+        .fallah-logo {
+            display: flex; align-items: center; gap: 10px;
+            text-decoration: none; cursor: pointer;
+        }
+        .fallah-mark {
+            position: relative; width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .fallah-crescent {
+            position: absolute; width: 32px; height: 32px;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            background: conic-gradient(from 200deg, var(--emerald-light), var(--gold-mid), var(--emerald-light)) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.7;
+        }
+        .fallah-fa {
+            font-family: var(--font-arabic); font-size: 1.35rem;
+            color: var(--emerald-light); font-weight: 700;
+            position: relative; z-index: 1; line-height: 1;
+            text-shadow: 0 0 12px rgba(13, 107, 71, 0.3);
+        }
+        .fallah-text {
+            display: flex; flex-direction: column;
+        }
+        .fallah-brand {
+            font-family: var(--font-title); font-size: 0.7rem;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, #1b5e20, #81c784, #2e7d32);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; font-weight: 700; text-transform: uppercase;
+        }
+        .fallah-sub {
+            font-family: var(--font-arabic); font-size: 0.55rem;
+            color: var(--gold-mid); opacity: 0.6; margin-top: -1px;
+        }
+
+        /* ===== SPLASH SCREEN ===== */
+        .splash-screen {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at center, #0f2218 0%, #0a1210 70%);
+            z-index: 10000;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .splash-screen.hidden {
+            opacity: 0; visibility: hidden; pointer-events: none;
+        }
+        .splash-logo-large {
+            position: relative; width: 100px; height: 100px;
+            display: flex; align-items: center; justify-content: center;
+            animation: splashPulse 2s ease-in-out infinite;
+        }
+        .splash-crescent-lg {
+            position: absolute; width: 90px; height: 90px;
+            border: 2.5px solid transparent;
+            border-radius: 50%;
+            background: conic-gradient(from 200deg, var(--emerald-light), var(--gold-mid), var(--emerald-light)) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: splashRingSpin 3s linear infinite;
+        }
+        .splash-fa-lg {
+            font-family: var(--font-arabic); font-size: 3.5rem;
+            color: var(--emerald-light); font-weight: 700;
+            position: relative; z-index: 1;
+            text-shadow: 0 0 30px rgba(13, 107, 71, 0.4);
+            opacity: 0; animation: splashFadeIn 0.8s ease-out 0.3s forwards;
+        }
+        .splash-title {
+            font-family: var(--font-title); font-size: 0.75rem;
+            letter-spacing: 4px; text-transform: uppercase;
+            color: var(--emerald-light); margin-top: 24px;
+            opacity: 0; animation: splashFadeIn 0.8s ease-out 0.6s forwards;
+        }
+        .splash-subtitle {
+            font-family: var(--font-text); font-size: 0.85rem;
+            color: var(--gold-mid); opacity: 0; font-style: italic;
+            animation: splashFadeIn 0.8s ease-out 0.9s forwards;
+            margin-top: 6px;
+        }
+        .splash-credit {
+            font-family: var(--font-arabic); font-size: 0.75rem;
+            color: var(--text-subtle); opacity: 0;
+            animation: splashFadeIn 0.8s ease-out 1.2s forwards;
+            margin-top: 20px;
+        }
+        @keyframes splashPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+        @keyframes splashRingSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes splashFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        [data-theme="light"] .splash-screen {
+            background: radial-gradient(ellipse at center, #f0ede4 0%, #f5f2eb 70%);
+        }
+
+        /* ===== FOOTER BRAND ===== */
+        .footer-brand-row {
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; margin-top: 16px; margin-bottom: 4px;
+        }
+        .footer-logo-mini {
+            position: relative; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .footer-crescent {
+            position: absolute; width: 24px; height: 24px;
+            border: 1.5px solid transparent; border-radius: 50%;
+            background: conic-gradient(from 200deg, var(--emerald-light), var(--gold-mid), var(--emerald-light)) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            opacity: 0.5;
+        }
+        .footer-fa-mini {
+            font-family: var(--font-arabic); font-size: 0.95rem;
+            color: var(--emerald-light); font-weight: 700;
+            position: relative; z-index: 1; opacity: 0.6;
+        }
+        .footer-credit-text {
+            font-family: var(--font-title); font-size: 0.4rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: rgba(224, 238, 210, 0.35);
+        }
+        .footer-copyright {
+            font-family: var(--font-title); font-size: 0.4rem;
+            letter-spacing: 1.5px; color: rgba(224, 238, 210, 0.2);
+            margin-top: 8px;
+        }
+
         .top-nav {
             position: fixed; top: 0; left: 0; right: 0;
             height: calc(var(--nav-height) + var(--safe-top));
@@ -1573,12 +1715,32 @@
 </head>
 
     <body>
+<!-- ===== SPLASH SCREEN ===== -->
+<div class="splash-screen" id="splashScreen">
+    <div class="splash-logo-large">
+        <div class="splash-crescent-lg"></div>
+        <span class="splash-fa-lg">ف</span>
+    </div>
+    <div class="splash-title">Essential Duas</div>
+    <div class="splash-subtitle">The Crown Collection</div>
+    <div class="splash-credit">المهندس محمد فلاح</div>
+</div>
+
 <!-- Skip to content for accessibility -->
 <a href="#mainContainer" class="skip-link">Skip to Duas</a>
 
 <!-- ===== TOP NAVIGATION ===== -->
 <nav class="top-nav" id="topNav">
-    <span class="nav-title">Essential Duas</span>
+    <div class="fallah-logo" onclick="scrollToTop()">
+        <div class="fallah-mark">
+            <div class="fallah-crescent"></div>
+            <span class="fallah-fa">ف</span>
+        </div>
+        <div class="fallah-text">
+            <span class="fallah-brand">Essential Duas</span>
+            <span class="fallah-sub">فلاح</span>
+        </div>
+    </div>
     <div class="nav-actions">
         <div class="font-controls">
             <button class="font-btn" onclick="adjustFontSize(-0.1)" title="Smaller text">A-</button>
@@ -1613,6 +1775,7 @@
 
             <h1 class="gold-text">Essential Duas</h1>
             <div class="subtitle">The Crown Collection from Quran & Sunnah</div>
+            <div style="font-family:var(--font-arabic);font-size:0.8rem;color:var(--gold-mid);opacity:0.55;margin-top:4px;">by المهندس محمد فلاح</div>
 
             <p class="intro-text">
                 A meticulously curated treasury of the most powerful supplications
@@ -3962,6 +4125,15 @@
 
     // ===== INITIALIZATION =====
     function init() {
+        // Dismiss splash screen
+        const splash = document.getElementById('splashScreen');
+        if (splash) {
+            setTimeout(() => {
+                splash.classList.add('hidden');
+                setTimeout(() => splash.remove(), 1000);
+            }, 2200);
+        }
+
         updateStats();
         checkStreak();
         loadDailyDua();
@@ -4481,8 +4653,8 @@ window.filterCategory = function(cat, btn) {
     window.sharePage = function() {
         if (navigator.share) {
             navigator.share({
-                title: 'Essential Duas - The Crown Collection',
-                text: '55 Essential Islamic Duas from Quran & Sunnah',
+                title: 'Essential Duas by فلاح',
+                text: '55 Essential Islamic Duas from Quran & Sunnah — by Engineer Mohammad Falah',
                 url: window.location.href
             });
         } else {
@@ -4497,7 +4669,7 @@ window.filterCategory = function(cat, btn) {
         if (!card) return;
         const title = card.querySelector('.dua-title').textContent;
         const arabic = card.querySelector('.arabic-text').textContent;
-        const text = `${title}\n\n${arabic}\n\nFrom: Essential Duas — The Crown Collection\n${window.location.href}`;
+        const text = `${title}\n\n${arabic}\n\nFrom: Essential Duas by فلاح\n${window.location.href}`;
         if (navigator.share) {
             navigator.share({ title: title, text: text });
         } else {
@@ -5154,7 +5326,8 @@ window.filterCategory = function(cat, btn) {
         `;
         wrap.innerHTML = `
             <div style="text-align:center;margin-bottom:24px;">
-                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a9a6a;margin-bottom:6px;">Essential Duas — The Crown Collection</div>
+                <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:16px;color:#1a9a6a;margin-bottom:4px;">ف</div>
+                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#1a9a6a;margin-bottom:6px;">Essential Duas by فلاح</div>
                 <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#e0eccc;font-weight:600;">${title.replace(/<[^>]*>/g,'')}</div>
             </div>
             <div style="background:rgba(13,107,71,0.06);border:1px solid rgba(13,107,71,0.15);border-radius:16px;padding:28px 24px;margin-bottom:20px;">
@@ -5163,7 +5336,7 @@ window.filterCategory = function(cat, btn) {
             <div style="font-family:'Playfair Display',serif;font-size:15px;color:rgba(224,238,210,0.85);line-height:1.8;font-style:italic;margin-bottom:16px;">${translation}</div>
             <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(13,107,71,0.12);">
                 <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.55);">📖 ${ref}</span>
-                <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.35);">mohhp.github.io/Essential-duas</span>
+                <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.35);">فلاح · mohhp.github.io/Essential-duas</span>
             </div>
         `;
         document.body.appendChild(wrap);
@@ -5191,7 +5364,7 @@ window.filterCategory = function(cat, btn) {
                         await navigator.share({
                             files: [new File([blob], 'dua.png', { type: 'image/png' })],
                             title: title,
-                            text: 'From Essential Duas — The Crown Collection'
+                            text: 'From Essential Duas by فلاح'
                         });
                         showToast('Shared!');
                         return;
@@ -5267,6 +5440,14 @@ window.filterCategory = function(cat, btn) {
         The Crown Collection<br>
         55 Essential Duas from Quran & Sunnah
     </div>
+    <div class="footer-brand-row">
+        <div class="footer-logo-mini">
+            <div class="footer-crescent"></div>
+            <span class="footer-fa-mini">ف</span>
+        </div>
+        <span class="footer-credit-text">Engineer Mohammad Falah · المهندس محمد فلاح</span>
+    </div>
+    <div class="footer-copyright">© 2025 فلاح · All rights reserved</div>
     <div class="footer-arabic">سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا أَنْتَ أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ</div>
 </footer>
 
