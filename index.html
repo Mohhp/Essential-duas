@@ -5512,8 +5512,8 @@ window.filterCategory = function(cat, btn) {
         const pill = document.querySelector(`.pill[data-category="${cat}"]`);
         filterCategory(cat, pill);
 
-        // Scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Scroll to the dua list so user sees cards immediately
+        duaList.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         // Save state
         localStorage.setItem('crown_active_category', cat);
