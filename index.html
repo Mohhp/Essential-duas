@@ -5437,14 +5437,14 @@ window.filterCategory = function(cat, btn) {
 
         // Achievements
         const achievements = [
-            { icon: '\U0001f331', name: 'First Step', earned: readCount >= 1, desc: 'Read your first dua' },
-            { icon: '\U0001f4d6', name: 'Bookworm', earned: bookmarkCount >= 5, desc: 'Bookmark 5 duas' },
-            { icon: '\U0001f525', name: 'On Fire', earned: STATE.streak >= 3, desc: '3-day streak' },
-            { icon: '\u2b50', name: 'Dedicated', earned: STATE.streak >= 7, desc: '7-day streak' },
-            { icon: '\U0001f30d', name: 'Explorer', earned: catSet.size >= 6, desc: 'Explore 6 categories' },
-            { icon: '\U0001f4aa', name: 'Halfway', earned: readCount >= 28, desc: 'Read 28+ duas' },
-            { icon: '\U0001f3c6', name: 'Crown Master', earned: readCount >= 55, desc: 'All 55 duas' },
-            { icon: '\U0001f52e', name: 'Scholar', earned: catSet.size >= 12, desc: 'All 12 categories' },
+            { icon: '🌱', name: 'First Step', earned: readCount >= 1, desc: 'Read your first dua' },
+            { icon: '📖', name: 'Bookworm', earned: bookmarkCount >= 5, desc: 'Bookmark 5 duas' },
+            { icon: '🔥', name: 'On Fire', earned: STATE.streak >= 3, desc: '3-day streak' },
+            { icon: '⭐', name: 'Dedicated', earned: STATE.streak >= 7, desc: '7-day streak' },
+            { icon: '🌍', name: 'Explorer', earned: catSet.size >= 6, desc: 'Explore 6 categories' },
+            { icon: '💪', name: 'Halfway', earned: readCount >= 28, desc: 'Read 28+ duas' },
+            { icon: '🏆', name: 'Crown Master', earned: readCount >= 55, desc: 'All 55 duas' },
+            { icon: '🔮', name: 'Scholar', earned: catSet.size >= 12, desc: 'All 12 categories' },
         ];
         const earnedCount = achievements.filter(a => a.earned).length;
         let achieveHTML = achievements.map(a => `
@@ -5455,18 +5455,18 @@ window.filterCategory = function(cat, btn) {
 
         // Milestone
         let milestone = '';
-        if (readCount >= 55) milestone = '\U0001f3c6 Completed the entire Crown Collection!';
-        else if (readCount >= 40) milestone = '\u2b50 Almost there \u2014 a true seeker of knowledge!';
-        else if (readCount >= 25) milestone = '\U0001f4aa Halfway champion \u2014 keep going!';
-        else if (readCount >= 10) milestone = '\U0001f331 Growing beautifully \u2014 10+ duas learned!';
-        else if (readCount >= 1) milestone = '\u2728 The journey of a thousand miles begins with one step.';
-        else milestone = '\U0001f4d6 Start your journey \u2014 tap "Mark Read" on any dua!';
+        if (readCount >= 55) milestone = '🏆 Completed the entire Crown Collection!';
+        else if (readCount >= 40) milestone = '⭐ Almost there \u2014 a true seeker of knowledge!';
+        else if (readCount >= 25) milestone = '💪 Halfway champion \u2014 keep going!';
+        else if (readCount >= 10) milestone = '🌱 Growing beautifully \u2014 10+ duas learned!';
+        else if (readCount >= 1) milestone = '✨ The journey of a thousand miles begins with one step.';
+        else milestone = '📖 Start your journey \u2014 tap "Mark Read" on any dua!';
 
         container.innerHTML = `
             <h2>Your Journey</h2>
 
             <div class="progress-stat-card">
-                <div class="progress-stat-icon">\U0001f4d6</div>
+                <div class="progress-stat-icon">📖</div>
                 <div class="progress-stat-info">
                     <div class="progress-stat-label">Duas Read</div>
                     <div class="progress-stat-value">${readCount} / ${total}</div>
@@ -5478,7 +5478,7 @@ window.filterCategory = function(cat, btn) {
             </div>
 
             <div class="progress-stat-card">
-                <div class="progress-stat-icon">\U0001f525</div>
+                <div class="progress-stat-icon">🔥</div>
                 <div class="progress-stat-info">
                     <div class="progress-stat-label">Current Streak</div>
                     <div class="progress-stat-value">${STATE.streak} days</div>
