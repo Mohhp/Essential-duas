@@ -5818,6 +5818,12 @@ window.filterCategory = function(cat, btn) {
         if (!rp.querySelector('.routine-content').innerHTML.trim()) {
             rp.querySelector('.routine-content').innerHTML = `
                 <h2>Recommended Daily Routine</h2>
+                <div class="progress-stat-card daily-dua-progress" style="flex-direction:column;text-align:center;cursor:pointer;border-color:rgba(201,168,76,0.15);" onclick="closeRoutine(); setTimeout(function(){ scrollToDailyDua(); }, 300);">
+                    <div style="font-family:var(--font-title);font-size:0.7rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,168,76,0.8);margin-bottom:0.5rem;"><span class="sparkle">✦</span> Dua of the Day <span class="sparkle">✦</span></div>
+                    <div id="routineDailyArabic" style="font-family:var(--font-arabic);font-size:calc(1.3rem * var(--font-scale));color:var(--gold-light);direction:rtl;line-height:2.2;margin:0.4rem 0;"></div>
+                    <div id="routineDailyTranslation" style="font-family:var(--font-text);font-size:0.88rem;color:var(--text-muted);font-style:italic;line-height:1.6;"></div>
+                    <div style="margin-top:10px;font-size:0.7rem;color:var(--text-subtle);letter-spacing:1px;text-transform:uppercase;">Tap to view full dua →</div>
+                </div>
                 <div class="routine-item">
                     <div class="routine-time">🌅 MORNING (After Fajr)</div>
                     <div class="routine-desc">
@@ -5870,6 +5876,7 @@ window.filterCategory = function(cat, btn) {
         rp.classList.add('active');
         lockScroll();
         setBottomNavActive('routine');
+        loadRoutineDailyDua();
     };
 
     window.closeRoutine = function() {
@@ -5975,12 +5982,12 @@ window.filterCategory = function(cat, btn) {
         }, 500);
     }
 
-    function loadProgressDailyDua() {
+    function loadRoutineDailyDua() {
         const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
         const duaIndex = (dayOfYear % 55) + 1;
         const card = document.querySelector(`.dua-card[data-id="${duaIndex}"]`);
-        const arabicEl = document.getElementById('progressDailyArabic');
-        const transEl = document.getElementById('progressDailyTranslation');
+        const arabicEl = document.getElementById('routineDailyArabic');
+        const transEl = document.getElementById('routineDailyTranslation');
         if (card && arabicEl) {
             arabicEl.innerText = card.querySelector('.arabic-text').innerText;
             transEl.innerText = card.querySelector('.translation').innerText.substring(0, 80) + '...';
@@ -6270,13 +6277,6 @@ window.filterCategory = function(cat, btn) {
         container.innerHTML = `
             <h2>Your Journey</h2>
 
-            <div class="progress-stat-card daily-dua-progress" style="flex-direction:column;text-align:center;cursor:pointer;" onclick="closeProgress(); setTimeout(function(){ scrollToDailyDua(); }, 300);">
-                <div style="font-family:var(--font-title);font-size:0.7rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,168,76,0.8);margin-bottom:0.5rem;"><span class="sparkle">✦</span> Dua of the Day <span class="sparkle">✦</span></div>
-                <div id="progressDailyArabic" style="font-family:var(--font-arabic);font-size:calc(1.3rem * var(--font-scale));color:var(--gold-light);direction:rtl;line-height:2.2;margin:0.4rem 0;"></div>
-                <div id="progressDailyTranslation" style="font-family:var(--font-text);font-size:0.88rem;color:var(--text-muted);font-style:italic;line-height:1.6;"></div>
-                <div style="margin-top:10px;font-size:0.7rem;color:var(--text-subtle);letter-spacing:1px;text-transform:uppercase;">Tap to view full dua →</div>
-            </div>
-
             <div class="progress-stat-card">
                 <div class="progress-stat-icon">📖</div>
                 <div class="progress-stat-info">
@@ -6330,8 +6330,7 @@ window.filterCategory = function(cat, btn) {
             <button class="progress-share-btn" onclick="shareProgress()">📤 Share Your Progress</button>
         `;
 
-        // Populate daily dua inside progress panel
-        loadProgressDailyDua();
+
     }
 
     window.shareProgress = async function() {
