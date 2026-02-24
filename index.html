@@ -1318,6 +1318,71 @@
         }
         .dua-card.expanded .card-body { max-height: 5000px; }
 
+        /* ===== PROGRESS PANEL ===== */
+        .progress-panel {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(6, 13, 8, 0.97);
+            z-index: 2000; overflow-y: auto;
+            padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
+            backdrop-filter: blur(20px);
+            opacity: 0; visibility: hidden; transform: translateY(20px);
+            pointer-events: none;
+            transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .progress-panel.active { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+        [data-theme="light"] .progress-panel { background: rgba(245, 242, 235, 0.98); }
+        .progress-panel-content {
+            max-width: 500px; margin: 0 auto; padding-top: 20px;
+        }
+        .progress-panel-content h2 {
+            font-family: var(--font-title); font-size: 1rem;
+            letter-spacing: 3px; text-transform: uppercase;
+            color: var(--emerald-light); text-align: center; margin-bottom: 1.5rem;
+        }
+        .progress-stat-card {
+            background: rgba(13, 107, 71, 0.06);
+            border: 1px solid rgba(13, 107, 71, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 20px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .progress-stat-icon { font-size: 1.8rem; flex-shrink: 0; }
+        .progress-stat-info { flex: 1; }
+        .progress-stat-label {
+            font-family: var(--font-title); font-size: 0.55rem;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--text-subtle); margin-bottom: 2px;
+        }
+        .progress-stat-value {
+            font-family: var(--font-title); font-size: 1.4rem;
+            color: var(--emerald-light); font-weight: 700;
+        }
+        .progress-stat-sub {
+            font-family: var(--font-text); font-size: 0.75rem;
+            color: var(--text-subtle); margin-top: 2px;
+        }
+        .progress-bar-visual {
+            width: 100%; height: 6px; border-radius: 3px;
+            background: rgba(13, 107, 71, 0.1); margin-top: 8px; overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%; border-radius: 3px;
+            background: linear-gradient(90deg, var(--green-dark), var(--emerald-light), var(--green-light));
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .progress-reset-btn {
+            display: block; margin: 24px auto 0; padding: 10px 24px;
+            border-radius: 50px; background: rgba(122, 46, 59, 0.08);
+            border: 1px solid rgba(122, 46, 59, 0.2);
+            color: #ef9a9a; font-family: var(--font-title);
+            font-size: 0.5rem; letter-spacing: 1.5px; text-transform: uppercase;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .progress-reset-btn:hover {
+            background: rgba(122, 46, 59, 0.15);
+            border-color: rgba(122, 46, 59, 0.4);
+        }
+
         /* ===== THEME TOGGLE IN NAV ===== */
         .theme-toggle {
             background: none; border: 1px solid rgba(13, 107, 71, 0.3);
@@ -1388,7 +1453,7 @@
         </div>
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" aria-label="Toggle theme" id="themeToggle">☀</button>
         <button class="nav-btn" onclick="openEtiquette()" title="Dua Etiquette" aria-label="Etiquette of Dua">📖</button>
-        <button class="nav-btn" onclick="openRoutine()" title="Daily Routine" aria-label="Daily routine">🕐</button>
+        <button class="nav-btn" onclick="openProgress()" title="Your Progress" aria-label="View progress stats">📊</button>
         <button class="nav-btn" onclick="toggleBookmarksPanel()" title="Bookmarks" aria-label="View bookmarks">★</button>
         <button class="nav-btn" onclick="sharePage()" title="Share" aria-label="Share this collection">↗</button>
     </div>
@@ -4533,6 +4598,100 @@ window.filterCategory = function(cat, btn) {
                 break;
         }
     };
+
+    // ===== PROGRESS PANEL =====
+    window.openProgress = function() {
+        let pp = document.querySelector('.progress-panel');
+        if (!pp) {
+            pp = document.createElement('div');
+            pp.className = 'progress-panel';
+            pp.setAttribute('onclick', 'if(event.target===this) closeProgress()');
+            pp.innerHTML = `
+                <button class="etiquette-close" onclick="closeProgress()">✕</button>
+                <div class="progress-panel-content" id="progressPanelContent"></div>`;
+            document.body.appendChild(pp);
+        }
+        renderProgressPanel();
+        pp.classList.add('active');
+        lockScroll();
+    };
+
+    window.closeProgress = function() {
+        const pp = document.querySelector('.progress-panel');
+        if (pp) pp.classList.remove('active');
+        unlockScroll();
+    };
+
+    function renderProgressPanel() {
+        const container = document.getElementById('progressPanelContent');
+        if (!container) return;
+
+        const total = 55;
+        const readCount = STATE.read.length;
+        const bookmarkCount = STATE.bookmarks.length;
+        const readPct = Math.round((readCount / total) * 100);
+
+        // Calculate categories explored
+        const catSet = new Set();
+        STATE.read.forEach(id => {
+            const card = document.querySelector(`.dua-card[data-id="${id}"]`);
+            if (card) {
+                (card.getAttribute('data-categories') || '').split(',').forEach(c => catSet.add(c.trim()));
+            }
+        });
+
+        // Milestones
+        let milestone = '';
+        if (readCount >= 55) milestone = '🏆 Completed the entire Crown Collection!';
+        else if (readCount >= 40) milestone = '⭐ Almost there — a true seeker of knowledge!';
+        else if (readCount >= 25) milestone = '💪 Halfway champion — keep going!';
+        else if (readCount >= 10) milestone = '🌱 Growing beautifully — 10+ duas learned!';
+        else if (readCount >= 1) milestone = '✨ The journey of a thousand miles begins with one step.';
+        else milestone = '📖 Start your journey — tap “Mark Read” on any dua!';
+
+        container.innerHTML = `
+            <h2>Your Journey</h2>
+            <div class="progress-stat-card">
+                <div class="progress-stat-icon">📖</div>
+                <div class="progress-stat-info">
+                    <div class="progress-stat-label">Duas Read</div>
+                    <div class="progress-stat-value">${readCount} / ${total}</div>
+                    <div class="progress-bar-visual">
+                        <div class="progress-bar-fill" style="width:${readPct}%"></div>
+                    </div>
+                    <div class="progress-stat-sub">${readPct}% complete</div>
+                </div>
+            </div>
+            <div class="progress-stat-card">
+                <div class="progress-stat-icon">⭐</div>
+                <div class="progress-stat-info">
+                    <div class="progress-stat-label">Bookmarked</div>
+                    <div class="progress-stat-value">${bookmarkCount}</div>
+                    <div class="progress-stat-sub">Your favourite duas saved for quick access</div>
+                </div>
+            </div>
+            <div class="progress-stat-card">
+                <div class="progress-stat-icon">🔥</div>
+                <div class="progress-stat-info">
+                    <div class="progress-stat-label">Current Streak</div>
+                    <div class="progress-stat-value">${STATE.streak} days</div>
+                    <div class="progress-stat-sub">Keep visiting daily to grow your streak!</div>
+                </div>
+            </div>
+            <div class="progress-stat-card">
+                <div class="progress-stat-icon">🌍</div>
+                <div class="progress-stat-info">
+                    <div class="progress-stat-label">Categories Explored</div>
+                    <div class="progress-stat-value">${catSet.size} / 12</div>
+                    <div class="progress-stat-sub">${catSet.size >= 12 ? 'All categories covered!' : 'Read duas from different categories to explore more'}</div>
+                </div>
+            </div>
+            <div class="progress-stat-card" style="text-align:center;justify-content:center;flex-direction:column;">
+                <div style="font-size:1.2rem;margin-bottom:8px;">${milestone}</div>
+            </div>
+            <button class="progress-reset-btn" onclick="if(confirm('Reset all reading progress? Bookmarks will be kept.')) { STATE.read=[]; localStorage.setItem('crown_read',JSON.stringify([])); document.querySelectorAll('.dua-card').forEach(c=>{c.classList.remove('read-card');const b=c.querySelector('.action-btn[onclick*=markRead]');if(b){b.classList.remove('read');b.innerHTML='\u2713 Mark Read';}}); updateStats(); renderProgressPanel(); showToast('Progress reset'); }">⚠ Reset Reading Progress</button>
+        `;
+    }
 
     // ===== SCROLL TO TOP =====
     window.scrollToTop = function() {
