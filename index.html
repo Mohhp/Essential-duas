@@ -2693,51 +2693,8 @@
                 ordered by scholarly priority with full authentication.
             </p>
 
-            <div class="stats-row">
-                <div class="stat-item">
-                    <div class="stat-number" id="totalCount">55</div>
-                    <div class="stat-label">Duas</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">12</div>
-                    <div class="stat-label">Categories</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" id="bookmarkCount">0</div>
-                    <div class="stat-label">Saved</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-progress">
-                        <svg viewBox="0 0 48 48">
-                            <circle class="progress-ring-bg" cx="24" cy="24" r="22"/>
-                            <circle class="progress-ring-fill" id="readProgressRing" cx="24" cy="24" r="22"/>
-                        </svg>
-                        <div class="stat-number" id="readCount">0</div>
-                    </div>
-                    <div class="stat-label">Read</div>
-                </div>
-            </div>
         </div>
     </section>
-
-    <!-- ===== STREAK BANNER ===== -->
-    <div class="streak-banner" id="streakBanner">
-        <span class="streak-fire">🔥</span>
-        <span>Streak: <span class="streak-count" id="streakCount">0</span> days</span>
-        <span>•</span>
-        <span>Last visit: <span id="lastVisit">Today</span></span>
-    </div>
-
-    <!-- ===== DAILY DUA ===== -->
-    <div class="daily-dua-banner" id="dailyDua" onclick="scrollToDailyDua()">
-        <div class="daily-label"><span class="sparkle">✦</span> Dua of the Day <span class="sparkle">✦</span></div>
-        <div class="daily-arabic" id="dailyArabic"></div>
-        <div class="daily-translation" id="dailyTranslation"></div>
-        <button class="daily-share-btn" onclick="event.stopPropagation(); shareDailyDua()">↗ Share Today's Dua</button>
-    </div>
-
-    <!-- ===== TIME-BASED SUGGESTION ===== -->
-    <div id="timeBanner"></div>
 
     <!-- ===== SEARCH ===== -->
     <div class="search-container">
@@ -6018,6 +5975,18 @@ window.filterCategory = function(cat, btn) {
         }, 500);
     }
 
+    function loadProgressDailyDua() {
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+        const duaIndex = (dayOfYear % 55) + 1;
+        const card = document.querySelector(`.dua-card[data-id="${duaIndex}"]`);
+        const arabicEl = document.getElementById('progressDailyArabic');
+        const transEl = document.getElementById('progressDailyTranslation');
+        if (card && arabicEl) {
+            arabicEl.innerText = card.querySelector('.arabic-text').innerText;
+            transEl.innerText = card.querySelector('.translation').innerText.substring(0, 80) + '...';
+        }
+    }
+
         // ===== RANDOM DUA =====
     window.showRandomDua = function() {
         const visibleCards = Array.from(els.cards).filter(c => 
@@ -6349,11 +6318,22 @@ window.filterCategory = function(cat, btn) {
             <div class="progress-stat-card" style="text-align:center;justify-content:center;flex-direction:column;">
                 <div style="font-size:1.2rem;margin-bottom:8px;">${milestone}</div>
             </div>
+            <div class="progress-stat-card daily-dua-progress" style="flex-direction:column;text-align:center;cursor:pointer;" onclick="closeProgress(); setTimeout(function(){ scrollToDailyDua(); }, 300);">
+                <div style="font-family:var(--font-title);font-size:0.7rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,168,76,0.8);margin-bottom:0.5rem;"><span class="sparkle">✦</span> Dua of the Day <span class="sparkle">✦</span></div>
+                <div id="progressDailyArabic" style="font-family:var(--font-arabic);font-size:calc(1.3rem * var(--font-scale));color:var(--gold-light);direction:rtl;line-height:2.2;margin:0.4rem 0;"></div>
+                <div id="progressDailyTranslation" style="font-family:var(--font-text);font-size:0.88rem;color:var(--text-muted);font-style:italic;line-height:1.6;"></div>
+                <div style="margin-top:10px;font-size:0.7rem;color:var(--text-subtle);letter-spacing:1px;text-transform:uppercase;">Tap to view full dua →</div>
+            </div>
+
+
 
             <button class="progress-reset-btn" onclick="if(confirm('Reset all reading progress? Bookmarks will be kept.')) { STATE.read=[]; localStorage.setItem('crown_read',JSON.stringify([])); document.querySelectorAll('.dua-card').forEach(c=>{c.classList.remove('read-card');const b=c.querySelector('.action-btn[onclick*=markRead]');if(b){b.classList.remove('read');b.innerHTML='\u2713 Mark Read';}}); updateStats(); renderProgressPanel(); showToast('Progress reset'); }">\u26a0 Reset Reading Progress</button>
 
             <button class="progress-share-btn" onclick="shareProgress()">📤 Share Your Progress</button>
         `;
+
+        // Populate daily dua inside progress panel
+        loadProgressDailyDua();
     }
 
     window.shareProgress = async function() {

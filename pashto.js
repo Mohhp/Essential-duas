@@ -640,16 +640,6 @@ function applyLanguage(lang) {
     const intro = document.querySelector('.intro-text');
     if (intro) { if (!intro.getAttribute('data-en')) intro.setAttribute('data-en', intro.textContent); intro.textContent = PS_UI.introText; }
 
-    // Stat labels
-    document.querySelectorAll('.stat-label').forEach(el => {
-        if (!el.getAttribute('data-en')) el.setAttribute('data-en', el.textContent);
-        const t = el.textContent.trim();
-        if (t === 'Duas' || t === 'دعاګانې') el.textContent = PS_UI.statDuas;
-        else if (t === 'Categories' || t === 'کټګورۍ') el.textContent = PS_UI.statCategories;
-        else if (t === 'Saved' || t === 'Tap ♡' || t === 'خوندي' || t === 'خوندي کړئ') el.textContent = PS_UI.statSaved;
-        else if (t === 'Read' || t === 'Start' || t === 'لوستل شوي' || t === 'پیل کړئ') el.textContent = PS_UI.statRead;
-    });
-
     // Category grid cards
     document.querySelectorAll('.cat-card').forEach(card => {
         const cat = card.getAttribute('data-cat');
@@ -687,24 +677,6 @@ function applyLanguage(lang) {
             cdhSubtitle.textContent = PS_UI.catCardSubtitles[activeCat];
         }
     }
-
-    // Streak banner
-    const streakBanner = document.getElementById('streakBanner');
-    if (streakBanner) {
-        const spans = streakBanner.querySelectorAll(':scope > span');
-        if (spans.length >= 4) {
-            if (!spans[1].getAttribute('data-en')) spans[1].setAttribute('data-en', spans[1].innerHTML);
-            const sc = document.getElementById('streakCount');
-            spans[1].innerHTML = PS_UI.streakLabel + ' <span class="streak-count" id="streakCount">' + (sc ? sc.textContent : '0') + '</span> ' + PS_UI.streakDays;
-            if (!spans[3].getAttribute('data-en')) spans[3].setAttribute('data-en', spans[3].innerHTML);
-            const lv = document.getElementById('lastVisit');
-            spans[3].innerHTML = PS_UI.lastVisitLabel + ' <span id="lastVisit">' + PS_UI.today + '</span>';
-        }
-    }
-
-    // Daily dua label
-    const dailyLabel = document.querySelector('.daily-label');
-    if (dailyLabel) { if (!dailyLabel.getAttribute('data-en')) dailyLabel.setAttribute('data-en', dailyLabel.innerHTML); dailyLabel.innerHTML = '<span class="sparkle">✦</span> ' + PS_UI.duaOfDay.replace(/✦/g,'').trim() + ' <span class="sparkle">✦</span>'; }
 
     // Search placeholder
     const si = document.getElementById('searchInput');
@@ -898,10 +870,6 @@ function applyLanguage(lang) {
     // Notification toggle label
     const notifyLabel = document.querySelector('.prayer-notify-label');
     if (notifyLabel) { if (!notifyLabel.getAttribute('data-en')) notifyLabel.setAttribute('data-en', notifyLabel.textContent); notifyLabel.textContent = PS_UI.prayerAlerts; }
-
-    // Daily share button
-    const dailyShareBtn = document.querySelector('.daily-share-btn');
-    if (dailyShareBtn) { if (!dailyShareBtn.getAttribute('data-en')) dailyShareBtn.setAttribute('data-en', dailyShareBtn.textContent); dailyShareBtn.textContent = PS_UI.shareDailyDua; }
 
     // Progress share button
     const progressShareBtn = document.querySelector('.progress-share-btn');
