@@ -955,6 +955,82 @@
             color: var(--gold-lightest); font-weight: 500; word-spacing: 5px;
         }
 
+        /* Word Popup — Tappable Arabic Words */
+        .arabic-word {
+            cursor: pointer; position: relative;
+            border-radius: 4px; padding: 0 2px;
+            transition: background 0.2s ease, color 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .arabic-word:hover { background: rgba(46, 196, 122, 0.08); }
+        .arabic-word.active-word { background: rgba(46, 196, 122, 0.15); color: var(--emerald-light); }
+
+        .word-popup {
+            position: fixed; z-index: 5000;
+            background: var(--bg-surface);
+            border: 1px solid rgba(46, 196, 122, 0.2);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            min-width: 200px; max-width: 300px;
+            box-shadow: var(--shadow-elevated);
+            backdrop-filter: blur(24px) saturate(150%);
+            opacity: 0; transform: translateY(8px) scale(0.95);
+            transition: opacity 0.25s ease, transform 0.25s var(--transition-spring);
+            pointer-events: none;
+            text-align: center;
+        }
+        .word-popup.visible {
+            opacity: 1; transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .word-popup-arabic {
+            font-family: var(--font-arabic);
+            font-size: calc(2rem * var(--font-scale));
+            color: var(--gold-lightest); font-weight: 600;
+            line-height: 1.6; margin-bottom: 8px;
+            direction: rtl;
+        }
+        .word-popup-root {
+            font-family: var(--font-arabic);
+            font-size: 1rem; color: var(--emerald-light);
+            margin-bottom: 6px; direction: rtl;
+            letter-spacing: 4px;
+        }
+        .word-popup-root-label {
+            font-family: var(--font-title);
+            font-size: 0.55rem; letter-spacing: 1.5px;
+            text-transform: uppercase; color: var(--text-faint);
+            margin-bottom: 2px;
+        }
+        .word-popup-meaning {
+            font-family: var(--font-text);
+            font-size: 0.82rem; color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .word-popup-divider {
+            width: 30px; height: 1px; margin: 8px auto;
+            background: rgba(46, 196, 122, 0.2);
+        }
+        .word-popup-arrow {
+            position: absolute; left: 50%;
+            width: 12px; height: 12px; background: var(--bg-surface);
+            border: 1px solid rgba(46, 196, 122, 0.2);
+            border-top: none; border-left: none;
+        }
+        .word-popup-arrow.arrow-bottom {
+            bottom: -7px;
+            transform: translateX(-50%) rotate(45deg);
+        }
+        .word-popup-arrow.arrow-top {
+            top: -7px;
+            transform: translateX(-50%) rotate(-135deg);
+        }
+        [data-theme="light"] .word-popup { background: rgba(255, 255, 255, 0.97); border-color: rgba(13, 123, 80, 0.15); }
+        [data-theme="light"] .word-popup-arabic { color: #1a1a0e; }
+        [data-theme="light"] .word-popup-arrow { background: rgba(255, 255, 255, 0.97); border-color: rgba(13, 123, 80, 0.15); }
+        [data-theme="light"] .arabic-word:hover { background: rgba(13, 123, 80, 0.06); }
+        [data-theme="light"] .arabic-word.active-word { background: rgba(13, 123, 80, 0.12); color: #0d7b50; }
+
         /* Transliteration */
         .transliteration {
             font-family: var(--font-amiri);
@@ -4323,6 +4399,7 @@
         renderTimeBanner();
         trackDailyActivity();
         renderBookmarksPanel();
+        wrapArabicWords();
 
         // Search listener
         if (els.searchInput) {
@@ -4450,6 +4527,7 @@
         const card = header.closest('.dua-card');
         const isExpanded = card.classList.toggle('expanded');
         header.setAttribute('aria-expanded', isExpanded);
+        if (isExpanded) wrapArabicWords();
     };
 
     window.toggleAllCards = function(expand) {
@@ -5657,6 +5735,694 @@ window.filterCategory = function(cat, btn) {
             showToast('Failed to generate image');
         }
     };
+
+    // ===== ARABIC WORD POPUP =====
+    const ARABIC_DICT = {
+        // Helper: keys are diacritic-stripped Arabic. Values: [root, meaning]
+        // ===== DIVINE NAMES & ATTRIBUTES =====
+        'الله': ['أ ل ه', 'Allah — God'],
+        'اللهم': ['أ ل ه', 'O Allah (invocation)'],
+        'الرحمن': ['ر ح م', 'The Most Gracious'],
+        'الرحيم': ['ر ح م', 'The Most Merciful'],
+        'الصمد': ['ص م د', 'The Eternal Refuge'],
+        'الاحد': ['و ح د', 'The One, Unique'],
+        'احد': ['و ح د', 'one / anyone'],
+        'الشافي': ['ش ف ي', 'The Healer'],
+        'الحي': ['ح ي ي', 'The Ever-Living'],
+        'القيوم': ['ق و م', 'The Sustainer of All'],
+        'الحليم': ['ح ل م', 'The Forbearing'],
+        'العظيم': ['ع ظ م', 'The Magnificent'],
+        'العليم': ['ع ل م', 'The All-Knowing'],
+        'العلي': ['ع ل و', 'The Most High'],
+        'السميع': ['س م ع', 'The All-Hearing'],
+        'الظاهر': ['ظ ه ر', 'The Manifest'],
+        'الباطن': ['ب ط ن', 'The Hidden'],
+        'الاخر': ['أ خ ر', 'The Last'],
+        'الاول': ['أ و ل', 'The First'],
+        'الوهاب': ['و ه ب', 'The Bestower'],
+        'المنان': ['م ن ن', 'The Gracious Giver'],
+        'المقدم': ['ق د م', 'The Expediter'],
+        'المؤخر': ['أ خ ر', 'The Delayer'],
+        'عفو': ['ع ف و', 'Pardoning; The Pardoner'],
+        'حميد': ['ح م د', 'Praiseworthy'],
+        'مجيد': ['م ج د', 'Glorious'],
+        'قدير': ['ق د ر', 'All-Powerful'],
+        'سميع': ['س م ع', 'All-Hearing'],
+        'عدل': ['ع د ل', 'Just / Justice'],
+        'الكريم': ['ك ر م', 'The Most Generous'],
+        'بديع': ['ب د ع', 'Originator'],
+
+        // ===== CORE ISLAMIC VOCABULARY =====
+        'بسم': ['س م و', 'in the name of'],
+        'الحمد': ['ح م د', 'all praise'],
+        'حمدا': ['ح م د', 'praise (n.)'],
+        'رب': ['ر ب ب', 'Lord / Sustainer'],
+        'ربي': ['ر ب ب', 'my Lord'],
+        'ربنا': ['ر ب ب', 'our Lord'],
+        'ربه': ['ر ب ب', 'his Lord'],
+        'ربك': ['ر ب ب', 'your Lord'],
+        'ربا': ['ر ب ب', 'as a Lord'],
+        'العالمين': ['ع ل م', 'the worlds / all creation'],
+        'مالك': ['م ل ك', 'Master / Owner'],
+        'ملك': ['م ل ك', 'King / Sovereign'],
+        'الملك': ['م ل ك', 'the Dominion / Kingdom'],
+        'يوم': ['ي و م', 'day'],
+        'يوما': ['ي و م', 'a day'],
+        'الدين': ['د ي ن', 'the religion / the Judgment'],
+        'دينا': ['د ي ن', 'as a religion'],
+        'ديني': ['د ي ن', 'my religion'],
+
+        // ===== SURAH AL-FATIHA =====
+        'اياك': ['إ ي ي', 'You alone'],
+        'نعبد': ['ع ب د', 'we worship'],
+        'نستعين': ['ع و ن', 'we seek help'],
+        'اهدنا': ['ه د ي', 'guide us'],
+        'الصراط': ['ص ر ط', 'the path'],
+        'صراط': ['ص ر ط', 'path of'],
+        'المستقيم': ['ق و م', 'the straight'],
+        'الذين': ['—', 'those who'],
+        'الذي': ['—', 'the one who / that which'],
+        'انعمت': ['ن ع م', 'You have blessed'],
+        'عليهم': ['ع ل و', 'upon them'],
+        'غير': ['غ ي ر', 'other than / not'],
+        'المغضوب': ['غ ض ب', 'those who earned wrath'],
+        'الضالين': ['ض ل ل', 'those who went astray'],
+
+        // ===== AYAT AL-KURSI =====
+        'الاه': ['أ ل ه', 'god / deity'],
+        'الا': ['—', 'except / but'],
+        'هو': ['—', 'He'],
+        'تاخذه': ['أ خ ذ', 'overtakes Him'],
+        'سنه': ['و س ن', 'slumber / drowsiness'],
+        'نوم': ['ن و م', 'sleep'],
+        'السماوات': ['س م و', 'the heavens'],
+        'السماء': ['س م و', 'the sky / heaven'],
+        'الارض': ['أ ر ض', 'the earth'],
+        'يشفع': ['ش ف ع', 'intercedes'],
+        'عنده': ['ع ن د', 'with Him / in His presence'],
+        'عندك': ['ع ن د', 'with You'],
+        'باذنه': ['أ ذ ن', 'by His permission'],
+        'يعلم': ['ع ل م', 'He knows'],
+        'ايديهم': ['ي د ي', 'their hands / before them'],
+        'خلفهم': ['خ ل ف', 'behind them'],
+        'يحيطون': ['ح و ط', 'they encompass'],
+        'بشيء': ['ش ي أ', 'anything / something'],
+        'شيء': ['ش ي أ', 'a thing'],
+        'علمه': ['ع ل م', 'His knowledge'],
+        'شاء': ['ش ي أ', 'He willed'],
+        'وسع': ['و س ع', 'encompasses / extends over'],
+        'كرسيه': ['ك ر س', 'His Throne (Kursi)'],
+        'يؤوده': ['أ و د', 'burdens / tires Him'],
+        'حفظهما': ['ح ف ظ', 'preserving them both'],
+
+        // ===== SURAHS AL-IKHLAS, AL-FALAQ, AN-NAS =====
+        'قل': ['ق و ل', 'say'],
+        'يلد': ['و ل د', 'He begets'],
+        'يولد': ['و ل د', 'He was begotten'],
+        'يكن': ['ك و ن', 'there is / was'],
+        'كفوا': ['ك ف أ', 'equivalent / equal'],
+        'اعوذ': ['ع و ذ', 'I seek refuge'],
+        'برب': ['ر ب ب', 'in the Lord of'],
+        'الفلق': ['ف ل ق', 'the daybreak'],
+        'شر': ['ش ر ر', 'evil / harm'],
+        'خلق': ['خ ل ق', 'He created / creation'],
+        'غاسق': ['غ س ق', 'darkness'],
+        'وقب': ['و ق ب', 'when it settles'],
+        'النفاثات': ['ن ف ث', 'the ones who blow'],
+        'العقد': ['ع ق د', 'the knots'],
+        'حاسد': ['ح س د', 'an envier'],
+        'حسد': ['ح س د', 'envies'],
+        'الناس': ['ن و س', 'mankind / the people'],
+        'الوسواس': ['و س و س', 'the whisperer'],
+        'الخناس': ['خ ن س', 'the retreater (sneaky)'],
+        'يوسوس': ['و س و س', 'whispers'],
+        'صدور': ['ص د ر', 'chests / hearts'],
+        'الجنه': ['ج ن ن', 'the jinn'],
+
+        // ===== COMMON DUA VERBS =====
+        'اسالك': ['س أ ل', 'I ask You'],
+        'اغفر': ['غ ف ر', 'forgive'],
+        'فاغفر': ['غ ف ر', 'so forgive'],
+        'يغفر': ['غ ف ر', 'forgives'],
+        'تغفر': ['غ ف ر', 'You forgive'],
+        'غفرانك': ['غ ف ر', 'Your forgiveness'],
+        'ارحمهما': ['ر ح م', 'have mercy on them both'],
+        'ارحمنا': ['ر ح م', 'have mercy on us'],
+        'رحمه': ['ر ح م', 'mercy / a mercy'],
+        'رحمتك': ['ر ح م', 'Your mercy'],
+        'برحمتك': ['ر ح م', 'by Your mercy'],
+        'ارحم': ['ر ح م', 'most merciful'],
+        'الراحمين': ['ر ح م', 'the most merciful ones'],
+        'وقنا': ['و ق ي', 'and protect us'],
+        'عذاب': ['ع ذ ب', 'punishment / torment'],
+        'النار': ['ن و ر', 'the Fire'],
+        'جهنم': ['ج ه ن م', 'Hell / Jahannam'],
+        'اشف': ['ش ف ي', 'heal'],
+        'شافي': ['ش ف ي', 'healer / curer'],
+        'شفاء': ['ش ف ي', 'healing / cure'],
+        'هب': ['و ه ب', 'grant / bestow'],
+        'اشرح': ['ش ر ح', 'expand / open'],
+        'يسر': ['ي س ر', 'ease / make easy'],
+        'يسره': ['ي س ر', 'make it easy'],
+        'بارك': ['ب ر ك', 'bless'],
+        'باركت': ['ب ر ك', 'You have blessed'],
+        'بركه': ['ب ر ك', 'blessing of'],
+        'ثبت': ['ث ب ت', 'make firm / steady'],
+        'افتح': ['ف ت ح', 'open'],
+        'احلل': ['ح ل ل', 'untie / loosen'],
+        'اجعلني': ['ج ع ل', 'make me'],
+        'تجعل': ['ج ع ل', 'You make'],
+        'جعلته': ['ج ع ل', 'You made it'],
+        'اكفني': ['ك ف ي', 'suffice me'],
+        'فاعف': ['ع ف و', 'so pardon'],
+        'العفو': ['ع ف و', 'pardon / forgiveness'],
+        'تحب': ['ح ب ب', 'You love'],
+        'اقض': ['ق ض ي', 'settle / decree'],
+        'فانصرنا': ['ن ص ر', 'so grant us victory'],
+        'صل': ['ص ل و', 'send blessings upon'],
+        'صلى': ['ص ل و', 'sent blessings'],
+        'صليت': ['ص ل و', 'You sent blessings'],
+        'سلم': ['س ل م', 'peace / bestow peace'],
+
+        // ===== COMMON NOUNS =====
+        'نفسا': ['ن ف س', 'a soul'],
+        'نفسي': ['ن ف س', 'my soul / myself'],
+        'انفسنا': ['ن ف س', 'ourselves'],
+        'قلبي': ['ق ل ب', 'my heart'],
+        'قلب': ['ق ل ب', 'a heart'],
+        'قلوبنا': ['ق ل ب', 'our hearts'],
+        'القلوب': ['ق ل ب', 'the hearts'],
+        'مقلب': ['ق ل ب', 'Turner of'],
+        'الابصار': ['ب ص ر', 'the eyes / sight'],
+        'علما': ['ع ل م', 'knowledge'],
+        'علم': ['ع ل م', 'knowledge'],
+        'بعلمك': ['ع ل م', 'by Your knowledge'],
+        'علام': ['ع ل م', 'Knower of'],
+        'علمته': ['ع ل م', 'You taught someone'],
+        'الغيوب': ['غ ي ب', 'the unseen things'],
+        'الغيب': ['غ ي ب', 'the unseen'],
+        'ذنبي': ['ذ ن ب', 'my sin'],
+        'بذنبي': ['ذ ن ب', 'my sin'],
+        'ذنوبنا': ['ذ ن ب', 'our sins'],
+        'الذنوب': ['ذ ن ب', 'the sins'],
+        'صدري': ['ص د ر', 'my chest / heart'],
+        'لساني': ['ل س ن', 'my tongue'],
+        'عقده': ['ع ق د', 'a knot'],
+        'الصلاه': ['ص ل و', 'the prayer'],
+        'الصلوه': ['ص ل و', 'the prayer'],
+        'الدنيا': ['د ن و', 'this worldly life'],
+        'الاخره': ['أ خ ر', 'the Hereafter'],
+        'حسنه': ['ح س ن', 'goodness / a good deed'],
+        'خيرا': ['خ ي ر', 'good / goodness'],
+        'خير': ['خ ي ر', 'best / good'],
+        'امري': ['أ م ر', 'my affair'],
+        'الامر': ['أ م ر', 'the matter / affair'],
+        'عبدك': ['ع ب د', 'Your servant'],
+        'عبادك': ['ع ب د', 'Your servants'],
+        'ابن': ['ب ن و', 'son of'],
+        'امتك': ['أ م و', 'Your female servant'],
+        'ناصيتي': ['ن ص ي', 'my forelock'],
+        'بناصيته': ['ن ص ي', 'by his forelock'],
+        'بيدك': ['ي د ي', 'in Your hand'],
+        'الجنه': ['ج ن ن', 'Paradise'],
+        'الجلال': ['ج ل ل', 'Majesty'],
+        'الاكرام': ['ك ر م', 'Honor / Generosity'],
+        'العرش': ['ع ر ش', 'the Throne'],
+        'القران': ['ق ر أ', 'the Quran'],
+        'ربيع': ['ر ب ع', 'spring / delight'],
+        'نور': ['ن و ر', 'light'],
+        'بنور': ['ن و ر', 'by the light of'],
+        'ملاء': ['م ل أ', 'filling / fullness'],
+        'دعاء': ['د ع و', 'supplication'],
+        'دعوه': ['د ع و', 'a supplication'],
+        'ذريه': ['ذ ر ر', 'offspring / progeny'],
+        'ذريتي': ['ذ ر ر', 'my offspring'],
+        'طيبه': ['ط ي ب', 'good / pure'],
+        'والدي': ['و ل د', 'my parents'],
+        'ربياني': ['ر ب و', 'they raised me'],
+        'صغيرا': ['ص غ ر', 'when I was small'],
+
+        // ===== COMMON PARTICLES & PREPOSITIONS =====
+        'في': ['—', 'in / within'],
+        'من': ['—', 'from / of'],
+        'عن': ['—', 'from / about'],
+        'على': ['—', 'upon / on'],
+        'الى': ['—', 'to / toward'],
+        'اليك': ['—', 'to You'],
+        'اليه': ['—', 'to him / it'],
+        'بين': ['—', 'between'],
+        'بعد': ['—', 'after'],
+        'قبل': ['—', 'before'],
+        'عند': ['—', 'at / with'],
+        'فوقك': ['—', 'above You'],
+        'دونك': ['—', 'besides You'],
+        'مع': ['—', 'with'],
+        'بما': ['—', 'with what / by what'],
+        'لها': ['—', 'for it (f.)'],
+        'له': ['—', 'for him / to Him'],
+        'لنا': ['—', 'for us'],
+        'لي': ['—', 'for me'],
+        'لك': ['—', 'for You / to You'],
+        'بك': ['—', 'in You / by You'],
+        'به': ['—', 'in it / by it'],
+        'فيه': ['—', 'in it'],
+        'في': ['—', 'in / concerning'],
+        'عليها': ['—', 'upon it (f.)'],
+        'علينا': ['—', 'upon us'],
+        'علي': ['—', 'upon me'],
+        'عنا': ['—', 'from us'],
+        'عني': ['—', 'from me'],
+        'عنه': ['—', 'from him / it'],
+        'منه': ['—', 'from him / from it'],
+        'بي': ['—', 'in me / with me'],
+
+        // ===== CONJUNCTIONS & NEGATION =====
+        'لا': ['—', 'no / not'],
+        'لم': ['—', 'did not (past negation)'],
+        'ان': ['—', 'that / indeed'],
+        'انك': ['—', 'indeed You'],
+        'اني': ['—', 'indeed I'],
+        'انه': ['—', 'indeed it / he'],
+        'بان': ['—', 'because / that'],
+        'اذا': ['—', 'when / if'],
+        'اذ': ['—', 'when (past)'],
+        'كما': ['—', 'just as / as'],
+        'او': ['—', 'or'],
+        'ثم': ['—', 'then'],
+        'ما': ['—', 'what / that which'],
+        'من': ['—', 'who / whoever'],
+
+        // ===== PRONOUNS =====
+        'انت': ['—', 'You (God)'],
+        'انا': ['—', 'I / me'],
+        'هذا': ['—', 'this'],
+        'كنت': ['ك و ن', 'I was / You were'],
+        'كنا': ['ك و ن', 'we were'],
+
+        // ===== MORE DUA VOCABULARY =====
+        'الهم': ['ه م م', 'worry / anxiety'],
+        'الحزن': ['ح ز ن', 'sadness / grief'],
+        'حزني': ['ح ز ن', 'my grief'],
+        'همي': ['ه م م', 'my worry'],
+        'العجز': ['ع ج ز', 'inability'],
+        'الكسل': ['ك س ل', 'laziness'],
+        'البخل': ['ب خ ل', 'stinginess'],
+        'الجبن': ['ج ب ن', 'cowardice'],
+        'الدين': ['د ي ن', 'the debt / religion'],
+        'ضلع': ['ض ل ع', 'burden of'],
+        'غلبه': ['غ ل ب', 'domination of / being overcome by'],
+        'الرجال': ['ر ج ل', 'men / people'],
+        'الفقر': ['ف ق ر', 'poverty'],
+        'طاعتك': ['ط و ع', 'Your obedience'],
+        'المعاصي': ['ع ص ي', 'sins / disobedience'],
+        'تقواها': ['و ق ي', 'its piety'],
+        'زكها': ['ز ك و', 'purify it'],
+        'زكاها': ['ز ك و', 'purified it'],
+        'وليها': ['و ل ي', 'its Guardian'],
+        'مولاها': ['و ل ي', 'its Protector'],
+        'العافيه': ['ع ف و', 'wellbeing / safety'],
+        'المعافاه': ['ع ف و', 'lasting wellbeing'],
+        'الدائمه': ['د و م', 'the lasting / permanent'],
+        'اصبحنا': ['ص ب ح', 'we have entered the morning'],
+        'اصبح': ['ص ب ح', 'has entered the morning'],
+        'حسبي': ['ح س ب', 'sufficient for me'],
+        'توكلت': ['و ك ل', 'I have placed my trust'],
+        'اسلمت': ['س ل م', 'I have submitted'],
+        'امنت': ['أ م ن', 'I have believed'],
+        'انبت': ['ن و ب', 'I have turned in repentance'],
+        'خاصمت': ['خ ص م', 'I have disputed'],
+        'حاكمت': ['ح ك م', 'I have sought judgment'],
+        'رضيت': ['ر ض ي', 'I am pleased / I accept'],
+        'بالاسلام': ['س ل م', 'with Islam'],
+        'محمد': ['ح م د', 'Muhammad ﷺ'],
+        'نبيا': ['ن ب أ', 'as a Prophet'],
+        'ال': ['—', 'family of'],
+        'ابراهيم': ['—', 'Ibrahim (Abraham)'],
+        'الرسول': ['ر س ل', 'the Messenger'],
+        'رسله': ['ر س ل', 'His messengers'],
+        'المؤمنون': ['أ م ن', 'the believers'],
+        'المؤمنين': ['أ م ن', 'the believers'],
+        'سمعنا': ['س م ع', 'we hear / we heard'],
+        'اطعنا': ['ط و ع', 'we obey / we obeyed'],
+        'المصير': ['ص ي ر', 'the destination / return'],
+        'يكلف': ['ك ل ف', 'burdens / charges'],
+        'وسعها': ['و س ع', 'its capacity'],
+        'كسبت': ['ك س ب', 'it earned'],
+        'اكتسبت': ['ك س ب', 'it has earned'],
+        'تؤاخذنا': ['أ خ ذ', 'hold us accountable'],
+        'نسينا': ['ن س ي', 'we forgot'],
+        'اخطانا': ['خ ط أ', 'we erred'],
+        'تحمل': ['ح م ل', 'place / burden'],
+        'اصرا': ['أ ص ر', 'a burden / hardship'],
+        'حملته': ['ح م ل', 'You placed it'],
+        'قبلنا': ['ق ب ل', 'before us'],
+        'طاقه': ['ط و ق', 'power / ability'],
+
+        // ===== ISTIKHARAH DUA =====
+        'استخيرك': ['خ ي ر', 'I seek Your guidance'],
+        'استقدرك': ['ق د ر', 'I seek Your power'],
+        'بقدرتك': ['ق د ر', 'by Your power'],
+        'فضلك': ['ف ض ل', 'Your bounty'],
+        'تقدر': ['ق د ر', 'You have power'],
+        'اقدر': ['ق د ر', 'I do not have power'],
+        'تعلم': ['ع ل م', 'You know'],
+        'اعلم': ['ع ل م', 'I know'],
+        'معاشي': ['ع ي ش', 'my livelihood'],
+        'عاقبه': ['ع ق ب', 'consequence / end'],
+        'فاقدره': ['ق د ر', 'then decree it'],
+        'فاصرفه': ['ص ر ف', 'then turn it away'],
+        'اصرفني': ['ص ر ف', 'turn me away'],
+
+        // ===== SAYYID AL-ISTIGHFAR =====
+        'خلقتني': ['خ ل ق', 'You created me'],
+        'عبدك': ['ع ب د', 'Your servant'],
+        'عهدك': ['ع ه د', 'Your covenant'],
+        'وعدك': ['و ع د', 'Your promise'],
+        'استطعت': ['ط و ع', 'I am able'],
+        'صنعت': ['ص ن ع', 'I have done'],
+        'ابوء': ['ب و أ', 'I acknowledge'],
+        'بنعمتك': ['ن ع م', 'Your favor / blessings'],
+
+        // ===== PROTECTION DUAS =====
+        'بكلمات': ['ك ل م', 'by the words of'],
+        'التامات': ['ت م م', 'the perfect (words)'],
+        'يضر': ['ض ر ر', 'harms'],
+        'اسمه': ['س م و', 'His name'],
+        'اسم': ['س م و', 'a name'],
+        'سميت': ['س م و', 'You named'],
+        'فتنه': ['ف ت ن', 'trial / tribulation'],
+        'المحيا': ['ح ي ي', 'life'],
+        'الممات': ['م و ت', 'death'],
+        'المسيح': ['م س ح', 'the Messiah'],
+        'الدجال': ['د ج ل', 'the Antichrist (Dajjal)'],
+        'القبر': ['ق ب ر', 'the grave'],
+        'الخبث': ['خ ب ث', 'male evil (jinn)'],
+        'الخبائث': ['خ ب ث', 'female evil (jinn)'],
+
+        // ===== IBRAHIMIC PRAYER =====
+        'محمد': ['ح م د', 'Muhammad ﷺ'],
+        'ابراهيم': ['—', 'Ibrahim (Abraham) ﷺ'],
+
+        // ===== NATURE & COSMIC =====
+        'السبع': ['س ب ع', 'the seven'],
+        'التوراه': ['—', 'the Torah'],
+        'الانجيل': ['—', 'the Gospel (Injeel)'],
+        'الفرقان': ['ف ر ق', 'the Criterion (Quran)'],
+        'فالق': ['ف ل ق', 'Splitter / Cleaver of'],
+        'الحب': ['ح ب ب', 'the seed'],
+        'النوى': ['ن و ي', 'the date-stone'],
+
+        // ===== MISC IMPORTANT WORDS =====
+        'سبحانك': ['س ب ح', 'Glory be to You'],
+        'سبحان': ['س ب ح', 'Glory be to'],
+        'الظالمين': ['ظ ل م', 'the wrongdoers'],
+        'ظلمنا': ['ظ ل م', 'we have wronged'],
+        'زدني': ['ز ي د', 'increase me'],
+        'نافعا': ['ن ف ع', 'beneficial'],
+        'ينفع': ['ن ف ع', 'benefits'],
+        'يخشع': ['خ ش ع', 'is humbled'],
+        'تشبع': ['ش ب ع', 'is satisfied'],
+        'يستجاب': ['ج و ب', 'is answered'],
+        'رزقا': ['ر ز ق', 'provision'],
+        'طيبا': ['ط ي ب', 'good / pure'],
+        'عملا': ['ع م ل', 'a deed'],
+        'متقبلا': ['ق ب ل', 'accepted'],
+        'مقيم': ['ق و م', 'establisher of'],
+        'تقبل': ['ق ب ل', 'accept'],
+        'صالحا': ['ص ل ح', 'righteous (deed)'],
+        'الصالحين': ['ص ل ح', 'the righteous'],
+        'ترضاه': ['ر ض ي', 'that pleases You'],
+        'ادخلني': ['د خ ل', 'admit me'],
+        'اوزعني': ['و ز ع', 'inspire me'],
+        'اشكر': ['ش ك ر', 'to be grateful'],
+        'نعمتك': ['ن ع م', 'Your blessing'],
+        'الضر': ['ض ر ر', 'the affliction / harm'],
+        'مسني': ['م س س', 'has afflicted me'],
+        'سقما': ['س ق م', 'sickness'],
+        'يغادر': ['غ د ر', 'leaves behind'],
+        'مذهب': ['ذ ه ب', 'Remover of'],
+        'الباس': ['ب أ س', 'the suffering / hardship'],
+        'يفقهوا': ['ف ق ه', 'they understand'],
+        'قولي': ['ق و ل', 'my speech'],
+        'قول': ['ق و ل', 'a saying / word'],
+        'عمل': ['ع م ل', 'a deed'],
+        'حسنت': ['ح س ن', 'You have made good'],
+        'خلقي': ['خ ل ق', 'my creation / form'],
+        'فحسن': ['ح س ن', 'so make good'],
+        'خلقي': ['خ ل ق', 'my character'],
+        'بحلالك': ['ح ل ل', 'with Your lawful'],
+        'حرامك': ['ح ر م', 'Your unlawful'],
+        'اغنني': ['غ ن ي', 'enrich me / make me free of need'],
+        'سواك': ['س و ي', 'other than You'],
+        'سهلا': ['س ه ل', 'easy'],
+        'سهل': ['س ه ل', 'easy / there is no ease'],
+        'شئت': ['ش ي أ', 'You will / wish'],
+        'وحده': ['و ح د', 'alone / uniquely'],
+        'شريك': ['ش ر ك', 'partner'],
+        'كل': ['ك ل ل', 'every / all'],
+        'كله': ['ك ل ل', 'all of it'],
+        'دقه': ['د ق ق', 'its minor'],
+        'جله': ['ج ل ل', 'its major'],
+        'اوله': ['أ و ل', 'its first'],
+        'اخره': ['أ خ ر', 'its last'],
+        'علانيته': ['ع ل ن', 'its open / public'],
+        'سره': ['س ر ر', 'its secret'],
+        'قدمت': ['ق د م', 'I have put forward'],
+        'اخرت': ['أ خ ر', 'I delayed'],
+        'اسررت': ['س ر ر', 'I concealed'],
+        'اعلنت': ['ع ل ن', 'I declared'],
+        'اشهد': ['ش ه د', 'I testify / bear witness'],
+        'كتابك': ['ك ت ب', 'Your Book'],
+        'كتبه': ['ك ت ب', 'His books'],
+        'ملائكته': ['م ل ك', 'His angels'],
+        'نفرق': ['ف ر ق', 'we differentiate'],
+        'توفاها': ['و ف ي', 'You take its soul'],
+        'احييتها': ['ح ي ي', 'You give it life'],
+        'فاحفظها': ['ح ف ظ', 'then protect it'],
+        'امتها': ['م و ت', 'You cause it to die'],
+        'مماتها': ['م و ت', 'its death'],
+        'محياها': ['ح ي ي', 'its life'],
+        'خلقك': ['خ ل ق', 'Your creation'],
+        'باقيتني': ['ب ق ي', 'You keep me alive'],
+        'ابقيتني': ['ب ق ي', 'You keep me alive'],
+        'حكمك': ['ح ك م', 'Your decree'],
+        'قضاؤك': ['ق ض ي', 'Your judgment'],
+        'ماض': ['م ض ي', 'executed / enacted'],
+        'استاثرت': ['أ ث ر', 'You kept exclusively'],
+        'انزلته': ['ن ز ل', 'You revealed it'],
+        'انزل': ['ن ز ل', 'was revealed'],
+        'جلاء': ['ج ل و', 'removal / departure of'],
+        'ذهاب': ['ذ ه ب', 'going away of'],
+        'مولانا': ['و ل ي', 'our Protector'],
+        'اقدامنا': ['ق د م', 'our feet'],
+        'الكافرين': ['ك ف ر', 'the disbelievers'],
+        'القوم': ['ق و م', 'the people'],
+        'المستضعفين': ['ض ع ف', 'the oppressed / weak'],
+        'لمنقلبون': ['ق ل ب', 'surely returning'],
+        'تكلني': ['و ك ل', 'leave me to'],
+        'طرفه': ['ط ر ف', 'blink of'],
+        'عين': ['ع ي ن', 'an eye'],
+        'شاني': ['ش أ ن', 'my affairs / condition'],
+        'اصلح': ['ص ل ح', 'rectify / set right'],
+        'يعنيني': ['ع ن ي', 'concerns me'],
+        'حسن': ['ح س ن', 'excellence / beauty of'],
+        'سخطك': ['س خ ط', 'Your displeasure'],
+        'غضبك': ['غ ض ب', 'Your anger'],
+        'عافيتك': ['ع ف و', 'Your protection'],
+        'عقوبتك': ['ع ق ب', 'Your punishment'],
+        'العتبى': ['ع ت ب', 'appeasement / making amends'],
+        'احصي': ['ح ص ي', 'enumerate / count'],
+        'ثناء': ['ث ن ي', 'praise'],
+        'اثني': ['ث ن ي', 'I praise'],
+
+        // ===== Connector words appearing frequently =====
+        'وهو': ['—', 'and He is'],
+        'فانه': ['—', 'for indeed it'],
+        'فانك': ['—', 'for indeed You'],
+    };
+
+    // Strip Arabic diacritics for dictionary lookup
+    function stripDiacritics(text) {
+        return text.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\uFE70-\uFE7F]/g, '')
+                   .replace(/\u0671/g, '\u0627') // alef wasla → alef
+                   .replace(/ٰ/g, '')            // superscript alef
+                   .replace(/ى/g, 'ي')           // alef maqsura → ya
+                   .replace(/ة/g, 'ه')           // ta marbuta → ha
+                   .replace(/ؤ/g, 'و')           // hamza on waw
+                   .replace(/ئ/g, 'ي')           // hamza on ya
+                   .replace(/أ|إ|آ/g, 'ا')       // hamza forms → alef
+                   .trim();
+    }
+
+    function lookupWord(rawWord) {
+        const cleaned = rawWord.replace(/[۞ۚۖۗ،,\.]/g, '').trim();
+        if (!cleaned) return null;
+        const stripped = stripDiacritics(cleaned);
+        // Try exact match first
+        if (ARABIC_DICT[stripped]) {
+            return { word: cleaned, root: ARABIC_DICT[stripped][0], meaning: ARABIC_DICT[stripped][1] };
+        }
+        // Try without leading و (conjunction)
+        if (stripped.startsWith('و') && stripped.length > 2) {
+            const withoutWaw = stripped.slice(1);
+            if (ARABIC_DICT[withoutWaw]) {
+                return { word: cleaned, root: ARABIC_DICT[withoutWaw][0], meaning: 'and ' + ARABIC_DICT[withoutWaw][1] };
+            }
+        }
+        // Try without leading ف
+        if (stripped.startsWith('ف') && stripped.length > 2) {
+            const withoutFa = stripped.slice(1);
+            if (ARABIC_DICT[withoutFa]) {
+                return { word: cleaned, root: ARABIC_DICT[withoutFa][0], meaning: 'so ' + ARABIC_DICT[withoutFa][1] };
+            }
+        }
+        // Try without leading بال / وال / لل / ال
+        for (const prefix of ['بال', 'وال', 'لل', 'ال', 'ب', 'ل', 'ك']) {
+            if (stripped.startsWith(prefix) && stripped.length > prefix.length + 1) {
+                const base = stripped.slice(prefix.length);
+                if (ARABIC_DICT[base]) {
+                    let prefixMeaning = prefix === 'ب' ? 'by/with ' : prefix === 'ل' ? 'for/to ' : prefix === 'ك' ? 'like ' : '';
+                    return { word: cleaned, root: ARABIC_DICT[base][0], meaning: prefixMeaning + ARABIC_DICT[base][1] };
+                }
+            }
+        }
+        return { word: cleaned, root: null, meaning: null };
+    }
+
+    // Word popup elements
+    let wordPopup = null;
+    let activeWordSpan = null;
+
+    function createWordPopup() {
+        wordPopup = document.createElement('div');
+        wordPopup.className = 'word-popup';
+        wordPopup.innerHTML = `
+            <div class="word-popup-arrow arrow-bottom"></div>
+            <div class="word-popup-arabic"></div>
+            <div class="word-popup-divider"></div>
+            <div class="word-popup-root-label">ROOT LETTERS</div>
+            <div class="word-popup-root"></div>
+            <div class="word-popup-divider"></div>
+            <div class="word-popup-meaning"></div>
+        `;
+        document.body.appendChild(wordPopup);
+    }
+
+    function showWordPopup(span, data) {
+        if (!wordPopup) createWordPopup();
+        if (activeWordSpan) activeWordSpan.classList.remove('active-word');
+        activeWordSpan = span;
+        span.classList.add('active-word');
+
+        const arabicEl = wordPopup.querySelector('.word-popup-arabic');
+        const rootEl = wordPopup.querySelector('.word-popup-root');
+        const rootLabelEl = wordPopup.querySelector('.word-popup-root-label');
+        const meaningEl = wordPopup.querySelector('.word-popup-meaning');
+        const arrow = wordPopup.querySelector('.word-popup-arrow');
+
+        arabicEl.textContent = data.word;
+        if (data.root && data.root !== '—') {
+            rootLabelEl.style.display = '';
+            rootEl.style.display = '';
+            rootEl.textContent = data.root;
+            rootEl.previousElementSibling.style.display = '';
+        } else {
+            rootLabelEl.style.display = 'none';
+            rootEl.style.display = 'none';
+            rootEl.previousElementSibling.style.display = 'none';
+        }
+        if (data.meaning) {
+            meaningEl.style.display = '';
+            meaningEl.textContent = data.meaning;
+            meaningEl.previousElementSibling.style.display = '';
+        } else {
+            meaningEl.style.display = 'none';
+            meaningEl.previousElementSibling.style.display = 'none';
+        }
+
+        // Position popup above the word
+        wordPopup.classList.remove('visible');
+        wordPopup.style.left = '0';
+        wordPopup.style.top = '0';
+        wordPopup.style.display = 'block';
+
+        requestAnimationFrame(() => {
+            const rect = span.getBoundingClientRect();
+            const popupRect = wordPopup.getBoundingClientRect();
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+
+            let left = rect.left + rect.width / 2 - popupRect.width / 2;
+            left = Math.max(8, Math.min(left, vw - popupRect.width - 8));
+
+            let top = rect.top - popupRect.height - 10;
+            let arrowOnTop = false;
+
+            if (top < 8) {
+                top = rect.bottom + 10;
+                arrowOnTop = true;
+            }
+
+            arrow.className = arrowOnTop ? 'word-popup-arrow arrow-top' : 'word-popup-arrow arrow-bottom';
+
+            // Adjust arrow horizontal position to point at word center
+            const wordCenter = rect.left + rect.width / 2;
+            const arrowLeft = wordCenter - left;
+            arrow.style.left = Math.max(16, Math.min(arrowLeft, popupRect.width - 16)) + 'px';
+
+            wordPopup.style.left = left + 'px';
+            wordPopup.style.top = top + 'px';
+            wordPopup.classList.add('visible');
+        });
+    }
+
+    function dismissWordPopup() {
+        if (wordPopup) wordPopup.classList.remove('visible');
+        if (activeWordSpan) {
+            activeWordSpan.classList.remove('active-word');
+            activeWordSpan = null;
+        }
+    }
+
+    function wrapArabicWords() {
+        document.querySelectorAll('.arabic-text').forEach(el => {
+            if (el.dataset.wordsWrapped) return;
+            const text = el.textContent;
+            // Split on whitespace, preserving decorative symbols as separate tokens
+            const tokens = text.split(/(\s+)/);
+            el.innerHTML = '';
+            tokens.forEach(token => {
+                if (/^\s+$/.test(token)) {
+                    el.appendChild(document.createTextNode(token));
+                    return;
+                }
+                // Skip if it's only decorative symbols
+                const cleaned = token.replace(/[۞ۚۖۗ]/g, '').trim();
+                if (!cleaned) {
+                    el.appendChild(document.createTextNode(token));
+                    return;
+                }
+                const span = document.createElement('span');
+                span.className = 'arabic-word';
+                span.textContent = token;
+                span.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const data = lookupWord(this.textContent);
+                    if (data) showWordPopup(this, data);
+                });
+                el.appendChild(span);
+            });
+            el.dataset.wordsWrapped = '1';
+        });
+    }
+
+    // Dismiss on tap outside or scroll
+    document.addEventListener('click', function(e) {
+        if (wordPopup && !wordPopup.contains(e.target) && !e.target.classList.contains('arabic-word')) {
+            dismissWordPopup();
+        }
+    });
+    window.addEventListener('scroll', dismissWordPopup, { passive: true });
 
     // ===== REGISTER SERVICE WORKER =====
     if ('serviceWorker' in navigator) {
