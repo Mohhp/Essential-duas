@@ -831,6 +831,215 @@
             padding: 1px 7px; border-radius: 10px; font-size: 0.6rem;
         }
 
+        /* ============================================ */
+        /* ===== CATEGORY GRID (Visual Card Layout) === */
+        /* ============================================ */
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            padding: 8px 0 20px;
+            transition: opacity 0.3s ease;
+        }
+        .category-grid.hidden-grid { display: none; }
+
+        .cat-card {
+            position: relative;
+            border-radius: 18px;
+            overflow: hidden;
+            cursor: pointer;
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 18px 16px;
+            transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), box-shadow 0.35s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25), 0 1px 4px rgba(0,0,0,0.15);
+            -webkit-tap-highlight-color: transparent;
+            transform: perspective(800px) rotateX(0) rotateY(0);
+            will-change: transform;
+        }
+        .cat-card:hover {
+            transform: perspective(800px) translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .cat-card:active {
+            transform: perspective(800px) scale(0.97);
+            transition-duration: 0.12s;
+        }
+        .cat-card.featured {
+            grid-column: 1 / -1;
+            min-height: 150px;
+        }
+
+        /* Decorative pseudo-elements */
+        .cat-card::before {
+            content: '';
+            position: absolute;
+            top: -30%; right: -20%;
+            width: 160px; height: 160px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .cat-card::after {
+            content: '';
+            position: absolute;
+            bottom: -40%; left: -15%;
+            width: 120px; height: 120px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .cat-card-icon {
+            font-size: 2.2rem;
+            margin-bottom: 6px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            position: relative; z-index: 1;
+        }
+        .cat-card.featured .cat-card-icon { font-size: 2.6rem; }
+
+        .cat-card-name {
+            font-family: var(--font-title);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+            line-height: 1.3;
+            position: relative; z-index: 1;
+        }
+        .cat-card.featured .cat-card-name { font-size: 1.1rem; }
+
+        .cat-card-count {
+            font-family: var(--font-title);
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.75);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 3px;
+            position: relative; z-index: 1;
+        }
+
+        /* Decorative wave/arc overlay */
+        .cat-card-wave {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .cat-card-wave::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -30%;
+            width: 200%; height: 200%;
+            background: radial-gradient(ellipse at 70% 20%, rgba(255,255,255,0.12) 0%, transparent 60%);
+        }
+
+        /* Individual card gradients */
+        .cat-card[data-cat="all"] {
+            background: linear-gradient(135deg, #2ec47a, #1a9d5c, #0d7b50);
+        }
+        .cat-card[data-cat="quran"] {
+            background: linear-gradient(135deg, #1b6b4f, #2d9e6e, #3db87d);
+        }
+        .cat-card[data-cat="protection"] {
+            background: linear-gradient(135deg, #2d5aa0, #4478c4, #5a8fd4);
+        }
+        .cat-card[data-cat="forgiveness"] {
+            background: linear-gradient(135deg, #b85a7a, #d4738e, #e89ab0);
+        }
+        .cat-card[data-cat="guidance"] {
+            background: linear-gradient(135deg, #7b4fa0, #9b6cc0, #b088d4);
+        }
+        .cat-card[data-cat="wellbeing"] {
+            background: linear-gradient(135deg, #2a8f6a, #48b88a, #6dd4a8);
+        }
+        .cat-card[data-cat="prophets"] {
+            background: linear-gradient(135deg, #c4883a, #d4a04e, #e4b86a);
+        }
+        .cat-card[data-cat="morning-evening"] {
+            background: linear-gradient(135deg, #d48a3a, #e8a44e, #f0be6a);
+        }
+        .cat-card[data-cat="provision"] {
+            background: linear-gradient(135deg, #c07040, #d48858, #e4a070);
+        }
+        .cat-card[data-cat="prayer"] {
+            background: linear-gradient(135deg, #2a7a8a, #3a98a8, #50b4c4);
+        }
+        .cat-card[data-cat="family"] {
+            background: linear-gradient(135deg, #c45a6a, #d47888, #e494a0);
+        }
+        .cat-card[data-cat="travel"] {
+            background: linear-gradient(135deg, #4a8ab0, #64a4c8, #7ebed8);
+        }
+        .cat-card[data-cat="scholars"] {
+            background: linear-gradient(135deg, #5a4a8a, #7a68a8, #9480c0);
+        }
+
+        /* Back to grid button */
+        .back-to-grid {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            margin-bottom: 16px;
+            border-radius: 50px;
+            background: rgba(46, 196, 122, 0.08);
+            border: 1px solid rgba(46, 196, 122, 0.15);
+            color: var(--emerald-light);
+            font-family: var(--font-title);
+            font-size: 0.75rem;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .back-to-grid:hover {
+            background: rgba(46, 196, 122, 0.15);
+            border-color: rgba(46, 196, 122, 0.3);
+        }
+        .back-to-grid.visible { display: inline-flex; }
+
+        /* Dua list section (when grid is showing, this hides) */
+        .dua-list-section { transition: opacity 0.25s ease; }
+        .dua-list-section.hidden-list { display: none; }
+
+        /* Category detail header */
+        .category-detail-header {
+            display: none;
+            text-align: center;
+            padding: 16px 0 12px;
+        }
+        .category-detail-header.visible { display: block; }
+        .category-detail-header .cdh-icon { font-size: 2.2rem; margin-bottom: 4px; }
+        .category-detail-header .cdh-title {
+            font-family: var(--font-title);
+            font-size: 1rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+        .category-detail-header .cdh-subtitle {
+            font-size: 0.78rem;
+            color: var(--text-subtle);
+            margin-top: 2px;
+        }
+
+        /* Light mode adjustments for category grid */
+        [data-theme="light"] .cat-card {
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08);
+        }
+        [data-theme="light"] .cat-card:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.1);
+        }
+        [data-theme="light"] .back-to-grid {
+            background: rgba(13, 123, 80, 0.06);
+            border-color: rgba(13, 123, 80, 0.15);
+            color: #0d7b50;
+        }
+
                 /* ============================================ */
         /* ===== DUA CARDS ===== */
         /* ============================================ */
@@ -2531,8 +2740,103 @@
         <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
     </div>
 
+    <!-- ===== CATEGORY GRID ===== -->
+    <div class="category-grid" id="categoryGrid">
+        <div class="cat-card featured" data-cat="all" onclick="openCategory('all')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">📿</div>
+            <div class="cat-card-name">All Duas</div>
+            <div class="cat-card-count">55 Duas</div>
+        </div>
+        <div class="cat-card featured" data-cat="quran" onclick="openCategory('quran')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">📖</div>
+            <div class="cat-card-name">The Quranic Foundation</div>
+            <div class="cat-card-count">10 Duas</div>
+        </div>
+        <div class="cat-card" data-cat="morning-evening" onclick="openCategory('morning-evening')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">🌅</div>
+            <div class="cat-card-name">Morning & Evening</div>
+            <div class="cat-card-count">5 Duas</div>
+        </div>
+        <div class="cat-card" data-cat="protection" onclick="openCategory('protection')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">🛡️</div>
+            <div class="cat-card-name">Protection & Refuge</div>
+            <div class="cat-card-count">7 Duas</div>
+        </div>
+        <div class="cat-card" data-cat="forgiveness" onclick="openCategory('forgiveness')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">🤲</div>
+            <div class="cat-card-name">Forgiveness</div>
+            <div class="cat-card-count">6 Duas</div>
+        </div>
+        <div class="cat-card" data-cat="guidance" onclick="openCategory('guidance')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">🌟</div>
+            <div class="cat-card-name">Guidance & Faith</div>
+            <div class="cat-card-count">5 Duas</div>
+        </div>
+        <div class="cat-card" data-cat="wellbeing" onclick="openCategory('wellbeing')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">💚</div>
+            <div class="cat-card-name">Wellbeing & Relief</div>
+            <div class="cat-card-count">6 Duas</div>
+        </div>
+        <div class="cat-card" data-cat="prophets" onclick="openCategory('prophets')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">🕌</div>
+            <div class="cat-card-name">Prophets' Duas</div>
+            <div class="cat-card-count">5 Duas</div>
+        </div>
+        <div class="cat-card" data-cat="prayer" onclick="openCategory('prayer')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">🕋</div>
+            <div class="cat-card-name">Prayer</div>
+            <div class="cat-card-count">4 Duas</div>
+        </div>
+        <div class="cat-card" data-cat="provision" onclick="openCategory('provision')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">🌾</div>
+            <div class="cat-card-name">Provision</div>
+            <div class="cat-card-count">4 Duas</div>
+        </div>
+        <div class="cat-card" data-cat="family" onclick="openCategory('family')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">👨‍👩‍👧</div>
+            <div class="cat-card-name">Family</div>
+            <div class="cat-card-count">3 Duas</div>
+        </div>
+        <div class="cat-card" data-cat="travel" onclick="openCategory('travel')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">✈️</div>
+            <div class="cat-card-name">Travel & Knowledge</div>
+            <div class="cat-card-count">3 Duas</div>
+        </div>
+        <div class="cat-card featured" data-cat="scholars" onclick="openCategory('scholars')">
+            <div class="cat-card-wave"></div>
+            <div class="cat-card-icon">📚</div>
+            <div class="cat-card-name">Treasures of the Scholars</div>
+            <div class="cat-card-count">3 Duas</div>
+        </div>
+    </div>
+
+    <!-- ===== DUA LIST SECTION (hidden by default, shown on category tap) ===== -->
+    <div class="dua-list-section hidden-list" id="duaListSection">
+
+    <!-- Back to categories button -->
+    <button class="back-to-grid visible" id="backToGrid" onclick="backToCategories()">← Back to Categories</button>
+
+    <!-- Category detail header -->
+    <div class="category-detail-header" id="categoryDetailHeader">
+        <div class="cdh-icon" id="cdhIcon"></div>
+        <div class="cdh-title" id="cdhTitle"></div>
+        <div class="cdh-subtitle" id="cdhSubtitle"></div>
+    </div>
+
     <!-- ===== TOOLBAR ===== -->
-        <div class="toolbar-row">
+    <div class="toolbar-row" id="toolbarRow">
         <div style="display:flex;gap:6px;flex-wrap:wrap">
             <button class="toolbar-btn" onclick="toggleAllCards(true)">▾ Expand All</button>
             <button class="toolbar-btn" onclick="toggleAllCards(false)">▴ Collapse All</button>
@@ -4784,6 +5088,8 @@
         </div>
     </div> <!-- end dua card 55 -->
 
+</div> <!-- ===== END .dua-list-section ===== -->
+
 </div> <!-- ===== END .container ===== -->
 
 <!-- ===== PASHTO LANGUAGE SUPPORT ===== -->
@@ -5142,6 +5448,103 @@ window.filterCategory = function(cat, btn) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
+    // ===== CATEGORY GRID NAVIGATION =====
+    const CATEGORY_META = {
+        'all':             { icon: '📿', title: 'All Duas',                subtitle: 'The complete collection of 55 essential supplications' },
+        'quran':           { icon: '📖', title: 'The Quranic Foundation',  subtitle: 'The speech of Allah — the highest authority' },
+        'protection':      { icon: '🛡️', title: 'Protection & Refuge',     subtitle: 'Shield yourself with the words of Allah and His Messenger ﷺ' },
+        'forgiveness':     { icon: '🤲', title: 'Forgiveness',             subtitle: 'Turn back to Allah with these powerful supplications' },
+        'guidance':        { icon: '🌟', title: 'Guidance & Faith',        subtitle: 'Ask Allah for direction and steadfastness' },
+        'wellbeing':       { icon: '💚', title: 'Wellbeing & Relief',      subtitle: 'Healing, ease, and comfort from the Sunnah' },
+        'prophets':        { icon: '🕌', title: "Prophets' Duas",          subtitle: 'Supplications of the Prophets عليهم السلام' },
+        'morning-evening': { icon: '🌅', title: 'Morning & Evening',       subtitle: 'Daily adhkar for protection and blessings' },
+        'provision':       { icon: '🌾', title: 'Provision',               subtitle: 'Ask Allah for sustenance and barakah' },
+        'prayer':          { icon: '🕋', title: 'Prayer',                  subtitle: 'The greatest names and supplications in salah' },
+        'family':          { icon: '👨‍👩‍👧', title: 'Family',                  subtitle: 'Duas for parents, spouse, and children' },
+        'travel':          { icon: '✈️', title: 'Travel & Knowledge',      subtitle: 'Supplications for journeys and seeking knowledge' },
+        'scholars':        { icon: '📚', title: 'Treasures of the Scholars', subtitle: 'Gems with honest transparent authentication' }
+    };
+
+    window.openCategory = function(cat) {
+        const grid = document.getElementById('categoryGrid');
+        const duaList = document.getElementById('duaListSection');
+        const detailHeader = document.getElementById('categoryDetailHeader');
+        const meta = CATEGORY_META[cat] || { icon: '📿', title: cat, subtitle: '' };
+
+        // Hide the grid, show dua list
+        grid.classList.add('hidden-grid');
+        duaList.classList.remove('hidden-list');
+
+        // Set detail header
+        document.getElementById('cdhIcon').textContent = meta.icon;
+        document.getElementById('cdhTitle').textContent = meta.title;
+        document.getElementById('cdhSubtitle').textContent = meta.subtitle;
+        detailHeader.classList.add('visible');
+
+        // Filter cards to this category
+        const pill = document.querySelector(`.pill[data-category="${cat}"]`);
+        filterCategory(cat, pill);
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Save state
+        localStorage.setItem('crown_active_category', cat);
+    };
+
+    window.backToCategories = function() {
+        const grid = document.getElementById('categoryGrid');
+        const duaList = document.getElementById('duaListSection');
+        const detailHeader = document.getElementById('categoryDetailHeader');
+
+        // Show grid, hide dua list
+        grid.classList.remove('hidden-grid');
+        duaList.classList.add('hidden-list');
+        detailHeader.classList.remove('visible');
+
+        // Reset all card visibility
+        els.cards.forEach(card => {
+            card.classList.remove('hidden-card');
+            card.style.display = '';
+        });
+
+        // Reset pills
+        if (els.pills) els.pills.forEach(p => p.classList.remove('active'));
+        const allPill = document.querySelector('.pill[data-category="all"]');
+        if (allPill) allPill.classList.add('active');
+
+        // Clear search
+        if (els.searchInput) els.searchInput.value = '';
+        if (els.searchClear) els.searchClear.classList.remove('visible');
+
+        // Drop saved state
+        localStorage.removeItem('crown_active_category');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Search should auto-open the dua list if grid is visible
+    (function patchSearchForGrid() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('focus', function() {
+                const grid = document.getElementById('categoryGrid');
+                if (grid && !grid.classList.contains('hidden-grid')) {
+                    openCategory('all');
+                }
+            });
+        }
+    })();
+
+    // Restore last category on page load if saved
+    (function restoreGridState() {
+        const savedCat = localStorage.getItem('crown_active_category');
+        if (savedCat) {
+            // User was viewing a category — restore it
+            openCategory(savedCat);
+        }
+    })();
+
     // ===== BOOKMARKS PANEL =====
     window.toggleBookmarksPanel = function() {
         let panel = document.getElementById('bookmarksPanel');
@@ -5204,6 +5607,11 @@ window.filterCategory = function(cat, btn) {
 
     // ===== SCROLL TO DUA =====
        window.scrollToDua = function(id) {
+        // If we're in grid view, switch to All category first
+        const grid = document.getElementById('categoryGrid');
+        if (grid && !grid.classList.contains('hidden-grid')) {
+            openCategory('all');
+        }
         const card = document.querySelector(`.dua-card[data-id="${id}"]`);
         if (card) {
             card.classList.remove('hidden-card');
@@ -5690,28 +6098,7 @@ window.filterCategory = function(cat, btn) {
         // Now open the requested panel
         switch (action) {
                       case 'home':
-                els.pills.forEach(p => p.classList.remove('active'));
-                const allPill = document.querySelector('.pill[data-category="all"]');
-                if (allPill) allPill.classList.add('active');
-                els.cards.forEach(card => {
-                    card.classList.remove('hidden-card');
-                    card.style.display = '';
-                });
-                // Expand all collapsed sections
-                document.querySelectorAll('.section-header.collapsed').forEach(sh => {
-                    sh.classList.remove('collapsed');
-                    const hint = sh.querySelector('.section-collapse-hint');
-                    if (hint) hint.textContent = 'tap to collapse';
-                    let next = sh.nextElementSibling;
-                    while (next && !next.classList.contains('section-header')) {
-                        if (next.classList.contains('dua-card')) next.style.display = '';
-                        next = next.nextElementSibling;
-                    }
-                });
-                if (els.noResults) els.noResults.classList.remove('visible');
-                if (els.searchInput) els.searchInput.value = '';
-                if (els.searchClear) els.searchClear.classList.remove('visible');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                backToCategories();
                 break;
             case 'routine':
                 setTimeout(() => openRoutine(), 50);
