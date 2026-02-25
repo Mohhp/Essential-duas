@@ -64,7 +64,7 @@ const PS_UI = {
         prayer: { title: 'لمونځ، عبادت او اسم اعظم', subtitle: 'د عبادت غوره دعاګانې' },
         travel: { title: 'سفر، جومات او ځانګړي مناسبتونه', subtitle: 'د ځانګړو حالاتو لپاره' },
         scholars: { title: 'د علماوو خزانې', subtitle: 'د لوی علماوو غوره شوې دعاګانې' },
-        ramadan: { title: 'رمضان او روژه', subtitle: 'د مبارک میاشتې او روژې دعاګانې' },
+        ramadan: { title: 'روژه', subtitle: 'د مبارک میاشتې او روژې دعاګانې' },
         'evil-eye': { title: 'سترګه او حسد', subtitle: 'د حسد او بد سترګې پروړاندې د پیغمبر صلی الله علیه وسلم دعاګانې' }
     },
     // Section hints
@@ -115,7 +115,7 @@ const PS_UI = {
         'family': 'کورنۍ',
         'travel': 'سفر او پوهه',
         'scholars': 'د علماوو خزانې',
-        'ramadan': 'رمضان او روژه',
+        'ramadan': 'روژه',
         'evil-eye': 'سترګه او حسد'
     },
     catCardSubtitles: {
