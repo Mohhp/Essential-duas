@@ -2,6 +2,10 @@
 *.png
 !icon-192.png
 !icon-512.png
+!dark-english-hero.png
+!dark-english-cards.png
+!light-english-hero.png
+!light-english-card.png
 .playwright-mcp/
 .vscode/
 chrome

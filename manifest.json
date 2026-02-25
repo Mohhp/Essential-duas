@@ -1,13 +1,27 @@
 {
+  "id": "/Essential-duas/",
   "name": "Essential Duas by فلاح — The Crown Collection",
   "short_name": "فلاح Duas",
-  "description": "55 essential Islamic duas from Quran & Sunnah — by Engineer Mohammad Falah (فلاح). Tasbeeh counter, bookmarks, memorization, audio recitation, and daily routines.",
+  "description": "63 essential Islamic duas from Quran & Sunnah — by Engineer Mohammad Falah (فلاح). Tasbeeh counter, bookmarks, memorization, audio recitation, prayer times, Qibla compass, and daily routines.",
   "start_url": ".",
+  "scope": ".",
+  "lang": "en",
+  "dir": "ltr",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
   "background_color": "#0a1210",
   "theme_color": "#0a1210",
   "orientation": "portrait-primary",
   "categories": ["education", "lifestyle"],
+  "iarc_rating_id": "",
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
   "icons": [
     {
       "src": "icon-192.png",
@@ -34,26 +48,64 @@
       "purpose": "maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "dark-english-hero.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home screen with daily dua and streak tracker"
+    },
+    {
+      "src": "dark-english-cards.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dua cards with Arabic text and translations"
+    },
+    {
+      "src": "light-english-hero.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Light theme home screen"
+    },
+    {
+      "src": "light-english-card.png",
+      "sizes": "375x812",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Dua card in light mode with authentication badges"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Tasbeeh Counter",
       "short_name": "Tasbeeh",
-      "url": "./#tasbeeh"
+      "url": "./#tasbeeh",
+      "description": "Digital tasbeeh counter with preset dhikr",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Daily Routine",
       "short_name": "Routine",
-      "url": "./#routine"
+      "url": "./#routine",
+      "description": "Morning and evening adhkar routines",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Dua of the Day",
       "short_name": "Daily Dua",
-      "url": "./#daily"
+      "url": "./#daily",
+      "description": "Today's featured dua",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Prayer Times",
       "short_name": "Prayer",
-      "url": "./#prayer"
+      "url": "./#prayer",
+      "description": "Prayer times and Qibla compass",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
