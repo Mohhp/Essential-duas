@@ -691,8 +691,8 @@ function applyLanguage(lang) {
     if (h1) { if (!h1.getAttribute('data-en')) h1.setAttribute('data-en', h1.textContent); h1.textContent = PS_UI.heroTitle; }
     const sub = document.querySelector('.subtitle');
     if (sub) { if (!sub.getAttribute('data-en')) sub.setAttribute('data-en', sub.textContent); sub.textContent = PS_UI.heroSubtitle; }
-    const sadaqa = document.querySelector('.hero [style*="font-style:italic"]');
-    if (sadaqa) { if (!sadaqa.getAttribute('data-en')) sadaqa.setAttribute('data-en', sadaqa.textContent); sadaqa.textContent = PS_UI.sadaqaJariya; }
+    const sadaqa = document.querySelector('.sadaqa-banner');
+    if (sadaqa) { if (!sadaqa.getAttribute('data-en')) sadaqa.setAttribute('data-en', sadaqa.innerHTML); sadaqa.innerHTML = '<span style="font-style:normal;font-size:0.9rem;">🤲</span> <span>' + PS_UI.sadaqaJariya + '</span>'; }
     const intro = document.querySelector('.intro-text');
     if (intro) { if (!intro.getAttribute('data-en')) intro.setAttribute('data-en', intro.textContent); intro.textContent = PS_UI.introText; }
 
