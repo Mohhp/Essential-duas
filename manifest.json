@@ -22,7 +22,40 @@
   "edge_side_panel": {
     "preferred_width": 400
   },
+  "share_target": {
+    "action": ".",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "icons": [
+    {
+      "src": "icon-48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "icon-192.png",
       "sizes": "192x192",
@@ -34,6 +67,18 @@
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "icon-512.png",
@@ -76,6 +121,13 @@
       "type": "image/png",
       "form_factor": "narrow",
       "label": "Dua card in light mode with authentication badges"
+    },
+    {
+      "src": "screenshot-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop view of Essential Duas"
     }
   ],
   "shortcuts": [
@@ -84,28 +136,28 @@
       "short_name": "Tasbeeh",
       "url": "./#tasbeeh",
       "description": "Digital tasbeeh counter with preset dhikr",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
     },
     {
       "name": "Daily Routine",
       "short_name": "Routine",
       "url": "./#routine",
       "description": "Morning and evening adhkar routines",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
     },
     {
       "name": "Dua of the Day",
       "short_name": "Daily Dua",
       "url": "./#daily",
       "description": "Today's featured dua",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
     },
     {
       "name": "Prayer Times",
       "short_name": "Prayer",
       "url": "./#prayer",
       "description": "Prayer times and Qibla compass",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
     }
   ]
 }
