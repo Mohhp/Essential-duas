@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1024">
+    <title>Feature Graphic — Essential Duas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Naskh+Arabic:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 1024px;
+            height: 500px;
+            overflow: hidden;
+            font-family: 'Cinzel', serif;
+        }
+        .graphic {
+            width: 1024px;
+            height: 500px;
+            background: linear-gradient(145deg, #0a1a10 0%, #0c2218 30%, #0a1a10 60%, #101810 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        /* Background pattern */
+        .graphic::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(46, 196, 122, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 60%, rgba(201, 168, 76, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(46, 196, 122, 0.03) 0%, transparent 70%);
+        }
+        /* Decorative geometric lines */
+        .graphic::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            height: 600px;
+            transform: translate(-50%, -50%) rotate(45deg);
+            border: 1px solid rgba(201, 168, 76, 0.06);
+            border-radius: 50%;
+        }
+        .content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px;
+        }
+        /* Crescent + star icon */
+        .icon-group {
+            margin-bottom: 20px;
+        }
+        .crescent {
+            font-size: 52px;
+            color: #c9a84c;
+            text-shadow: 0 0 40px rgba(201, 168, 76, 0.3);
+            display: inline-block;
+        }
+        .app-name-ar {
+            font-family: 'Noto Naskh Arabic', serif;
+            font-size: 38px;
+            font-weight: 700;
+            color: #c9a84c;
+            text-shadow: 0 2px 20px rgba(201, 168, 76, 0.25);
+            margin-bottom: 6px;
+            direction: rtl;
+        }
+        .app-name-en {
+            font-family: 'Cinzel', serif;
+            font-size: 42px;
+            font-weight: 700;
+            color: rgba(235, 245, 220, 0.95);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 8px;
+        }
+        .tagline {
+            font-family: 'Cinzel', serif;
+            font-size: 15px;
+            font-weight: 400;
+            color: rgba(200, 225, 210, 0.65);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+        .features {
+            display: flex;
+            gap: 28px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .feature-pill {
+            background: rgba(46, 196, 122, 0.08);
+            border: 1px solid rgba(46, 196, 122, 0.15);
+            color: rgba(200, 225, 210, 0.8);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            font-family: 'Cinzel', serif;
+        }
+        /* Corner decorations */
+        .corner {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-color: rgba(201, 168, 76, 0.15);
+            border-style: solid;
+        }
+        .corner.tl { top: 24px; left: 24px; border-width: 2px 0 0 2px; }
+        .corner.tr { top: 24px; right: 24px; border-width: 2px 2px 0 0; }
+        .corner.bl { bottom: 24px; left: 24px; border-width: 0 0 2px 2px; }
+        .corner.br { bottom: 24px; right: 24px; border-width: 0 2px 2px 0; }
+
+        /* Small decorative dots */
+        .dot-row {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(201, 168, 76, 0.3);
+        }
+        .dot.active { background: #c9a84c; }
+
+        /* Instructions (hidden in screenshot) */
+        .instructions {
+            position: fixed;
+            top: 510px;
+            left: 0;
+            padding: 20px;
+            color: #888;
+            font-family: system-ui;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="graphic">
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+
+        <div class="content">
+            <div class="icon-group">
+                <span class="crescent">☪</span>
+            </div>
+            <div class="app-name-ar">الأدعية الأساسية</div>
+            <div class="app-name-en">Essential Duas</div>
+            <div class="tagline">The Crown Collection — by فلاح</div>
+            <div class="features">
+                <span class="feature-pill">63 Duas</span>
+                <span class="feature-pill">Prayer Times</span>
+                <span class="feature-pill">Tasbeeh</span>
+                <span class="feature-pill">Qibla</span>
+                <span class="feature-pill">Memorize</span>
+            </div>
+        </div>
+
+        <div class="dot-row">
+            <div class="dot"></div>
+            <div class="dot active"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <strong>How to export as 1024×500 PNG:</strong><br>
+        1. Open this file in Chrome at 100% zoom<br>
+        2. Press F12 → toggle device toolbar (Ctrl+Shift+M)<br>
+        3. Set dimensions to 1024 × 500<br>
+        4. Right-click → "Capture screenshot" or use DevTools: ⋮ → "Capture screenshot"<br>
+        <br>
+        Or use a command-line tool:<br>
+        <code>npx puppeteer screenshot --width 1024 --height 500 feature-graphic.html feature-graphic.png</code>
+    </div>
+</body>
+</html>

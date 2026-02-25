@@ -1,10 +1,11 @@
-const CACHE_NAME = 'essential-duas-v20';
+const CACHE_NAME = 'essential-duas-v21';
 const OFFLINE_PAGE = './offline.html';
 
 const ASSETS = [
   './',
   './index.html',
   './offline.html',
+  './privacy.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
