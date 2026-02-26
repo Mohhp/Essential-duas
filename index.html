@@ -7026,10 +7026,26 @@ window.filterCategory = function(cat, btn) {
             extra.style.display = 'none';
             if (prompt) prompt.textContent = 'Tap to expand translation & references ↓';
         } else {
-            // only copy translation and references, not full card layout
-            const trans = card.querySelector('.translation')?.outerHTML || '';
-            const refs = card.querySelector('.reference')?.outerHTML || '';
-            extra.innerHTML = `${trans}${refs}`;
+            // Extract plain text to avoid copying structural HTML that may render differently
+            const transText = card.querySelector('.translation')?.textContent?.trim() || '';
+            const refText = card.querySelector('.reference .ref-text')?.textContent?.trim() || card.querySelector('.reference')?.textContent?.trim() || '';
+            // Debug log to console for verification
+            try { console.log('daily dua', duaIndex, { translation: transText, references: refText }); } catch(e) {}
+
+            // Build safe DOM nodes into the extra container
+            extra.innerHTML = '';
+            const tdiv = document.createElement('div');
+            tdiv.className = 'routine-extra-translation';
+            tdiv.style.cssText = 'font-family:var(--font-text);font-size:0.95rem;color:var(--text-muted);line-height:1.6;margin-bottom:8px;';
+            tdiv.textContent = transText;
+
+            const rdiv = document.createElement('div');
+            rdiv.className = 'routine-extra-reference';
+            rdiv.style.cssText = 'font-size:0.85rem;color:var(--text-subtle);';
+            rdiv.textContent = refText;
+
+            extra.appendChild(tdiv);
+            extra.appendChild(rdiv);
             extra.style.display = 'block';
             if (prompt) prompt.textContent = 'Tap to hide details ↑';
         }
