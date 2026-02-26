@@ -274,13 +274,13 @@ const PS_UI = {
         24: 'د اندېښنې او پرېشانۍ دعا',
         25: 'د اتو بلاګانو څخه پناه',
         26: 'د سختې پرېشانۍ وخت کې',
-        27: 'لا سهل — هیڅ شی اسانه نه دی مګر هغه چې ته اسانه کړې',
-        28: 'د جبرائیل د روغتیا دعا',
+        27: 'لا سهل - هيخ شی اسانه نه دی مگر هغه چې ته یی اسانه کړې',
+        28: 'د جبرائیل علیه السلام د روغتيا دعاء',
         29: 'د موسی علیه السلام دعا — زما سینه پراخه کړه',
         30: 'د ابراهیم علیه السلام دعا — لمونځ قایم کړه',
         31: 'د سلیمان علیه السلام دعا — شکرګزاري',
         32: 'د ایوب علیه السلام دعا — د مصیبت وخت',
-        33: 'د زکریا علیه السلام دعا — نېکه اولاد',
+        33: 'د زكريا عليه السلام دعا - نیک اولاد',
         34: 'د سهار او ماښام ذکر',
         35: 'حسبي الله — پر الله توکل',
         36: 'تهلیل — ورځ کې ۱۰۰ ځله',
@@ -685,6 +685,33 @@ function convertDigitsInTree(root) {
     });
 }
 
+// Convert Pashto digits back to western digits in visible text nodes.
+function pashtoToWestern(input) {
+    const map = { '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4', '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9' };
+    return String(input).replace(/[۰۱۲۳۴۵۶۷۸۹]/g, d => map[d] || d);
+}
+
+function convertPashtoDigitsInTree(root) {
+    if (!root) return;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            if (!node.nodeValue || !node.nodeValue.match(/[۰۱۲۳۴۵۶۷۸۹]/)) return NodeFilter.FILTER_REJECT;
+            const p = node.parentElement;
+            if (!p) return NodeFilter.FILTER_REJECT;
+            const tag = (p.tagName || '').toUpperCase();
+            const blocked = ['SCRIPT','STYLE','NOSCRIPT','TEXTAREA','INPUT','CODE','PRE','SVG'];
+            if (blocked.includes(tag)) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+        }
+    }, false);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(n => {
+        try { n.nodeValue = n.nodeValue.replace(/[۰۱۲۳۴۵۶۷۸۹]+/g, match => pashtoToWestern(match)); }
+        catch (e) {}
+    });
+}
+
 
 function getCurrentLang() {
     return localStorage.getItem('crown_lang') || 'en';
@@ -828,7 +855,9 @@ function applyLanguage(lang) {
                 const psText = PS_UI.badges[origText] || origText;
                 badgeHTML = ' <span class="' + badge.className + '">' + psText + '</span>';
             }
-            titleEl.innerHTML = PS_UI.duaTitles[id] + badgeHTML;
+            // replace plain 'دعا' with Arabic variant 'دعاء' in titles
+            const titleText = PS_UI.duaTitles[id].replace(/دعا/g, 'دعاء');
+            titleEl.innerHTML = titleText + badgeHTML;
         }
 
         // Category tag
@@ -847,7 +876,9 @@ function applyLanguage(lang) {
                 const tDiv = document.createElement('div');
                 tDiv.className = 'translation-ps';
                 tDiv.setAttribute('dir', 'rtl');
-                tDiv.textContent = PS_DUAS[id].t;
+                // normalize 'دعا' -> 'دعاء' in Pashto translation text
+                const pashtoText = (PS_DUAS[id].t || '').replace(/دعا/g, 'دعاء');
+                tDiv.textContent = pashtoText;
                 const enTrans = inner.querySelector('.translation');
                 if (enTrans && enTrans.nextSibling) {
                     inner.insertBefore(tDiv, enTrans.nextSibling);
@@ -1016,6 +1047,8 @@ function restoreEnglish() {
         if (cdhTitle) cdhTitle.textContent = meta.title;
         if (cdhSubtitle) cdhSubtitle.textContent = meta.subtitle;
     }
+    // Convert any Pashto digits back to western digits so numbers update without refresh
+    try { convertPashtoDigitsInTree(document.body); } catch (e) { /* noop */ }
 }
 
 // Patch showToast for Pashto — deferred until showToast exists
