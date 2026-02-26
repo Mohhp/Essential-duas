@@ -1564,6 +1564,9 @@
             border-radius: var(--radius-sm); transition: all 0.3s;
         }
         .prayer-location-bar .loc-refresh:hover { background: rgba(46, 196, 122, 0.1); }
+        .prayer-location-bar .loc-edit { background: none; border: none; color: var(--emerald-light);
+            cursor: pointer; font-size: 1.1rem; padding: 4px 8px; border-radius: var(--radius-sm); transition: all 0.3s; margin-left:4px; }
+        .prayer-location-bar .loc-edit:hover { background: rgba(46, 196, 122, 0.1); }
         .prayer-countdown-card {
             text-align: center; padding: 16px;
             background: rgba(46, 196, 122, 0.10);
@@ -6213,12 +6216,13 @@ window.filterCategory = function(cat, btn) {
         if (!rp.querySelector('.routine-content').innerHTML.trim()) {
             rp.querySelector('.routine-content').innerHTML = `
                 <h2>Recommended Daily Routine</h2>
-                <div class="progress-stat-card daily-dua-progress" style="flex-direction:column;text-align:center;cursor:pointer;border-color:rgba(201,168,76,0.15);" onclick="closeRoutine(); setTimeout(function(){ scrollToDailyDua(); }, 300);">
+                <div class="progress-stat-card daily-dua-progress" style="flex-direction:column;text-align:center;cursor:pointer;border-color:rgba(201,168,76,0.15);" onclick="toggleRoutineDailyDua();">
                     <div style="font-family:var(--font-title);font-size:0.7rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,168,76,0.8);margin-bottom:0.5rem;"><span class="sparkle">✦</span> Dua of the Day <span class="sparkle">✦</span></div>
                     <div id="routineDailyArabic" style="font-family:var(--font-arabic);font-size:calc(1.3rem * var(--font-scale));color:var(--gold-light);direction:rtl;line-height:2.2;margin:0.4rem 0;"></div>
                     <div id="routineDailyTranslation" style="font-family:var(--font-text);font-size:0.88rem;color:var(--text-muted);font-style:italic;line-height:1.6;"></div>
-                    <div style="margin-top:10px;font-size:0.7rem;color:var(--text-subtle);letter-spacing:1px;text-transform:uppercase;">Tap to view full dua →</div>
+                    <div id="routineDailyPrompt" style="margin-top:10px;font-size:0.7rem;color:var(--text-subtle);letter-spacing:1px;text-transform:uppercase;">Tap to view full dua ↓</div>
                 </div>
+                <div id="routineDailyExtra" style="display:none;margin-top:10px;padding:12px;background:rgba(46,196,122,0.08);border:1px solid rgba(46,196,122,0.18);border-radius:var(--radius-md);"></div>
                 <div class="routine-item">
                     <div class="routine-time">🌅 MORNING (After Fajr)</div>
                     <div class="routine-desc">
@@ -6268,6 +6272,17 @@ window.filterCategory = function(cat, btn) {
                     </div>
                 </div>`;
         }
+        // clear any previously shown extra details
+        const extra = rp.querySelector('#routineDailyExtra');
+        const prompt = rp.querySelector('#routineDailyPrompt');
+        if (extra) {
+            extra.innerHTML = '';
+            extra.style.display = 'none';
+        }
+        if (prompt) {
+            prompt.textContent = 'Tap to view full dua ↓';
+        }
+
         rp.classList.add('active');
         lockScroll();
         setBottomNavActive('routine');
@@ -6992,6 +7007,30 @@ window.filterCategory = function(cat, btn) {
         const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
         const duaIndex = (dayOfYear % 55) + 1;
         scrollToDua(duaIndex);
+    };
+
+    // show/hide detailed dua inside routine panel
+    window.toggleRoutineDailyDua = function() {
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+        const duaIndex = (dayOfYear % 55) + 1;
+        const card = document.querySelector(`.dua-card[data-id="${duaIndex}"]`);
+        const extra = document.getElementById('routineDailyExtra');
+        const prompt = document.getElementById('routineDailyPrompt');
+        if (!extra || !card) return;
+        if (extra.innerHTML.trim()) {
+            extra.innerHTML = '';
+            extra.style.display = 'none';
+            if (prompt) prompt.textContent = 'Tap to view full dua ↓';
+        } else {
+            // clone the relevant parts of the card
+            const title = card.querySelector('.dua-title')?.outerHTML || '';
+            const arabic = card.querySelector('.arabic-text')?.outerHTML || '';
+            const trans = card.querySelector('.translation')?.outerHTML || '';
+            const refs = card.querySelector('.references')?.outerHTML || '';
+            extra.innerHTML = `${title}${arabic}${trans}${refs}`;
+            extra.style.display = 'block';
+            if (prompt) prompt.textContent = 'Tap to hide dua ↑';
+        }
     };
 
     window.shareDailyDua = function() {
@@ -8020,9 +8059,44 @@ window.filterCategory = function(cat, btn) {
         );
     };
 
+    // Allow manual location entry via text or lat,lng
+    window.promptLocation = async function() {
+        const input = prompt('Enter city name or latitude,longitude');
+        if (!input) return;
+        let lat, lng, city = '';
+        const coordMatch = input.trim().match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+        if (coordMatch) {
+            lat = parseFloat(coordMatch[1]);
+            lng = parseFloat(coordMatch[2]);
+        } else {
+            try {
+                const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&limit=1`);
+                const data = await resp.json();
+                if (data && data[0]) {
+                    lat = parseFloat(data[0].lat);
+                    lng = parseFloat(data[0].lon);
+                    city = data[0].display_name || '';
+                } else {
+                    alert('Location not found');
+                    return;
+                }
+            } catch (e) {
+                alert('Unable to look up location');
+                return;
+            }
+        }
+        if (typeof lat === 'number' && typeof lng === 'number') {
+            localStorage.setItem('crown_location', JSON.stringify({ lat, lng, city }));
+            onLocationReady(lat, lng, city);
+        }
+    };
+
     function onLocationReady(lat, lng, city) {
         const locText = document.getElementById('prayerLocText');
-        if (locText) locText.textContent = city || `${lat.toFixed(2)}°, ${lng.toFixed(2)}°`;
+        if (locText) {
+            locText.textContent = city || `${lat.toFixed(2)}°, ${lng.toFixed(2)}°`;
+            locText.title = 'Click to change location';
+        }
 
         calculateAndRenderPrayers(lat, lng);
         calculateQibla(lat, lng);
@@ -8410,8 +8484,9 @@ window.filterCategory = function(cat, btn) {
         <h2>Prayer Times</h2>
         <div class="prayer-location-bar" id="prayerLocationBar">
             <span class="loc-icon">📍</span>
-            <span class="loc-text" id="prayerLocText">Tap to detect location</span>
+            <span class="loc-text" id="prayerLocText" onclick="promptLocation()" style="cursor:pointer;">Tap to detect or change location</span>
             <button class="loc-refresh" onclick="requestLocation()" title="Refresh location">↻</button>
+            <button class="loc-edit" onclick="promptLocation()" title="Change location">✎</button>
         </div>
         <div class="prayer-countdown-card" id="prayerCountdown">
             <div class="prayer-countdown-label">Next Prayer</div>
