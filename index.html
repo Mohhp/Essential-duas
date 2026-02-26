@@ -7005,7 +7005,7 @@ window.filterCategory = function(cat, btn) {
     // ===== SCROLL TO DAILY DUA =====
     window.scrollToDailyDua = function() {
         const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-        const duaIndex = (dayOfYear % 55) + 1;
+        const duaIndex = (dayOfYear % 63) + 1;
         scrollToDua(duaIndex);
     };
 
@@ -7016,7 +7016,7 @@ window.filterCategory = function(cat, btn) {
             event.preventDefault();
         }
         const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-        const duaIndex = (dayOfYear % 55) + 1;
+        const duaIndex = (dayOfYear % 63) + 1;
         const card = document.querySelector(`.dua-card[data-id="${duaIndex}"]`);
         const extra = document.getElementById('routineDailyExtra');
         const prompt = document.getElementById('routineDailyPrompt');
@@ -7037,7 +7037,7 @@ window.filterCategory = function(cat, btn) {
 
     window.shareDailyDua = function() {
         const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
-        const duaIndex = (dayOfYear % 55) + 1;
+        const duaIndex = (dayOfYear % 63) + 1;
         shareAsImage(duaIndex);
     };
 
