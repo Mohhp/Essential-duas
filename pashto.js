@@ -275,7 +275,7 @@ const PS_UI = {
         25: 'د اتو بلاګانو څخه پناه',
         26: 'د سختې پرېشانۍ وخت کې',
         27: 'لا سهل - هيخ شی اسانه نه دی مگر هغه چې ته یی اسانه کړې',
-        28: 'د جبرائیل علیه السلام د روغتيا دعاء',
+            28: 'د جبرائیل علیه السلام د روغتيا دعاء',
         29: 'د موسی علیه السلام دعا — زما سینه پراخه کړه',
         30: 'د ابراهیم علیه السلام دعا — لمونځ قایم کړه',
         31: 'د سلیمان علیه السلام دعا — شکرګزاري',
@@ -685,6 +685,12 @@ function convertDigitsInTree(root) {
     });
 }
 
+// Normalize duplicate hamzas (ء) to a single hamza in Pashto/Arabic text
+function normalizeHamza(s) {
+    if (!s || typeof s !== 'string') return s;
+    return s.replace(/ء+/g, 'ء');
+}
+
 // Convert Pashto digits back to western digits in visible text nodes.
 function pashtoToWestern(input) {
     const map = { '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4', '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9' };
@@ -855,8 +861,9 @@ function applyLanguage(lang) {
                 const psText = PS_UI.badges[origText] || origText;
                 badgeHTML = ' <span class="' + badge.className + '">' + psText + '</span>';
             }
-            // replace plain 'دعا' with Arabic variant 'دعاء' in titles
-            const titleText = PS_UI.duaTitles[id].replace(/دعا/g, 'دعاء');
+            // replace plain 'دعا' with Arabic variant 'دعاء' and normalize hamzas in titles
+            let titleText = PS_UI.duaTitles[id].replace(/دعا/g, 'دعاء');
+            titleText = normalizeHamza(titleText);
             titleEl.innerHTML = titleText + badgeHTML;
         }
 
@@ -876,8 +883,9 @@ function applyLanguage(lang) {
                 const tDiv = document.createElement('div');
                 tDiv.className = 'translation-ps';
                 tDiv.setAttribute('dir', 'rtl');
-                // normalize 'دعا' -> 'دعاء' in Pashto translation text
-                const pashtoText = (PS_DUAS[id].t || '').replace(/دعا/g, 'دعاء');
+                // normalize 'دعا' -> 'دعاء' in Pashto translation text and normalize hamzas
+                let pashtoText = (PS_DUAS[id].t || '').replace(/دعا/g, 'دعاء');
+                pashtoText = normalizeHamza(pashtoText);
                 tDiv.textContent = pashtoText;
                 const enTrans = inner.querySelector('.translation');
                 if (enTrans && enTrans.nextSibling) {
