@@ -250,7 +250,7 @@ const PS_UI = {
     duaTitles: {
         1: 'سورة الفاتحه - د قرآن مور',
         2: 'آیت الکرسي - ترټولو لویه آیت',
-        3: 'د یونس علیه السلام دعا — هېڅکله رد نه شوې',
+        3: 'د يونس عليه السلام دعا - هېڅکله نه ده رد شوې',
         4: 'د مور پلار لپاره رحمت',
         5: 'د البقرې وروستۍ دوه آیتونه',
         6: 'درې قُل — د شپې سپر',
@@ -258,7 +258,7 @@ const PS_UI = {
         8: 'زمونږ زړونه مه انحراف کوه',
         9: 'د آدم او حوا علیهما السلام دعا',
         10: 'ما ته پوهه زیاته کړه',
-        11: 'د الله تعالی د کاملو کلمو پناه',
+        11: 'د الله تعالى په کاملو کلمو باندې پناه',
         12: 'د الله په نوم — هیڅ شی نقصان نشي رسولی',
         13: 'څلور پناه غوښتنې — د لمونځ فرض',
         14: 'د الله په ربوبیت رضایت',
@@ -299,8 +299,8 @@ const PS_UI = {
         49: 'د ویده کېدو دمخه — بشپړه پیغمبري دعا',
         50: 'د سفر دعا',
         51: 'جومات ته ننوتل',
-        52: 'د ګناهونو د زیاتوالي لپاره',
-        53: 'د خضر علیه السلام دعا',
+        52: 'د ګناهګارنو لپاره دعاء',
+        53: 'د الخدر عليه السلام دعاء',
         54: 'د طائف دعا — د توکل ترټولو لویه بیلګه',
         55: 'د ماسټر کیلي دعا — هره دعا چې پیغمبر ﷺ کړې',
         56: 'د نوي سپوږمۍ لیدلو دعا',
@@ -423,7 +423,7 @@ const PS_DUAS = {
         v: 'یواځینی شی چې الله تعالی خپل پیغمبر صلی الله علیه وسلم ته یې د زیاتوالي حکم ورکړ — پوهه. د زده کوونکو، مسلکیانو او د حق لټونکو لپاره غوره دعا.'
     },
     11: {
-        t: 'زه د الله تعالی د کاملو کلمو پناه غواړم، د هغه ټولو مخلوقاتو د شر څخه چې الله تعالی پیدا کړي.',
+        t: 'زه د الله تعالی په کاملو کلمو باندې پناه غواړم، د هغه ټولو مخلوقاتو د شر څخه چې الله تعالی پیدا کړي',
         v: 'هر څوک چې په کوم ځای کې دا ووایي — تر هغې چې هلته وي هیڅ شی به ورته زیان ونه رسوي.'
     },
     12: {
@@ -599,27 +599,27 @@ Object.assign(PS_DUAS, {
         v: ''
     },
     52: {
-        t: 'ای زمونږ ربه، زمونږ ګناهونه وبخښه او زمونږ په کارونو کې زیاتي، زمونږ قدمونه ثابت کړه، او مونږ ته د کافرانو پر وړاندې مدد راکړه.',
+        t: 'ای زمونږ ربه، زمونږ ګناهونه او زمونږ څخه زمونږ په کارونو کې زیاتي وبخښه، زمونږ قدمونه ثابت کړه، او مونږ ته د کافرانو پر وړاندې کامیابی راکړه.',
         v: ''
     },
     53: {
-        t: 'ای الله، پر ما رحم وکړه چې تر ابده زه د ګناهونو پرېښودو توان ولرم، پر ما رحم وکړه چې هغه شی ته مې فکر نه ځي چې ما سره اړخ نه لري، او ما ته هغه ښه پوهاوی ورکړه چې ته ورسره راضي شې.',
+        t: 'ای الله، پر ما رحم وکړه او دا توان راکړه چې تر ابده د ګناهونو څخه ځان وساتم، پر ما رحم وکړه چې هغه څه سره کار ونه لرم چې ما سره تړاو نلری، او ما ته هغه ښه پوهاوی راکړه چې ته ورسره راضي یی.',
         v: 'خضر علیه السلام ته منسوب دعا. لویو اولیاوو هېڅکله نه ده پرېښې. مضمون یې د قرآني اصولو سره بشپړ مطابقت لري.'
     },
     54: {
-        t: 'ای الله، تا ته زما د کمزورۍ، بې وسۍ او د خلکو مخې ته سپکوالي شکایت کوم. ای ترټولو مهربانه، ته د کمزورانو رب یې او ته زما رب یې. چا ته مې پرېږدې؟ لیرې چا ته چې پر ما سختي وکړي؟ یا دښمن ته چې تا ورته زما کار سپارلی؟ که ته پر ما غوسه نه یې، نو زه پروا نه کوم — خو ستا عافیت زما لپاره پراخه ده. زه د ستا د مخ د نور پناه غواړم، چې تیارې ورته رڼا شوې او د دنیا او آخرت کارونه ورته سم شوي، چې ستا غضب پر ما نازل شي یا ستا غصه پر ما راشي. ستا حق دی چې ملامتي وکړې تر هغې چې راضي شې، او هیڅ قوت او طاقت نشته مګر ستا سره.',
+        t: 'ای الله، تا ته زه زما د کمزورۍ، بې وسۍ او د خلکو مخکې د سپکوالي شکایت کوم. ای ترټولو مهربانه، ته د کمزورانو رب یې او ته زما رب یې. چا ته مې پرېږدې؟ لیرې (پردي) چا ته چې پر ما سختي (بد سلوک) وکړي؟ یا دښمن ته چې تا ورته زما کار سپارلی (اختیار ورکړی)؟ که ته پر ما غوسه نه یې، نو زه یی پروا نه کوم — خو ستا عافیت زما لپاره  پراخ دې. زه ستا د مخ په ښایست (رڼا) باندې پناه غواړم، چې تیارې ورته رڼا شوې او د دنیا او آخرت کارونه ورته سم شوي، چې ستا غضب پر ما نازل شي یا ستا غصه پر ما راشي. ستا حق دی چې ملامتي یا جزا ورکړې تر هغې چې راضي شې، او هیڅ قوت او طاقت نشته مګر ستا سره.',
         v: 'یوازې یو ځل — ویني بهېدونکی او طائف کې رد شوی. ابن تیمیه، ابن القیم رحمهما الله او ډېرو علماوو د تر اوسه ثبت شوي د توکل ترټولو لویې بېلګې په توګه منلی.'
     },
     55: {
-        t: 'ای الله، زه له تا غواړم هغه غوره شی چې ستا بنده او پیغمبر محمد صلی الله علیه وسلم تا ته ورته وغوښتل، او زه له تا د هغه بدترینه پناه غواړم چې ستا بنده او پیغمبر محمد صلی الله علیه وسلم ترې پناه وغوښته.',
+        t: 'ای الله، زه له تا غواړم هغه څه چې ستا بنده او پیغمبر محمد صلی الله علیه وسلم له تا وغوښتل، او زه له تا د هغه بدو پناه غواړم چې ستا بنده او پیغمبر محمد صلی الله علیه وسلم ترې پناه وغوښته.',
         v: 'د دې یوې دعا سره، ته الله تعالی ته د هرې ښه شي غوښتنه کوې چې پیغمبر صلی الله علیه وسلم یې په ټول عمر غوښتې — او د هرې بدۍ پناه غواړې چې هغه صلی الله علیه وسلم پناه ورته غوښته. د ټولو دعاګانو دعا په یوه جمله کې.'
     },
     56: {
-        t: 'ای الله، دا سپوږمۍ زمونږ پر سر د برکت، ایمان، سلامتیا او اسلام سره راوچېچوه. زما رب او ستا رب الله دی.',
+        t: 'ای الله، دا سپوږمۍ زمونږ پر سر د برکت، ایمان، سلامتیا او اسلام سره راپورته کړه. زما رب او ستا رب الله دی.',
         v: 'پیغمبر صلی الله علیه وسلم به هره نوې سپوږمۍ لیدلو ته دا ولوستله. خصوصاً د رمضان په پیل کې — د الله تعالی مبارکه میاشت د ایمان او شکرګزارۍ سره ښه راغلاست ووایاست.'
     },
     57: {
-        t: 'تندره ولاړه، رګونه لوند شول، او اجر ثابت شو — ان شاء الله.',
+        t: 'تنده ولاړه، رګونه لانده شول، او اجر ثابت شو — ان شاء الله.',
         v: 'پیغمبر صلی الله علیه وسلم به دا د روژې ماتولو (افطار) په وخت ویله. دا دعا اعتراف کوي چې د روژې فزیکي ازموینه پای ته ورسیده او باور ساتي چې الله تعالی اجر قبول کړی.'
     },
     58: {
@@ -631,7 +631,7 @@ Object.assign(PS_DUAS, {
         v: 'پیغمبر صلی الله علیه وسلم وفرمایل: «درې دعاګانې رد نه کېږي: د روژه نیونکي دعا، د عادل حاکم دعا، او د مظلوم دعا.» خپلې زیاتې غوښتنې د افطار دمخه وکړئ — دا د قبولیت وخت دی.'
     },
     60: {
-        t: 'زه تاسو دواړو ته د الله د کاملو کلمو پناه ورکوم، د هر شیطان، زهري ځناور، او هرې حسدي سترګې څخه.',
+        t: 'زه تاسو دواړو ته د الله په کاملو کلمو باندی پناه غواړم، د هر شیطان، هر زهري ځناور، او هرې حسدي سترګې څخه.',
         v: 'پیغمبر صلی الله علیه وسلم به حسن او حسین رضي الله عنهما لپاره دا پناه وغوښته او وفرمایل: «ستاسو پلار ابراهیم علیه السلام به هم اسماعیل او اسحق علیهما السلام لپاره دا پناه غوښته.» دا د ابراهیمي روحاني ساتنې دود دی.'
     },
     61: {
@@ -643,7 +643,7 @@ Object.assign(PS_DUAS, {
         v: 'الله تعالی خاصه د حسد کوونکي له شره د پناه غوښتنه حکم کړه. پیغمبر صلی الله علیه وسلم د فلق او ناس په باره کې وفرمایل: «هیچا پناه نه ده غوښتې د دې دوو په شان.» هره سهار او ماښام ۳ ځله یې ولولئ.'
     },
     63: {
-        t: 'هغه په و چې الله تعالی وغوښتل — نو هیڅ ځواک نشته مګر د الله تعالی سره.',
+        t: 'هغه څه چې الله تعالی وغوښتل — نو هیڅ بل ځواک نشته بې د الله تعالی څخه.',
         v: 'الله تعالی دا جمله د دوو باغ لرونکو په مثال کې زده کړه. کله چې یو ښکلی شی ووینئ — ماشوم، کور، صحت — «ما شاء الله» ووایاست. دا نعمت الله تعالی ته منسوبوي او سترګه مخه نیسي.'
     }
 });
@@ -651,6 +651,40 @@ Object.assign(PS_DUAS, {
 // ============================================
 // LANGUAGE TOGGLE & APPLY FUNCTIONS
 // ============================================
+
+// Convert western digits to Pashto digits when in Pashto mode
+function toPashtoDigits(input) {
+    const map = { '0': '۰', '1': '۱', '2': '۲', '3': '۳', '4': '۴', '5': '۵', '6': '۶', '7': '۷', '8': '۸', '9': '۹' };
+    return String(input).replace(/\d/g, d => map[d] || d);
+}
+
+// Convert all visible text-node digits under a root element to Pashto digits.
+function convertDigitsInTree(root) {
+    if (!root) return;
+    const mapFunc = d => toPashtoDigits(d);
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            if (!node.nodeValue || !node.nodeValue.match(/\d/)) return NodeFilter.FILTER_REJECT;
+            const p = node.parentElement;
+            if (!p) return NodeFilter.FILTER_REJECT;
+            const tag = (p.tagName || '').toUpperCase();
+            const blocked = ['SCRIPT','STYLE','NOSCRIPT','TEXTAREA','INPUT','CODE','PRE','SVG'];
+            if (blocked.includes(tag)) return NodeFilter.FILTER_REJECT;
+            if (p.hasAttribute && p.hasAttribute('data-en')) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+        }
+    }, false);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(n => {
+        try {
+            n.nodeValue = n.nodeValue.replace(/\d+/g, match => mapFunc(match));
+        } catch (e) {
+            // ignore errors on unusual nodes
+        }
+    });
+}
+
 
 function getCurrentLang() {
     return localStorage.getItem('crown_lang') || 'en';
@@ -708,7 +742,8 @@ function applyLanguage(lang) {
         }
         if (countEl) {
             if (!countEl.getAttribute('data-en')) countEl.setAttribute('data-en', countEl.textContent);
-            const num = countEl.textContent.replace(/[^0-9]/g, '');
+            let num = countEl.textContent.replace(/[^0-9]/g, '');
+            if (num && typeof toPashtoDigits === 'function') num = toPashtoDigits(num);
             countEl.textContent = num + ' ' + PS_UI.duasSuffix;
         }
     });
@@ -873,14 +908,20 @@ function applyLanguage(lang) {
     if (totalLabel) {
         if (!totalLabel.getAttribute('data-en')) totalLabel.setAttribute('data-en', totalLabel.innerHTML);
         const span = totalLabel.querySelector('span');
-        totalLabel.innerHTML = PS_UI.total + ': <span>' + (span ? span.textContent : '0') + '</span>';
+        let totalNum = span ? span.textContent : '0';
+        if (typeof toPashtoDigits === 'function') totalNum = toPashtoDigits(totalNum);
+        totalLabel.innerHTML = PS_UI.total + ': <span>' + totalNum + '</span>';
     }
     const targetLabel = document.getElementById('tasbeehTargetLabel');
     if (targetLabel) {
         if (!targetLabel.getAttribute('data-en')) targetLabel.setAttribute('data-en', targetLabel.textContent);
         const t = targetLabel.textContent;
         if (t.includes('OPEN COUNT')) targetLabel.textContent = PS_UI.openCount;
-        else targetLabel.textContent = PS_UI.target + ': ' + t.replace(/[^0-9]/g, '');
+        else {
+            let num = t.replace(/[^0-9]/g, '');
+            if (typeof toPashtoDigits === 'function') num = toPashtoDigits(num);
+            targetLabel.textContent = PS_UI.target + ': ' + num;
+        }
     }
 
     // Footer
@@ -937,13 +978,20 @@ function applyLanguage(lang) {
     document.querySelectorAll('.sr-rating-btn.sr-hard').forEach(el => el.textContent = PS_UI.srHard);
     // Memorize button with due count
     const memBtn = document.getElementById('memorizeToggle');
-    if (memBtn) {
+        if (memBtn) {
         if (!memBtn.getAttribute('data-en')) memBtn.setAttribute('data-en', memBtn.textContent);
         const t = memBtn.textContent;
         const match = t.match(/\((\d+) due\)/);
-        if (match) memBtn.textContent = PS_UI.memorize + ' (' + match[1] + ' ' + PS_UI.srDue + ')';
+        if (match) {
+            let n = match[1];
+            if (typeof toPashtoDigits === 'function') n = toPashtoDigits(n);
+            memBtn.textContent = PS_UI.memorize + ' (' + n + ' ' + PS_UI.srDue + ')';
+        }
         else memBtn.textContent = PS_UI.memorize;
     }
+
+    // Convert remaining visible digits in the DOM to Pashto digits
+    try { convertDigitsInTree(document.body); } catch (e) { /* noop */ }
 }
 
 function restoreEnglish() {
