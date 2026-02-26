@@ -7028,7 +7028,7 @@ window.filterCategory = function(cat, btn) {
         } else {
             // only copy translation and references, not full card layout
             const trans = card.querySelector('.translation')?.outerHTML || '';
-            const refs = card.querySelector('.references')?.outerHTML || '';
+            const refs = card.querySelector('.reference')?.outerHTML || '';
             extra.innerHTML = `${trans}${refs}`;
             extra.style.display = 'block';
             if (prompt) prompt.textContent = 'Tap to hide details ↑';
