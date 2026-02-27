@@ -3,9 +3,19 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
+      "package_name": "io.github.mohhp.essentialduas",
+      "sha256_cert_fingerprints": [
+        "F4:77:C9:76:59:74:88:61:08:E6:54:73:F6:17:73:9D:E9:BE:17:E6:BE:B7:6F:23:01:CC:8F:57:3A:B0:A5:D7"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
       "package_name": "com.falah.essentialduas",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_YOUR_SHA256_FINGERPRINT"
+        "F4:77:C9:76:59:74:88:61:08:E6:54:73:F6:17:73:9D:E9:BE:17:E6:BE:B7:6F:23:01:CC:8F:57:3A:B0:A5:D7"
       ]
     }
   }

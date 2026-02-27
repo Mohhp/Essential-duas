@@ -1,0 +1,78 @@
+name: Build Android AAB
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_code:
+        description: "Android versionCode (must be higher than Play current)"
+        required: true
+        default: "5"
+      version_name:
+        description: "Android versionName"
+        required: true
+        default: "1.0.5"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/googlechromelabs/bubblewrap:latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        run: |
+          test -n "${{ secrets.KEYSTORE_BASE64 }}"
+          test -n "${{ secrets.KEYSTORE_PASSWORD }}"
+          test -n "${{ secrets.KEY_PASSWORD }}"
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > signing.keystore
+          ls -lh signing.keystore
+
+      - name: Prepare manifest version + alias
+        run: |
+          python3 - << 'PY'
+          import json
+          from pathlib import Path
+
+          path = Path("twa-manifest.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          data["appVersionCode"] = int("${{ github.event.inputs.version_code }}")
+          data["appVersion"] = "${{ github.event.inputs.version_name }}"
+
+          alias = "${{ secrets.KEY_ALIAS }}".strip()
+          if alias:
+              data.setdefault("signingKey", {})["alias"] = alias
+
+          data.setdefault("signingKey", {})["path"] = "./signing.keystore"
+          path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+          PY
+
+      - name: Generate Android project
+        run: bubblewrap update --manifest=./twa-manifest.json
+
+      - name: Build signed bundle
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: bubblewrap build --manifest=./twa-manifest.json --skipPwaValidation
+
+      - name: Show generated artifacts
+        run: find . -type f \( -name "*.aab" -o -name "*.apk" \) | sort
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: essential-duas-aab-v${{ github.event.inputs.version_code }}
+          path: |
+            **/*.aab
+
+      - name: Upload APK (optional)
+        uses: actions/upload-artifact@v4
+        with:
+          name: essential-duas-apk-v${{ github.event.inputs.version_code }}
+          path: |
+            **/*.apk
