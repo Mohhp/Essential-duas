@@ -1,10 +1,10 @@
 {
-  "id": "/Essential-duas/",
+  "id": "./",
   "name": "Essential Duas by فلاح — The Crown Collection",
-  "short_name": "فلاح Duas",
+  "short_name": "Essential Duas",
   "description": "63 essential Islamic duas from Quran & Sunnah — by Engineer Mohammad Falah (فلاح). Tasbeeh counter, bookmarks, memorization, audio recitation, prayer times, Qibla compass, and daily routines.",
-  "start_url": "/Essential-duas/",
-  "scope": "/Essential-duas/",
+  "start_url": "./",
+  "scope": "./",
   "lang": "en",
   "dir": "ltr",
   "display": "standalone",
@@ -23,8 +23,9 @@
     "preferred_width": 400
   },
   "share_target": {
-    "action": ".",
+    "action": "./",
     "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
     "params": {
       "title": "title",
       "text": "text",
