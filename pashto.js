@@ -726,6 +726,7 @@ function getCurrentLang() {
 
 function toggleLanguage() {
     const lang = getCurrentLang() === 'en' ? 'ps' : 'en';
+    console.log('[pashto] toggleLanguage ->', lang);
     localStorage.setItem('crown_lang', lang);
     applyLanguage(lang);
     // Re-run updateStats so stat labels reflect the new language
@@ -734,6 +735,7 @@ function toggleLanguage() {
 
 function applyLanguage(lang) {
     if (!lang) lang = getCurrentLang();
+    console.log('[pashto] applyLanguage starting, lang=', lang);
     const isPS = lang === 'ps';
 
     // Body class
@@ -749,8 +751,10 @@ function applyLanguage(lang) {
     if (!isPS) {
         // Restore English — remove injected Pashto elements, restore original text
         restoreEnglish();
+        console.log('[pashto] restored English mode');
         return;
     }
+    console.log('[pashto] activating Pashto mode');
 
     // === PASHTO MODE ===
 
