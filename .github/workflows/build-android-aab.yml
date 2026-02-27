@@ -43,9 +43,23 @@ jobs:
           sdkmanager --update
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Configure Bubblewrap paths
+      - name: Preconfigure Bubblewrap (non-interactive)
         run: |
-          bubblewrap updateConfig --jdkPath="$JAVA_HOME" --androidSdkPath="$ANDROID_SDK_ROOT"
+          mkdir -p "$HOME/.bubblewrap"
+          python3 - << 'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          config = {
+            "jdkPath": os.environ["JAVA_HOME"],
+            "androidSdkPath": os.environ["ANDROID_SDK_ROOT"],
+          }
+          Path(os.environ["HOME"], ".bubblewrap", "config.json").write_text(
+            json.dumps(config), encoding="utf-8"
+          )
+          PY
+          cat "$HOME/.bubblewrap/config.json"
 
       - name: Validate required secrets
         run: |
