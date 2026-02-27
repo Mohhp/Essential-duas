@@ -7029,9 +7029,6 @@ window.filterCategory = function(cat, btn) {
             // Extract plain text to avoid copying structural HTML that may render differently
             const transText = card.querySelector('.translation')?.textContent?.trim() || '';
             const refText = card.querySelector('.reference .ref-text')?.textContent?.trim() || card.querySelector('.reference')?.textContent?.trim() || '';
-            // Debug log to console for verification
-            try { console.log('daily dua', duaIndex, { translation: transText, references: refText }); } catch(e) {}
-
             // Build safe DOM nodes into the extra container
             extra.innerHTML = '';
             const tdiv = document.createElement('div');
