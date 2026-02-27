@@ -92,7 +92,7 @@ jobs:
           PY
 
       - name: Generate Android project
-        run: bubblewrap update --manifest=./twa-manifest.json
+        run: bubblewrap update --manifest=./twa-manifest.json --skipVersionUpgrade
 
       - name: Build signed bundle
         env:
