@@ -27,7 +27,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
 
@@ -69,7 +69,7 @@
             --text-faint: rgba(170, 210, 190, 0.70);
             --font-arabic: 'Noto Naskh Arabic', 'Amiri', serif;
             --font-amiri: 'Amiri', serif;
-            --font-title: 'Cinzel', serif;
+            --font-title: 'Playfair Display', serif;
             --font-text: 'Playfair Display', serif;
             --radius-sm: 8px;
             --radius-md: 14px;
@@ -437,6 +437,7 @@
             border-bottom: 1px solid rgba(46, 196, 122, 0.08);
             z-index: 1000;
             display: flex; align-items: center; justify-content: space-between;
+            gap: 10px;
             padding-left: 16px; padding-right: 16px;
             transition: transform 0.4s var(--transition-smooth), background 0.3s ease, box-shadow 0.3s ease;
         }
@@ -466,7 +467,7 @@
             border-color: rgba(46, 196, 122, 0.3); color: var(--emerald-light);
             transform: scale(1.08);
         }
-        .nav-actions { display: flex; gap: 4px; align-items: center; }
+        .nav-actions { display: flex; gap: 8px; align-items: center; margin-left: auto; position: relative; }
 
         /* ===== FONT SIZE CONTROLS ===== */
         .font-controls {
@@ -526,19 +527,22 @@
         }
         .bottom-nav-item {
             display: flex; flex-direction: column; align-items: center; gap: 4px;
-            padding: 8px 10px; border-radius: var(--radius-md); cursor: pointer;
-            transition: all 0.3s var(--transition-smooth); border: none; background: none;
+            padding: 8px 12px; border-radius: 999px; cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+            border: 1px solid transparent;
+            background: none;
             color: var(--text-subtle); font-size: 0.63rem;
             font-family: var(--font-title); letter-spacing: 0.5px;
             position: relative;
         }
         .bottom-nav-item.active {
             color: var(--emerald-light);
-            background: rgba(46, 196, 122, 0.08);
+            background: rgba(46, 196, 122, 0.12);
+            border-color: rgba(46, 196, 122, 0.28);
         }
         .bottom-nav-item.active::before {
             content: ''; position: absolute; top: -1px; left: 50%;
-            transform: translateX(-50%); width: 20px; height: 2px;
+            transform: translateX(-50%); width: calc(100% - 18px); height: 2px;
             background: var(--emerald-light); border-radius: 2px;
         }
         .bottom-nav-item .icon { font-size: 1.2rem; line-height: 1; transition: transform 0.25s var(--transition-spring); }
@@ -989,25 +993,21 @@
             display: none;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
+            padding: 8px 14px;
             border-radius: 50px;
             background: rgba(10, 28, 20, 0.85);
             border: 1px solid rgba(46, 196, 122, 0.25);
             color: var(--emerald-light);
             font-family: var(--font-title);
-            font-size: 0.75rem;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
+            font-size: 0.78rem;
+            letter-spacing: 0.4px;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: fixed;
-            top: 64px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 500;
+            position: relative;
+            margin: 0 0 14px;
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.22);
         }
         .back-to-grid:hover {
             background: rgba(10, 28, 20, 0.95);
@@ -1029,9 +1029,9 @@
         .category-detail-header .cdh-icon { font-size: 2.2rem; margin-bottom: 4px; }
         .category-detail-header .cdh-title {
             font-family: var(--font-title);
-            font-size: 1rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
+            font-size: 1.02rem;
+            letter-spacing: 0.35px;
+            font-weight: 700;
             color: var(--text-primary);
         }
         .category-detail-header .cdh-subtitle {
@@ -1238,7 +1238,7 @@
 
         .arabic-text {
             font-family: var(--font-arabic);
-            font-size: calc(1.5rem * var(--font-scale));
+            font-size: calc(1.6rem * var(--font-scale));
             line-height: 2.8; text-align: right; direction: rtl;
             color: var(--gold-lightest); font-weight: 500; word-spacing: 5px;
         }
@@ -1324,17 +1324,17 @@
             font-family: var(--font-amiri);
             font-size: calc(0.9rem * var(--font-scale));
             color: var(--text-subtle); font-style: italic;
-            line-height: 2.3; padding: 10px 0;
+            line-height: 2.15; padding: 8px 0;
             border-bottom: 1px solid rgba(46, 196, 122, 0.05);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         /* Translation */
         .translation {
             font-family: var(--font-text);
-            font-size: calc(0.93rem * var(--font-scale));
+            font-size: calc(1.02rem * var(--font-scale));
             color: var(--text-primary);
-            line-height: 2.1; padding: 8px 0;
+            line-height: 2; padding: 8px 0;
         }
 
         /* Source/Reference */
@@ -1345,8 +1345,8 @@
         }
         .ref-icon { font-size: 0.75rem; color: var(--text-subtle); }
         .ref-text {
-            font-family: var(--font-title); font-size: calc(0.62rem * var(--font-scale));
-            letter-spacing: 1px; text-transform: uppercase;
+            font-family: var(--font-title); font-size: calc(0.56rem * var(--font-scale));
+            letter-spacing: 0.4px;
             color: var(--text-subtle);
         }
 
@@ -1420,9 +1420,9 @@
             font-size: 1.1rem; color: var(--emerald-light); opacity: 0.5;
         }
         .section-title {
-            font-family: var(--font-title); font-size: 0.75rem;
-            letter-spacing: 3.5px; text-transform: uppercase;
-            color: var(--emerald-light); font-weight: 600;
+            font-family: var(--font-title); font-size: 0.92rem;
+            letter-spacing: 0.5px;
+            color: var(--emerald-light); font-weight: 700;
         }
         .section-subtitle {
             font-family: var(--font-text); font-size: 0.78rem;
@@ -2461,7 +2461,7 @@
         }
         /* ===== NAV OVERFLOW MENU (MOBILE) ===== */
         .nav-overflow-toggle {
-            display: none;
+            display: flex;
             background: rgba(46, 196, 122, 0.04);
             border: 1px solid rgba(46, 196, 122, 0.12);
             color: var(--text-muted); width: 34px; height: 34px;
@@ -2477,24 +2477,302 @@
             background: rgba(12, 26, 19, 0.95);
             backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid rgba(46, 196, 122, 0.12);
-            border-radius: var(--radius-md); padding: 6px;
-            min-width: 150px; z-index: 1001;
+            border-radius: var(--radius-md); padding: 8px;
+            min-width: 210px;
+            width: min(210px, calc(100vw - 12px));
+            max-width: calc(100vw - 12px);
+            z-index: 1001;
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
             flex-direction: column; gap: 2px;
         }
         .nav-overflow-menu.open { display: flex; }
+        .overflow-control-row {
+            padding: 6px;
+        }
+        .overflow-control-row .lang-toggle,
+        .overflow-control-row .font-controls {
+            width: 100%;
+            margin-right: 0;
+            justify-content: center;
+        }
         .nav-overflow-menu .nav-btn {
             width: 100%; border-radius: 8px; justify-content: flex-start;
-            gap: 10px; padding: 10px 14px; font-size: 0.78rem;
-            font-family: var(--font-title); letter-spacing: 1px;
+            height: auto;
+            min-height: 44px;
+            gap: 10px; padding: 10px 12px; font-size: 0.78rem;
+            font-family: var(--font-title); letter-spacing: 0.5px;
         }
         .nav-overflow-menu .nav-btn .overflow-label {
-            font-size: 0.68rem; letter-spacing: 1.2px; text-transform: uppercase;
+            font-size: 0.72rem; letter-spacing: 0.5px;
         }
         [data-theme="light"] .nav-overflow-menu {
             background: rgba(247, 245, 239, 0.96);
             border-color: rgba(13, 123, 80, 0.12);
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        /* ===== UX ENHANCEMENTS (300ms TRANSITIONS + NEW UI) ===== */
+        body,
+        .top-nav,
+        .bottom-nav,
+        .dua-card,
+        .cat-card,
+        .search-input,
+        .pill,
+        .toolbar-btn,
+        .progress-panel,
+        .etiquette-panel,
+        .routine-panel,
+        .prayer-panel,
+        .tasbeeh-panel {
+            transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease, box-shadow 300ms ease;
+        }
+
+        .etiquette-panel,
+        .routine-panel,
+        .prayer-panel,
+        .progress-panel,
+        .tasbeeh-panel {
+            transform: translateY(16px);
+            transition: opacity 300ms ease, visibility 300ms ease, transform 300ms ease;
+        }
+        .etiquette-panel.active,
+        .routine-panel.active,
+        .prayer-panel.active,
+        .progress-panel.active,
+        .tasbeeh-panel.active {
+            transform: translateY(0);
+        }
+
+        .card-body {
+            transition: max-height 300ms ease;
+        }
+
+        .overlay {
+            transition: opacity 300ms ease, visibility 300ms ease;
+        }
+        .side-panel {
+            transition: transform 300ms ease;
+        }
+
+        .tab-fade-target {
+            transition: opacity 300ms ease;
+        }
+        .tab-fade-target.is-fading {
+            opacity: 0.38;
+        }
+
+        .progress-category-bar {
+            margin-bottom: 8px;
+        }
+        .progress-cat-label {
+            font-size: 0.58rem;
+            letter-spacing: 0.3px;
+            text-transform: none;
+        }
+        .progress-cat-bar {
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(46, 196, 122, 0.08);
+        }
+        .progress-cat-fill {
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--emerald-light), var(--gold-mid));
+        }
+        .progress-cat-count {
+            width: 42px;
+            text-align: right;
+            font-size: 0.58rem;
+        }
+
+        .achievement-badge {
+            position: relative;
+        }
+        .achievement-badge.earned {
+            background: rgba(46, 196, 122, 0.12);
+            border-color: rgba(46, 196, 122, 0.28);
+            box-shadow: 0 0 18px rgba(46, 196, 122, 0.18);
+        }
+        .achievement-badge.locked {
+            opacity: 0.62;
+            filter: grayscale(1);
+        }
+        .achievement-lock {
+            position: absolute;
+            top: 6px;
+            right: 7px;
+            font-size: 0.72rem;
+            opacity: 0.85;
+        }
+        .achievement-name {
+            letter-spacing: 0.5px;
+            text-transform: none;
+        }
+
+        .skeleton {
+            position: relative;
+            overflow: hidden;
+            background: rgba(46, 196, 122, 0.08);
+            border-radius: 8px;
+        }
+        .skeleton::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+            animation: skeletonShimmer 1.2s ease-in-out infinite;
+        }
+        @keyframes skeletonShimmer {
+            100% { transform: translateX(100%); }
+        }
+        .prayer-skeleton-row {
+            height: 48px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(46, 196, 122, 0.08);
+        }
+
+        .daily-reminder-prompt {
+            margin: 16px auto 0;
+            max-width: 460px;
+            background: rgba(46, 196, 122, 0.06);
+            border: 1px solid rgba(46, 196, 122, 0.14);
+            border-radius: var(--radius-lg);
+            padding: 12px 14px;
+            text-align: left;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+        .daily-reminder-prompt.visible { display: block; }
+        .daily-reminder-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--emerald-light);
+            font-size: 0.86rem;
+            font-weight: 600;
+        }
+        .daily-reminder-sub {
+            margin-top: 4px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .daily-reminder-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .daily-reminder-btn {
+            border: 1px solid rgba(46, 196, 122, 0.22);
+            background: rgba(46, 196, 122, 0.08);
+            color: var(--text-primary);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 0.74rem;
+            cursor: pointer;
+            min-height: 36px;
+            transition: all 300ms ease;
+        }
+        .daily-reminder-btn.primary {
+            background: rgba(46, 196, 122, 0.18);
+            color: var(--emerald-light);
+        }
+
+        .onboarding-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 4000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 300ms ease;
+        }
+        .onboarding-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .onboarding-card {
+            width: min(92vw, 420px);
+            background: var(--bg-card);
+            border: 1px solid rgba(46, 196, 122, 0.16);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+            box-shadow: var(--shadow-elevated);
+            touch-action: pan-y;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .onboarding-card.slide-in-next {
+            animation: onboardingSlideNext 300ms ease;
+        }
+        .onboarding-card.slide-in-prev {
+            animation: onboardingSlidePrev 300ms ease;
+        }
+        @keyframes onboardingSlideNext {
+            from { opacity: 0; transform: translateX(20px) scale(0.98); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        @keyframes onboardingSlidePrev {
+            from { opacity: 0; transform: translateX(-20px) scale(0.98); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        .onboarding-step {
+            font-size: 0.68rem;
+            color: var(--text-subtle);
+            margin-bottom: 10px;
+            letter-spacing: 0.4px;
+        }
+        .onboarding-title {
+            color: var(--emerald-light);
+            font-size: 1.02rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .onboarding-body {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.75;
+            min-height: 86px;
+        }
+        .onboarding-dots {
+            display: flex;
+            gap: 6px;
+            margin: 12px 0;
+        }
+        .onboarding-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(46, 196, 122, 0.25);
+        }
+        .onboarding-dot.active {
+            background: var(--emerald-light);
+        }
+        .onboarding-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .onboarding-btn {
+            border-radius: 999px;
+            border: 1px solid rgba(46, 196, 122, 0.22);
+            background: rgba(46, 196, 122, 0.08);
+            color: var(--text-primary);
+            padding: 10px 14px;
+            min-height: 44px;
+            font-size: 0.76rem;
+            cursor: pointer;
+            transition: all 300ms ease;
+        }
+        .onboarding-btn.primary {
+            background: rgba(46, 196, 122, 0.18);
+            color: var(--emerald-light);
         }
         /* ============================================ */
         @media (max-width: 420px) {
@@ -2506,14 +2784,33 @@
             .tasbeeh-count-display { font-size: 3.5rem; }
             .tasbeeh-tap-btn { width: 120px; height: 120px; }
 
-            /* Nav overflow: hide etiquette, progress, share; show hamburger */
-            .nav-overflow-toggle { display: flex; }
-            .nav-actions > .nav-btn { display: none; }
+            /* Nav overflow */
             .nav-actions { position: relative; }
 
             /* Category pills: wrap instead of scroll on small screens */
             .category-pills { flex-wrap: wrap; overflow-x: visible; padding-bottom: 8px; }
             .pill { padding: 8px 14px; font-size: 0.65rem; letter-spacing: 1px; }
+        }
+
+        @media (max-width: 380px) {
+            .nav-overflow-menu {
+                right: 0;
+                width: min(196px, calc(100vw - 10px));
+                max-width: calc(100vw - 10px);
+                padding: 6px;
+                gap: 1px;
+            }
+            .overflow-control-row {
+                padding: 4px;
+            }
+            .nav-overflow-menu .nav-btn {
+                min-height: 44px;
+                padding: 8px 10px;
+                font-size: 0.74rem;
+            }
+            .nav-overflow-menu .nav-btn .overflow-label {
+                font-size: 0.69rem;
+            }
         }
 
         @media (min-width: 768px) {
@@ -2618,7 +2915,7 @@
         .lang-ps .section-collapse-hint,
         .lang-ps .dua-title,
         .lang-ps .dua-category-tag {
-            font-family: var(--font-arabic);
+            font-family: var(--font-amiri);
         }
     </style>
 </head>
@@ -2651,21 +2948,21 @@
         </div>
     </div>
     <div class="nav-actions">
-        <div class="lang-toggle" id="langToggle" onclick="toggleLanguage()" title="Switch language" aria-label="Toggle language">
-            <span id="langEN" class="active-lang">EN</span>
-            <span id="langPS">پښتو</span>
-        </div>
-        <div class="font-controls">
-            <button class="font-btn" onclick="adjustFontSize(-0.1)" title="Smaller text" aria-label="Decrease font size">A-</button>
-            <button class="font-btn" onclick="adjustFontSize(0.1)" title="Larger text" aria-label="Increase font size">A+</button>
-        </div>
         <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" aria-label="Toggle theme" id="themeToggle">☀</button>
-        <button class="nav-btn" onclick="openEtiquette()" title="Dua Etiquette" aria-label="Etiquette of Dua">📖</button>
-        <button class="nav-btn" onclick="openProgress()" title="Your Progress" aria-label="View progress stats">📊</button>
-        <button class="nav-btn" onclick="sharePage()" title="Share" aria-label="Share this collection">↗</button>
-        <!-- Mobile overflow menu -->
         <button class="nav-overflow-toggle" onclick="toggleNavOverflow(event)" title="More options" aria-label="More options" aria-expanded="false" id="navOverflowBtn">⋮</button>
         <div class="nav-overflow-menu" id="navOverflowMenu" role="menu">
+            <div class="overflow-control-row">
+                <div class="lang-toggle" id="langToggle" onclick="toggleLanguage()" title="Switch language" aria-label="Toggle language" role="menuitem">
+                    <span id="langEN" class="active-lang">EN</span>
+                    <span id="langPS">پښتو</span>
+                </div>
+            </div>
+            <div class="overflow-control-row">
+                <div class="font-controls" role="menuitem">
+                    <button class="font-btn" onclick="adjustFontSize(-0.1)" title="Smaller text" aria-label="Decrease font size">A-</button>
+                    <button class="font-btn" onclick="adjustFontSize(0.1)" title="Larger text" aria-label="Increase font size">A+</button>
+                </div>
+            </div>
             <button class="nav-btn" role="menuitem" onclick="openEtiquette(); closeNavOverflow()">📖 <span class="overflow-label">Etiquette</span></button>
             <button class="nav-btn" role="menuitem" onclick="openProgress(); closeNavOverflow()">📊 <span class="overflow-label">Progress</span></button>
             <button class="nav-btn" role="menuitem" onclick="sharePage(); closeNavOverflow()">↗ <span class="overflow-label">Share</span></button>
@@ -2714,6 +3011,15 @@
             ">
                 <span style="font-style:normal;font-size:0.9rem;">🤲</span>
                 <span>Share this with someone — it may be your <span style="color:var(--gold-mid);font-weight:600;">Sadaqa Jariya</span></span>
+            </div>
+
+            <div class="daily-reminder-prompt" id="dailyReminderPrompt">
+                <div class="daily-reminder-title">🔔 Daily Dua Reminder</div>
+                <div class="daily-reminder-sub">Would you like a gentle daily reminder for the dua of the day?</div>
+                <div class="daily-reminder-actions">
+                    <button class="daily-reminder-btn primary" onclick="enableDailyDuaReminders()">Yes, remind me</button>
+                    <button class="daily-reminder-btn" onclick="dismissDailyDuaPrompt()">Not now</button>
+                </div>
             </div>
 
         </div>
@@ -3048,7 +3354,7 @@
                 <div class="arabic-container">
                     <div class="arabic-text">آمَنَ الرَّسُولُ بِمَا أُنْزِلَ إِلَيْهِ مِنْ رَبِّهِ وَالْمُؤْمِنُونَ ۚ كُلٌّ آمَنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ لَا نُفَرِّقُ بَيْنَ أَحَدٍ مِنْ رُسُلِهِ ۚ وَقَالُوا سَمِعْنَا وَأَطَعْنَا ۖ غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ ۞ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا ۚ لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ ۗ رَبَّنَا لَا تُؤَاخِذْنَا إِنْ نَسِينَا أَوْ أَخْطَأْنَا ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِنْ قَبْلِنَا ۚ رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ ۖ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا ۚ أَنْتَ مَوْلَانَا فَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ</div>
                 </div>
-                <div class="transliteration" style="font-size:calc(0.82rem * var(--font-scale))">Āmanar-Rasūlu bi-mā unzila ilayhi min Rabbihī wal-mu'minūn... Rabbanā lā tu'ākhidhnā in nasīnā aw akhṭa'nā. Rabbanā wa lā taḥmil 'alaynā iṣran kamā ḥamaltahū 'alal-ladhīna min qablinā. Rabbanā wa lā tuḥammilnā mā lā ṭāqata lanā bih. Wa'fu 'annā waghfir lanā warḥamnā. Anta Mawlānā fanṣurnā 'alal-qawmil-kāfirīn.</div>
+                <div class="transliteration">Āmanar-Rasūlu bi-mā unzila ilayhi min Rabbihī wal-mu'minūn... Rabbanā lā tu'ākhidhnā in nasīnā aw akhṭa'nā. Rabbanā wa lā taḥmil 'alaynā iṣran kamā ḥamaltahū 'alal-ladhīna min qablinā. Rabbanā wa lā tuḥammilnā mā lā ṭāqata lanā bih. Wa'fu 'annā waghfir lanā warḥamnā. Anta Mawlānā fanṣurnā 'alal-qawmil-kāfirīn.</div>
                 <div class="translation">"The Messenger has believed in what was revealed to him from his Lord, and so have the believers... Our Lord, do not impose blame upon us if we forget or err. Our Lord, lay not upon us a burden like that which You laid upon those before us. Our Lord, burden us not with that which we have no ability to bear. Pardon us, forgive us, and have mercy upon us. You are our Protector, so give us victory over the disbelieving people."</div>
                 <div class="reference">
                     <span class="ref-icon">📖</span>
@@ -3695,7 +4001,7 @@
                 <div class="arabic-container">
                     <div class="arabic-text">اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ وَأَسْأَلُكَ مِنْ فَضْلِكَ الْعَظِيمِ فَإِنَّكَ تَقْدِرُ وَلَا أَقْدِرُ وَتَعْلَمُ وَلَا أَعْلَمُ وَأَنْتَ عَلَّامُ الْغُيُوبِ اللَّهُمَّ إِنْ كُنْتَ تَعْلَمُ أَنَّ هَذَا الْأَمْرَ خَيْرٌ لِي فِي دِينِي وَمَعَاشِي وَعَاقِبَةِ أَمْرِي فَاقْدُرْهُ لِي وَيَسِّرْهُ لِي ثُمَّ بَارِكْ لِي فِيهِ وَإِنْ كُنْتَ تَعْلَمُ أَنَّ هَذَا الْأَمْرَ شَرٌّ لِي فِي دِينِي وَمَعَاشِي وَعَاقِبَةِ أَمْرِي فَاصْرِفْهُ عَنِّي وَاصْرِفْنِي عَنْهُ وَاقْدُرْ لِيَ الْخَيْرَ حَيْثُ كَانَ ثُمَّ أَرْضِنِي بِهِ</div>
                 </div>
-                <div class="transliteration" style="font-size:calc(0.82rem * var(--font-scale))">Allāhumma innī astakhīruka bi 'ilmik, wa astaqdiruka bi qudratik, wa as'aluka min faḍlikal-'aẓīm. Fa innaka taqdiru wa lā aqdir, wa ta'lamu wa lā a'lam, wa anta 'Allāmul-Ghuyūb. Allāhumma in kunta ta'lamu anna hādhal-amra khayrun lī fī dīnī wa ma'āshī wa 'āqibati amrī fāqdurhu lī wa yassirhu lī thumma bārik lī fīh. Wa in kunta ta'lamu anna hādhal-amra sharrun lī fī dīnī wa ma'āshī wa 'āqibati amrī faṣrifhu 'annī waṣrifnī 'anhu wāqdur liyal-khayra ḥaythu kāna thumma arḍinī bih.</div>
+                <div class="transliteration">Allāhumma innī astakhīruka bi 'ilmik, wa astaqdiruka bi qudratik, wa as'aluka min faḍlikal-'aẓīm. Fa innaka taqdiru wa lā aqdir, wa ta'lamu wa lā a'lam, wa anta 'Allāmul-Ghuyūb. Allāhumma in kunta ta'lamu anna hādhal-amra khayrun lī fī dīnī wa ma'āshī wa 'āqibati amrī fāqdurhu lī wa yassirhu lī thumma bārik lī fīh. Wa in kunta ta'lamu anna hādhal-amra sharrun lī fī dīnī wa ma'āshī wa 'āqibati amrī faṣrifhu 'annī waṣrifnī 'anhu wāqdur liyal-khayra ḥaythu kāna thumma arḍinī bih.</div>
                 <div class="translation">"O Allah, I seek Your counsel by Your knowledge, and I seek Your ability by Your power, and I ask You from Your immense bounty. For verily, You are able and I am not, You know and I do not, and You are the Knower of the unseen. O Allah, if You know that this matter is good for me in my religion, my livelihood and my final outcome, then decree it for me and make it easy for me, and bless me in it. And if You know that this matter is bad for me in my religion, my livelihood and my final outcome, then turn it away from me and turn me away from it, and decree for me the good wherever it may be, and make me content with it."</div>
                 <div class="reference">
                     <span class="ref-icon">📖</span>
@@ -3824,7 +4130,7 @@
                 <div class="arabic-container">
                     <div class="arabic-text">اللَّهُمَّ إِنِّي عَبْدُكَ ابْنُ عَبْدِكَ ابْنُ أَمَتِكَ نَاصِيَتِي بِيَدِكَ مَاضٍ فِيَّ حُكْمُكَ عَدْلٌ فِيَّ قَضَاؤُكَ أَسْأَلُكَ بِكُلِّ اسْمٍ هُوَ لَكَ سَمَّيْتَ بِهِ نَفْسَكَ أَوْ أَنْزَلْتَهُ فِي كِتَابِكَ أَوْ عَلَّمْتَهُ أَحَدًا مِنْ خَلْقِكَ أَوِ اسْتَأْثَرْتَ بِهِ فِي عِلْمِ الْغَيْبِ عِنْدَكَ أَنْ تَجْعَلَ الْقُرْآنَ رَبِيعَ قَلْبِي وَنُورَ صَدْرِي وَجَلَاءَ حُزْنِي وَذَهَابَ هَمِّي</div>
                 </div>
-                <div class="transliteration" style="font-size:calc(0.8rem * var(--font-scale))">Allāhumma innī 'abduka ibnu 'abdika ibnu amatik, nāṣiyatī bi-yadik, māḍin fiyya ḥukmuk, 'adlun fiyya qaḍā'uk, as'aluka bi-kulli ismin huwa lak, sammayta bihī nafsak, aw anzaltahū fī kitābik, aw 'allamtahū aḥadan min khalqik, aw ista'tharta bihī fī 'ilmil-ghaybi 'indak, an taj'alal-Qur'āna rabī'a qalbī wa nūra ṣadrī wa jalā'a ḥuznī wa dhahāba hammī.</div>
+                <div class="transliteration">Allāhumma innī 'abduka ibnu 'abdika ibnu amatik, nāṣiyatī bi-yadik, māḍin fiyya ḥukmuk, 'adlun fiyya qaḍā'uk, as'aluka bi-kulli ismin huwa lak, sammayta bihī nafsak, aw anzaltahū fī kitābik, aw 'allamtahū aḥadan min khalqik, aw ista'tharta bihī fī 'ilmil-ghaybi 'indak, an taj'alal-Qur'āna rabī'a qalbī wa nūra ṣadrī wa jalā'a ḥuznī wa dhahāba hammī.</div>
                 <div class="translation">"O Allah, I am Your servant, son of Your servant, son of Your maidservant. My forelock is in Your hand, Your command over me is forever executed, Your decree over me is just. I ask You by every name belonging to You — which You named Yourself with, revealed in Your Book, taught to any of Your creation, or kept in the unseen — to make the Quran the spring of my heart, the light of my chest, the departure of my grief, and the banisher of my anxiety."</div>
                 <div class="reference">
                     <span class="ref-icon">📖</span>
@@ -4734,7 +5040,7 @@
                 <div class="arabic-container">
                     <div class="arabic-text">اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَرَبَّ الْعَرْشِ الْعَظِيمِ رَبَّنَا وَرَبَّ كُلِّ شَيْءٍ فَالِقَ الْحَبِّ وَالنَّوَىٰ وَمُنْزِلَ التَّوْرَاةِ وَالْإِنْجِيلِ وَالْفُرْقَانِ أَعُوذُ بِكَ مِنْ شَرِّ كُلِّ شَيْءٍ أَنْتَ آخِذٌ بِنَاصِيَتِهِ اللَّهُمَّ أَنْتَ الْأَوَّلُ فَلَيْسَ قَبْلَكَ شَيْءٌ وَأَنْتَ الْآخِرُ فَلَيْسَ بَعْدَكَ شَيْءٌ وَأَنْتَ الظَّاهِرُ فَلَيْسَ فَوْقَكَ شَيْءٌ وَأَنْتَ الْبَاطِنُ فَلَيْسَ دُونَكَ شَيْءٌ اقْضِ عَنَّا الدَّيْنَ وَأَغْنِنَا مِنَ الْفَقْرِ</div>
                 </div>
-                <div class="transliteration" style="font-size:calc(0.82rem * var(--font-scale))">Allāhumma Rabbas-samāwātis-sabʿi wa Rabbal-ʿArshil-ʿAẓīm, Rabbanā wa Rabba kulli shay', Fāliqal-ḥabbi wan-nawā, wa Munzilat-Tawrāti wal-Injīli wal-Furqān. Aʿūdhu bika min sharri kulli shay'in anta ākhidhun bi-nāṣiyatih. Allāhumma antal-Awwalu falaysa qablaka shay', wa antal-Ākhiru falaysa baʿdaka shay', wa antaẓ-Ẓāhiru falaysa fawqaka shay', wa antal-Bāṭinu falaysa dūnaka shay'. Iqḍi ʿannad-dayna wa aghninā minal-faqr.</div>
+                <div class="transliteration">Allāhumma Rabbas-samāwātis-sabʿi wa Rabbal-ʿArshil-ʿAẓīm, Rabbanā wa Rabba kulli shay', Fāliqal-ḥabbi wan-nawā, wa Munzilat-Tawrāti wal-Injīli wal-Furqān. Aʿūdhu bika min sharri kulli shay'in anta ākhidhun bi-nāṣiyatih. Allāhumma antal-Awwalu falaysa qablaka shay', wa antal-Ākhiru falaysa baʿdaka shay', wa antaẓ-Ẓāhiru falaysa fawqaka shay', wa antal-Bāṭinu falaysa dūnaka shay'. Iqḍi ʿannad-dayna wa aghninā minal-faqr.</div>
                 <div class="translation">"O Allah, Lord of the seven heavens and the Magnificent Throne, our Lord and Lord of all things, Splitter of the grain and the seed, Revealer of the Torah, the Gospel and the Criterion. I seek refuge in You from the evil of everything whose forelock You hold. You are the First — nothing before You; the Last — nothing after You; the Manifest — nothing above You; the Hidden — nothing beyond You. Settle our debts and free us from poverty."</div>
                 <div class="reference">
                     <span class="ref-icon">📖</span>
@@ -5022,7 +5328,7 @@
                 <div class="arabic-container">
                     <div class="arabic-text">اللَّهُمَّ إِلَيْكَ أَشْكُو ضَعْفَ قُوَّتِي وَقِلَّةَ حِيلَتِي وَهَوَانِي عَلَى النَّاسِ يَا أَرْحَمَ الرَّاحِمِينَ أَنْتَ رَبُّ الْمُسْتَضْعَفِينَ وَأَنْتَ رَبِّي إِلَىٰ مَنْ تَكِلُنِي؟ إِلَىٰ بَعِيدٍ يَتَجَهَّمُنِي أَمْ إِلَىٰ عَدُوٍّ مَلَّكْتَهُ أَمْرِي؟ إِنْ لَمْ يَكُنْ بِكَ عَلَيَّ غَضَبٌ فَلَا أُبَالِي وَلَٰكِنَّ عَافِيَتَكَ هِيَ أَوْسَعُ لِي أَعُوذُ بِنُورِ وَجْهِكَ الَّذِي أَشْرَقَتْ لَهُ الظُّلُمَاتُ وَصَلَحَ عَلَيْهِ أَمْرُ الدُّنْيَا وَالْآخِرَةِ مِنْ أَنْ يَنْزِلَ بِي غَضَبُكَ أَوْ يَحِلَّ عَلَيَّ سَخَطُكَ لَكَ الْعُتْبَىٰ حَتَّىٰ تَرْضَىٰ وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِكَ</div>
                 </div>
-                <div class="transliteration" style="font-size:calc(0.8rem * var(--font-scale))">Allāhumma ilayka ashkū ḍaʿfa quwwatī wa qillata ḥīlatī wa hawānī ʿalan-nās. Yā Arḥamar-Rāḥimīn, anta Rabbul-mustaḍʿafīn wa anta Rabbī. Ilā man takilunī? Ilā baʿīdin yatajahhamunī am ilā ʿaduwwin mallaktahu amrī? In lam yakun bika ʿalayya ghaḍabun falā ubālī, wa lākinna ʿāfiyataka hiya awsaʿu lī. Aʿūdhu bi-nūri wajhikal-ladhī ashraqat lahuz-ẓulumātu wa ṣalaḥa ʿalayhi amrud-dunyā wal-ākhirati min an yanzila bī ghaḍabuka aw yaḥilla ʿalayya sakhaṭuk. Lakal-ʿutbā ḥattā tarḍā, wa lā ḥawla wa lā quwwata illā bik.</div>
+                <div class="transliteration">Allāhumma ilayka ashkū ḍaʿfa quwwatī wa qillata ḥīlatī wa hawānī ʿalan-nās. Yā Arḥamar-Rāḥimīn, anta Rabbul-mustaḍʿafīn wa anta Rabbī. Ilā man takilunī? Ilā baʿīdin yatajahhamunī am ilā ʿaduwwin mallaktahu amrī? In lam yakun bika ʿalayya ghaḍabun falā ubālī, wa lākinna ʿāfiyataka hiya awsaʿu lī. Aʿūdhu bi-nūri wajhikal-ladhī ashraqat lahuz-ẓulumātu wa ṣalaḥa ʿalayhi amrud-dunyā wal-ākhirati min an yanzila bī ghaḍabuka aw yaḥilla ʿalayya sakhaṭuk. Lakal-ʿutbā ḥattā tarḍā, wa lā ḥawla wa lā quwwata illā bik.</div>
                 <div class="translation">"O Allah, to You I complain of my weakness, my lack of resources and my humiliation before the people. O Most Merciful, You are the Lord of the weak and You are my Lord. To whom do You entrust me? To a distant person who will treat me harshly? Or to an enemy whom You have given control over my affair? If You are not angry with me, then I do not care — but Your protection would be more encompassing for me. I seek refuge in the light of Your Face, by which all darkness is illuminated and the affairs of this world and the Hereafter are set right, from Your anger descending upon me or Your wrath befalling me. Yours is the right to admonish until You are pleased, and there is no power nor strength except with You."</div>
                 <div class="reference">
                     <span class="ref-icon">📖</span>
@@ -5479,6 +5785,8 @@
         trackDailyActivity();
         renderBookmarksPanel();
         wrapArabicWords();
+        initDailyReminderPrompt();
+        showOnboardingIfFirstTime();
 
         // Apply saved language preference
         if (typeof applyLanguage === 'function') applyLanguage();
@@ -5629,6 +5937,139 @@
         }, 1500); // After splash screen
     }
 
+    function runTabFadeTransition(target) {
+        if (!target) return;
+        target.classList.add('tab-fade-target');
+        target.classList.add('is-fading');
+        setTimeout(() => target.classList.remove('is-fading'), 300);
+    }
+
+    function initDailyReminderPrompt() {
+        const prompt = document.getElementById('dailyReminderPrompt');
+        if (!prompt) return;
+        const dismissed = localStorage.getItem('crown_daily_dua_prompt_dismissed') === 'true';
+        const enabled = localStorage.getItem('crown_notifications') === 'true';
+        if (!dismissed && !enabled) prompt.classList.add('visible');
+        else prompt.classList.remove('visible');
+    }
+
+    window.dismissDailyDuaPrompt = function() {
+        localStorage.setItem('crown_daily_dua_prompt_dismissed', 'true');
+        const prompt = document.getElementById('dailyReminderPrompt');
+        if (prompt) prompt.classList.remove('visible');
+    };
+
+    window.enableDailyDuaReminders = function() {
+        window.togglePrayerNotifications(true);
+        dismissDailyDuaPrompt();
+    };
+
+    function showOnboardingIfFirstTime() {
+        if (localStorage.getItem('crown_onboarding_done') === 'true') return;
+
+        const slides = [
+            { title: 'Welcome', body: 'Welcome to Essential Duas — your curated collection of verified duas from Quran and Sunnah.' },
+            { title: 'Key Features', body: 'Browse by category, save favorites, track progress, use Tasbeeh, and view prayer times with Qibla.' },
+            { title: 'How to Use', body: 'Tap a category to explore, expand a card to read details, and use Mark Read to build your streak.' },
+            { title: 'Get Started', body: 'Begin with one dua today. Small consistency brings lasting barakah over time.' }
+        ];
+
+        let index = 0;
+        const overlay = document.createElement('div');
+        overlay.className = 'onboarding-overlay';
+        overlay.id = 'onboardingOverlay';
+        let slideDirection = 'next';
+
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        function goNext() {
+            if (index >= slides.length - 1) {
+                closeOnboarding();
+                return;
+            }
+            slideDirection = 'next';
+            index++;
+            render();
+        }
+
+        function goPrev() {
+            if (index <= 0) return;
+            slideDirection = 'prev';
+            index--;
+            render();
+        }
+
+        function bindSwipeHandlers() {
+            const card = overlay.querySelector('.onboarding-card');
+            if (!card) return;
+
+            card.addEventListener('touchstart', function(e) {
+                if (!e.touches || !e.touches[0]) return;
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            card.addEventListener('touchend', function(e) {
+                if (!e.changedTouches || !e.changedTouches[0]) return;
+
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                const deltaX = endX - touchStartX;
+                const deltaY = endY - touchStartY;
+                const absX = Math.abs(deltaX);
+                const absY = Math.abs(deltaY);
+
+                if (absX < 40 || absX <= absY * 1.2) return;
+
+                if (deltaX < 0) goNext();
+                else goPrev();
+            }, { passive: true });
+        }
+
+        function closeOnboarding() {
+            localStorage.setItem('crown_onboarding_done', 'true');
+            overlay.classList.remove('active');
+            setTimeout(() => overlay.remove(), 300);
+            unlockScroll();
+        }
+
+        function render() {
+            const slide = slides[index];
+            const dots = slides.map((_, i) => `<span class="onboarding-dot ${i === index ? 'active' : ''}"></span>`).join('');
+            const isLast = index === slides.length - 1;
+            const directionClass = slideDirection === 'prev' ? 'slide-in-prev' : 'slide-in-next';
+            overlay.innerHTML = `
+                <div class="onboarding-card ${directionClass}" role="dialog" aria-modal="true" aria-label="App onboarding">
+                    <div class="onboarding-step">Step ${index + 1} of ${slides.length}</div>
+                    <div class="onboarding-title">${slide.title}</div>
+                    <div class="onboarding-body">${slide.body}</div>
+                    <div class="onboarding-dots">${dots}</div>
+                    <div class="onboarding-actions">
+                        <button class="onboarding-btn" id="onboardingSkip">Skip</button>
+                        <button class="onboarding-btn ${isLast ? 'primary' : ''}" id="onboardingNext">${isLast ? 'Get Started' : 'Next'}</button>
+                    </div>
+                </div>`;
+
+            const skip = overlay.querySelector('#onboardingSkip');
+            const next = overlay.querySelector('#onboardingNext');
+            if (skip) skip.onclick = closeOnboarding;
+            if (next) {
+                next.onclick = function() {
+                    if (isLast) closeOnboarding();
+                    else goNext();
+                };
+            }
+
+            bindSwipeHandlers();
+        }
+
+        render();
+        document.body.appendChild(overlay);
+        lockScroll();
+        requestAnimationFrame(() => overlay.classList.add('active'));
+    }
+
     // ===== CARD TOGGLE =====
     window.toggleCard = function(header) {
         const card = header.closest('.dua-card');
@@ -5766,6 +6207,8 @@
     };
 
 window.filterCategory = function(cat, btn) {
+    runTabFadeTransition(document.getElementById('duaListSection'));
+
     if (els.pills) els.pills.forEach(p => p.classList.remove('active'));
     if (btn && btn.classList.contains('pill')) btn.classList.add('active');
 
@@ -6346,7 +6789,7 @@ window.filterCategory = function(cat, btn) {
         // Update progress ring
         const ring = document.getElementById('readProgressRing');
         if (ring) {
-            const total = 55;
+            const total = 63;
             const read = STATE.read.length;
             const circumference = 2 * Math.PI * 22;
             const offset = circumference - (read / total) * circumference;
@@ -6499,6 +6942,8 @@ window.filterCategory = function(cat, btn) {
     // ===== BOTTOM NAV HANDLER =====
         // ===== BOTTOM NAV HANDLER =====
     window.handleBottomNav = function(action, btn) {
+        runTabFadeTransition(document.getElementById('mainContainer'));
+
         // Update active state
         document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -6597,13 +7042,13 @@ window.filterCategory = function(cat, btn) {
         const container = document.getElementById('progressPanelContent');
         if (!container) return;
 
-        const total = 55;
+        const total = 63;
         const readCount = STATE.read.length;
         const bookmarkCount = STATE.bookmarks.length;
         const readPct = Math.round((readCount / total) * 100);
 
         // Calculate categories explored with counts
-        const allCats = ['quran','protection','forgiveness','guidance','wellbeing','prophets','morning-evening','provision','prayer','family','travel','scholars'];
+        const allCats = ['quran','protection','forgiveness','guidance','wellbeing','prophets','morning-evening','provision','prayer','family','travel','scholars','ramadan','evil-eye'];
         const catMap = {};
         allCats.forEach(c => catMap[c] = 0);
         STATE.read.forEach(id => {
@@ -6645,6 +7090,23 @@ window.filterCategory = function(cat, btn) {
 
         // Category bars
         let catBarsHTML = '';
+        const catColors = {
+            quran: '#7e57c2',
+            protection: '#2ec47a',
+            forgiveness: '#c9a84c',
+            guidance: '#64b5f6',
+            wellbeing: '#4db6ac',
+            prophets: '#ffb74d',
+            'morning-evening': '#aed581',
+            provision: '#ce93d8',
+            prayer: '#81c784',
+            family: '#f48fb1',
+            travel: '#90caf9',
+            scholars: '#b39ddb',
+            ramadan: '#4db6ac',
+            'evil-eye': '#9575cd'
+        };
+
         allCats.forEach(cat => {
             const count = catMap[cat] || 0;
             const catTotal = catTotals[cat] || 1;
@@ -6652,7 +7114,7 @@ window.filterCategory = function(cat, btn) {
             const label = cat.charAt(0).toUpperCase() + cat.slice(1).replace('-', ' ');
             catBarsHTML += `<div class="progress-category-bar">
                 <div class="progress-cat-label">${label}</div>
-                <div class="progress-cat-bar"><div class="progress-cat-fill" style="width:${pct}%"></div></div>
+                <div class="progress-cat-bar"><div class="progress-cat-fill" style="width:${pct}%;background:${catColors[cat] || '#2ec47a'}"></div></div>
                 <div class="progress-cat-count">${count}/${catTotal}</div>
             </div>`;
         });
@@ -6663,7 +7125,7 @@ window.filterCategory = function(cat, btn) {
             { icon: '📖', name: 'Bookworm', earned: bookmarkCount >= 5, desc: 'Bookmark 5 duas' },
             { icon: '🔥', name: 'On Fire', earned: STATE.streak >= 3, desc: '3-day streak' },
             { icon: '⭐', name: 'Dedicated', earned: STATE.streak >= 7, desc: '7-day streak' },
-            { icon: '🌍', name: 'Explorer', earned: catSet.size >= 6, desc: 'Explore 6 categories' },
+            { icon: '🌍', name: 'Explorer', earned: catSet.size >= 7, desc: 'Explore 7 categories' },
             { icon: '💪', name: 'Halfway', earned: readCount >= 32, desc: 'Read 32+ duas' },
             { icon: '🏆', name: 'Crown Master', earned: readCount >= 63, desc: 'All 63 duas' },
             { icon: '🔮', name: 'Scholar', earned: catSet.size >= 14, desc: 'All 14 categories' },
@@ -6672,6 +7134,7 @@ window.filterCategory = function(cat, btn) {
         let achieveHTML = achievements.map(a => `
             <div class="achievement-badge ${a.earned ? 'earned' : 'locked'}" title="${a.desc}">
                 <div class="achievement-icon">${a.icon}</div>
+                ${a.earned ? '' : '<div class="achievement-lock">🔒</div>'}
                 <div class="achievement-name">${a.name}</div>
             </div>`).join('');
 
@@ -6746,7 +7209,7 @@ window.filterCategory = function(cat, btn) {
     window.shareProgress = async function() {
         showToast('Generating image...');
 
-        const total = 55;
+        const total = 63;
         const readCount = STATE.read.length;
         const readPct = Math.round((readCount / total) * 100);
         const bookmarkCount = STATE.bookmarks.length;
@@ -6786,28 +7249,28 @@ window.filterCategory = function(cat, btn) {
         wrap.innerHTML = `
             <div style="text-align:center;margin-bottom:20px;">
                 <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:16px;color:#2ec47a;margin-bottom:4px;">ف</div>
-                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#2ec47a;margin-bottom:6px;">Essential Duas by فلاح</div>
-                <div style="font-family:'Cinzel',serif;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:#e0eccc;font-weight:600;">My Journey</div>
+                <div style="font-family:'Playfair Display',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#2ec47a;margin-bottom:6px;">Essential Duas by فلاح</div>
+                <div style="font-family:'Playfair Display',serif;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:#e0eccc;font-weight:600;">My Journey</div>
             </div>
             <div style="display:flex;gap:12px;margin-bottom:16px;">
                 <div style="flex:1;background:rgba(46,196,122,0.06);border:1px solid rgba(46,196,122,0.12);border-radius:14px;padding:16px;text-align:center;">
-                    <div style="font-family:'Cinzel',serif;font-size:24px;color:#d4af37;">${readCount}<span style="font-size:14px;color:rgba(224,238,210,0.5);">/${total}</span></div>
-                    <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Duas Read</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:24px;color:#d4af37;">${readCount}<span style="font-size:14px;color:rgba(224,238,210,0.5);">/${total}</span></div>
+                    <div style="font-family:'Playfair Display',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Duas Read</div>
                 </div>
                 <div style="flex:1;background:rgba(46,196,122,0.06);border:1px solid rgba(46,196,122,0.12);border-radius:14px;padding:16px;text-align:center;">
-                    <div style="font-family:'Cinzel',serif;font-size:24px;color:#d4af37;">${streak}</div>
-                    <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Day Streak</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:24px;color:#d4af37;">${streak}</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Day Streak</div>
                 </div>
                 <div style="flex:1;background:rgba(46,196,122,0.06);border:1px solid rgba(46,196,122,0.12);border-radius:14px;padding:16px;text-align:center;">
-                    <div style="font-family:'Cinzel',serif;font-size:24px;color:#d4af37;">${bookmarkCount}</div>
-                    <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Saved</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:24px;color:#d4af37;">${bookmarkCount}</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Saved</div>
                 </div>
             </div>
             ${earned ? `<div style="text-align:center;font-size:1.4rem;margin-bottom:12px;letter-spacing:4px;">${earned}</div>` : ''}
             <div style="text-align:center;font-family:'Playfair Display',serif;font-size:14px;color:rgba(224,238,210,0.85);margin-bottom:16px;">${milestone}</div>
             <div style="display:flex;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(46,196,122,0.1);">
-                <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.55);">${readPct}% Complete</span>
-                <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.35);">فلاح · mohhp.github.io/Essential-duas</span>
+                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.55);">${readPct}% Complete</span>
+                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.35);">فلاح · mohhp.github.io/Essential-duas</span>
             </div>
         `;
         document.body.appendChild(wrap);
@@ -7081,24 +7544,61 @@ window.filterCategory = function(cat, btn) {
     };
 
     // ===== NAV OVERFLOW MENU =====
+    function positionNavOverflowMenu() {
+        const menu = document.getElementById('navOverflowMenu');
+        if (!menu || !menu.classList.contains('open')) return;
+
+        menu.style.left = '';
+        menu.style.right = '';
+
+        const viewportPadding = 4;
+        let rect = menu.getBoundingClientRect();
+
+        if (rect.right > (window.innerWidth - viewportPadding)) {
+            menu.style.right = 'auto';
+            menu.style.left = '0';
+            rect = menu.getBoundingClientRect();
+        }
+
+        if (rect.left < viewportPadding) {
+            menu.style.left = `${viewportPadding}px`;
+        }
+    }
+
     window.toggleNavOverflow = function(e) {
         e.stopPropagation();
         const menu = document.getElementById('navOverflowMenu');
         const btn = document.getElementById('navOverflowBtn');
         const isOpen = menu.classList.toggle('open');
         btn.setAttribute('aria-expanded', isOpen);
+        if (isOpen) {
+            requestAnimationFrame(positionNavOverflowMenu);
+        } else {
+            menu.style.left = '';
+            menu.style.right = '';
+        }
     };
     window.closeNavOverflow = function() {
         const menu = document.getElementById('navOverflowMenu');
         const btn = document.getElementById('navOverflowBtn');
-        if (menu) menu.classList.remove('open');
+        if (menu) {
+            menu.classList.remove('open');
+            menu.style.left = '';
+            menu.style.right = '';
+        }
         if (btn) btn.setAttribute('aria-expanded', 'false');
     };
+
+    window.addEventListener('resize', positionNavOverflowMenu);
+    window.addEventListener('orientationchange', positionNavOverflowMenu);
+
     document.addEventListener('click', function(e) {
         const menu = document.getElementById('navOverflowMenu');
         const btn = document.getElementById('navOverflowBtn');
         if (menu && !menu.contains(e.target) && e.target !== btn) {
             menu.classList.remove('open');
+            menu.style.left = '';
+            menu.style.right = '';
             if (btn) btn.setAttribute('aria-expanded', 'false');
         }
     });
@@ -7259,16 +7759,16 @@ window.filterCategory = function(cat, btn) {
         wrap.innerHTML = `
             <div style="text-align:center;margin-bottom:24px;">
                 <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:16px;color:#2ec47a;margin-bottom:4px;">ف</div>
-                <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#2ec47a;margin-bottom:6px;">Essential Duas by فلاح</div>
-                <div style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#e0eccc;font-weight:600;">${title.replace(/<[^>]*>/g,'')}</div>
+                <div style="font-family:'Playfair Display',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#2ec47a;margin-bottom:6px;">Essential Duas by فلاح</div>
+                <div style="font-family:'Playfair Display',serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#e0eccc;font-weight:600;">${title.replace(/<[^>]*>/g,'')}</div>
             </div>
             <div style="background:rgba(46,196,122,0.05);border:1px solid rgba(46,196,122,0.12);border-radius:16px;padding:28px 24px;margin-bottom:20px;">
                 <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:24px;line-height:2.2;text-align:right;direction:rtl;color:#f5f9f0;word-spacing:4px;">${arabic}</div>
             </div>
             <div style="font-family:'Playfair Display',serif;font-size:15px;color:rgba(224,238,210,0.85);line-height:1.8;font-style:italic;margin-bottom:16px;">${translation}</div>
             <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(46,196,122,0.1);">
-                <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.55);">📖 ${ref}</span>
-                <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.35);">فلاح · mohhp.github.io/Essential-duas</span>
+                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.55);">📖 ${ref}</span>
+                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.35);">فلاح · mohhp.github.io/Essential-duas</span>
             </div>
         `;
         document.body.appendChild(wrap);
@@ -8020,11 +8520,51 @@ window.filterCategory = function(cat, btn) {
     let compassWatchId = null;
     let userQibla = null;
 
+    function renderPrayerSkeleton() {
+        const grid = document.getElementById('prayerTimesGrid');
+        const countdown = document.getElementById('prayerCountdown');
+        const locBar = document.getElementById('prayerLocationBar');
+        const locText = document.getElementById('prayerLocText');
+
+        if (locBar) locBar.classList.add('loading');
+        if (locText) locText.classList.add('skeleton');
+        if (countdown) {
+            countdown.classList.add('loading');
+            const nameEl = document.getElementById('nextPrayerName');
+            const timeEl = document.getElementById('nextPrayerCountdown');
+            if (nameEl) nameEl.classList.add('skeleton');
+            if (timeEl) timeEl.classList.add('skeleton');
+        }
+        if (grid) {
+            grid.innerHTML = `
+                <div class="prayer-skeleton-row skeleton"></div>
+                <div class="prayer-skeleton-row skeleton"></div>
+                <div class="prayer-skeleton-row skeleton"></div>
+                <div class="prayer-skeleton-row skeleton"></div>
+                <div class="prayer-skeleton-row skeleton"></div>`;
+        }
+    }
+
+    function clearPrayerSkeleton() {
+        const countdown = document.getElementById('prayerCountdown');
+        const locBar = document.getElementById('prayerLocationBar');
+        const locText = document.getElementById('prayerLocText');
+        const nameEl = document.getElementById('nextPrayerName');
+        const timeEl = document.getElementById('nextPrayerCountdown');
+
+        if (locBar) locBar.classList.remove('loading');
+        if (locText) locText.classList.remove('skeleton');
+        if (countdown) countdown.classList.remove('loading');
+        if (nameEl) nameEl.classList.remove('skeleton');
+        if (timeEl) timeEl.classList.remove('skeleton');
+    }
+
     window.openPrayer = function() {
         const pp = document.querySelector('.prayer-panel');
         if (pp) pp.classList.add('active');
         lockScroll();
         setBottomNavActive('prayer');
+        renderPrayerSkeleton();
         // Auto-detect location if not cached
         const cached = localStorage.getItem('crown_location');
         if (cached) {
@@ -8046,6 +8586,7 @@ window.filterCategory = function(cat, btn) {
     window.requestLocation = function() {
         const locText = document.getElementById('prayerLocText');
         if (locText) locText.textContent = 'Detecting location...';
+        renderPrayerSkeleton();
 
         if (!navigator.geolocation) {
             if (locText) locText.textContent = 'Geolocation not supported';
@@ -8068,7 +8609,10 @@ window.filterCategory = function(cat, btn) {
                 onLocationReady(lat, lng, city);
             },
             (err) => {
+                clearPrayerSkeleton();
                 if (locText) locText.textContent = 'Location denied — tap ↻ to retry';
+                const grid = document.getElementById('prayerTimesGrid');
+                if (grid) grid.innerHTML = '<div style="text-align:center;padding:14px;opacity:0.7;">Enable location to load prayer times.</div>';
             },
             { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }
         );
@@ -8108,6 +8652,7 @@ window.filterCategory = function(cat, btn) {
 
     function onLocationReady(lat, lng, city) {
         const locText = document.getElementById('prayerLocText');
+        clearPrayerSkeleton();
         if (locText) {
             locText.textContent = city || `${lat.toFixed(2)}°, ${lng.toFixed(2)}°`;
             locText.title = 'Click to change location';
@@ -8130,8 +8675,7 @@ window.filterCategory = function(cat, btn) {
                 if (grid) grid.innerHTML = '<div style="text-align:center;padding:20px;opacity:0.6;">Prayer library failed to load. Please refresh.</div>';
                 return;
             }
-            const grid = document.getElementById('prayerTimesGrid');
-            if (grid) grid.innerHTML = '<div style="text-align:center;padding:20px;opacity:0.6;">Prayer library loading...</div>';
+            renderPrayerSkeleton();
             setTimeout(() => calculateAndRenderPrayers(lat, lng), 500);
             return;
         }
@@ -8152,6 +8696,7 @@ window.filterCategory = function(cat, btn) {
             isha: pt.isha
         };
 
+        clearPrayerSkeleton();
         renderPrayerGrid();
         startCountdown();
     }
@@ -8354,6 +8899,7 @@ window.filterCategory = function(cat, btn) {
 
     // ===== PRAYER NOTIFICATIONS =====
     let notificationTimeouts = [];
+    let dailyDuaReminderTimer = null;
 
     window.togglePrayerNotifications = function(enabled) {
         localStorage.setItem('crown_notifications', enabled ? 'true' : 'false');
@@ -8367,10 +8913,12 @@ window.filterCategory = function(cat, btn) {
                         showToast('Notification permission denied');
                     } else {
                         schedulePrayerNotifications();
+                        scheduleDailyDuaReminder();
                     }
                 });
             } else if ('Notification' in window && Notification.permission === 'granted') {
                 schedulePrayerNotifications();
+                scheduleDailyDuaReminder();
                 showToast('Prayer alerts enabled');
             } else {
                 const toggle = document.getElementById('notifyToggle');
@@ -8380,8 +8928,10 @@ window.filterCategory = function(cat, btn) {
             }
         } else {
             clearPrayerNotifications();
+            clearDailyDuaReminder();
             showToast('Prayer alerts disabled');
         }
+        initDailyReminderPrompt();
     };
 
     function schedulePrayerNotifications() {
@@ -8415,10 +8965,49 @@ window.filterCategory = function(cat, btn) {
         notificationTimeouts = [];
     }
 
+    function getTodayDuaSummary() {
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+        const duaIndex = (dayOfYear % 63) + 1;
+        const card = document.querySelector(`.dua-card[data-id="${duaIndex}"]`);
+        const title = card?.querySelector('.dua-title')?.textContent?.trim() || `Dua #${duaIndex}`;
+        return { title, duaIndex };
+    }
+
+    function clearDailyDuaReminder() {
+        if (dailyDuaReminderTimer) {
+            clearTimeout(dailyDuaReminderTimer);
+            dailyDuaReminderTimer = null;
+        }
+    }
+
+    function scheduleDailyDuaReminder() {
+        clearDailyDuaReminder();
+        if (localStorage.getItem('crown_notifications') !== 'true') return;
+        if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+        const now = new Date();
+        const next = new Date(now);
+        next.setHours(9, 0, 0, 0);
+        if (next <= now) next.setDate(next.getDate() + 1);
+        const delay = next - now;
+
+        dailyDuaReminderTimer = setTimeout(() => {
+            const { title } = getTodayDuaSummary();
+            new Notification('📖 Daily Dua Reminder', {
+                body: `Today’s focus: ${title}`,
+                icon: 'icon-192.png',
+                tag: 'daily-dua-reminder',
+                renotify: false
+            });
+            scheduleDailyDuaReminder();
+        }, delay);
+    }
+
     // Re-schedule notifications on visibility change
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden && localStorage.getItem('crown_notifications') === 'true' && prayerTimesData) {
             schedulePrayerNotifications();
+            scheduleDailyDuaReminder();
         }
     });
 
@@ -8438,6 +9027,7 @@ window.filterCategory = function(cat, btn) {
             // Schedule notifications if enabled
             if (localStorage.getItem('crown_notifications') === 'true') {
                 schedulePrayerNotifications();
+                scheduleDailyDuaReminder();
             }
         }
     });
