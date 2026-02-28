@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essential-duas-v22';
+const CACHE_NAME = 'essential-duas-v24';
 const OFFLINE_PAGE = './offline.html';
 
 const ASSETS = [
@@ -11,6 +11,8 @@ const ASSETS = [
   './icon-512.png',
   './favicon.svg',
   './pashto.js',
+  './audio/adhan-alert.wav',
+  './audio/notification-tone.wav',
   'https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js',
   'https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap'
 ];
@@ -50,6 +52,27 @@ self.addEventListener('activate', (event) => {
 // Fetch — network first, cache fallback, offline page as last resort
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+
+  const requestUrl = new URL(event.request.url);
+  const isAudioRequest = event.request.destination === 'audio'
+    || requestUrl.pathname.includes('/audio/')
+    || /\.mp3$/i.test(requestUrl.pathname)
+    || requestUrl.hostname.includes('islamic.network')
+    || requestUrl.hostname.includes('alquran.cloud');
+
+  if (isAudioRequest) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        });
+      }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
 
   // For navigation requests (HTML pages)
   if (event.request.mode === 'navigate') {

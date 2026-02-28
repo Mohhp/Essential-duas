@@ -223,7 +223,7 @@ const PS_UI = {
     detectingLocation: 'ځای پیژندل کېږي...',
     locationDenied: 'ځای رد شو — د بیا هڅې لپاره ↻ ټک وکړئ',
     nextPrayer: 'راتلونکی لمونځ',
-    prayerNames: { fajr: 'فجر', sunrise: 'لمر خاته', dhuhr: 'غرمه', asr: 'ماسپښین', maghrib: 'ماښام', isha: 'ماخستن' },
+    prayerNames: { fajr: 'سهار', sunrise: 'لمر ختل', dhuhr: 'غرمه', asr: 'مازديګر', maghrib: 'ماښام', isha: 'ماخستن' },
     qiblaTitle: 'د قبلې لوری',
     qiblaFromNorth: 'شمال ته درجې',
     qiblaPointPhone: 'خپل ټیلیفون وګرځوئ — تیر قبله ښیي',
@@ -232,6 +232,25 @@ const PS_UI = {
     prayerAlerts: '🔔 د لمونځ خبرتیاوې',
     alertsEnabled: 'د لمونځ خبرتیاوې فعالې شوې',
     alertsDisabled: 'د لمونځ خبرتیاوې غیر فعالې شوې',
+    alertsPermissionDenied: 'د خبرتیا اجازه رد شوه',
+    alertsUnsupported: 'خبرتیاوې نه ملاتړ کوي',
+    amToken: 'غ.م',
+    pmToken: 'غ.و',
+    reminderSettingsTitle: 'د لمونځ یادونې',
+    reminderMaster: '🔔 د لمونځ خبرتیاوې',
+    reminderSound: 'غږ',
+    reminderBefore: 'له وخت مخکې',
+    reminderAtTime: 'پر وخت',
+    reminder5: '۵ دقیقې مخکې',
+    reminder10: '۱۰ دقیقې مخکې',
+    reminder15: '۱۵ دقیقې مخکې',
+    soundAdhan: 'بشپړ اذان',
+    soundTone: 'لنډ زنګ',
+    soundSilent: 'بې غږه',
+    testReminder: 'د یادونې ازمويښت',
+    testReminderBody: 'دا د {prayer} لپاره ازمویښتي یادونه ده',
+    preReminderBody: 'د {prayer} لمونځ به په {minutes} دقیقو کې وي',
+    atTimeBody: 'د {prayer} لمانځه وخت شو',
     now: 'اوس',
     next: 'بل',
     // Spaced Repetition
@@ -720,7 +739,7 @@ function convertPashtoDigitsInTree(root) {
 
 
 function getCurrentLang() {
-    return localStorage.getItem('crown_lang') || 'en';
+    return localStorage.getItem('crown_lang') || 'ps';
 }
 
 function toggleLanguage() {
@@ -1029,6 +1048,10 @@ function applyLanguage(lang) {
         else memBtn.textContent = PS_UI.memorize;
     }
 
+    if (typeof window.refreshPrayerLanguage === 'function') window.refreshPrayerLanguage();
+    if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
+    if (typeof window.refreshAudioButtonLanguage === 'function') window.refreshAudioButtonLanguage();
+
     // Convert remaining visible digits in the DOM to Pashto digits
     try { convertDigitsInTree(document.body); } catch (e) { /* noop */ }
 }
@@ -1059,6 +1082,10 @@ function restoreEnglish() {
     }
     // Convert any Pashto digits back to western digits so numbers update without refresh
     try { convertPashtoDigitsInTree(document.body); } catch (e) { /* noop */ }
+
+    if (typeof window.refreshPrayerLanguage === 'function') window.refreshPrayerLanguage();
+    if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
+    if (typeof window.refreshAudioButtonLanguage === 'function') window.refreshAudioButtonLanguage();
 }
 
 // Patch showToast for Pashto — deferred until showToast exists
