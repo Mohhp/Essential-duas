@@ -166,6 +166,9 @@
                 const prayerp = document.querySelector('.prayer-panel.active');
                 if (prayerp) { closePrayer(); return; }
 
+                const mp = document.getElementById('memorizePanel');
+                if (mp && mp.classList.contains('active')) { closeMemorizeSession(); return; }
+
                 const bp = document.getElementById('bookmarksPanel');
                 if (bp && bp.classList.contains('active')) { toggleBookmarksPanel(); return; }
 
@@ -857,6 +860,8 @@ window.filterCategory = function(cat, btn) {
     let tasbeehCount = 0;
     let tasbeehTarget = 33;
     let currentDhikrIndex = 0;
+    let tasbeehSoundEnabled = localStorage.getItem('crown_tasbeeh_sound') === 'true';
+    let tasbeehAudioCtx = null;
 
     // Load saved totals
     function getDhikrTotals() {
@@ -896,6 +901,46 @@ window.filterCategory = function(cat, btn) {
         if (lifetimeEl) lifetimeEl.innerHTML = `TOTAL: <span>${getOverallTotal().toLocaleString()}</span>`;
     }
 
+    function updateTasbeehSoundToggle() {
+        const toggleBtn = document.getElementById('tasbeehSoundToggle');
+        if (!toggleBtn) return;
+        toggleBtn.textContent = tasbeehSoundEnabled ? '🔊 Click Sound' : '🔇 Click Sound';
+    }
+
+    function playTasbeehClick() {
+        if (!tasbeehSoundEnabled) return;
+        try {
+            if (!tasbeehAudioCtx) {
+                const ACtx = window.AudioContext || window.webkitAudioContext;
+                if (!ACtx) return;
+                tasbeehAudioCtx = new ACtx();
+            }
+            if (tasbeehAudioCtx.state === 'suspended') tasbeehAudioCtx.resume();
+
+            const osc = tasbeehAudioCtx.createOscillator();
+            const gain = tasbeehAudioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.value = 760;
+            gain.gain.setValueAtTime(0.0001, tasbeehAudioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.03, tasbeehAudioCtx.currentTime + 0.004);
+            gain.gain.exponentialRampToValueAtTime(0.0001, tasbeehAudioCtx.currentTime + 0.045);
+            osc.connect(gain);
+            gain.connect(tasbeehAudioCtx.destination);
+            osc.start();
+            osc.stop(tasbeehAudioCtx.currentTime + 0.05);
+        } catch (error) {
+            // no-op
+        }
+    }
+
+    function triggerTasbeehCelebration() {
+        const panel = document.querySelector('.tasbeeh-panel');
+        if (panel) {
+            panel.classList.add('celebrate');
+            setTimeout(() => panel.classList.remove('celebrate'), 780);
+        }
+    }
+
     window.selectDhikr = function(index) {
         // Save current session count before switching
         if (tasbeehCount > 0) {
@@ -930,6 +975,7 @@ window.filterCategory = function(cat, btn) {
         updateTasbeehUI();
         const tt = document.getElementById('tasbeehTargetLabel');
         if (tt) tt.textContent = `TARGET: ${tasbeehTarget}`;
+        updateTasbeehSoundToggle();
         const closeBtn = document.querySelector('.tasbeeh-close');
         if (closeBtn) closeBtn.focus();
     };
@@ -953,19 +999,36 @@ window.filterCategory = function(cat, btn) {
         setBottomNavActive('home');
     };
 
-    window.tapTasbeeh = function() {
+    window.tapTasbeeh = function(event) {
         tasbeehCount++;
         const display = document.getElementById('tasbeehDisplay');
         const btn = document.querySelector('.tasbeeh-tap-btn');
-        if (display) display.textContent = tasbeehCount;
+        if (display) {
+            display.textContent = tasbeehCount;
+            display.classList.remove('bump');
+            requestAnimationFrame(() => display.classList.add('bump'));
+        }
         if (btn) {
             btn.classList.add('pulse');
             setTimeout(() => btn.classList.remove('pulse'), 100);
+
+            if (event) {
+                const rect = btn.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                ripple.className = 'tasbeeh-ripple';
+                ripple.style.left = `${event.clientX - rect.left}px`;
+                ripple.style.top = `${event.clientY - rect.top}px`;
+                btn.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 700);
+            }
         }
-        if (navigator.vibrate) navigator.vibrate(5);
+        if (navigator.vibrate) navigator.vibrate(50);
+        playTasbeehClick();
+
         if (tasbeehCount === tasbeehTarget && tasbeehTarget !== 0) {
-            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
             saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
+            triggerTasbeehCelebration();
             tasbeehCount = 0;
             showToast('Target reached! ✨ Count saved.');
             // Auto-advance to next dhikr if user reached target
@@ -996,6 +1059,13 @@ window.filterCategory = function(cat, btn) {
         document.querySelectorAll('.tasbeeh-preset').forEach(p => p.classList.remove('active'));
         const activePreset = document.querySelector(`.tasbeeh-preset[onclick="setTasbeehTarget(${t})"]`);
         if (activePreset) activePreset.classList.add('active');
+    };
+
+    window.toggleTasbeehSound = function() {
+        tasbeehSoundEnabled = !tasbeehSoundEnabled;
+        localStorage.setItem('crown_tasbeeh_sound', tasbeehSoundEnabled ? 'true' : 'false');
+        updateTasbeehSoundToggle();
+        showToast(tasbeehSoundEnabled ? 'Tasbeeh click sound ON' : 'Tasbeeh click sound OFF');
     };
 
     // ===== ETIQUETTE PANEL =====
@@ -2107,10 +2177,13 @@ window.filterCategory = function(cat, btn) {
     // ===== THEME TOGGLE (LIGHT/DARK) =====
     function applyTheme() {
         const saved = localStorage.getItem('crown_theme') || 'dark';
+        const themeMeta = document.querySelector('meta[name="theme-color"]');
         if (saved === 'light') {
             document.documentElement.setAttribute('data-theme', 'light');
+            if (themeMeta) themeMeta.setAttribute('content', '#faf7f2');
         } else {
             document.documentElement.removeAttribute('data-theme');
+            if (themeMeta) themeMeta.setAttribute('content', '#1e2a3a');
         }
         const btn = document.getElementById('themeToggle');
         if (btn) btn.innerHTML = saved === 'light' ? '🌙' : '☀';
@@ -2118,12 +2191,15 @@ window.filterCategory = function(cat, btn) {
 
     window.toggleTheme = function() {
         const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        const themeMeta = document.querySelector('meta[name="theme-color"]');
         if (isLight) {
             document.documentElement.removeAttribute('data-theme');
             localStorage.setItem('crown_theme', 'dark');
+            if (themeMeta) themeMeta.setAttribute('content', '#1e2a3a');
         } else {
             document.documentElement.setAttribute('data-theme', 'light');
             localStorage.setItem('crown_theme', 'light');
+            if (themeMeta) themeMeta.setAttribute('content', '#faf7f2');
         }
         const btn = document.getElementById('themeToggle');
         if (btn) btn.innerHTML = isLight ? '☀' : '🌙';
@@ -2191,48 +2267,147 @@ window.filterCategory = function(cat, btn) {
     });
 
     // ===== MEMORIZATION MODE =====
+    let flashcardQueue = [];
+    let flashcardIndex = 0;
+    let flashcardFlipped = false;
+
+    function getFlashcardData(card) {
+        return {
+            id: parseInt(card.getAttribute('data-id'), 10),
+            arabic: card.querySelector('.arabic-text')?.textContent?.trim() || '',
+            transliteration: card.querySelector('.transliteration')?.textContent?.trim() || '',
+            translation: card.querySelector('.translation')?.textContent?.trim() || '',
+            reference: card.querySelector('.ref-text')?.textContent?.trim() || '',
+            title: card.querySelector('.dua-title')?.textContent?.trim() || ''
+        };
+    }
+
+    function normalizeFlashcardIndex(index) {
+        if (!flashcardQueue.length) return 0;
+        if (index < 0) return 0;
+        if (index >= flashcardQueue.length) return flashcardQueue.length - 1;
+        return index;
+    }
+
+    function renderFlashcard() {
+        const card = flashcardQueue[flashcardIndex];
+        if (!card) return;
+
+        const arabic = document.getElementById('flashcardArabic');
+        const translation = document.getElementById('flashcardTranslation');
+        const transliteration = document.getElementById('flashcardTransliteration');
+        const reference = document.getElementById('flashcardReference');
+        const progressText = document.getElementById('memorizeProgressText');
+        const progressFill = document.getElementById('memorizeProgressFill');
+        const flash = document.getElementById('flashcard');
+        const ratingRow = document.getElementById('flashcardRatingRow');
+
+        if (arabic) arabic.textContent = card.arabic;
+        if (translation) translation.textContent = card.translation;
+        if (transliteration) transliteration.textContent = card.transliteration;
+        if (reference) reference.textContent = card.reference || card.title;
+
+        const isPS = isPashtoMode();
+        const currentNum = flashcardIndex + 1;
+        const totalNum = flashcardQueue.length;
+        if (progressText) {
+            progressText.textContent = isPS
+                ? `${localizeDigits(currentNum)} له ${localizeDigits(totalNum)}`
+                : `Card ${currentNum} of ${totalNum}`;
+        }
+        if (progressFill) progressFill.style.width = `${Math.round((currentNum / totalNum) * 100)}%`;
+
+        flashcardFlipped = false;
+        if (flash) flash.classList.remove('flipped');
+        if (ratingRow) ratingRow.classList.remove('visible');
+    }
+
+    function bindFlashcardSwipe() {
+        const wrap = document.getElementById('flashcardWrap');
+        if (!wrap || wrap.dataset.boundSwipe === '1') return;
+
+        let startX = 0;
+        let startY = 0;
+        wrap.addEventListener('touchstart', (e) => {
+            if (!e.touches?.[0]) return;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+
+        wrap.addEventListener('touchend', (e) => {
+            if (!e.changedTouches?.[0]) return;
+            const deltaX = e.changedTouches[0].clientX - startX;
+            const deltaY = e.changedTouches[0].clientY - startY;
+            if (Math.abs(deltaX) < 40 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+            if (deltaX < 0) nextFlashcard();
+            else prevFlashcard();
+        }, { passive: true });
+
+        wrap.dataset.boundSwipe = '1';
+    }
+
     window.toggleMemorizeMode = function() {
-        const btn = document.getElementById('memorizeToggle');
-        const isActive = btn && btn.classList.toggle('active');
-        els.cards.forEach(card => {
-            if (isActive) {
-                card.classList.add('memorize-mode');
-                card.querySelectorAll('.arabic-text').forEach(t => t.classList.remove('revealed'));
-                // Remove any existing rating rows
-                card.querySelectorAll('.sr-rating-row').forEach(r => r.remove());
-            } else {
-                card.classList.remove('memorize-mode');
-                card.querySelectorAll('.sr-rating-row').forEach(r => r.remove());
-            }
-        });
-        if (isActive) updateSRBadges();
-        showToast(isActive ? 'Memorize Mode ON — tap Arabic to reveal' : 'Memorize Mode OFF');
+        if (document.getElementById('memorizePanel')?.classList.contains('active')) {
+            closeMemorizeSession();
+            return;
+        }
+        openMemorizeSession();
     };
 
-    // Arabic reveal on tap (delegated) — enhanced with SR rating
-    document.addEventListener('click', function(e) {
-        const arabicEl = e.target.closest('.memorize-mode .arabic-text');
-        if (arabicEl) {
-            const wasRevealed = arabicEl.classList.contains('revealed');
-            arabicEl.classList.toggle('revealed');
+    window.openMemorizeSession = function() {
+        const panel = document.getElementById('memorizePanel');
+        const btn = document.getElementById('memorizeToggle');
+        if (!panel || !btn) return;
 
-            if (!wasRevealed) {
-                // Show rating buttons
-                const card = arabicEl.closest('.dua-card');
-                if (card && !card.querySelector('.sr-rating-row')) {
-                    const id = parseInt(card.getAttribute('data-id'));
-                    const container = arabicEl.closest('.arabic-container') || arabicEl.parentElement;
-                    const row = document.createElement('div');
-                    row.className = 'sr-rating-row';
-                    row.innerHTML = `
-                        <button class="sr-rating-btn sr-easy" onclick="rateSR(${id}, 'easy', this)">✓ Easy</button>
-                        <button class="sr-rating-btn sr-hard" onclick="rateSR(${id}, 'hard', this)">✗ Hard</button>`;
-                    container.after(row);
-                    requestAnimationFrame(() => row.classList.add('visible'));
-                }
-            }
+        flashcardQueue = Array.from(document.querySelectorAll('.dua-card')).map(getFlashcardData).filter(item => item.arabic);
+        flashcardIndex = 0;
+        btn.classList.add('active');
+        panel.classList.add('active');
+        lockScroll();
+        bindFlashcardSwipe();
+        renderFlashcard();
+        showToast(isPashtoMode() ? 'د حفظ فلشکارډ حالت فعال شو' : 'Flashcard memorization mode enabled');
+    };
+
+    window.closeMemorizeSession = function() {
+        const panel = document.getElementById('memorizePanel');
+        const btn = document.getElementById('memorizeToggle');
+        if (panel) panel.classList.remove('active');
+        if (btn) btn.classList.remove('active');
+        unlockScroll();
+    };
+
+    window.flipFlashcard = function() {
+        const flash = document.getElementById('flashcard');
+        const ratingRow = document.getElementById('flashcardRatingRow');
+        if (!flash || !ratingRow) return;
+        flashcardFlipped = !flashcardFlipped;
+        flash.classList.toggle('flipped', flashcardFlipped);
+        ratingRow.classList.toggle('visible', flashcardFlipped);
+    };
+
+    window.nextFlashcard = function() {
+        flashcardIndex = normalizeFlashcardIndex(flashcardIndex + 1);
+        renderFlashcard();
+    };
+
+    window.prevFlashcard = function() {
+        flashcardIndex = normalizeFlashcardIndex(flashcardIndex - 1);
+        renderFlashcard();
+    };
+
+    window.rateCurrentFlashcard = function(rating) {
+        const current = flashcardQueue[flashcardIndex];
+        if (!current) return;
+        rateSR(current.id, rating);
+        if (flashcardIndex < flashcardQueue.length - 1) {
+            flashcardIndex += 1;
+            renderFlashcard();
+        } else {
+            closeMemorizeSession();
+            showToast(isPashtoMode() ? 'د نن ورځې د تکرار سیشن بشپړ شو' : 'Review session complete');
         }
-    });
+    };
 
     // ===== SPACED REPETITION SYSTEM =====
     function getSRData() {
@@ -2242,13 +2417,16 @@ window.filterCategory = function(cat, btn) {
         localStorage.setItem('crown_sr', JSON.stringify(data));
     }
 
-    window.rateSR = function(duaId, rating, btn) {
+    window.rateSR = function(duaId, rating, btn = null) {
         const sr = getSRData();
         const entry = sr[duaId] || { interval: 1, easeFactor: 2.0, nextReview: 0 };
 
         if (rating === 'easy') {
             entry.interval = Math.min(entry.interval * entry.easeFactor, 365);
             entry.easeFactor = Math.min(entry.easeFactor + 0.1, 3.0);
+        } else if (rating === 'good') {
+            entry.interval = Math.min(Math.max(2, entry.interval * (entry.easeFactor - 0.15)), 180);
+            entry.easeFactor = Math.min(entry.easeFactor + 0.02, 2.8);
         } else {
             entry.interval = 1;
             entry.easeFactor = Math.max(entry.easeFactor - 0.2, 1.3);
@@ -2258,14 +2436,17 @@ window.filterCategory = function(cat, btn) {
         saveSRData(sr);
 
         // Remove rating row
-        const row = btn.closest('.sr-rating-row');
-        if (row) {
-            row.classList.remove('visible');
-            setTimeout(() => row.remove(), 300);
+        if (btn) {
+            const row = btn.closest('.sr-rating-row');
+            if (row) {
+                row.classList.remove('visible');
+                setTimeout(() => row.remove(), 300);
+            }
         }
 
         const days = Math.round(entry.interval);
-        showToast(rating === 'easy' ? `Next review in ${days} day${days > 1 ? 's' : ''}` : 'Will review again tomorrow');
+        if (rating === 'hard') showToast('Will review again tomorrow');
+        else showToast(`Next review in ${days} day${days > 1 ? 's' : ''}`);
         updateSRBadges();
     };
 
@@ -2329,50 +2510,53 @@ window.filterCategory = function(cat, btn) {
 
         showToast('Generating image...');
 
-        const title = card.querySelector('.dua-title')?.textContent || '';
-        const arabic = card.querySelector('.arabic-text')?.textContent || '';
-        const translation = card.querySelector('.translation')?.textContent || '';
-        const ref = card.querySelector('.ref-text')?.textContent || '';
+        const title = (card.querySelector('.dua-title')?.textContent || '').replace(/\s+/g, ' ').trim();
+        const arabic = (card.querySelector('.arabic-text')?.textContent || '').trim();
+        const translation = (card.querySelector('.translation')?.textContent || '').trim();
+        const ref = (card.querySelector('.ref-text')?.textContent || '').trim();
+        const auth = (card.querySelector('.auth-badge')?.textContent || 'AUTHENTIC').replace(/\s+/g, ' ').trim();
 
-        // Build a clean off-screen card for rendering
-        const wrap = document.createElement('div');
-        wrap.style.cssText = `
-            position:fixed; left:-9999px; top:0;
-            width:600px; padding:48px 40px;
-            background: linear-gradient(145deg, #0c1a13, #142a20);
-            border-radius:24px; font-family:serif;
-            border: 1px solid rgba(46,196,122,0.2);
-        `;
-        wrap.innerHTML = `
-            <div style="text-align:center;margin-bottom:24px;">
-                <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:16px;color:#2ec47a;margin-bottom:4px;">ف</div>
-                <div style="font-family:'Playfair Display',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#2ec47a;margin-bottom:6px;">Essential Duas by فلاح</div>
-                <div style="font-family:'Playfair Display',serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#e0eccc;font-weight:600;">${title.replace(/<[^>]*>/g,'')}</div>
-            </div>
-            <div style="background:rgba(46,196,122,0.05);border:1px solid rgba(46,196,122,0.12);border-radius:16px;padding:28px 24px;margin-bottom:20px;">
-                <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:24px;line-height:2.2;text-align:right;direction:rtl;color:#f5f9f0;word-spacing:4px;">${arabic}</div>
-            </div>
-            <div style="font-family:'Playfair Display',serif;font-size:15px;color:rgba(224,238,210,0.85);line-height:1.8;font-style:italic;margin-bottom:16px;">${translation}</div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid rgba(46,196,122,0.1);">
-                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.55);">📖 ${ref}</span>
-                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.35);">فلاح · mohhp.github.io/Essential-duas</span>
-            </div>
-        `;
-        document.body.appendChild(wrap);
+        const template = document.getElementById('shareImageTemplate');
+        const frame = document.getElementById('shareImageFrame');
+        if (!template || !frame) {
+            showToast('Share template unavailable');
+            return;
+        }
+
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        const isPS = isPashtoMode();
+
+        frame.style.background = isLight
+            ? 'linear-gradient(150deg, #f7ead0 0%, #f3ddaf 30%, #faefe0 100%)'
+            : 'linear-gradient(155deg, #0f4b3a 0%, #1e2a3a 55%, #15283b 100%)';
+
+        const authTag = document.getElementById('shareAuthTag');
+        const arabicText = document.getElementById('shareArabicText');
+        const translationText = document.getElementById('shareTranslationText');
+        const referenceText = document.getElementById('shareReferenceText');
+        const brandName = document.getElementById('shareBrandName');
+        if (authTag) authTag.textContent = auth;
+        if (arabicText) arabicText.textContent = arabic;
+        if (translationText) translationText.textContent = translation;
+        if (referenceText) referenceText.textContent = ref || title;
+        if (brandName) brandName.textContent = isPS ? 'لازمي دعاګانې' : 'Essential Duas';
 
         try {
             if (typeof html2canvas === 'undefined') {
                 showToast('Image library loading, try again...');
-                document.body.removeChild(wrap);
                 return;
             }
-            const canvas = await html2canvas(wrap, {
-                backgroundColor: '#0c1a13',
-                scale: 2,
+
+            template.style.opacity = '1';
+            const canvas = await html2canvas(frame, {
+                backgroundColor: null,
+                scale: Math.max(2, window.devicePixelRatio || 2),
                 useCORS: true,
-                logging: false
+                logging: false,
+                width: 1080,
+                windowWidth: 1200
             });
-            document.body.removeChild(wrap);
+            template.style.opacity = '0';
 
             canvas.toBlob(async (blob) => {
                 if (!blob) { showToast('Failed to generate'); return; }
@@ -2383,7 +2567,7 @@ window.filterCategory = function(cat, btn) {
                         await navigator.share({
                             files: [new File([blob], 'dua.png', { type: 'image/png' })],
                             title: title,
-                            text: 'From Essential Duas by فلاح'
+                            text: isPS ? 'له لازمي دعاګانو څخه' : 'From Essential Duas'
                         });
                         showToast('Shared!');
                         return;
@@ -2398,7 +2582,7 @@ window.filterCategory = function(cat, btn) {
                 showToast('Image downloaded!');
             }, 'image/png');
         } catch(e) {
-            document.body.removeChild(wrap);
+            template.style.opacity = '0';
             showToast('Failed to generate image');
         }
     };
@@ -3142,6 +3326,15 @@ window.filterCategory = function(cat, btn) {
     let reminderSettings = null;
     let reminderAudio = { adhan: null, tone: null };
 
+    function preloadPrayerReminderAudio() {
+        Object.entries(REMINDER_AUDIO_FILES).forEach(([key, src]) => {
+            if (reminderAudio[key]) return;
+            const audio = new Audio(src);
+            audio.preload = 'metadata';
+            reminderAudio[key] = audio;
+        });
+    }
+
     function getPrayerLabel(name) {
         return isPashtoMode() ? (PRAYER_LABELS_PS[name] || PRAYER_LABELS_EN[name]) : (PRAYER_LABELS_EN[name] || name);
     }
@@ -3289,6 +3482,29 @@ window.filterCategory = function(cat, btn) {
             const label = document.getElementById(`remPrayerLabel-${name}`);
             if (label) label.textContent = getPrayerLabel(name);
         });
+
+        const instruction = document.getElementById('qiblaInstruction');
+        if (instruction) {
+            instruction.textContent = isPashtoMode()
+                ? 'موبایل مو هوار ونیسئ او وڅرخئ تر څو ستنه د قبلې نښه ته برابره شي.'
+                : 'Hold your phone flat and rotate until the needle points to the Qibla marker.';
+        }
+
+        const labelN = document.querySelector('.qibla-compass .compass-n');
+        const labelS = document.querySelector('.qibla-compass .compass-s');
+        const labelE = document.querySelector('.qibla-compass .compass-e');
+        const labelW = document.querySelector('.qibla-compass .compass-w');
+        if (isPashtoMode()) {
+            if (labelN) labelN.textContent = 'ش';
+            if (labelS) labelS.textContent = 'ج';
+            if (labelE) labelE.textContent = 'ختیځ';
+            if (labelW) labelW.textContent = 'لویدیځ';
+        } else {
+            if (labelN) labelN.textContent = 'N';
+            if (labelS) labelS.textContent = 'S';
+            if (labelE) labelE.textContent = 'E';
+            if (labelW) labelW.textContent = 'W';
+        }
     }
 
     function initReminderControls() {
@@ -3538,6 +3754,7 @@ window.filterCategory = function(cat, btn) {
         if (closeBtn) closeBtn.focus();
         initReminderControls();
         initCitySelector();
+        preloadPrayerReminderAudio();
         if (typeof window.refreshPrayerLanguage === 'function') window.refreshPrayerLanguage();
         renderPrayerSkeleton();
         // Auto-detect location if not cached
@@ -3827,10 +4044,22 @@ window.filterCategory = function(cat, btn) {
 
         const degEl = document.getElementById('qiblaDegree');
         const statusEl = document.getElementById('qiblaStatus');
-        if (degEl) degEl.textContent = `${Math.round(qibla)}° from North`;
-        if (statusEl) statusEl.textContent = 'Point your phone — arrow shows Qibla';
+        const qiblaRounded = Math.round(qibla);
+        if (degEl) {
+            degEl.textContent = isPashtoMode()
+                ? `${localizeDigits(qiblaRounded)}° له شماله د قبلې لوری`
+                : `Qibla bearing: ${qiblaRounded}° from North`;
+        }
+        if (statusEl) {
+            statusEl.textContent = isPashtoMode()
+                ? 'موبایل وڅرخوئ — ستنه د قبلې نښې ته برابره کړئ'
+                : 'Rotate phone until needle aligns with Qibla marker';
+        }
 
-        // Static fallback: rotate arrow to qibla bearing
+        const marker = document.getElementById('qiblaMarker');
+        if (marker) marker.style.transform = `rotate(${qibla}deg)`;
+
+        // Static fallback: rotate needle to Qibla if heading sensors unavailable
         const arrow = document.getElementById('qiblaArrow');
         if (arrow) arrow.style.transform = `translate(-50%, -100%) rotate(${qibla}deg)`;
     }
@@ -3865,13 +4094,19 @@ window.filterCategory = function(cat, btn) {
         if (heading == null || userQibla == null) return;
 
         const arrow = document.getElementById('qiblaArrow');
-        const compass = document.getElementById('qiblaCompass');
+        const section = document.getElementById('qiblaSection');
+        const statusEl = document.getElementById('qiblaStatus');
         if (arrow) {
-            const rotation = userQibla - heading;
-            arrow.style.transform = `translate(-50%, -100%) rotate(${rotation}deg)`;
+            arrow.style.transform = `translate(-50%, -100%) rotate(${heading}deg)`;
         }
-        if (compass) {
-            compass.style.transform = `rotate(${-heading}deg)`;
+
+        const delta = Math.abs((((heading - userQibla) % 360) + 540) % 360 - 180);
+        const aligned = delta <= 5;
+        if (section) section.classList.toggle('aligned', aligned);
+        if (statusEl) {
+            statusEl.textContent = aligned
+                ? (isPashtoMode() ? 'ماشاءالله! تاسو قبلې ته برابر یاست.' : 'MashaAllah! You are facing Qibla.')
+                : (isPashtoMode() ? `نږدې یاست — ${localizeDigits(Math.round(delta))}° توپیر` : `Almost there — ${Math.round(delta)}° off`);
         }
     }
 

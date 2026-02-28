@@ -27,10 +27,14 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="styles.css">
+    <!-- Production assets (default) -->
+    <link rel="stylesheet" href="styles.min.css">
+    <!-- Development assets (uncomment for local debugging) -->
+    <!-- <link rel="stylesheet" href="styles.css"> -->
 </head>
 
     <body>
@@ -2848,7 +2852,10 @@
 <!-- ══════════════════════════════════════════ -->
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
-<script src="app.js"></script>
+<!-- Production assets (default) -->
+<script src="app.min.js"></script>
+<!-- Development assets (uncomment for local debugging) -->
+<!-- <script src="app.js"></script> -->
 
 <!-- ===== OVERLAY ===== -->
 <div class="overlay" onclick="toggleBookmarksPanel()"></div>
@@ -2862,8 +2869,9 @@
     <div class="tasbeeh-virtue" id="tasbeehVirtue">33× after every salah</div>
     <div class="tasbeeh-count-display" id="tasbeehDisplay">0</div>
     <div class="tasbeeh-target" id="tasbeehTargetLabel">TARGET: 33</div>
-    <button class="tasbeeh-tap-btn" onclick="tapTasbeeh()">TAP</button>
+    <button class="tasbeeh-tap-btn" onclick="tapTasbeeh(event)">TAP</button>
     <div class="tasbeeh-controls">
+        <button class="tasbeeh-ctrl-btn" id="tasbeehSoundToggle" onclick="toggleTasbeehSound()">🔇 Click Sound</button>
         <button class="tasbeeh-ctrl-btn" onclick="resetTasbeeh()">RESET</button>
     </div>
     <div class="tasbeeh-presets">
@@ -2908,14 +2916,17 @@
         <div class="qibla-section" id="qiblaSection">
             <div class="qibla-title">Qibla Direction</div>
             <div class="qibla-compass" id="qiblaCompass">
+                <div class="qibla-degree-ring" id="qiblaDegreeRing"></div>
                 <span class="compass-n">N</span>
                 <span class="compass-s">S</span>
                 <span class="compass-e">E</span>
                 <span class="compass-w">W</span>
+                <div class="qibla-marker" id="qiblaMarker" aria-hidden="true"><span>🕋</span></div>
                 <div class="qibla-arrow" id="qiblaArrow"></div>
             </div>
             <div class="qibla-degree" id="qiblaDegree">--°</div>
             <div class="qibla-status" id="qiblaStatus">Enable location to see Qibla</div>
+            <div class="qibla-instruction" id="qiblaInstruction">Hold your phone flat and rotate until the needle points to the Qibla marker.</div>
         </div>
         <div class="prayer-reminder-settings" id="prayerReminderSettings">
             <div class="prayer-reminder-title" id="reminderSettingsTitle">Prayer reminders</div>
@@ -2976,6 +2987,54 @@
 
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+
+<!-- ===== SHARE IMAGE TEMPLATE (hidden) ===== -->
+<div class="share-image-template" id="shareImageTemplate" aria-hidden="true">
+    <div class="share-image-frame" id="shareImageFrame">
+        <div class="share-image-border"></div>
+        <div class="share-image-content">
+            <div class="share-auth-tag" id="shareAuthTag">SAHIH</div>
+            <div class="share-arabic" id="shareArabicText">اللَّهُمَّ اهْدِنِي</div>
+            <div class="share-translation" id="shareTranslationText">O Allah, guide me.</div>
+            <div class="share-reference" id="shareReferenceText">Sahih Bukhari</div>
+            <div class="share-branding">
+                <img src="icon-192.png" width="24" height="24" loading="lazy" alt="Essential Duas icon" class="share-brand-icon" id="shareBrandIcon">
+                <span id="shareBrandName">Essential Duas</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== FLASHCARD MEMORIZATION PANEL ===== -->
+<div class="memorize-panel" id="memorizePanel" onclick="if(event.target===this) closeMemorizeSession()">
+    <button class="memorize-close" onclick="closeMemorizeSession()" aria-label="Close memorization panel">✕</button>
+    <div class="memorize-panel-content">
+        <div class="memorize-progress-text" id="memorizeProgressText">Card 1 of 1</div>
+        <div class="memorize-progress-bar"><div id="memorizeProgressFill"></div></div>
+        <div class="flashcard-wrap" id="flashcardWrap">
+            <div class="flashcard" id="flashcard" onclick="flipFlashcard()">
+                <div class="flashcard-face flashcard-front">
+                    <div class="flashcard-arabic" id="flashcardArabic"></div>
+                </div>
+                <div class="flashcard-face flashcard-back">
+                    <div class="flashcard-translation" id="flashcardTranslation"></div>
+                    <div class="flashcard-transliteration" id="flashcardTransliteration"></div>
+                    <div class="flashcard-reference" id="flashcardReference"></div>
+                </div>
+            </div>
+        </div>
+        <div class="flashcard-actions">
+            <button class="flash-btn" onclick="flipFlashcard()">Flip</button>
+            <button class="flash-btn" onclick="prevFlashcard()">← Prev</button>
+            <button class="flash-btn" onclick="nextFlashcard()">Next →</button>
+        </div>
+        <div class="flashcard-rating-row" id="flashcardRatingRow">
+            <button class="flash-rate easy" onclick="rateCurrentFlashcard('easy')">Easy / اسانه</button>
+            <button class="flash-rate good" onclick="rateCurrentFlashcard('good')">Good / ښه</button>
+            <button class="flash-rate hard" onclick="rateCurrentFlashcard('hard')">Hard / ستونزمنه</button>
+        </div>
+    </div>
+</div>
 
 <!-- ===== FOOTER ===== -->
 <footer class="footer">

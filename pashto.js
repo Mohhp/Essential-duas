@@ -778,7 +778,7 @@ function applyLanguage(lang) {
     const sub = document.querySelector('.subtitle');
     if (sub) { if (!sub.getAttribute('data-en')) sub.setAttribute('data-en', sub.textContent); sub.textContent = PS_UI.heroSubtitle; }
     const sadaqa = document.querySelector('.sadaqa-banner');
-    if (sadaqa) { if (!sadaqa.getAttribute('data-en')) sadaqa.setAttribute('data-en', sadaqa.innerHTML); sadaqa.innerHTML = '<span style="font-style:normal;font-size:0.9rem;">🤲</span> <span>دا د چا سره شریکه کړئ — کیدای شي ستاسو <span style="color:var(--gold-mid);font-weight:600;">صدقه جاریه</span> وي</span>'; }
+    if (sadaqa) { if (!sadaqa.getAttribute('data-en')) sadaqa.setAttribute('data-en', sadaqa.innerHTML); sadaqa.innerHTML = '<span style="font-style:normal;font-size:0.9rem;">🤲</span> <span>دا د چا سره شریکه کړئ — کیدای شي ستاسو <span style="color:var(--gold-light);font-weight:700;">صدقه جاریه</span> وي</span>'; }
     const intro = document.querySelector('.intro-text');
     if (intro) { if (!intro.getAttribute('data-en')) intro.setAttribute('data-en', intro.textContent); intro.textContent = PS_UI.introText; }
 
