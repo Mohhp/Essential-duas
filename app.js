@@ -6156,17 +6156,20 @@ window.filterCategory = function(cat, btn) {
 
     function syncQuranReaderStickyOffsets() {
         const reader = document.getElementById('quranReaderScreen');
+        const sticky = document.getElementById('quranReaderSticky');
         const header = document.getElementById('quranReaderHeader');
-        const tools = document.querySelector('.quran-reader-tools');
         const list = document.getElementById('quranAyahList');
-        if (!reader || !header || !list) return;
+        const scrollContent = document.getElementById('quranScrollContent');
+        if (!reader || !header || !list || !sticky) return;
 
-        const headerHeight = Math.ceil(header.getBoundingClientRect().height || header.offsetHeight || 0);
-        const toolsHidden = !tools || getComputedStyle(tools).display === 'none';
-        const toolsHeight = toolsHidden ? 0 : Math.ceil(tools.getBoundingClientRect().height || tools.offsetHeight || 0);
-        const stickyOffset = Math.max(16, headerHeight + toolsHeight + 16);
+        const stickyHeight = Math.ceil(sticky.getBoundingClientRect().height || sticky.offsetHeight || 0);
+        const stickyOffset = Math.max(24, stickyHeight + 12);
 
-        list.style.paddingTop = '8px';
+        if (scrollContent) {
+            const dynamicTopPad = Math.max(4, Math.round(stickyHeight * 0.02));
+            scrollContent.style.paddingTop = `${dynamicTopPad}px`;
+        }
+        reader.style.setProperty('--quran-sticky-height', `${stickyHeight}px`);
         reader.style.setProperty('--quran-reader-offset', `${stickyOffset}px`);
     }
 
@@ -6345,15 +6348,10 @@ window.filterCategory = function(cat, btn) {
 
     function updateQuranMiniPlayerVisibility() {
         const player = document.getElementById('quranMiniPlayer');
-        const reader = document.getElementById('quranReaderScreen');
         if (!player) return;
 
         const blockedByReadingMode = document.body.classList.contains('quran-reading-mode');
         const isPlaying = !!(quranState.audio && quranState.audioAyah && !quranState.audio.paused && !blockedByReadingMode);
-
-        if (reader) {
-            reader.style.setProperty('--quran-player-offset', isPlaying ? '64px' : '0px');
-        }
 
         if (isPlaying) {
             if (quranMiniHideTimer) {
@@ -6364,17 +6362,21 @@ window.filterCategory = function(cat, btn) {
                 player.classList.add('active');
                 requestAnimationFrame(() => {
                     player.classList.add('ready');
+                    syncQuranReaderStickyOffsets();
                 });
             } else {
                 player.classList.add('ready');
+                syncQuranReaderStickyOffsets();
             }
             return;
         }
 
         player.classList.remove('ready');
+        syncQuranReaderStickyOffsets();
         if (player.classList.contains('active')) {
             quranMiniHideTimer = setTimeout(() => {
                 if (!player.classList.contains('ready')) player.classList.remove('active');
+                syncQuranReaderStickyOffsets();
                 quranMiniHideTimer = null;
             }, 200);
         }

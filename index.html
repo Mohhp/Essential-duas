@@ -2923,7 +2923,7 @@
         </div>
 
         <div class="quran-reader-screen" id="quranReaderScreen">
-            <div class="quran-reader-sticky" id="quranReaderSticky">
+            <div class="quran-sticky-top quran-reader-sticky" id="quranReaderSticky">
                 <div class="quran-reader-header" id="quranReaderHeader"></div>
                 <div class="quran-reader-tools">
                     <div class="quran-translation-toggle" id="quranTranslationToggle">
@@ -2934,25 +2934,21 @@
                     </div>
                     <button type="button" class="quran-row-btn quran-play-all-header" id="quranPlayAll">Play All</button>
                 </div>
+                <div class="quran-mini-player" id="quranMiniPlayer">
+                    <div class="quran-mini-controls">
+                        <button type="button" id="quranPrevAyah">⏮</button>
+                        <button type="button" id="quranPlayPause">▶</button>
+                        <button type="button" id="quranStopAyah">⏹</button>
+                        <button type="button" id="quranNextAyah">⏭</button>
+                        <div class="quran-mini-progress"><span id="quranMiniProgressFill"></span></div>
+                        <span class="quran-mini-time" id="quranMiniTime">0:00 / 0:00</span>
+                    </div>
+                </div>
             </div>
-            <div class="quran-skeleton-list" id="quranSkeletonList"></div>
-            <div class="quran-ayah-list" id="quranAyahList"></div>
-            <div class="quran-load-more" id="quranLoadMore">Load more…</div>
-        </div>
-
-        <div class="quran-mini-player" id="quranMiniPlayer">
-            <div class="quran-mini-head">
-                <span id="quranNowPlayingLabel">Not playing</span>
-                <span id="quranReciterName">ar.alafasy</span>
-            </div>
-            <div class="quran-mini-controls">
-                <button type="button" id="quranPrevAyah">⏮</button>
-                <button type="button" id="quranPlayPause">▶</button>
-                <button type="button" id="quranStopAyah">⏹</button>
-                <button type="button" id="quranNextAyah">⏭</button>
-                <div class="quran-mini-progress"><span id="quranMiniProgressFill"></span></div>
-                <span class="quran-mini-time" id="quranMiniTime">0:00 / 0:00</span>
-                <button type="button" id="quranSpeedCycle">1x</button>
+            <div class="quran-scroll-content" id="quranScrollContent">
+                <div class="quran-skeleton-list" id="quranSkeletonList"></div>
+                <div class="quran-ayah-list" id="quranAyahList"></div>
+                <div class="quran-load-more" id="quranLoadMore">Load more…</div>
             </div>
         </div>
     </div>
