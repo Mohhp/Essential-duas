@@ -6017,10 +6017,10 @@ window.filterCategory = function(cat, btn) {
         header.innerHTML = `
             <div class="quran-surah-frame">
                 <div style="font-family:var(--font-arabic);font-size:1.3rem;color:var(--gold-light);direction:rtl;">${escapeHtml(cleanSurahArabicName(data.name))}</div>
-                <div style="font-family:var(--font-title);font-size:0.7rem;color:var(--text-subtle);margin-top:2px;">${escapeHtml(data.englishName)} • ${localizeQuranNumber(data.numberOfAyahs)} ${ui.ayahs}</div>
+                <div style="font-family:var(--font-title);font-size:0.7rem;color:var(--text-subtle);margin-top:2px;">${escapeHtml(data.englishName)} &bull; ${localizeQuranNumber(data.numberOfAyahs)} ${ui.ayahs}</div>
                 <div style="margin-top:4px;font-size:0.62rem;color:var(--text-subtle);">${rev.icon} ${rev.label}</div>
             </div>
-            ${Number(data.surahNumber) === 9 ? '' : `<div style="font-family:var(--font-arabic);font-size:1.2rem;line-height:2;color:var(--gold-light);margin-top:8px;">${ui.bismillah}</div>`}
+            ${Number(data.surahNumber) === 9 ? '' : `<div style="font-family:var(--font-arabic);font-size:1.2rem;line-height:2;color:var(--gold-light);margin-top:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.12);">${ui.bismillah}</div>`}
         `;
 
         requestAnimationFrame(() => syncQuranReaderStickyOffsets());
