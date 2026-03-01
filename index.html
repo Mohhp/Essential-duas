@@ -2940,18 +2940,6 @@
                 <div class="quran-ayah-list" id="quranAyahList"></div>
                 <div class="quran-load-more" id="quranLoadMore">Load more…</div>
             </div>
-            <button type="button" class="quran-audio-dot" id="quranAudioDot" aria-label="Play or pause Quran audio">▶</button>
-            <div class="quran-audio-popup" id="quranAudioPopup" aria-hidden="true">
-                <div class="quran-audio-popup-head">
-                    <span id="quranAudioAyahLabel">Ayah 0/0</span>
-                    <button type="button" id="quranAudioPopupClose" aria-label="Close audio popup">✕</button>
-                </div>
-                <div class="quran-audio-popup-actions">
-                    <button type="button" id="quranAudioPrev" aria-label="Previous ayah">⏮</button>
-                    <button type="button" id="quranAudioStop" aria-label="Stop audio">⏹</button>
-                    <button type="button" id="quranAudioNext" aria-label="Next ayah">⏭</button>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -3163,6 +3151,20 @@
         <span>Prayer</span>
     </button>
 </nav>
+
+<!-- ===== QURAN FLOATING AUDIO DOT (BODY LEVEL) ===== -->
+<div id="quran-floating-dot" class="quran-audio-dot" style="display:none;" aria-label="Play or pause Quran audio" role="button" tabindex="0">
+    <span class="dot-icon">⏸</span>
+</div>
+
+<!-- ===== QURAN FLOATING DOT POPUP (BODY LEVEL) ===== -->
+<div id="quran-dot-popup" class="quran-dot-popup" style="display:none;" aria-hidden="true">
+    <button class="dot-popup-btn" id="dot-prev" type="button" aria-label="Previous ayah">⏮</button>
+    <button class="dot-popup-btn" id="dot-stop" type="button" aria-label="Stop audio">⏹ Stop</button>
+    <button class="dot-popup-btn" id="dot-next" type="button" aria-label="Next ayah">⏭</button>
+    <span class="dot-popup-info" id="dot-ayah-info">Ayah 1/7</span>
+    <button class="dot-popup-btn" id="dot-close" type="button" aria-label="Close audio popup">✕ Close</button>
+</div>
 
 </body>
 </html>
