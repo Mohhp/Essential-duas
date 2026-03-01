@@ -4768,6 +4768,7 @@ window.filterCategory = function(cat, btn) {
             tabSettings: isPS ? 'تنظیمات' : 'Settings',
             searchPlaceholder: isPS ? 'سورت ولټوئ (شمېره، عربي، انګلیسي)...' : 'Search Surah (number, Arabic, English)...',
             continueReading: isPS ? 'مطالعه دوام ورکړئ' : 'Continue Reading',
+            continue: isPS ? 'دوام' : 'Continue',
             recentlyRead: isPS ? 'وروستي لوستل شوي' : 'Recently Read',
             ayahs: isPS ? 'آیتونه' : 'Ayahs',
             makki: isPS ? 'مکي' : 'Makki',
@@ -4912,6 +4913,58 @@ window.filterCategory = function(cat, btn) {
         return String(name || '').replace(/^سُورَةُ\s*/u, '').replace(/^سورة\s*/u, '').trim();
     }
 
+    function normalizeLatinSearchText(value) {
+        let text = String(value || '')
+            .toLowerCase()
+            .normalize('NFKD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/['’`\-_.]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        text = text.replace(/^(al|as|ar|an)\s+/i, '');
+        const compact = text.replace(/\s+/g, '');
+        const slimVowels = compact.replace(/([aeiou])\1+/g, '$1');
+        const consonantSkeleton = slimVowels.replace(/[aeiou]/g, '');
+        return { compact, slimVowels, consonantSkeleton };
+    }
+
+    function normalizeArabicSearchText(value) {
+        const normalized = String(value || '')
+            .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '')
+            .replace(/[\u0640]/g, '')
+            .replace(/[أإآٱ]/g, 'ا')
+            .replace(/ى/g, 'ي')
+            .replace(/ؤ/g, 'و')
+            .replace(/ئ/g, 'ي')
+            .replace(/ة/g, 'ه')
+            .replace(/[\s\-ـ'’`_.]+/g, '')
+            .trim();
+        return {
+            value: normalized,
+            noArticle: normalized.replace(/^ال+/, '')
+        };
+    }
+
+    function includesFuzzyLatin(haystackRaw, needleRaw) {
+        const haystack = normalizeLatinSearchText(haystackRaw);
+        const needle = normalizeLatinSearchText(needleRaw);
+        if (!needle.compact) return true;
+        if (haystack.compact.includes(needle.compact)) return true;
+        if (haystack.slimVowels.includes(needle.slimVowels)) return true;
+        return !!needle.consonantSkeleton && haystack.consonantSkeleton.includes(needle.consonantSkeleton);
+    }
+
+    function includesFuzzyArabic(haystackRaw, needleRaw) {
+        const haystack = normalizeArabicSearchText(haystackRaw);
+        const needle = normalizeArabicSearchText(needleRaw);
+        if (!needle.value) return true;
+        return haystack.value.includes(needle.value)
+            || haystack.noArticle.includes(needle.value)
+            || haystack.value.includes(needle.noArticle)
+            || haystack.noArticle.includes(needle.noArticle);
+    }
+
     function getRevelationMeta(typeRaw) {
         const ui = getQuranUiText();
         const type = String(typeRaw || '').toLowerCase();
@@ -4922,7 +4975,14 @@ window.filterCategory = function(cat, btn) {
     }
 
     function getCurrentSurahMetaByNumber(surahNumber) {
-        const refs = quranState.meta?.surahs?.references || [];
+        let refs = quranState.meta?.surahs?.references || [];
+        if (!refs.length) {
+            try {
+                const cachedMeta = JSON.parse(localStorage.getItem(QURAN_META_KEY) || 'null');
+                refs = cachedMeta?.surahs?.references || [];
+                if (refs.length && !quranState.meta) quranState.meta = cachedMeta;
+            } catch (error) {}
+        }
         return refs.find(ref => Number(ref.number) === Number(surahNumber)) || null;
     }
 
@@ -4954,14 +5014,21 @@ window.filterCategory = function(cat, btn) {
 
     function buildQuranSurahList(search = '') {
         const refs = quranState.meta?.surahs?.references || [];
-        const query = String(search || '').trim().toLowerCase();
+        const query = String(search || '').trim();
         if (!query) return refs;
+
+        const hasArabic = /[\u0600-\u06FF]/.test(query);
 
         return refs.filter((surah) => {
             const number = String(surah.number);
-            const ar = cleanSurahArabicName(surah.name).toLowerCase();
-            const en = String(surah.englishName || '').toLowerCase();
-            return number.includes(query) || en.includes(query) || ar.includes(query);
+            const ar = cleanSurahArabicName(surah.name);
+            const en = String(surah.englishName || '');
+            const enTranslation = String(surah.englishNameTranslation || '');
+            if (number.includes(query)) return true;
+            if (hasArabic) return includesFuzzyArabic(ar, query);
+            return includesFuzzyLatin(en, query)
+                || includesFuzzyLatin(enTranslation, query)
+                || includesFuzzyArabic(ar, query);
         });
     }
 
@@ -4989,7 +5056,7 @@ window.filterCategory = function(cat, btn) {
                         <div style="font-size:0.88rem;color:var(--text-primary);">${surahName}</div>
                         <div style="font-size:0.68rem;color:var(--text-subtle);">${ui.juzLabel ? '' : ''}${isPashtoMode() ? 'آیت' : 'Ayah'} ${localizeQuranNumber(last.ayahNumber || 1)}</div>
                     </div>
-                    <button class="quran-row-btn" type="button" onclick="resumeQuranReading()">${ui.open}</button>
+                    <button class="quran-row-btn" type="button" onclick="resumeQuranReading()">${ui.continue}</button>
                 </div>
             </div>`;
     }
@@ -5030,7 +5097,11 @@ window.filterCategory = function(cat, btn) {
         if (search) search.style.display = view === 'surah' ? '' : 'none';
         if (!list) return;
 
-        if (view === 'surah') renderQuranSurahRows();
+        if (view === 'surah') {
+            renderQuranContinueCard();
+            renderQuranRecentSection();
+            renderQuranSurahRows();
+        }
         else if (view === 'juz') renderQuranJuzRows();
         else if (view === 'bookmarks') renderQuranBookmarksSection();
         else if (view === 'settings') renderQuranSettingsSection();
@@ -5370,6 +5441,7 @@ window.filterCategory = function(cat, btn) {
         if (fill) fill.style.width = `${percent}%`;
 
         setQuranLastRead({ surahNumber: quranState.currentSurah, ayahNumber: ayahNo });
+        renderQuranContinueCard();
 
         if (quranState.renderedAyahs < quranState.currentSurahData.ayahs.length) {
             const nearBottom = panel.scrollTop + panel.clientHeight > panel.scrollHeight - 260;
@@ -5413,6 +5485,8 @@ window.filterCategory = function(cat, btn) {
             const finalCard = document.getElementById(`quranAyah-${quranState.currentSurah}:${ayahNumber}`);
             if (finalCard) finalCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+            setQuranLastRead({ surahNumber: quranState.currentSurah, ayahNumber: Number(ayahNumber) || 1 });
+
             pushQuranRecent({ surahNumber: quranState.currentSurah, ayahNumber, surahLabel: isPashtoMode() ? cleanSurahArabicName(data.name) : data.englishName });
             markSurahOffline(quranState.currentSurah);
             renderQuranContinueCard();
@@ -5451,26 +5525,51 @@ window.filterCategory = function(cat, btn) {
         if (playAllBtn) playAllBtn.textContent = ui.playAll;
     }
 
+    async function getAyahGlobalNumber(surahNumber, ayahNumber) {
+        const stateData = quranState.currentSurahData;
+        if (stateData && Number(quranState.currentSurah) === Number(surahNumber)) {
+            const found = stateData.ayahs?.find(a => Number(a.numberInSurah) === Number(ayahNumber));
+            if (found?.number) return Number(found.number);
+        }
+
+        try {
+            const bundle = await fetchSurahBundle(Number(surahNumber));
+            const found = bundle?.ayahs?.find(a => Number(a.numberInSurah) === Number(ayahNumber));
+            if (found?.number) return Number(found.number);
+        } catch (error) {}
+
+        return null;
+    }
+
     async function fetchAyahAudioUrl(surahNumber, ayahNumber, reciter) {
-        const response = await fetch(`${QURAN_API_BASE}/ayah/${surahNumber}:${ayahNumber}/${reciter}`);
-        const json = await response.json();
-        return json?.data?.audio || null;
+        const globalAyahNo = await getAyahGlobalNumber(surahNumber, ayahNumber);
+        if (globalAyahNo) return `https://cdn.islamic.network/quran/audio/128/${reciter}/${globalAyahNo}.mp3`;
+
+        try {
+            const response = await fetch(`${QURAN_API_BASE}/ayah/${surahNumber}:${ayahNumber}/${reciter}`);
+            const json = await response.json();
+            if (json?.data?.audio) return json.data.audio;
+        } catch (error) {}
+
+        return null;
     }
 
     async function getPlayableAudioSource(audioUrl) {
         if (!audioUrl || !('caches' in window)) return audioUrl;
         try {
             const cache = await caches.open(QURAN_AUDIO_CACHE);
-            let match = await cache.match(audioUrl);
+            let match = await cache.match(audioUrl, { ignoreSearch: true });
             if (!match) {
-                const response = await fetch(audioUrl, { mode: 'cors' });
-                if (response.ok) {
+                const response = await fetch(audioUrl, { mode: 'no-cors', cache: 'no-store' });
+                if (response && (response.ok || response.type === 'opaque')) {
                     await cache.put(audioUrl, response.clone());
                     match = response;
                 }
             }
             if (match) {
+                if (match.type === 'opaque') return audioUrl;
                 const blob = await match.blob();
+                if (!blob || !blob.size) return audioUrl;
                 if (quranState.audioObjectUrl) URL.revokeObjectURL(quranState.audioObjectUrl);
                 quranState.audioObjectUrl = URL.createObjectURL(blob);
                 return quranState.audioObjectUrl;
@@ -5604,13 +5703,15 @@ window.filterCategory = function(cat, btn) {
 
         const cache = await caches.open(QURAN_AUDIO_CACHE);
         for (const ayah of data.ayahs) {
-            const audioUrl = await fetchAyahAudioUrl(surahNumber, ayah.numberInSurah, reciter);
+            const audioUrl = ayah?.number
+                ? `https://cdn.islamic.network/quran/audio/128/${reciter}/${ayah.number}.mp3`
+                : await fetchAyahAudioUrl(surahNumber, ayah.numberInSurah, reciter);
             if (!audioUrl) continue;
-            const exists = await cache.match(audioUrl);
+            const exists = await cache.match(audioUrl, { ignoreSearch: true });
             if (exists) continue;
             try {
-                const resp = await fetch(audioUrl, { mode: 'cors' });
-                if (resp.ok) await cache.put(audioUrl, resp.clone());
+                const resp = await fetch(audioUrl, { mode: 'no-cors', cache: 'no-store' });
+                if (resp && (resp.ok || resp.type === 'opaque')) await cache.put(audioUrl, resp.clone());
             } catch (error) {}
         }
     }
@@ -5781,6 +5882,9 @@ window.filterCategory = function(cat, btn) {
         lockScroll();
         setBottomNavActive('quran');
         await initQuran();
+        renderQuranContinueCard();
+        renderQuranRecentSection();
+        if (quranState.view === 'surah') renderQuranSurahRows();
     };
 
     window.closeQuran = function() {

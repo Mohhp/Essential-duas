@@ -1,4 +1,5 @@
-const CACHE_NAME = 'essential-duas-v27';
+const CACHE_NAME = 'essential-duas-v28';
+const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
 
 const ASSETS = [
@@ -62,14 +63,31 @@ self.addEventListener('fetch', (event) => {
 
   if (isAudioRequest) {
     event.respondWith(
-      caches.match(event.request).then((cached) => {
-        if (cached) return cached;
-        return fetch(event.request).then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+      (async () => {
+        const audioCache = await caches.open(QURAN_AUDIO_CACHE);
+        const appCache = await caches.open(CACHE_NAME);
+
+        const cachedAudio = await audioCache.match(event.request, { ignoreSearch: true });
+        if (cachedAudio) return cachedAudio;
+
+        const cachedApp = await appCache.match(event.request, { ignoreSearch: true });
+        if (cachedApp) return cachedApp;
+
+        try {
+          const response = await fetch(event.request);
+          if (response && response.ok) {
+            const forAudio = response.clone();
+            const forApp = response.clone();
+            audioCache.put(event.request, forAudio).catch(() => {});
+            appCache.put(event.request, forApp).catch(() => {});
+          }
           return response;
-        });
-      }).catch(() => caches.match(event.request))
+        } catch (error) {
+          const fallback = await caches.match(event.request, { ignoreSearch: true });
+          if (fallback) return fallback;
+          throw error;
+        }
+      })()
     );
     return;
   }
