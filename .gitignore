@@ -17,3 +17,4 @@
 .vscode/
 chrome
 node_modules/
+*.bak
