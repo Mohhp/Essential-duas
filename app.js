@@ -84,6 +84,8 @@
                 if (winScroll > 50) els.nav.classList.add('scrolled');
                 else els.nav.classList.remove('scrolled');
             }
+
+            updateInAppFabVisibility();
         });
 
         // Restore bookmarks UI
@@ -217,6 +219,9 @@
             else if (hash === '#quran') openQuran();
             window.location.hash = '';
         }, 1500); // After splash screen
+
+        initInAppNavigationUX();
+        updateInAppFabVisibility();
     }
 
     function enhanceAccessibility() {
@@ -448,6 +453,27 @@
         const isExpanded = card.classList.toggle('expanded');
         header.setAttribute('aria-expanded', isExpanded);
         if (isExpanded) wrapArabicWords();
+
+        const grid = document.getElementById('categoryGrid');
+        const inCategoryView = !!grid && grid.classList.contains('hidden-grid');
+        if (!inCategoryView) return;
+
+        if (isExpanded) {
+            recordInAppRoute(true, {
+                [IN_APP_HISTORY_FLAG]: true,
+                view: IN_APP_VIEWS.DUA_DETAIL,
+                category: localStorage.getItem('crown_active_category') || 'all',
+                duaId: Number(card.getAttribute('data-id')) || null,
+                ts: Date.now()
+            });
+        } else {
+            recordInAppRoute(false, {
+                [IN_APP_HISTORY_FLAG]: true,
+                view: IN_APP_VIEWS.CATEGORY_VIEW,
+                category: localStorage.getItem('crown_active_category') || 'all',
+                ts: Date.now()
+            });
+        }
     };
 
     window.toggleAllCards = function(expand) {
@@ -498,6 +524,366 @@
             target.classList.add('active');
             target.setAttribute('aria-current', 'page');
         }
+    }
+
+    let inAppCurrentRoute = 'home';
+    const IN_APP_HISTORY_FLAG = '__essential_duas_in_app';
+    let inAppHistorySuppressed = false;
+    let inAppTopVisible = false;
+
+    const IN_APP_VIEWS = {
+        HOME: 'home',
+        CATEGORY_VIEW: 'category_view',
+        DUA_DETAIL: 'dua_detail',
+        QURAN_TAB: 'quran_tab',
+        SURAH_READER: 'surah_reader',
+        PANEL: 'panel'
+    };
+
+    function isCategorySubViewActive() {
+        const grid = document.getElementById('categoryGrid');
+        return !!grid && grid.classList.contains('hidden-grid');
+    }
+
+    function getActivePanelElement() {
+        return document.querySelector('.quran-panel.active')
+            || document.querySelector('.prayer-panel.active')
+            || document.querySelector('.routine-panel.active')
+            || document.querySelector('.tasbeeh-panel.active')
+            || document.querySelector('.etiquette-panel.active')
+            || document.querySelector('.progress-panel.active')
+            || document.querySelector('#bookmarksPanel.active');
+    }
+
+    function getExpandedDuaCard() {
+        return document.querySelector('#duaListSection .dua-card.expanded:not(.hidden-card)');
+    }
+
+    function getInAppStateFromDom() {
+        const quranPanel = document.querySelector('.quran-panel.active');
+        const quranReader = document.getElementById('quranReaderScreen');
+        if (quranPanel && quranReader?.classList.contains('active')) {
+            return {
+                [IN_APP_HISTORY_FLAG]: true,
+                view: IN_APP_VIEWS.SURAH_READER,
+                surah: Number(quranState.currentSurah) || null,
+                ayah: Number((quranState.audioAyah || '').split(':')[1]) || null,
+                ts: Date.now()
+            };
+        }
+
+        if (quranPanel) {
+            return {
+                [IN_APP_HISTORY_FLAG]: true,
+                view: IN_APP_VIEWS.QURAN_TAB,
+                quranView: quranState.view || 'surah',
+                ts: Date.now()
+            };
+        }
+
+        const panelMap = [
+            ['.prayer-panel.active', 'prayer'],
+            ['.routine-panel.active', 'routine'],
+            ['.tasbeeh-panel.active', 'tasbeeh'],
+            ['.etiquette-panel.active', 'etiquette'],
+            ['.progress-panel.active', 'progress'],
+            ['#bookmarksPanel.active', 'bookmarks']
+        ];
+
+        for (const [selector, panelName] of panelMap) {
+            if (document.querySelector(selector)) {
+                return {
+                    [IN_APP_HISTORY_FLAG]: true,
+                    view: IN_APP_VIEWS.PANEL,
+                    panel: panelName,
+                    ts: Date.now()
+                };
+            }
+        }
+
+        if (isCategorySubViewActive()) {
+            const expanded = getExpandedDuaCard();
+            if (expanded) {
+                return {
+                    [IN_APP_HISTORY_FLAG]: true,
+                    view: IN_APP_VIEWS.DUA_DETAIL,
+                    category: localStorage.getItem('crown_active_category') || 'all',
+                    duaId: Number(expanded.getAttribute('data-id')) || null,
+                    ts: Date.now()
+                };
+            }
+
+            return {
+                [IN_APP_HISTORY_FLAG]: true,
+                view: IN_APP_VIEWS.CATEGORY_VIEW,
+                category: localStorage.getItem('crown_active_category') || 'all',
+                ts: Date.now()
+            };
+        }
+
+        return {
+            [IN_APP_HISTORY_FLAG]: true,
+            view: IN_APP_VIEWS.HOME,
+            ts: Date.now()
+        };
+    }
+
+    function getInAppRoute() {
+        const state = getInAppStateFromDom();
+        return state.view || IN_APP_VIEWS.HOME;
+    }
+
+    function sameInAppState(a, b) {
+        if (!a || !b) return false;
+        return a.view === b.view
+            && a.panel === b.panel
+            && a.category === b.category
+            && a.duaId === b.duaId
+            && a.surah === b.surah
+            && a.quranView === b.quranView;
+    }
+
+    function getActiveScrollableElement() {
+        if (document.querySelector('.quran-panel.active')) {
+            return document.querySelector('.quran-panel');
+        }
+        if (document.querySelector('.prayer-panel.active')) {
+            return document.querySelector('.prayer-panel');
+        }
+        if (document.querySelector('.routine-panel.active')) {
+            return document.querySelector('.routine-panel');
+        }
+        if (document.querySelector('.tasbeeh-panel.active')) {
+            return document.querySelector('.tasbeeh-panel');
+        }
+        if (document.querySelector('.etiquette-panel.active')) {
+            return document.querySelector('.etiquette-panel');
+        }
+        if (document.querySelector('.progress-panel.active')) {
+            return document.querySelector('.progress-panel');
+        }
+        return document.scrollingElement || document.documentElement || document.body || window;
+    }
+
+    function updateInAppFabVisibility() {
+        const backBtn = document.getElementById('inAppBackBtn');
+        const topBtn = document.getElementById('inAppTopBtn');
+        const route = getInAppRoute();
+        if (backBtn) backBtn.classList.toggle('visible', route !== IN_APP_VIEWS.HOME);
+
+        const scroller = getActiveScrollableElement();
+        const scrollTop = scroller === window
+            ? (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0)
+            : Math.max(
+                scroller.scrollTop || 0,
+                window.scrollY || 0,
+                document.documentElement.scrollTop || 0,
+                document.body.scrollTop || 0
+            );
+
+        if (scrollTop > 300) inAppTopVisible = true;
+        else if (scrollTop < 100) inAppTopVisible = false;
+
+        if (topBtn) topBtn.classList.toggle('visible', inAppTopVisible);
+    }
+
+    function recordInAppRoute(push = false, forcedState = null) {
+        if (inAppHistorySuppressed) {
+            updateInAppFabVisibility();
+            return;
+        }
+
+        const state = forcedState || getInAppStateFromDom();
+        const current = history.state;
+
+        if (!current || !current[IN_APP_HISTORY_FLAG]) {
+            history.replaceState(state, '');
+            inAppCurrentRoute = state.view || IN_APP_VIEWS.HOME;
+            updateInAppFabVisibility();
+            return;
+        }
+
+        if (push && !sameInAppState(state, current)) {
+            history.pushState(state, '');
+        } else {
+            history.replaceState(state, '');
+        }
+
+        inAppCurrentRoute = state.view || IN_APP_VIEWS.HOME;
+        updateInAppFabVisibility();
+    }
+
+    function scrollActiveViewToTop() {
+        const scroller = getActiveScrollableElement();
+        if (scroller === window) window.scrollTo({ top: 0, behavior: 'smooth' });
+        else scroller.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeAllPanelsForStateApply() {
+        if (document.querySelector('.quran-panel.active')) closeQuran();
+        if (document.querySelector('.prayer-panel.active')) closePrayer();
+        if (document.querySelector('.routine-panel.active')) closeRoutine();
+        if (document.querySelector('.tasbeeh-panel.active')) closeTasbeeh();
+        if (document.querySelector('.etiquette-panel.active')) closeEtiquette();
+        if (document.querySelector('.progress-panel.active')) closeProgress();
+        const bookmarksPanel = document.getElementById('bookmarksPanel');
+        if (bookmarksPanel?.classList.contains('active')) toggleBookmarksPanel();
+    }
+
+    function collapseExpandedDuaCards() {
+        document.querySelectorAll('#duaListSection .dua-card.expanded').forEach((card) => {
+            card.classList.remove('expanded');
+            const header = card.querySelector('.card-header');
+            if (header) header.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    async function applyInAppState(state) {
+        if (!state || !state[IN_APP_HISTORY_FLAG]) return;
+
+        inAppHistorySuppressed = true;
+        try {
+            const view = state.view || IN_APP_VIEWS.HOME;
+
+            closeAllPanelsForStateApply();
+
+            if (view === IN_APP_VIEWS.HOME) {
+                if (isCategorySubViewActive()) backToCategories();
+                collapseExpandedDuaCards();
+            } else if (view === IN_APP_VIEWS.CATEGORY_VIEW) {
+                openCategory(state.category || 'all', { skipScroll: true });
+                collapseExpandedDuaCards();
+            } else if (view === IN_APP_VIEWS.DUA_DETAIL) {
+                const category = state.category || 'all';
+                openCategory(category, { skipScroll: true });
+                collapseExpandedDuaCards();
+                const card = document.querySelector(`#duaListSection .dua-card[data-id="${state.duaId}"]`);
+                const header = card?.querySelector('.card-header');
+                if (card && header && !card.classList.contains('expanded')) {
+                    toggleCard(header);
+                }
+            } else if (view === IN_APP_VIEWS.QURAN_TAB) {
+                await openQuran();
+                setQuranView('surah');
+            } else if (view === IN_APP_VIEWS.SURAH_READER) {
+                await openQuran();
+                await openQuranSurah(Number(state.surah) || 1, Number(state.ayah) || 1);
+            } else if (view === IN_APP_VIEWS.PANEL) {
+                const panel = state.panel;
+                if (panel === 'prayer') openPrayer();
+                else if (panel === 'routine') openRoutine();
+                else if (panel === 'tasbeeh') openTasbeeh();
+                else if (panel === 'etiquette') openEtiquette();
+                else if (panel === 'progress') openProgress();
+                else if (panel === 'bookmarks') toggleBookmarksPanel();
+            }
+        } finally {
+            inAppHistorySuppressed = false;
+            updateInAppFabVisibility();
+        }
+    }
+
+    function triggerInAppBack() {
+        const route = getInAppRoute();
+        if (route === IN_APP_VIEWS.HOME) return;
+        history.back();
+    }
+
+    function initInAppNavigationUX() {
+        const backBtn = document.getElementById('inAppBackBtn');
+        const topBtn = document.getElementById('inAppTopBtn');
+
+        if (backBtn && backBtn.dataset.bound !== '1') {
+            backBtn.addEventListener('touchstart', (event) => {
+                event.preventDefault();
+                triggerInAppBack();
+            }, { passive: false });
+            backBtn.addEventListener('click', triggerInAppBack);
+            backBtn.dataset.bound = '1';
+        }
+
+        if (topBtn && topBtn.dataset.bound !== '1') {
+            topBtn.addEventListener('touchstart', (event) => {
+                event.preventDefault();
+                scrollActiveViewToTop();
+            }, { passive: false });
+            topBtn.addEventListener('click', scrollActiveViewToTop);
+            topBtn.dataset.bound = '1';
+        }
+
+        window.addEventListener('popstate', (event) => {
+            const state = event.state;
+            if (!state || !state[IN_APP_HISTORY_FLAG]) {
+                if (getInAppRoute() !== IN_APP_VIEWS.HOME) {
+                    inAppHistorySuppressed = true;
+                    try {
+                        closeAllPanelsForStateApply();
+                        if (isCategorySubViewActive()) backToCategories();
+                        collapseExpandedDuaCards();
+                    } finally {
+                        inAppHistorySuppressed = false;
+                    }
+                }
+                updateInAppFabVisibility();
+                return;
+            }
+
+            applyInAppState(state);
+        });
+
+        let swipeStartX = 0;
+        let swipeStartY = 0;
+        let swipeTracking = false;
+        const swipeIndicator = document.getElementById('inAppSwipeIndicator');
+
+        document.addEventListener('touchstart', (event) => {
+            const touch = event.touches?.[0];
+            if (!touch) return;
+            swipeTracking = touch.clientX <= 30;
+            if (!swipeTracking) return;
+            swipeStartX = touch.clientX;
+            swipeStartY = touch.clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (event) => {
+            if (!swipeTracking) return;
+            const touch = event.touches?.[0];
+            if (!touch) return;
+            const dx = touch.clientX - swipeStartX;
+            const dy = Math.abs(touch.clientY - swipeStartY);
+            if (dy > 60) {
+                swipeTracking = false;
+                if (swipeIndicator) swipeIndicator.classList.remove('visible');
+                return;
+            }
+            if (swipeIndicator) swipeIndicator.classList.toggle('visible', dx > 12 && getInAppRoute() !== 'home');
+        }, { passive: true });
+
+        document.addEventListener('touchend', (event) => {
+            if (!swipeTracking) return;
+            const touch = event.changedTouches?.[0];
+            swipeTracking = false;
+            if (swipeIndicator) swipeIndicator.classList.remove('visible');
+            if (!touch) return;
+            const dx = touch.clientX - swipeStartX;
+            if (dx >= 80 && getInAppRoute() !== IN_APP_VIEWS.HOME) triggerInAppBack();
+        }, { passive: true });
+
+        window.addEventListener('scroll', updateInAppFabVisibility, { passive: true });
+        document.addEventListener('scroll', updateInAppFabVisibility, { passive: true });
+        const mainContainer = document.getElementById('mainContainer');
+        if (mainContainer) mainContainer.addEventListener('scroll', updateInAppFabVisibility, { passive: true });
+        document.querySelectorAll('.quran-panel, .prayer-panel, .routine-panel, .tasbeeh-panel, .etiquette-panel').forEach((panel) => {
+            panel.addEventListener('scroll', updateInAppFabVisibility, { passive: true });
+        });
+
+        const currentState = getInAppStateFromDom();
+        if (!history.state || !history.state[IN_APP_HISTORY_FLAG]) {
+            history.replaceState(currentState, '');
+        } else {
+            recordInAppRoute(false, currentState);
+        }
+        updateInAppFabVisibility();
     }
 
     // ===== BOOKMARKING =====
@@ -687,6 +1073,11 @@ window.filterCategory = function(cat, btn) {
         // Filter cards to this category
         const pill = document.querySelector(`.pill[data-category="${cat}"]`);
         filterCategory(cat, pill);
+        document.querySelectorAll('#duaListSection .dua-card.expanded').forEach((card) => {
+            card.classList.remove('expanded');
+            const header = card.querySelector('.card-header');
+            if (header) header.setAttribute('aria-expanded', 'false');
+        });
 
         // Scroll to the dua list so user sees cards immediately
         if (!opts.skipScroll) {
@@ -695,6 +1086,12 @@ window.filterCategory = function(cat, btn) {
 
         // Save state
         localStorage.setItem('crown_active_category', cat);
+        recordInAppRoute(true, {
+            [IN_APP_HISTORY_FLAG]: true,
+            view: IN_APP_VIEWS.CATEGORY_VIEW,
+            category: cat,
+            ts: Date.now()
+        });
     };
 
     window.backToCategories = function() {
@@ -735,6 +1132,11 @@ window.filterCategory = function(cat, btn) {
 
         // Drop saved state
         localStorage.removeItem('crown_active_category');
+        recordInAppRoute(false, {
+            [IN_APP_HISTORY_FLAG]: true,
+            view: IN_APP_VIEWS.HOME,
+            ts: Date.now()
+        });
     };
 
     // Search should auto-open the dua list if grid is visible
@@ -797,9 +1199,11 @@ window.filterCategory = function(cat, btn) {
         if (isOpening) {
             lockScroll();
             setBottomNavActive('saved');
+            recordInAppRoute(true);
         } else {
             unlockScroll();
             setBottomNavActive('home');
+            recordInAppRoute(false);
         }
     };
 
@@ -982,6 +1386,7 @@ window.filterCategory = function(cat, btn) {
         updateTasbeehSoundToggle();
         const closeBtn = document.querySelector('.tasbeeh-close');
         if (closeBtn) closeBtn.focus();
+        recordInAppRoute(true);
     };
 
     window.openTasbeehWith = function(target) {
@@ -1001,6 +1406,7 @@ window.filterCategory = function(cat, btn) {
         if (tp) tp.classList.remove('active');
         unlockScroll();
         setBottomNavActive('home');
+        recordInAppRoute(false);
     };
 
     window.tapTasbeeh = function(event) {
@@ -1094,12 +1500,14 @@ window.filterCategory = function(cat, btn) {
         lockScroll();
         const closeBtn = ep.querySelector('.etiquette-close');
         if (closeBtn) closeBtn.focus();
+        recordInAppRoute(true);
     };
 
     window.closeEtiquette = function() {
         const ep = document.querySelector('.etiquette-panel');
         if (ep) ep.classList.remove('active');
         unlockScroll();
+        recordInAppRoute(false);
     };
 
     // ===== ROUTINE PANEL =====
@@ -1182,6 +1590,7 @@ window.filterCategory = function(cat, btn) {
         loadRoutineDailyDua();
         const closeBtn = rp.querySelector('.etiquette-close');
         if (closeBtn) closeBtn.focus();
+        recordInAppRoute(true);
     };
 
     window.closeRoutine = function() {
@@ -1189,6 +1598,7 @@ window.filterCategory = function(cat, btn) {
         if (rp) rp.classList.remove('active');
         unlockScroll();
         setBottomNavActive('home');
+        recordInAppRoute(false);
     };
 
     // ===== SHARE =====
@@ -1461,12 +1871,14 @@ window.filterCategory = function(cat, btn) {
         renderProgressPanel();
         pp.classList.add('active');
         lockScroll();
+        recordInAppRoute(true);
     };
 
     window.closeProgress = function() {
         const pp = document.querySelector('.progress-panel');
         if (pp) pp.classList.remove('active');
         unlockScroll();
+        recordInAppRoute(false);
     };
 
     function renderProgressPanel() {
@@ -3267,6 +3679,16 @@ window.filterCategory = function(cat, btn) {
         adhan: 'audio/adhan-alert.wav',
         tone: 'audio/notification-tone.wav'
     };
+    const REMINDER_SOUND_OPTIONS = [
+        { id: 'adhan_mishary', labelEn: 'Full Adhan — Mishary Rashid Alafasy', labelPs: 'بشپړ اذان — مشاري راشد العفاسي', file: 'audio/reminders/adhan-mishary.wav' },
+        { id: 'adhan_abdulbasit', labelEn: 'Full Adhan — Abdul Basit', labelPs: 'بشپړ اذان — عبدالباسط', file: 'audio/reminders/adhan-abdulbasit.wav' },
+        { id: 'adhan_short', labelEn: 'Short Adhan — Allahu Akbar', labelPs: 'لنډ اذان — الله اکبر', file: 'audio/reminders/adhan-short.wav' },
+        { id: 'takbeer', labelEn: 'Takbeer — Allahu Akbar repeat', labelPs: 'تکبیر — الله اکبر تکرار', file: 'audio/reminders/takbeer.wav' },
+        { id: 'nasheed_soft', labelEn: 'Soft Islamic Nasheed tone', labelPs: 'نرم اسلامي نشید غږ', file: 'audio/reminders/nasheed-soft.wav' },
+        { id: 'bell_chime', labelEn: 'Simple Bell / Chime', labelPs: 'ساده زنګ / چایم', file: 'audio/reminders/bell-chime.wav' },
+        { id: 'soft_ding', labelEn: 'Soft Ding', labelPs: 'نرم ډینګ', file: 'audio/reminders/soft-ding.wav' },
+        { id: 'silent', labelEn: 'Silent — notification only', labelPs: 'بې غږه — یوازې خبرتیا', file: null }
+    ];
     const PRAYER_LABELS_EN = { fajr: 'Fajr', sunrise: 'Sunrise', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
     const PRAYER_LABELS_PS = { fajr: 'سهار', sunrise: 'لمر ختل', dhuhr: 'غرمه', asr: 'مازديګر', maghrib: 'ماښام', isha: 'ماخستن' };
     const PRAYER_ICONS = { fajr: '🌅', sunrise: '☀️', dhuhr: '🕛', asr: '🌤', maghrib: '🌇', isha: '🌙' };
@@ -3332,7 +3754,8 @@ window.filterCategory = function(cat, btn) {
     let compassWatchId = null;
     let userQibla = null;
     let reminderSettings = null;
-    let reminderAudio = { adhan: null, tone: null };
+    let reminderAudio = {};
+    let reminderPreviewAudio = null;
     let reminderMidnightTimer = null;
     let dailyReminderRescheduleTimeout = null;
     let isGpsResolving = false;
@@ -3410,12 +3833,175 @@ window.filterCategory = function(cat, btn) {
     }
 
     function preloadPrayerReminderAudio() {
-        Object.entries(REMINDER_AUDIO_FILES).forEach(([key, src]) => {
-            if (reminderAudio[key]) return;
-            const audio = new Audio(src);
+        REMINDER_SOUND_OPTIONS.forEach((option) => {
+            if (!option.file || reminderAudio[option.id]) return;
+            const audio = new Audio(option.file);
             audio.preload = 'metadata';
-            reminderAudio[key] = audio;
+            reminderAudio[option.id] = audio;
         });
+        window.reminderAudio = reminderAudio;
+    }
+
+    function playReminderAudioOption(soundId, { isPreview = false } = {}) {
+        const option = getReminderSoundOption(soundId);
+        if (!option || !option.file || option.id === 'silent') return null;
+
+        if (!reminderAudio[option.id]) {
+            reminderAudio[option.id] = new Audio(option.file);
+            reminderAudio[option.id].preload = 'auto';
+        }
+
+        const audio = reminderAudio[option.id];
+        try {
+            audio.currentTime = 0;
+            const playPromise = audio.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch((error) => {
+                    console.error('[ReminderAudio] play failed', { soundId: option.id, isPreview, error });
+                });
+            }
+            return audio;
+        } catch (error) {
+            console.error('[ReminderAudio] play failed (sync)', { soundId: option.id, isPreview, error });
+            return null;
+        }
+    }
+
+    function getReminderSoundOption(soundId) {
+        return REMINDER_SOUND_OPTIONS.find(option => option.id === soundId) || REMINDER_SOUND_OPTIONS[0];
+    }
+
+    function getReminderSoundLabel(soundId) {
+        const option = getReminderSoundOption(soundId);
+        return isPashtoMode() ? option.labelPs : option.labelEn;
+    }
+
+    function renderReminderSoundCards() {
+        const root = document.getElementById('reminderSoundCards');
+        if (!root) return;
+        const settings = loadReminderSettings();
+
+        root.innerHTML = REMINDER_SOUND_OPTIONS.map((option) => {
+            const active = settings.soundId === option.id;
+            return `
+                <div class="reminder-sound-card ${active ? 'active' : ''}" data-sound-id="${option.id}" role="button" tabindex="0" aria-label="${escapeHtml(getReminderSoundLabel(option.id))}" onclick="selectReminderSoundOption('${option.id}')">
+                    <span class="reminder-sound-radio" aria-hidden="true"></span>
+                    <span class="reminder-sound-name">${escapeHtml(getReminderSoundLabel(option.id))}</span>
+                    <button type="button" class="reminder-sound-preview" data-preview-sound="${option.id}" ${option.file ? '' : 'disabled'} onclick="event.stopPropagation(); previewReminderSoundOption('${option.id}', this)">${option.file ? '▶' : '—'}</button>
+                </div>
+            `;
+        }).join('');
+
+        root.querySelectorAll('.reminder-sound-card').forEach((card) => {
+            const soundId = card.getAttribute('data-sound-id');
+            card.addEventListener('click', (event) => {
+                if (event.target.closest('.reminder-sound-preview')) return;
+                const settings = loadReminderSettings();
+                settings.soundId = soundId;
+                saveReminderSettings();
+                renderReminderSoundCards();
+                showToast(getPrayerUiText().reminderSaved);
+            });
+            card.addEventListener('keydown', (event) => {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                event.preventDefault();
+                const settings = loadReminderSettings();
+                settings.soundId = soundId;
+                saveReminderSettings();
+                renderReminderSoundCards();
+                showToast(getPrayerUiText().reminderSaved);
+            });
+        });
+
+        root.querySelectorAll('.reminder-sound-preview').forEach((button) => {
+            const soundId = button.getAttribute('data-preview-sound');
+
+            const runPreview = (event, isTouch = false) => {
+                if (event) {
+                    event.stopPropagation();
+                    if (isTouch) event.preventDefault();
+                }
+                button.classList.add('is-playing');
+                previewReminderSound(soundId, button);
+            };
+
+            button.addEventListener('touchstart', (event) => runPreview(event, true), { passive: false });
+            button.addEventListener('click', (event) => runPreview(event, false));
+        });
+    }
+
+    window.selectReminderSoundOption = function(soundId) {
+        const settings = loadReminderSettings();
+        settings.soundId = soundId;
+        saveReminderSettings();
+        renderReminderSoundCards();
+        renderPerPrayerSoundSelectors();
+        showToast(getPrayerUiText().reminderSaved);
+    };
+
+    window.previewReminderSoundOption = function(soundId, triggerButton) {
+        previewReminderSound(soundId, triggerButton || null);
+    };
+
+    function renderPerPrayerSoundSelectors() {
+        const wrap = document.getElementById('perPrayerSoundWrap');
+        if (!wrap) return;
+        const settings = loadReminderSettings();
+        wrap.classList.toggle('active', !settings.sameSoundForAll);
+        if (settings.sameSoundForAll) {
+            wrap.innerHTML = '';
+            return;
+        }
+
+        const options = REMINDER_SOUND_OPTIONS.map((option) => `<option value="${option.id}">${escapeHtml(getReminderSoundLabel(option.id))}</option>`).join('');
+        wrap.innerHTML = REMINDER_PRAYERS.map((prayerName) => `
+            <div class="per-prayer-sound-row">
+                <label for="perPrayerSound-${prayerName}">${escapeHtml(getPrayerLabel(prayerName))}</label>
+                <select id="perPrayerSound-${prayerName}" data-prayer-sound="${prayerName}" class="prayer-reminder-select">${options}</select>
+            </div>
+        `).join('');
+
+        wrap.querySelectorAll('[data-prayer-sound]').forEach((select) => {
+            const prayerName = select.getAttribute('data-prayer-sound');
+            select.value = settings.prayerSounds[prayerName] || settings.soundId;
+            select.addEventListener('change', () => {
+                const current = loadReminderSettings();
+                current.prayerSounds[prayerName] = select.value;
+                saveReminderSettings();
+                showToast(getPrayerUiText().reminderSaved);
+            });
+        });
+    }
+
+    function previewReminderSound(soundId, triggerButton) {
+        const option = getReminderSoundOption(soundId);
+        if (!option.file) return;
+        if (reminderPreviewAudio) {
+            reminderPreviewAudio.pause();
+            reminderPreviewAudio.currentTime = 0;
+        }
+        reminderPreviewAudio = playReminderAudioOption(soundId, { isPreview: true });
+        window.reminderPreviewAudio = reminderPreviewAudio;
+        if (!reminderPreviewAudio) {
+            if (triggerButton) {
+                triggerButton.classList.remove('is-playing');
+                triggerButton.textContent = '▶';
+            }
+            return;
+        }
+        if (triggerButton) {
+            triggerButton.textContent = '⏸';
+            reminderPreviewAudio.addEventListener('ended', () => {
+                triggerButton.classList.remove('is-playing');
+                triggerButton.textContent = '▶';
+            }, { once: true });
+            setTimeout(() => {
+                if (triggerButton.textContent === '⏸') {
+                    triggerButton.classList.remove('is-playing');
+                    triggerButton.textContent = '▶';
+                }
+            }, 1400);
+        }
     }
 
     function getPrayerLabel(name) {
@@ -3484,6 +4070,15 @@ window.filterCategory = function(cat, btn) {
         return {
             enabled: false,
             mode: 'tone',
+            soundId: 'adhan_mishary',
+            sameSoundForAll: true,
+            prayerSounds: {
+                fajr: 'adhan_mishary',
+                dhuhr: 'adhan_short',
+                asr: 'adhan_short',
+                maghrib: 'takbeer',
+                isha: 'nasheed_soft'
+            },
             offsetMinutes: 0,
             prayers: {
                 fajr: true,
@@ -3498,11 +4093,18 @@ window.filterCategory = function(cat, btn) {
     function loadReminderSettings() {
         if (reminderSettings) return reminderSettings;
         const defaults = getReminderDefaults();
+        const validSoundIds = REMINDER_SOUND_OPTIONS.map(option => option.id);
         try {
             const raw = JSON.parse(localStorage.getItem('crown_prayer_reminders') || 'null');
             reminderSettings = {
                 enabled: !!raw?.enabled,
                 mode: ['adhan', 'tone', 'silent'].includes(raw?.mode) ? raw.mode : defaults.mode,
+                soundId: validSoundIds.includes(raw?.soundId) ? raw.soundId : defaults.soundId,
+                sameSoundForAll: typeof raw?.sameSoundForAll === 'boolean' ? raw.sameSoundForAll : defaults.sameSoundForAll,
+                prayerSounds: {
+                    ...defaults.prayerSounds,
+                    ...Object.fromEntries(Object.entries(raw?.prayerSounds || {}).filter(([name, soundId]) => REMINDER_PRAYERS.includes(name) && validSoundIds.includes(soundId)))
+                },
                 offsetMinutes: [0, 5, 10, 15].includes(Number(raw?.offsetMinutes)) ? Number(raw.offsetMinutes) : defaults.offsetMinutes,
                 prayers: {
                     ...defaults.prayers,
@@ -3535,6 +4137,12 @@ window.filterCategory = function(cat, btn) {
         const modeSelect = document.getElementById('reminderSoundMode');
         if (modeSelect) modeSelect.value = settings.mode;
 
+        const sameSoundToggle = document.getElementById('sameSoundForAllToggle');
+        if (sameSoundToggle) sameSoundToggle.checked = !!settings.sameSoundForAll;
+
+        renderReminderSoundCards();
+        renderPerPrayerSoundSelectors();
+
         const beforeSelect = document.getElementById('reminderBefore');
         if (beforeSelect) beforeSelect.value = String(settings.offsetMinutes);
     }
@@ -3544,12 +4152,14 @@ window.filterCategory = function(cat, btn) {
         const sectionTitle = document.getElementById('reminderSettingsTitle');
         const masterLabel = document.getElementById('reminderMasterLabel');
         const soundLabel = document.getElementById('reminderSoundLabel');
+        const sameAllLabel = document.getElementById('sameSoundAllLabel');
         const beforeLabel = document.getElementById('reminderBeforeLabel');
         const testBtn = document.getElementById('reminderTestBtn');
 
         if (sectionTitle) sectionTitle.textContent = uiText.reminderSettingsTitle;
         if (masterLabel) masterLabel.textContent = uiText.reminderMaster;
         if (soundLabel) soundLabel.textContent = uiText.reminderSound;
+        if (sameAllLabel) sameAllLabel.textContent = isPashtoMode() ? 'د ټولو لمونځونو لپاره یو غږ' : 'Same sound for all prayers';
         if (beforeLabel) beforeLabel.textContent = uiText.reminderBefore;
         if (testBtn) testBtn.textContent = uiText.testReminder;
 
@@ -3579,6 +4189,9 @@ window.filterCategory = function(cat, btn) {
             const label = document.getElementById(`remPrayerLabel-${name}`);
             if (label) label.textContent = getPrayerLabel(name);
         });
+
+        renderReminderSoundCards();
+        renderPerPrayerSoundSelectors();
 
         const instruction = document.getElementById('qiblaInstruction');
         if (instruction) {
@@ -3648,6 +4261,17 @@ window.filterCategory = function(cat, btn) {
             });
         }
 
+        const sameSoundToggle = document.getElementById('sameSoundForAllToggle');
+        if (sameSoundToggle) {
+            sameSoundToggle.addEventListener('change', () => {
+                const settings = loadReminderSettings();
+                settings.sameSoundForAll = !!sameSoundToggle.checked;
+                saveReminderSettings();
+                renderPerPrayerSoundSelectors();
+                showToast(getPrayerUiText().reminderSaved);
+            });
+        }
+
         const beforeSelect = document.getElementById('reminderBefore');
         if (beforeSelect) {
             beforeSelect.addEventListener('change', () => {
@@ -3665,6 +4289,10 @@ window.filterCategory = function(cat, btn) {
 
         const testBtn = document.getElementById('reminderTestBtn');
         if (testBtn) {
+            testBtn.addEventListener('touchstart', (event) => {
+                event.preventDefault();
+                runReminderTest();
+            }, { passive: false });
             testBtn.addEventListener('click', () => {
                 runReminderTest();
             });
@@ -3959,6 +4587,7 @@ window.filterCategory = function(cat, btn) {
             setSelectedCityChip(getPrayerUiText().noCitySelected);
             requestLocation();
         }
+        recordInAppRoute(true);
     };
 
     window.closePrayer = function() {
@@ -3967,6 +4596,7 @@ window.filterCategory = function(cat, btn) {
         unlockScroll();
         setBottomNavActive('home');
         if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+        recordInAppRoute(false);
     };
 
     window.requestLocation = function() {
@@ -4416,22 +5046,15 @@ window.filterCategory = function(cat, btn) {
         new Notification(title, options);
     }
 
-    function playReminderSound(mode) {
-        if (mode === 'silent') return;
-        const selectedMode = mode === 'adhan' ? 'adhan' : 'tone';
-        const src = REMINDER_AUDIO_FILES[selectedMode];
-        if (!src) return;
+    function resolveReminderSoundId(prayerName = null) {
+        const settings = loadReminderSettings();
+        if (settings.mode === 'silent') return 'silent';
+        if (settings.sameSoundForAll || !prayerName) return settings.soundId || 'adhan_mishary';
+        return settings.prayerSounds?.[prayerName] || settings.soundId || 'adhan_mishary';
+    }
 
-        if (!reminderAudio[selectedMode]) {
-            reminderAudio[selectedMode] = new Audio(src);
-            reminderAudio[selectedMode].preload = 'auto';
-        }
-
-        const audio = reminderAudio[selectedMode];
-        try {
-            audio.currentTime = 0;
-            audio.play().catch(() => {});
-        } catch (error) { /* ignore playback issues */ }
+    function playReminderSound(soundId) {
+        playReminderAudioOption(soundId, { isPreview: false });
     }
 
     function getPrayerCoordinates() {
@@ -4513,8 +5136,7 @@ window.filterCategory = function(cat, btn) {
             requireInteraction: false
         });
 
-        const settings = loadReminderSettings();
-        playReminderSound(settings.mode);
+        playReminderSound(resolveReminderSoundId(prayerName));
 
         if (!document.hidden) {
             showToast(uiText.inAppPrayerAlert.replace('{prayer}', localizedPrayer));
@@ -4523,12 +5145,11 @@ window.filterCategory = function(cat, btn) {
 
     function runReminderTest() {
         const uiText = getPrayerUiText();
-        const settings = loadReminderSettings();
         const samplePrayer = getNextPrayer(new Date()) || 'fajr';
         const localizedPrayer = getPrayerLabel(samplePrayer);
         const body = uiText.testReminderBody.replace('{prayer}', localizedPrayer);
 
-        playReminderSound(settings.mode);
+        playReminderSound(resolveReminderSoundId(samplePrayer));
 
         requestNotificationPermissionIfNeeded().then((granted) => {
             if (!granted) return;
@@ -5105,6 +5726,9 @@ window.filterCategory = function(cat, btn) {
         else if (view === 'juz') renderQuranJuzRows();
         else if (view === 'bookmarks') renderQuranBookmarksSection();
         else if (view === 'settings') renderQuranSettingsSection();
+
+        updateInAppFabVisibility();
+        if (document.querySelector('.quran-panel.active')) recordInAppRoute(false);
     }
 
     function renderQuranSurahRows() {
@@ -5366,6 +5990,30 @@ window.filterCategory = function(cat, btn) {
             </div>
             ${Number(data.surahNumber) === 9 ? '' : `<div style="font-family:var(--font-arabic);font-size:1.2rem;line-height:2;color:var(--gold-light);margin-top:8px;">${ui.bismillah}</div>`}
         `;
+
+        requestAnimationFrame(() => syncQuranReaderStickyOffsets());
+    }
+
+    function syncQuranReaderStickyOffsets() {
+        const reader = document.getElementById('quranReaderScreen');
+        const header = document.getElementById('quranReaderHeader');
+        const toggle = document.getElementById('quranTranslationToggle');
+        const list = document.getElementById('quranAyahList');
+        if (!reader || !header || !list) return;
+
+        const headerHeight = Math.ceil(header.getBoundingClientRect().height || header.offsetHeight || 0);
+        const toggleHidden = !toggle || getComputedStyle(toggle).display === 'none';
+        const toggleHeight = toggleHidden ? 0 : Math.ceil(toggle.getBoundingClientRect().height || toggle.offsetHeight || 0);
+
+        const toggleTop = Math.max(0, headerHeight + 8);
+        const stickyOffset = Math.max(16, headerHeight + toggleHeight + 16);
+
+        if (toggle && !toggleHidden) {
+            toggle.style.top = `${toggleTop}px`;
+        }
+
+        list.style.paddingTop = `${stickyOffset}px`;
+        reader.style.setProperty('--quran-reader-offset', `${stickyOffset}px`);
     }
 
     function shouldShowTranslationBlock(mode, type) {
@@ -5401,8 +6049,8 @@ window.filterCategory = function(cat, btn) {
                     <div class="quran-ayah-head">
                         <span class="quran-ayah-num">${localizeQuranNumber(ayah.numberInSurah)}</span>
                         <div class="quran-ayah-actions">
-                            <button type="button" class="quran-ayah-btn" onclick="playQuranAyah(${quranState.currentSurah}, ${ayah.numberInSurah}, false)">▶</button>
-                            <button type="button" class="quran-ayah-btn" onclick="toggleQuranAyahBookmark(${quranState.currentSurah}, ${ayah.numberInSurah})">${bookmarked ? '★' : '☆'}</button>
+                            <button type="button" class="quran-ayah-btn" data-ayah-action="play" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" onclick="playQuranAyah(${quranState.currentSurah}, ${ayah.numberInSurah}, false)">▶</button>
+                            <button type="button" class="quran-ayah-btn" data-ayah-action="bookmark" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" onclick="toggleQuranAyahBookmark(${quranState.currentSurah}, ${ayah.numberInSurah})">${bookmarked ? '★' : '☆'}</button>
                         </div>
                     </div>
                     <div class="quran-ayah-ar">${escapeHtml(ayah.arabic)}</div>
@@ -5491,7 +6139,9 @@ window.filterCategory = function(cat, btn) {
             markSurahOffline(quranState.currentSurah);
             renderQuranContinueCard();
             renderQuranRecentSection();
+            syncQuranReaderStickyOffsets();
             updateQuranReaderProgress();
+            recordInAppRoute(true);
         } catch (error) {
             showToast(getQuranUiText().noData);
             reader.classList.remove('active');
@@ -5523,6 +6173,66 @@ window.filterCategory = function(cat, btn) {
         }
         const playAllBtn = document.getElementById('quranPlayAll');
         if (playAllBtn) playAllBtn.textContent = ui.playAll;
+    }
+
+    const quranTapLocks = new Map();
+
+    function bindFastTap(element, key, handler) {
+        if (!element || element.dataset.fastTapBound === '1') return;
+
+        const runHandler = () => {
+            const now = Date.now();
+            const lockKey = key || element.id || 'fast-tap';
+            const last = quranTapLocks.get(lockKey) || 0;
+            if (now - last < 220) return;
+            quranTapLocks.set(lockKey, now);
+            handler();
+        };
+
+        element.addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            element.classList.add('pressed');
+            setTimeout(() => element.classList.remove('pressed'), 90);
+            runHandler();
+        }, { passive: false });
+
+        element.addEventListener('click', () => {
+            const last = quranTapLocks.get(key || element.id || 'fast-tap') || 0;
+            if (Date.now() - last < 320) return;
+            runHandler();
+        });
+
+        element.dataset.fastTapBound = '1';
+    }
+
+    function setQuranPlayButtonLoading(isLoading) {
+        const button = document.getElementById('quranPlayPause');
+        if (!button) return;
+        button.classList.toggle('is-loading', !!isLoading);
+        if (!isLoading) {
+            if (!quranState.audioAyah) {
+                button.textContent = '▶';
+            } else {
+                button.textContent = quranState.audio && !quranState.audio.paused ? '⏸' : '▶';
+            }
+        }
+    }
+
+    function stopQuranAudio(resetTime = true) {
+        if (!quranState.audio) return;
+        quranState.audio.pause();
+        if (resetTime) quranState.audio.currentTime = 0;
+        quranState.audioPlayAll = false;
+        const fill = document.getElementById('quranMiniProgressFill');
+        if (fill && resetTime) fill.style.width = '0%';
+        const button = document.getElementById('quranPlayPause');
+        if (button) button.textContent = '▶';
+        if (resetTime) {
+            quranState.audioAyah = null;
+            highlightPlayingAyah();
+            updateQuranMiniPlayerLabel();
+        }
+        setQuranPlayButtonLoading(false);
     }
 
     async function getAyahGlobalNumber(surahNumber, ayahNumber) {
@@ -5590,10 +6300,12 @@ window.filterCategory = function(cat, btn) {
     }
 
     async function playQuranAyahInternal(surahNumber, ayahNumber, playAll = false) {
+        console.log('[QuranAudio] play request', { surahNumber, ayahNumber, playAll });
         if (!quranState.currentSurahData || Number(quranState.currentSurah) !== Number(surahNumber)) {
             await openQuranSurah(surahNumber, ayahNumber);
         }
         const settings = getQuranSettings();
+        setQuranPlayButtonLoading(true);
         if (!quranState.audio) {
             quranState.audio = new Audio();
             quranState.audio.preload = 'auto';
@@ -5604,6 +6316,10 @@ window.filterCategory = function(cat, btn) {
                 const percent = Math.max(0, Math.min(100, (quranState.audio.currentTime / duration) * 100));
                 fill.style.width = `${percent}%`;
             });
+            quranState.audio.addEventListener('waiting', () => setQuranPlayButtonLoading(true));
+            quranState.audio.addEventListener('stalled', () => setQuranPlayButtonLoading(true));
+            quranState.audio.addEventListener('canplay', () => setQuranPlayButtonLoading(false));
+            quranState.audio.addEventListener('playing', () => setQuranPlayButtonLoading(false));
             quranState.audio.addEventListener('ended', () => {
                 if (!quranState.audioAyah) return;
                 const [sNo, aNo] = quranState.audioAyah.split(':').map(Number);
@@ -5611,32 +6327,44 @@ window.filterCategory = function(cat, btn) {
                     playQuranAyahInternal(sNo, aNo + 1, true);
                 } else {
                     quranState.audioPlayAll = false;
+                    const playPauseBtn = document.getElementById('quranPlayPause');
+                    if (playPauseBtn) playPauseBtn.textContent = '▶';
                 }
             });
         }
 
         quranState.audioPlayAll = !!playAll;
+        quranState.audioAyah = `${surahNumber}:${ayahNumber}`;
+        highlightPlayingAyah();
+        updateQuranMiniPlayerLabel();
+
         const playPauseBtn = document.getElementById('quranPlayPause');
         if (playPauseBtn) playPauseBtn.textContent = '⏸';
 
         const audioUrl = await fetchAyahAudioUrl(surahNumber, ayahNumber, settings.reciter);
+        console.log('[QuranAudio] resolved audio URL', { hasAudioUrl: !!audioUrl, reciter: settings.reciter });
         if (!audioUrl) {
             showToast(getQuranUiText().noData);
+            setQuranPlayButtonLoading(false);
             return;
         }
 
         const src = await getPlayableAudioSource(audioUrl);
-        quranState.audioAyah = `${surahNumber}:${ayahNumber}`;
         quranState.audio.playbackRate = Number(document.getElementById('quranSpeedSelect')?.value || 1);
         quranState.audio.src = src;
         quranState.audio.currentTime = 0;
         try {
             await quranState.audio.play();
         } catch (error) {
+            console.error('[QuranAudio] play() failed', error);
             showToast('Audio playback failed');
+            quranState.audioAyah = null;
+            highlightPlayingAyah();
+            updateQuranMiniPlayerLabel();
+            setQuranPlayButtonLoading(false);
+            return;
         }
-        highlightPlayingAyah();
-        updateQuranMiniPlayerLabel();
+        setQuranPlayButtonLoading(false);
     }
 
     window.playQuranAyah = function(surahNumber, ayahNumber, playAll = false) {
@@ -5645,14 +6373,59 @@ window.filterCategory = function(cat, btn) {
 
     function toggleQuranPlayPause() {
         const button = document.getElementById('quranPlayPause');
-        if (!quranState.audio || !quranState.audioAyah) return;
+        if (!quranState.audio) return;
+        if (!quranState.audioAyah && (!button || button.textContent.trim() !== '⏸')) return;
+
+        const pendingLoad = quranState.audio.paused && button && button.textContent.trim() === '⏸';
+        if (pendingLoad) {
+            stopQuranAudio(false);
+            if (button) button.textContent = '▶';
+            return;
+        }
+
         if (quranState.audio.paused) {
-            quranState.audio.play().catch(() => {});
+            setQuranPlayButtonLoading(true);
+            quranState.audio.play().catch(() => {
+                setQuranPlayButtonLoading(false);
+            });
             if (button) button.textContent = '⏸';
         } else {
-            quranState.audio.pause();
+            stopQuranAudio(false);
             if (button) button.textContent = '▶';
         }
+    }
+
+    window.toggleQuranPlayPause = toggleQuranPlayPause;
+
+    function handleQuranAyahActionEvent(event, isTouch = false) {
+        const target = event.target && event.target.closest
+            ? event.target.closest('.quran-ayah-btn[data-ayah-action]')
+            : null;
+        if (!target) return;
+
+        if (isTouch) {
+            event.preventDefault();
+            target.classList.add('pressed');
+            setTimeout(() => target.classList.remove('pressed'), 90);
+        }
+
+        const action = target.getAttribute('data-ayah-action');
+        const surah = Number(target.getAttribute('data-surah'));
+        const ayah = Number(target.getAttribute('data-ayah'));
+        if (!action || !surah || !ayah) return;
+        console.log('[QuranAudio] ayah action tapped', { action, surah, ayah, isTouch });
+
+        const lockKey = `ayah-${action}-${surah}-${ayah}`;
+        const now = Date.now();
+        const last = quranTapLocks.get(lockKey) || 0;
+        if (now - last < 220) return;
+        quranTapLocks.set(lockKey, now);
+
+        if (action === 'play') {
+            setQuranPlayButtonLoading(true);
+            playQuranAyahInternal(surah, ayah, false);
+        }
+        else if (action === 'bookmark') toggleQuranAyahBookmark(surah, ayah);
     }
 
     function playRelativeAyah(step) {
@@ -5779,30 +6552,42 @@ window.filterCategory = function(cat, btn) {
             readingModeBtn.addEventListener('click', () => {
                 document.body.classList.toggle('quran-reading-mode');
                 showToast(document.body.classList.contains('quran-reading-mode') ? getQuranUiText().readingModeOn : getQuranUiText().readingModeOff);
+                requestAnimationFrame(() => syncQuranReaderStickyOffsets());
             });
             readingModeBtn.dataset.bound = '1';
+        }
+
+        if (!window.__quranStickyOffsetResizeBound) {
+            window.addEventListener('resize', () => syncQuranReaderStickyOffsets(), { passive: true });
+            window.__quranStickyOffsetResizeBound = true;
         }
 
         const playPause = document.getElementById('quranPlayPause');
         const prev = document.getElementById('quranPrevAyah');
         const next = document.getElementById('quranNextAyah');
+        const stop = document.getElementById('quranStopAyah');
         const playAll = document.getElementById('quranPlayAll');
         const speed = document.getElementById('quranSpeedSelect');
+        const ayahList = document.getElementById('quranAyahList');
 
         if (playPause && playPause.dataset.bound !== '1') {
-            playPause.addEventListener('click', toggleQuranPlayPause);
+            bindFastTap(playPause, 'quran-play-pause', toggleQuranPlayPause);
             playPause.dataset.bound = '1';
         }
         if (prev && prev.dataset.bound !== '1') {
-            prev.addEventListener('click', () => playRelativeAyah(-1));
+            bindFastTap(prev, 'quran-prev-ayah', () => playRelativeAyah(-1));
             prev.dataset.bound = '1';
         }
         if (next && next.dataset.bound !== '1') {
-            next.addEventListener('click', () => playRelativeAyah(1));
+            bindFastTap(next, 'quran-next-ayah', () => playRelativeAyah(1));
             next.dataset.bound = '1';
         }
+        if (stop && stop.dataset.bound !== '1') {
+            bindFastTap(stop, 'quran-stop-ayah', () => stopQuranAudio(true));
+            stop.dataset.bound = '1';
+        }
         if (playAll && playAll.dataset.bound !== '1') {
-            playAll.addEventListener('click', () => {
+            bindFastTap(playAll, 'quran-play-all', () => {
                 if (!quranState.currentSurahData || !quranState.currentSurah) return;
                 playQuranAyahInternal(quranState.currentSurah, 1, true);
             });
@@ -5813,6 +6598,12 @@ window.filterCategory = function(cat, btn) {
                 if (quranState.audio) quranState.audio.playbackRate = Number(speed.value || 1);
             });
             speed.dataset.bound = '1';
+        }
+
+        if (ayahList && ayahList.dataset.boundActions !== '1') {
+            ayahList.addEventListener('touchstart', (event) => handleQuranAyahActionEvent(event, true), { passive: false });
+            ayahList.addEventListener('click', (event) => handleQuranAyahActionEvent(event, false));
+            ayahList.dataset.boundActions = '1';
         }
     }
 
@@ -5872,6 +6663,7 @@ window.filterCategory = function(cat, btn) {
         if (quranState.currentSurahData) {
             renderQuranReaderHeader(quranState.currentSurahData);
             renderQuranAyahChunk(true);
+            syncQuranReaderStickyOffsets();
         }
     };
 
@@ -5885,6 +6677,7 @@ window.filterCategory = function(cat, btn) {
         renderQuranContinueCard();
         renderQuranRecentSection();
         if (quranState.view === 'surah') renderQuranSurahRows();
+        recordInAppRoute(true);
     };
 
     window.closeQuran = function() {
@@ -5893,6 +6686,7 @@ window.filterCategory = function(cat, btn) {
         document.body.classList.remove('quran-reading-mode');
         unlockScroll();
         setBottomNavActive('home');
+        recordInAppRoute(false);
     };
 
     window.openQuranSurah = openQuranSurah;

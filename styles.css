@@ -2430,14 +2430,15 @@
 
         .quran-reader-header {
             border: 1px solid rgba(201, 168, 76, 0.24);
-            background: linear-gradient(145deg, rgba(201, 168, 76, 0.09), rgba(46, 196, 122, 0.08));
+            background: var(--bg-card);
             border-radius: var(--radius-md);
-            padding: 12px;
+            padding: 10px 12px;
             margin-bottom: 10px;
             text-align: center;
             position: sticky;
-            top: 8px;
-            z-index: 3;
+            top: 0;
+            z-index: 32;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
         }
 
         .quran-surah-frame {
@@ -2453,6 +2454,11 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 8px;
             margin-bottom: 12px;
+            position: sticky;
+            top: 88px;
+            z-index: 31;
+            background: var(--bg-dark);
+            padding: 6px 0;
         }
 
         .quran-tt-btn {
@@ -2476,6 +2482,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+            padding-top: 16px;
         }
 
         .quran-ayah-card {
@@ -2484,6 +2491,7 @@
             background: rgba(46, 196, 122, 0.05);
             padding: 12px;
             position: relative;
+            scroll-margin-top: var(--quran-reader-offset, 180px);
         }
 
         .quran-ayah-card.playing {
@@ -2523,12 +2531,20 @@
             background: rgba(46, 196, 122, 0.06);
             color: var(--text-subtle);
             border-radius: 999px;
-            min-height: 26px;
-            padding: 0 8px;
+            min-height: 48px;
+            min-width: 48px;
+            padding: 0 12px;
             font-family: var(--font-title);
-            font-size: 0.56rem;
+            font-size: 0.66rem;
             letter-spacing: 0.6px;
             cursor: pointer;
+            touch-action: manipulation;
+            transition: transform 0.08s ease, opacity 0.08s ease, background 0.2s ease;
+        }
+        .quran-ayah-btn:active,
+        .quran-ayah-btn.pressed {
+            transform: scale(0.9);
+            opacity: 0.82;
         }
 
         .quran-ayah-ar {
@@ -2616,7 +2632,7 @@
 
         .quran-mini-controls {
             display: grid;
-            grid-template-columns: repeat(5, minmax(0, auto));
+            grid-template-columns: repeat(6, minmax(0, auto));
             gap: 6px;
             align-items: center;
         }
@@ -2625,12 +2641,38 @@
             border: 1px solid rgba(46, 196, 122, 0.26);
             background: rgba(46, 196, 122, 0.08);
             color: var(--text-primary);
-            min-height: 30px;
+            min-height: 48px;
+            min-width: 48px;
             border-radius: 999px;
             padding: 0 10px;
             font-family: var(--font-title);
-            font-size: 0.62rem;
+            font-size: 0.68rem;
             letter-spacing: 0.6px;
+            touch-action: manipulation;
+            transition: transform 0.08s ease, opacity 0.08s ease, background 0.2s ease;
+        }
+        .quran-mini-controls button:active,
+        .quran-mini-controls button.pressed {
+            transform: scale(0.9);
+            opacity: 0.82;
+        }
+        .quran-mini-controls button.is-loading {
+            position: relative;
+            color: transparent;
+        }
+        .quran-mini-controls button.is-loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(224, 238, 210, 0.35);
+            border-top-color: var(--emerald-light);
+            border-radius: 50%;
+            animation: quranSpin 0.7s linear infinite;
+        }
+
+        @keyframes quranSpin {
+            to { transform: rotate(360deg); }
         }
 
         .quran-mini-progress {
@@ -2696,8 +2738,18 @@
             padding-top: calc(var(--safe-top) + 8px);
             background: rgba(8, 18, 14, 0.985);
         }
+        body.quran-reading-mode .quran-reader-header {
+            top: 0;
+        }
+        body.quran-reading-mode .quran-translation-toggle {
+            top: 78px;
+        }
 
         [data-theme="light"] .quran-panel {
+            background: rgba(250, 247, 242, 0.98);
+        }
+        [data-theme="light"] .quran-reader-header,
+        [data-theme="light"] .quran-translation-toggle {
             background: rgba(250, 247, 242, 0.98);
         }
         [data-theme="light"] .quran-view-tab,
@@ -2733,9 +2785,155 @@
         @media (max-width: 520px) {
             .quran-view-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .quran-mini-controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-            .quran-mini-controls #quranPlayAll { grid-column: span 2; }
+            .quran-mini-controls #quranPlayAll { grid-column: span 3; }
             .quran-mini-controls #quranSpeedSelect { grid-column: span 1; }
             .quran-translation-toggle { grid-template-columns: 1fr; }
+            .quran-reader-header {
+                padding: 8px 10px;
+            }
+            .quran-surah-frame {
+                padding: 6px 8px;
+            }
+            .quran-surah-frame > div:first-child {
+                font-size: 1.08rem !important;
+            }
+            .quran-translation-toggle {
+                top: 78px;
+            }
+        }
+
+        .reminder-sound-cards {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .reminder-sound-card {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(46, 196, 122, 0.18);
+            background: rgba(46, 196, 122, 0.06);
+            border-radius: 12px;
+            padding: 10px;
+            transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+            touch-action: manipulation;
+        }
+        .reminder-sound-card.active {
+            border-color: rgba(201, 168, 76, 0.34);
+            background: rgba(201, 168, 76, 0.09);
+            box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.18);
+        }
+        .reminder-sound-card:active {
+            transform: scale(0.98);
+        }
+        .reminder-sound-radio {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(46, 196, 122, 0.34);
+            position: relative;
+        }
+        .reminder-sound-card.active .reminder-sound-radio::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 50%;
+            background: var(--gold-mid);
+        }
+        .reminder-sound-name {
+            font-family: var(--font-title);
+            font-size: 0.74rem;
+            letter-spacing: 0.4px;
+            color: var(--text-primary);
+        }
+        .reminder-sound-preview {
+            min-height: 42px;
+            min-width: 42px;
+            border-radius: 50%;
+            border: 1px solid rgba(46, 196, 122, 0.24);
+            background: rgba(46, 196, 122, 0.08);
+            color: var(--text-subtle);
+            touch-action: manipulation;
+            transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease;
+        }
+        .reminder-sound-preview:active,
+        .reminder-sound-preview.is-playing {
+            transform: scale(0.94);
+            background: rgba(201, 168, 76, 0.18);
+            opacity: 0.92;
+        }
+        .per-prayer-sound-wrap {
+            display: none;
+            margin-bottom: 6px;
+        }
+        .per-prayer-sound-wrap.active {
+            display: grid;
+            gap: 6px;
+        }
+        .per-prayer-sound-row {
+            display: grid;
+            grid-template-columns: minmax(72px, auto) 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .in-app-back-fab,
+        .in-app-top-fab {
+            position: fixed;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid rgba(46, 196, 122, 0.24);
+            background: rgba(12, 26, 19, 0.86);
+            color: var(--emerald-light);
+            z-index: 2205;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            touch-action: manipulation;
+        }
+        .in-app-back-fab.visible,
+        .in-app-top-fab.visible {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+        .in-app-back-fab {
+            left: 12px;
+            bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 16px);
+        }
+        .in-app-top-fab {
+            right: 12px;
+            bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 16px);
+        }
+        .in-app-back-fab:active,
+        .in-app-top-fab:active {
+            transform: scale(0.92);
+        }
+        .in-app-swipe-indicator {
+            position: fixed;
+            left: 6px;
+            top: 50%;
+            transform: translate(-20px, -50%);
+            width: 32px;
+            height: 56px;
+            border-radius: 0 10px 10px 0;
+            border: 1px solid rgba(46, 196, 122, 0.24);
+            background: rgba(12, 26, 19, 0.8);
+            color: var(--emerald-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            z-index: 2210;
+            pointer-events: none;
+            transition: opacity 0.16s ease, transform 0.16s ease;
+        }
+        .in-app-swipe-indicator.visible {
+            opacity: 1;
+            transform: translate(0, -50%);
         }
 
         /* Tasbeeh Panel */
