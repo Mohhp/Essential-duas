@@ -5504,6 +5504,8 @@ window.filterCategory = function(cat, btn) {
 
     const QURAN_TRANSLATION_MODES = ['all', 'ar-ps', 'ar-en', 'ar'];
     const QURAN_AUDIO_SPEEDS = [0.75, 1, 1.25];
+    const QURAN_STICKY_AUTO_HIDE_MS = 4000;
+    const QURAN_STOP_HIDE_MS = 2000;
 
     const quranState = {
         initialized: false,
@@ -5517,13 +5519,19 @@ window.filterCategory = function(cat, btn) {
         audio: null,
         audioObjectUrl: null,
         audioAyah: null,
+        playerState: 'hidden',
+        isChainedPlayback: false,
+        lastPlayedSurah: null,
+        lastPlayedAyah: null,
         audioRate: 1,
         audioPlayAll: false,
         audioPausedManually: false,
+        stickyHidden: false,
         loadingReader: false,
         loadingList: false
     };
-    let quranMiniHideTimer = null;
+    let quranStickyHideTimer = null;
+    let quranStopHideTimer = null;
 
     function getQuranDefaults() {
         return {
@@ -6162,15 +6170,86 @@ window.filterCategory = function(cat, btn) {
         const scrollContent = document.getElementById('quranScrollContent');
         if (!reader || !header || !list || !sticky) return;
 
-        const stickyHeight = Math.ceil(sticky.getBoundingClientRect().height || sticky.offsetHeight || 0);
+        const measuredHeight = Math.ceil(sticky.getBoundingClientRect().height || sticky.offsetHeight || 0);
+        const hidden = sticky.classList.contains('auto-hidden');
+        const stickyHeight = hidden ? 0 : measuredHeight;
         const stickyOffset = Math.max(24, stickyHeight + 12);
 
         if (scrollContent) {
             const dynamicTopPad = Math.max(4, Math.round(stickyHeight * 0.02));
             scrollContent.style.paddingTop = `${dynamicTopPad}px`;
         }
-        reader.style.setProperty('--quran-sticky-height', `${stickyHeight}px`);
+        reader.style.setProperty('--quran-sticky-height', `${measuredHeight}px`);
         reader.style.setProperty('--quran-reader-offset', `${stickyOffset}px`);
+    }
+
+    function clearQuranStickyTimers() {
+        if (quranStickyHideTimer) {
+            clearTimeout(quranStickyHideTimer);
+            quranStickyHideTimer = null;
+        }
+        if (quranStopHideTimer) {
+            clearTimeout(quranStopHideTimer);
+            quranStopHideTimer = null;
+        }
+    }
+
+    function updateQuranHiddenIndicator() {
+        const indicator = document.getElementById('quranHiddenIndicator');
+        if (!indicator) return;
+        const show = !!(quranState.stickyHidden && quranState.playerState === 'playing');
+        indicator.classList.toggle('active', show);
+        indicator.setAttribute('aria-hidden', show ? 'false' : 'true');
+    }
+
+    function hideQuranStickyHeader() {
+        const sticky = document.getElementById('quranReaderSticky');
+        if (!sticky) return;
+        sticky.classList.add('auto-hidden');
+        quranState.stickyHidden = true;
+        syncQuranReaderStickyOffsets();
+        updateQuranHiddenIndicator();
+    }
+
+    function showQuranStickyHeader(restartTimer = false) {
+        const sticky = document.getElementById('quranReaderSticky');
+        if (!sticky) return;
+        sticky.classList.remove('auto-hidden');
+        quranState.stickyHidden = false;
+        syncQuranReaderStickyOffsets();
+        updateQuranHiddenIndicator();
+        if (restartTimer) resetQuranStickyAutoHideTimer();
+    }
+
+    function resetQuranStickyAutoHideTimer() {
+        if (quranStickyHideTimer) {
+            clearTimeout(quranStickyHideTimer);
+            quranStickyHideTimer = null;
+        }
+        if (quranState.playerState !== 'playing') return;
+        quranStickyHideTimer = setTimeout(() => {
+            hideQuranStickyHeader();
+            quranStickyHideTimer = null;
+        }, QURAN_STICKY_AUTO_HIDE_MS);
+    }
+
+    function scheduleQuranStopHide() {
+        if (quranStopHideTimer) {
+            clearTimeout(quranStopHideTimer);
+            quranStopHideTimer = null;
+        }
+        quranStopHideTimer = setTimeout(() => {
+            if (quranState.playerState === 'stopped') hideQuranStickyHeader();
+            quranStopHideTimer = null;
+        }, QURAN_STOP_HIDE_MS);
+    }
+
+    function markQuranControlsInteraction() {
+        if (quranState.playerState === 'playing') {
+            showQuranStickyHeader(true);
+        } else if (quranState.playerState === 'stopped' && quranState.stickyHidden) {
+            showQuranStickyHeader(false);
+        }
     }
 
     function shouldShowTranslationBlock(mode, type) {
@@ -6322,9 +6401,11 @@ window.filterCategory = function(cat, btn) {
         const reciter = QURAN_RECITERS.find(r => r.id === settings.reciter);
         if (reciterName) reciterName.textContent = reciter ? reciter.name : settings.reciter;
         if (nowLabel) {
-            if (!quranState.audioAyah) nowLabel.textContent = ui.notPlaying;
+            const key = quranState.audioAyah
+                || (quranState.lastPlayedSurah && quranState.lastPlayedAyah ? `${quranState.lastPlayedSurah}:${quranState.lastPlayedAyah}` : null);
+            if (!key) nowLabel.textContent = ui.notPlaying;
             else {
-                const [surahNo, ayahNo] = quranState.audioAyah.split(':');
+                const [surahNo, ayahNo] = key.split(':');
                 nowLabel.textContent = `${isPashtoMode() ? 'سورت' : 'Surah'} ${localizeQuranNumber(surahNo)} • ${isPashtoMode() ? 'آیت' : 'Ayah'} ${localizeQuranNumber(ayahNo)}`;
             }
         }
@@ -6342,43 +6423,45 @@ window.filterCategory = function(cat, btn) {
 
     function updateQuranMiniTime() {
         const time = document.getElementById('quranMiniTime');
-        if (!time || !quranState.audio) return;
+        if (!time) return;
+        if (!quranState.audio) {
+            time.textContent = '0:00 / 0:00';
+            return;
+        }
         time.textContent = `${formatQuranTime(quranState.audio.currentTime)} / ${formatQuranTime(quranState.audio.duration)}`;
+    }
+
+    function updateQuranPlayPauseIcon() {
+        const button = document.getElementById('quranPlayPause');
+        if (!button) return;
+        if (button.classList.contains('is-loading')) return;
+        button.textContent = quranState.playerState === 'playing' ? '⏸' : '▶';
+    }
+
+    function setQuranPlayerState(nextState) {
+        quranState.playerState = nextState;
+        updateQuranPlayPauseIcon();
+        updateQuranMiniPlayerVisibility();
     }
 
     function updateQuranMiniPlayerVisibility() {
         const player = document.getElementById('quranMiniPlayer');
         if (!player) return;
 
-        const blockedByReadingMode = document.body.classList.contains('quran-reading-mode');
-        const isPlaying = !!(quranState.audio && quranState.audioAyah && !quranState.audio.paused && !blockedByReadingMode);
+        const hasResumablePoint = !!(quranState.lastPlayedSurah && quranState.lastPlayedAyah);
+        const shouldShow = quranState.playerState !== 'hidden'
+            || !!quranState.audioAyah
+            || hasResumablePoint;
 
-        if (isPlaying) {
-            if (quranMiniHideTimer) {
-                clearTimeout(quranMiniHideTimer);
-                quranMiniHideTimer = null;
-            }
-            if (!player.classList.contains('active')) {
-                player.classList.add('active');
-                requestAnimationFrame(() => {
-                    player.classList.add('ready');
-                    syncQuranReaderStickyOffsets();
-                });
-            } else {
-                player.classList.add('ready');
-                syncQuranReaderStickyOffsets();
-            }
-            return;
-        }
-
-        player.classList.remove('ready');
+        player.classList.toggle('active', shouldShow);
+        player.classList.toggle('ready', shouldShow);
         syncQuranReaderStickyOffsets();
-        if (player.classList.contains('active')) {
-            quranMiniHideTimer = setTimeout(() => {
-                if (!player.classList.contains('ready')) player.classList.remove('active');
-                syncQuranReaderStickyOffsets();
-                quranMiniHideTimer = null;
-            }, 200);
+        updateQuranHiddenIndicator();
+
+        if (quranState.playerState === 'playing') {
+            resetQuranStickyAutoHideTimer();
+        } else if (quranState.playerState === 'paused' || quranState.playerState === 'loading') {
+            showQuranStickyHeader(false);
         }
     }
 
@@ -6402,6 +6485,7 @@ window.filterCategory = function(cat, btn) {
             const last = quranTapLocks.get(lockKey) || 0;
             if (now - last < 220) return;
             quranTapLocks.set(lockKey, now);
+            markQuranControlsInteraction();
             handler();
         };
 
@@ -6425,31 +6509,51 @@ window.filterCategory = function(cat, btn) {
         const button = document.getElementById('quranPlayPause');
         if (!button) return;
         button.classList.toggle('is-loading', !!isLoading);
-        if (!isLoading) {
-            if (!quranState.audioAyah) {
-                button.textContent = '▶';
-            } else {
-                button.textContent = quranState.audio && !quranState.audio.paused ? '⏸' : '▶';
-            }
-        }
+        if (!isLoading) updateQuranPlayPauseIcon();
     }
 
-    function stopQuranAudio(resetTime = true) {
-        if (!quranState.audio) return;
-        quranState.audio.pause();
-        if (resetTime) quranState.audio.currentTime = 0;
+    function stopQuranAudio({ resetTime = true, explicitStop = false, fullyReset = false } = {}) {
+        if (quranState.audio) {
+            quranState.audio.pause();
+            if (resetTime) quranState.audio.currentTime = 0;
+        }
+
+        if (quranState.audioAyah) {
+            const [lastSurah, lastAyah] = quranState.audioAyah.split(':').map(Number);
+            if (lastSurah && lastAyah) {
+                quranState.lastPlayedSurah = lastSurah;
+                quranState.lastPlayedAyah = lastAyah;
+            }
+        }
+
         quranState.audioPlayAll = false;
+        quranState.isChainedPlayback = false;
+
         const fill = document.getElementById('quranMiniProgressFill');
         if (fill && resetTime) fill.style.width = '0%';
-        const button = document.getElementById('quranPlayPause');
-        if (button) button.textContent = '▶';
-        if (resetTime) {
+
+        if (fullyReset) {
             quranState.audioAyah = null;
-            highlightPlayingAyah();
-            updateQuranMiniPlayerLabel();
+            quranState.lastPlayedSurah = null;
+            quranState.lastPlayedAyah = null;
+            setQuranPlayerState('hidden');
+            showQuranStickyHeader(false);
+            clearQuranStickyTimers();
+        } else if (explicitStop) {
+            quranState.audioAyah = null;
+            setQuranPlayerState('stopped');
+            showQuranStickyHeader(false);
+            scheduleQuranStopHide();
+        } else {
+            quranState.audioAyah = null;
+            setQuranPlayerState('hidden');
+            showQuranStickyHeader(false);
+            clearQuranStickyTimers();
         }
+
+        highlightPlayingAyah();
+        updateQuranMiniPlayerLabel();
         updateQuranMiniTime();
-        updateQuranMiniPlayerVisibility();
         setQuranPlayButtonLoading(false);
     }
 
@@ -6523,7 +6627,13 @@ window.filterCategory = function(cat, btn) {
             await openQuranSurah(surahNumber, ayahNumber);
         }
         const settings = getQuranSettings();
+        quranState.lastPlayedSurah = Number(surahNumber);
+        quranState.lastPlayedAyah = Number(ayahNumber);
+        quranState.audioPlayAll = !!playAll;
+        setQuranPlayerState('loading');
+        showQuranStickyHeader(true);
         setQuranPlayButtonLoading(true);
+
         if (!quranState.audio) {
             quranState.audio = new Audio();
             quranState.audio.preload = 'auto';
@@ -6535,36 +6645,51 @@ window.filterCategory = function(cat, btn) {
                 fill.style.width = `${percent}%`;
                 updateQuranMiniTime();
             });
-            quranState.audio.addEventListener('waiting', () => setQuranPlayButtonLoading(true));
-            quranState.audio.addEventListener('stalled', () => setQuranPlayButtonLoading(true));
-            quranState.audio.addEventListener('canplay', () => setQuranPlayButtonLoading(false));
-            quranState.audio.addEventListener('playing', () => {
+            quranState.audio.addEventListener('waiting', () => {
+                if (quranState.playerState === 'playing' || quranState.isChainedPlayback) setQuranPlayerState('loading');
+                setQuranPlayButtonLoading(true);
+            });
+            quranState.audio.addEventListener('stalled', () => {
+                if (quranState.playerState === 'playing' || quranState.isChainedPlayback) setQuranPlayerState('loading');
+                setQuranPlayButtonLoading(true);
+            });
+            quranState.audio.addEventListener('canplay', () => {
                 setQuranPlayButtonLoading(false);
-                updateQuranMiniPlayerVisibility();
+                if (!quranState.audio.paused && quranState.playerState !== 'paused') setQuranPlayerState('playing');
+            });
+            quranState.audio.addEventListener('playing', () => {
+                quranState.isChainedPlayback = false;
+                setQuranPlayerState('playing');
+                setQuranPlayButtonLoading(false);
             });
             quranState.audio.addEventListener('ended', () => {
                 if (!quranState.audioAyah) return;
                 const [sNo, aNo] = quranState.audioAyah.split(':').map(Number);
                 if (quranState.audioPlayAll && quranState.currentSurahData && aNo < quranState.currentSurahData.ayahs.length) {
+                    quranState.isChainedPlayback = true;
+                    setQuranPlayerState('loading');
+                    setQuranPlayButtonLoading(true);
                     playQuranAyahInternal(sNo, aNo + 1, true);
                 } else {
-                    stopQuranAudio(true);
+                    stopQuranAudio({ resetTime: true });
                 }
+            });
+            quranState.audio.addEventListener('error', () => {
+                quranState.isChainedPlayback = false;
+                showToast('Audio playback failed');
+                stopQuranAudio({ resetTime: true, explicitStop: true });
             });
         }
 
-        quranState.audioPlayAll = !!playAll;
         quranState.audioAyah = `${surahNumber}:${ayahNumber}`;
         highlightPlayingAyah();
         updateQuranMiniPlayerLabel();
-
-        const playPauseBtn = document.getElementById('quranPlayPause');
-        if (playPauseBtn) playPauseBtn.textContent = '⏸';
 
         const audioUrl = await fetchAyahAudioUrl(surahNumber, ayahNumber, settings.reciter);
         console.log('[QuranAudio] resolved audio URL', { hasAudioUrl: !!audioUrl, reciter: settings.reciter });
         if (!audioUrl) {
             showToast(getQuranUiText().noData);
+            setQuranPlayerState('stopped');
             setQuranPlayButtonLoading(false);
             return;
         }
@@ -6578,14 +6703,16 @@ window.filterCategory = function(cat, btn) {
         } catch (error) {
             console.error('[QuranAudio] play() failed', error);
             showToast('Audio playback failed');
-            quranState.audioAyah = null;
+            quranState.isChainedPlayback = false;
             highlightPlayingAyah();
             updateQuranMiniPlayerLabel();
+            setQuranPlayerState('stopped');
             setQuranPlayButtonLoading(false);
             return;
         }
+
+        setQuranPlayerState('playing');
         updateQuranMiniTime();
-        updateQuranMiniPlayerVisibility();
         setQuranPlayButtonLoading(false);
     }
 
@@ -6594,27 +6721,33 @@ window.filterCategory = function(cat, btn) {
     };
 
     function toggleQuranPlayPause() {
-        const button = document.getElementById('quranPlayPause');
-        if (!quranState.audio) return;
-        if (!quranState.audioAyah && (!button || button.textContent.trim() !== '⏸')) return;
+        markQuranControlsInteraction();
 
-        const pendingLoad = quranState.audio.paused && button && button.textContent.trim() === '⏸';
-        if (pendingLoad) {
-            stopQuranAudio(false);
-            if (button) button.textContent = '▶';
+        if (quranState.playerState === 'loading') {
             return;
         }
 
-        if (quranState.audio.paused) {
+        if (quranState.playerState === 'playing' && quranState.audio) {
+            quranState.audio.pause();
+            quranState.audioPausedManually = true;
+            setQuranPlayerState('paused');
+            clearQuranStickyTimers();
+            showQuranStickyHeader(false);
+            return;
+        }
+
+        if (quranState.playerState === 'paused' && quranState.audio) {
             setQuranPlayButtonLoading(true);
             quranState.audio.play().catch(() => {
+                setQuranPlayerState('paused');
                 setQuranPlayButtonLoading(false);
             });
-            if (button) button.textContent = '⏸';
-            updateQuranMiniPlayerVisibility();
-        } else {
-            stopQuranAudio(false);
-            if (button) button.textContent = '▶';
+            quranState.audioPausedManually = false;
+            return;
+        }
+
+        if (quranState.lastPlayedSurah && quranState.lastPlayedAyah) {
+            playQuranAyahInternal(quranState.lastPlayedSurah, quranState.lastPlayedAyah, false);
         }
     }
 
@@ -6625,6 +6758,8 @@ window.filterCategory = function(cat, btn) {
             ? event.target.closest('.quran-ayah-btn[data-ayah-action]')
             : null;
         if (!target) return;
+
+        markQuranControlsInteraction();
 
         if (isTouch) {
             event.preventDefault();
@@ -6645,15 +6780,17 @@ window.filterCategory = function(cat, btn) {
         quranTapLocks.set(lockKey, now);
 
         if (action === 'play') {
-            setQuranPlayButtonLoading(true);
             playQuranAyahInternal(surah, ayah, false);
         }
         else if (action === 'bookmark') toggleQuranAyahBookmark(surah, ayah);
     }
 
     function playRelativeAyah(step) {
-        if (!quranState.audioAyah) return;
-        const [surahNo, ayahNo] = quranState.audioAyah.split(':').map(Number);
+        markQuranControlsInteraction();
+        if (!quranState.audioAyah && !(quranState.lastPlayedSurah && quranState.lastPlayedAyah)) return;
+        const [surahNo, ayahNo] = quranState.audioAyah
+            ? quranState.audioAyah.split(':').map(Number)
+            : [Number(quranState.lastPlayedSurah), Number(quranState.lastPlayedAyah)];
         const nextNo = ayahNo + step;
         if (!quranState.currentSurahData) return;
         if (nextNo < 1 || nextNo > quranState.currentSurahData.ayahs.length) return;
@@ -6748,6 +6885,7 @@ window.filterCategory = function(cat, btn) {
         document.querySelectorAll('.quran-tt-btn').forEach(btn => {
             if (btn.dataset.bound === '1') return;
             btn.addEventListener('click', () => {
+                markQuranControlsInteraction();
                 const settings = getQuranSettings();
                 settings.translationMode = btn.getAttribute('data-mode');
                 settings.mushafMode = settings.translationMode === 'ar';
@@ -6793,6 +6931,9 @@ window.filterCategory = function(cat, btn) {
         const playAll = document.getElementById('quranPlayAll');
         const speed = document.getElementById('quranSpeedCycle');
         const ayahList = document.getElementById('quranAyahList');
+        const miniClose = document.getElementById('quranMiniClose');
+        const hiddenIndicator = document.getElementById('quranHiddenIndicator');
+        const scrollContent = document.getElementById('quranScrollContent');
 
         if (playPause && playPause.dataset.bound !== '1') {
             bindFastTap(playPause, 'quran-play-pause', toggleQuranPlayPause);
@@ -6807,7 +6948,7 @@ window.filterCategory = function(cat, btn) {
             next.dataset.bound = '1';
         }
         if (stop && stop.dataset.bound !== '1') {
-            bindFastTap(stop, 'quran-stop-ayah', () => stopQuranAudio(true));
+            bindFastTap(stop, 'quran-stop-ayah', () => stopQuranAudio({ resetTime: true, explicitStop: true }));
             stop.dataset.bound = '1';
         }
         if (playAll && playAll.dataset.bound !== '1') {
@@ -6821,11 +6962,35 @@ window.filterCategory = function(cat, btn) {
             bindFastTap(speed, 'quran-speed-cycle', cycleQuranSpeed);
             speed.dataset.bound = '1';
         }
+        if (miniClose && miniClose.dataset.bound !== '1') {
+            bindFastTap(miniClose, 'quran-mini-close', () => stopQuranAudio({ resetTime: true, fullyReset: true }));
+            miniClose.dataset.bound = '1';
+        }
+        if (hiddenIndicator && hiddenIndicator.dataset.bound !== '1') {
+            bindFastTap(hiddenIndicator, 'quran-hidden-indicator', () => {
+                showQuranStickyHeader(quranState.playerState === 'playing');
+            });
+            hiddenIndicator.dataset.bound = '1';
+        }
 
         if (ayahList && ayahList.dataset.boundActions !== '1') {
             ayahList.addEventListener('touchstart', (event) => handleQuranAyahActionEvent(event, true), { passive: false });
             ayahList.addEventListener('click', (event) => handleQuranAyahActionEvent(event, false));
             ayahList.dataset.boundActions = '1';
+        }
+
+        if (scrollContent && scrollContent.dataset.boundTapShow !== '1') {
+            const onTapShow = (event) => {
+                const interactive = event.target && event.target.closest
+                    ? event.target.closest('button, input, select, .quran-ayah-btn, .quran-row-btn, .quran-tt-btn, .quran-mini-controls')
+                    : null;
+                if (interactive) return;
+                if (quranState.playerState === 'playing' || quranState.playerState === 'stopped') {
+                    showQuranStickyHeader(quranState.playerState === 'playing');
+                }
+            };
+            scrollContent.addEventListener('click', onTapShow);
+            scrollContent.dataset.boundTapShow = '1';
         }
     }
 
@@ -6899,6 +7064,7 @@ window.filterCategory = function(cat, btn) {
         lockScroll();
         setBottomNavActive('quran');
         await initQuran();
+        showQuranStickyHeader(quranState.playerState === 'playing');
         renderQuranContinueCard();
         renderQuranRecentSection();
         if (quranState.view === 'surah') renderQuranSurahRows();
@@ -6908,6 +7074,8 @@ window.filterCategory = function(cat, btn) {
     window.closeQuran = function() {
         const panel = document.querySelector('.quran-panel');
         if (panel) panel.classList.remove('active');
+        clearQuranStickyTimers();
+        showQuranStickyHeader(false);
         updateQuranMiniPlayerVisibility();
         document.body.classList.remove('quran-reading-mode');
         unlockScroll();
