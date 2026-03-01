@@ -2923,15 +2923,17 @@
         </div>
 
         <div class="quran-reader-screen" id="quranReaderScreen">
-            <div class="quran-reader-header" id="quranReaderHeader"></div>
-            <div class="quran-reader-tools">
-                <div class="quran-translation-toggle" id="quranTranslationToggle">
-                    <button type="button" class="quran-tt-btn active" data-mode="all">AR + PS + EN</button>
-                    <button type="button" class="quran-tt-btn" data-mode="ar-ps">AR + PS</button>
-                    <button type="button" class="quran-tt-btn" data-mode="ar-en">AR + EN</button>
-                    <button type="button" class="quran-tt-btn" data-mode="ar">Arabic Only</button>
+            <div class="quran-reader-sticky" id="quranReaderSticky">
+                <div class="quran-reader-header" id="quranReaderHeader"></div>
+                <div class="quran-reader-tools">
+                    <div class="quran-translation-toggle" id="quranTranslationToggle">
+                        <button type="button" class="quran-tt-btn active" data-mode="all">AR + PS + EN</button>
+                        <button type="button" class="quran-tt-btn" data-mode="ar-ps">AR + PS</button>
+                        <button type="button" class="quran-tt-btn" data-mode="ar-en">AR + EN</button>
+                        <button type="button" class="quran-tt-btn" data-mode="ar">Arabic Only</button>
+                    </div>
+                    <button type="button" class="quran-row-btn quran-play-all-header" id="quranPlayAll">Play All</button>
                 </div>
-                <button type="button" class="quran-row-btn quran-play-all-header" id="quranPlayAll">Play All</button>
             </div>
             <div class="quran-skeleton-list" id="quranSkeletonList"></div>
             <div class="quran-ayah-list" id="quranAyahList"></div>
@@ -3033,13 +3035,15 @@
             </div>
 
             <div class="prayer-reminder-controls">
-                <label id="reminderSoundLabel">Reminder Sound / د یادونې غږ</label>
-                <label class="prayer-reminder-item" style="margin-bottom:6px;">
+                <label for="reminderSoundSelect" id="reminderSoundLabel">Reminder Sound / د یادونې غږ</label>
+                <div class="reminder-sound-row">
+                    <select id="reminderSoundSelect" class="prayer-reminder-select" aria-label="Reminder Sound / د یادونې غږ"></select>
+                    <button type="button" id="reminderSoundPreviewBtn" class="reminder-sound-preview-btn" aria-label="Preview reminder sound">🔊</button>
+                </div>
+                <label class="prayer-reminder-item reminder-compact-toggle">
                     <span class="reminder-prayer-label-wrap"><span id="sameSoundAllLabel">Same sound for all prayers</span></span>
                     <input type="checkbox" id="sameSoundForAllToggle" checked>
                 </label>
-                <div id="reminderSoundCards" class="reminder-sound-cards" aria-live="polite"></div>
-                <div id="perPrayerSoundWrap" class="per-prayer-sound-wrap"></div>
 
                 <label for="reminderBefore" id="reminderBeforeLabel">Remind me</label>
                 <select id="reminderBefore" class="prayer-reminder-select">

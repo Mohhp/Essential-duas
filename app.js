@@ -3680,14 +3680,73 @@ window.filterCategory = function(cat, btn) {
         tone: 'audio/notification-tone.wav'
     };
     const REMINDER_SOUND_OPTIONS = [
-        { id: 'adhan_mishary', labelEn: 'Full Adhan — Mishary Rashid Alafasy', labelPs: 'بشپړ اذان — مشاري راشد العفاسي', file: 'audio/reminders/adhan-mishary.mp3' },
-        { id: 'adhan_abdulbasit', labelEn: 'Full Adhan — Abdul Basit', labelPs: 'بشپړ اذان — عبدالباسط', file: 'audio/reminders/adhan-abdulbasit.mp3' },
-        { id: 'adhan_short', labelEn: 'Short Adhan — Allahu Akbar', labelPs: 'لنډ اذان — الله اکبر', file: 'audio/reminders/adhan-short.mp3' },
-        { id: 'takbeer', labelEn: 'Takbeer — Allahu Akbar repeat', labelPs: 'تکبیر — الله اکبر تکرار', file: 'audio/reminders/takbeer.mp3' },
-        { id: 'nasheed_soft', labelEn: 'Soft Islamic Nasheed tone', labelPs: 'نرم اسلامي نشید غږ', file: 'audio/reminders/nasheed-soft.mp3' },
-        { id: 'bell_chime', labelEn: 'Simple Bell / Chime', labelPs: 'ساده زنګ / چایم', file: 'audio/reminders/bell-chime.mp3' },
-        { id: 'soft_ding', labelEn: 'Soft Ding', labelPs: 'نرم ډینګ', file: 'audio/reminders/soft-ding.mp3' },
-        { id: 'silent', labelEn: 'Silent — notification only', labelPs: 'بې غږه — یوازې خبرتیا', file: null }
+        {
+            id: 'adhan_mishary',
+            labelEn: 'Full Adhan — Mishary Rashid Alafasy',
+            labelPs: 'بشپړ اذان — مشاري راشد العفاسي',
+            source: 'remote',
+            url: 'https://server8.mp3quran.net/afs/001.mp3',
+            clipStart: 0,
+            clipDuration: 30
+        },
+        {
+            id: 'adhan_abdulbasit',
+            labelEn: 'Full Adhan — Abdul Basit',
+            labelPs: 'بشپړ اذان — عبدالباسط',
+            source: 'remote',
+            url: 'https://server7.mp3quran.net/basit/001.mp3',
+            clipStart: 0,
+            clipDuration: 30
+        },
+        {
+            id: 'adhan_short',
+            labelEn: 'Short Adhan (Opening Takbeer)',
+            labelPs: 'لنډ اذان (د تکبیر پیل)',
+            source: 'remote',
+            url: 'https://server8.mp3quran.net/afs/001.mp3',
+            clipStart: 0,
+            clipDuration: 10
+        },
+        {
+            id: 'takbeer',
+            labelEn: 'Takbeer Only',
+            labelPs: 'یوازې تکبیر',
+            source: 'remote',
+            url: 'https://server8.mp3quran.net/afs/001.mp3',
+            clipStart: 0,
+            clipDuration: 5
+        },
+        {
+            id: 'nasheed_soft',
+            labelEn: 'Soft Islamic Nasheed',
+            labelPs: 'نرم اسلامي نشید',
+            source: 'synth',
+            synth: 'nasheed',
+            clipDuration: 8
+        },
+        {
+            id: 'bell_chime',
+            labelEn: 'Simple Bell Chime',
+            labelPs: 'ساده زنګ',
+            source: 'synth',
+            synth: 'bell',
+            clipDuration: 5
+        },
+        {
+            id: 'soft_ding',
+            labelEn: 'Soft Ding',
+            labelPs: 'نرم ډینګ',
+            source: 'synth',
+            synth: 'ding',
+            clipDuration: 4
+        },
+        {
+            id: 'silent',
+            labelEn: 'Silent (No Sound)',
+            labelPs: 'بې غږه (هیڅ غږ نشته)',
+            source: 'silent',
+            clipDuration: 0
+        }
     ];
     const PRAYER_LABELS_EN = { fajr: 'Fajr', sunrise: 'Sunrise', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
     const PRAYER_LABELS_PS = { fajr: 'سهار', sunrise: 'لمر ختل', dhuhr: 'غرمه', asr: 'مازديګر', maghrib: 'ماښام', isha: 'ماخستن' };
@@ -3757,6 +3816,7 @@ window.filterCategory = function(cat, btn) {
     let reminderAudio = {};
     let reminderPreviewAudio = null;
     let reminderPreviewButton = null;
+    let reminderPreviewStop = null;
     let reminderMidnightTimer = null;
     let dailyReminderRescheduleTimeout = null;
     let isGpsResolving = false;
@@ -3835,47 +3895,153 @@ window.filterCategory = function(cat, btn) {
 
     function preloadPrayerReminderAudio() {
         REMINDER_SOUND_OPTIONS.forEach((option) => {
-            if (!option.file || reminderAudio[option.id]) return;
-            const audio = new Audio(option.file);
+            if (option.source !== 'remote' || !option.url || reminderAudio[option.id]) return;
+            const audio = new Audio(option.url);
             audio.preload = 'metadata';
             reminderAudio[option.id] = audio;
         });
         window.reminderAudio = reminderAudio;
     }
 
-    function playReminderAudioOption(soundId, { isPreview = false } = {}) {
-        const option = getReminderSoundOption(soundId);
-        if (!option || !option.file || option.id === 'silent') return null;
+    function playSyntheticReminderTone(kind, durationSeconds = 5) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return null;
 
-        if (isPreview) {
-            const previewAudio = new Audio(option.file);
-            previewAudio.preload = 'auto';
-            previewAudio.currentTime = 0;
-            previewAudio.play().catch((error) => {
-                console.error('[ReminderAudio] preview play failed', { soundId: option.id, isPreview, error });
+        const context = new AudioCtx();
+        const master = context.createGain();
+        const start = context.currentTime;
+        const stopAt = start + Math.max(1, Number(durationSeconds) || 5);
+        let endedCb = null;
+        let stopped = false;
+
+        master.gain.value = 0.0001;
+        master.connect(context.destination);
+        if (typeof context.resume === 'function') context.resume().catch(() => {});
+
+        const addTone = (frequency, at, duration, gain = 0.16, type = 'sine') => {
+            const osc = context.createOscillator();
+            const amp = context.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(frequency, at);
+            amp.gain.setValueAtTime(0.0001, at);
+            amp.gain.exponentialRampToValueAtTime(Math.max(0.001, gain), at + 0.02);
+            amp.gain.exponentialRampToValueAtTime(0.0001, at + duration);
+            osc.connect(amp);
+            amp.connect(master);
+            osc.start(at);
+            osc.stop(at + duration + 0.05);
+        };
+
+        if (kind === 'nasheed') {
+            const pattern = [392, 440, 523.25, 440, 392];
+            pattern.forEach((freq, index) => {
+                const at = start + (index * 0.45);
+                if (at + 0.4 < stopAt) {
+                    addTone(freq, at, 0.38, 0.1, 'sine');
+                    addTone(freq * 2, at + 0.03, 0.3, 0.03, 'triangle');
+                }
             });
-            return previewAudio;
+        } else if (kind === 'bell') {
+            addTone(1046.5, start + 0.02, 1.6, 0.2, 'triangle');
+            addTone(1568, start + 0.03, 1.8, 0.09, 'sine');
+        } else {
+            addTone(880, start + 0.02, 0.9, 0.17, 'sine');
+            addTone(1320, start + 0.04, 0.5, 0.06, 'triangle');
         }
 
-        if (!reminderAudio[option.id]) {
-            reminderAudio[option.id] = new Audio(option.file);
-            reminderAudio[option.id].preload = 'auto';
+        const finish = () => {
+            if (stopped) return;
+            stopped = true;
+            try {
+                master.gain.cancelScheduledValues(context.currentTime);
+                master.gain.setTargetAtTime(0.0001, context.currentTime, 0.05);
+            } catch (error) {}
+            setTimeout(() => context.close().catch(() => {}), 120);
+            if (typeof endedCb === 'function') endedCb();
+        };
+
+        const timer = setTimeout(finish, Math.max(150, Math.floor((stopAt - start) * 1000)));
+
+        return {
+            stop() {
+                clearTimeout(timer);
+                finish();
+            },
+            onEnded(callback) {
+                endedCb = callback;
+            }
+        };
+    }
+
+    function playReminderAudioOption(soundId, { isPreview = false, maxDurationSeconds = null } = {}) {
+        const option = getReminderSoundOption(soundId);
+        if (!option || option.source === 'silent' || option.id === 'silent') return null;
+
+        const maxDuration = Number(maxDurationSeconds);
+        const durationSeconds = Number.isFinite(maxDuration) && maxDuration > 0
+            ? maxDuration
+            : Math.max(1, Number(option.clipDuration) || 8);
+
+        if (option.source === 'synth') {
+            return playSyntheticReminderTone(option.synth || 'ding', durationSeconds);
         }
 
-        const audio = reminderAudio[option.id];
-        try {
-            audio.currentTime = 0;
+        const src = option.url || option.file;
+        if (!src) return null;
+
+        const audio = isPreview ? new Audio(src) : (reminderAudio[option.id] || new Audio(src));
+        if (!isPreview && !reminderAudio[option.id]) reminderAudio[option.id] = audio;
+
+        audio.preload = 'auto';
+        const seekSeconds = Math.max(0, Number(option.clipStart) || 0);
+        let timer = null;
+        let endedCb = null;
+        let finished = false;
+
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            if (timer) {
+                clearTimeout(timer);
+                timer = null;
+            }
+            if (typeof endedCb === 'function') endedCb();
+        };
+
+        const stop = () => {
+            try {
+                audio.pause();
+            } catch (error) {}
+            finish();
+        };
+
+        const begin = () => {
+            try {
+                audio.currentTime = seekSeconds;
+            } catch (error) {}
+
             const playPromise = audio.play();
             if (playPromise && typeof playPromise.catch === 'function') {
                 playPromise.catch((error) => {
                     console.error('[ReminderAudio] play failed', { soundId: option.id, isPreview, error });
+                    finish();
                 });
             }
-            return audio;
-        } catch (error) {
-            console.error('[ReminderAudio] play failed (sync)', { soundId: option.id, isPreview, error });
-            return null;
-        }
+
+            timer = setTimeout(stop, Math.floor(durationSeconds * 1000));
+        };
+
+        if (audio.readyState >= 1) begin();
+        else audio.addEventListener('loadedmetadata', begin, { once: true });
+
+        audio.addEventListener('ended', finish, { once: true });
+
+        return {
+            stop,
+            onEnded(callback) {
+                endedCb = callback;
+            }
+        };
     }
 
     function getReminderSoundOption(soundId) {
@@ -3887,65 +4053,31 @@ window.filterCategory = function(cat, btn) {
         return isPashtoMode() ? option.labelPs : option.labelEn;
     }
 
-    function renderReminderSoundCards() {
-        const root = document.getElementById('reminderSoundCards');
-        if (!root) return;
+    function renderReminderSoundSelector() {
+        const select = document.getElementById('reminderSoundSelect');
+        const previewBtn = document.getElementById('reminderSoundPreviewBtn');
+        if (!select) return;
+
         const settings = loadReminderSettings();
+        select.innerHTML = REMINDER_SOUND_OPTIONS.map((option) => (`
+            <option value="${option.id}">${escapeHtml(getReminderSoundLabel(option.id))}</option>
+        `)).join('');
+        select.value = settings.soundId || 'adhan_mishary';
 
-        root.innerHTML = REMINDER_SOUND_OPTIONS.map((option) => {
-            const active = settings.soundId === option.id;
-            return `
-                <div class="reminder-sound-card ${active ? 'active' : ''}" data-sound-id="${option.id}" role="button" tabindex="0" aria-label="${escapeHtml(getReminderSoundLabel(option.id))}" onclick="selectReminderSoundOption('${option.id}')">
-                    <span class="reminder-sound-radio" aria-hidden="true"></span>
-                    <span class="reminder-sound-name">${escapeHtml(getReminderSoundLabel(option.id))}</span>
-                    <button type="button" class="reminder-sound-preview" data-preview-sound="${option.id}" ${option.file ? '' : 'disabled'} onclick="event.stopPropagation(); previewReminderSoundOption('${option.id}', this)">${option.file ? '▶' : '—'}</button>
-                </div>
-            `;
-        }).join('');
-
-        root.querySelectorAll('.reminder-sound-card').forEach((card) => {
-            const soundId = card.getAttribute('data-sound-id');
-            card.addEventListener('click', (event) => {
-                if (event.target.closest('.reminder-sound-preview')) return;
-                const settings = loadReminderSettings();
-                settings.soundId = soundId;
-                saveReminderSettings();
-                renderReminderSoundCards();
-                showToast(getPrayerUiText().reminderSaved);
-            });
-            card.addEventListener('keydown', (event) => {
-                if (event.key !== 'Enter' && event.key !== ' ') return;
-                event.preventDefault();
-                const settings = loadReminderSettings();
-                settings.soundId = soundId;
-                saveReminderSettings();
-                renderReminderSoundCards();
-                showToast(getPrayerUiText().reminderSaved);
-            });
-        });
-
-        root.querySelectorAll('.reminder-sound-preview').forEach((button) => {
-            const soundId = button.getAttribute('data-preview-sound');
-
-            const runPreview = (event, isTouch = false) => {
-                if (event) {
-                    event.stopPropagation();
-                    if (isTouch) event.preventDefault();
-                }
-                button.classList.add('is-playing');
-                previewReminderSound(soundId, button);
-            };
-
-            button.addEventListener('touchstart', (event) => runPreview(event, true), { passive: false });
-            button.addEventListener('click', (event) => runPreview(event, false));
-        });
+        if (previewBtn) {
+            const selected = getReminderSoundOption(select.value);
+            const muted = selected.id === 'silent' || selected.source === 'silent';
+            previewBtn.disabled = muted;
+            previewBtn.classList.remove('is-playing');
+            previewBtn.textContent = '🔊';
+        }
     }
 
     window.selectReminderSoundOption = function(soundId) {
         const settings = loadReminderSettings();
         settings.soundId = soundId;
         saveReminderSettings();
-        renderReminderSoundCards();
+        renderReminderSoundSelector();
         renderPerPrayerSoundSelectors();
         showToast(getPrayerUiText().reminderSaved);
     };
@@ -3957,61 +4089,54 @@ window.filterCategory = function(cat, btn) {
     function renderPerPrayerSoundSelectors() {
         const wrap = document.getElementById('perPrayerSoundWrap');
         if (!wrap) return;
-        const settings = loadReminderSettings();
-        wrap.classList.toggle('active', !settings.sameSoundForAll);
-        if (settings.sameSoundForAll) {
-            wrap.innerHTML = '';
-            return;
+        wrap.classList.remove('active');
+        wrap.innerHTML = '';
+    }
+
+    function stopReminderPreview() {
+        if (reminderPreviewStop) {
+            reminderPreviewStop();
+            reminderPreviewStop = null;
         }
-
-        const options = REMINDER_SOUND_OPTIONS.map((option) => `<option value="${option.id}">${escapeHtml(getReminderSoundLabel(option.id))}</option>`).join('');
-        wrap.innerHTML = REMINDER_PRAYERS.map((prayerName) => `
-            <div class="per-prayer-sound-row">
-                <label for="perPrayerSound-${prayerName}">${escapeHtml(getPrayerLabel(prayerName))}</label>
-                <select id="perPrayerSound-${prayerName}" data-prayer-sound="${prayerName}" class="prayer-reminder-select">${options}</select>
-            </div>
-        `).join('');
-
-        wrap.querySelectorAll('[data-prayer-sound]').forEach((select) => {
-            const prayerName = select.getAttribute('data-prayer-sound');
-            select.value = settings.prayerSounds[prayerName] || settings.soundId;
-            select.addEventListener('change', () => {
-                const current = loadReminderSettings();
-                current.prayerSounds[prayerName] = select.value;
-                saveReminderSettings();
-                showToast(getPrayerUiText().reminderSaved);
-            });
-        });
+        if (reminderPreviewAudio && typeof reminderPreviewAudio.pause === 'function') {
+            try {
+                reminderPreviewAudio.pause();
+            } catch (error) {}
+        }
+        reminderPreviewAudio = null;
+        window.reminderPreviewAudio = null;
+        if (reminderPreviewButton) {
+            reminderPreviewButton.classList.remove('is-playing');
+            reminderPreviewButton.textContent = '🔊';
+        }
+        reminderPreviewButton = null;
     }
 
     function previewReminderSound(soundId, triggerButton) {
         const option = getReminderSoundOption(soundId);
-        if (!option.file) return;
-        if (reminderPreviewAudio) {
-            reminderPreviewAudio.pause();
-            reminderPreviewAudio.currentTime = 0;
-        }
-        if (reminderPreviewButton) {
-            reminderPreviewButton.classList.remove('is-playing');
-            reminderPreviewButton.textContent = '▶';
-        }
-        reminderPreviewAudio = playReminderAudioOption(soundId, { isPreview: true });
-        window.reminderPreviewAudio = reminderPreviewAudio;
-        if (!reminderPreviewAudio) {
-            if (triggerButton) {
-                triggerButton.classList.remove('is-playing');
-                triggerButton.textContent = '▶';
-            }
-            return;
-        }
+        if (!option || option.id === 'silent' || option.source === 'silent') return;
+
+        stopReminderPreview();
+
         if (triggerButton) {
             reminderPreviewButton = triggerButton;
+            triggerButton.classList.add('is-playing');
             triggerButton.textContent = '⏸';
-            reminderPreviewAudio.addEventListener('ended', () => {
-                triggerButton.classList.remove('is-playing');
-                triggerButton.textContent = '▶';
-                reminderPreviewButton = null;
-            }, { once: true });
+        }
+
+        const controller = playReminderAudioOption(soundId, { isPreview: true, maxDurationSeconds: 5 });
+        window.reminderPreviewAudio = controller;
+        if (!controller) {
+            stopReminderPreview();
+            return;
+        }
+
+        reminderPreviewAudio = controller;
+        reminderPreviewStop = typeof controller.stop === 'function' ? controller.stop : null;
+        if (typeof controller.onEnded === 'function') {
+            controller.onEnded(() => {
+                stopReminderPreview();
+            });
         }
     }
 
@@ -4152,13 +4277,10 @@ window.filterCategory = function(cat, btn) {
             if (row) row.classList.toggle('active', !!settings.enabled && !!settings.prayers[name]);
         });
 
-        const modeSelect = document.getElementById('reminderSoundMode');
-        if (modeSelect) modeSelect.value = settings.mode;
-
         const sameSoundToggle = document.getElementById('sameSoundForAllToggle');
         if (sameSoundToggle) sameSoundToggle.checked = !!settings.sameSoundForAll;
 
-        renderReminderSoundCards();
+        renderReminderSoundSelector();
         renderPerPrayerSoundSelectors();
 
         const beforeSelect = document.getElementById('reminderBefore');
@@ -4176,20 +4298,10 @@ window.filterCategory = function(cat, btn) {
 
         if (sectionTitle) sectionTitle.textContent = uiText.reminderSettingsTitle;
         if (masterLabel) masterLabel.textContent = uiText.reminderMaster;
-        if (soundLabel) soundLabel.textContent = uiText.reminderSound;
+        if (soundLabel) soundLabel.textContent = 'Reminder Sound / د یادونې غږ';
         if (sameAllLabel) sameAllLabel.textContent = isPashtoMode() ? 'د ټولو لمونځونو لپاره یو غږ' : 'Same sound for all prayers';
         if (beforeLabel) beforeLabel.textContent = uiText.reminderBefore;
         if (testBtn) testBtn.textContent = uiText.testReminder;
-
-        const modeSelect = document.getElementById('reminderSoundMode');
-        if (modeSelect) {
-            const adhanOpt = modeSelect.querySelector('option[value="adhan"]');
-            const toneOpt = modeSelect.querySelector('option[value="tone"]');
-            const silentOpt = modeSelect.querySelector('option[value="silent"]');
-            if (adhanOpt) adhanOpt.textContent = uiText.soundAdhan;
-            if (toneOpt) toneOpt.textContent = uiText.soundTone;
-            if (silentOpt) silentOpt.textContent = uiText.soundSilent;
-        }
 
         const beforeSelect = document.getElementById('reminderBefore');
         if (beforeSelect) {
@@ -4208,7 +4320,7 @@ window.filterCategory = function(cat, btn) {
             if (label) label.textContent = getPrayerLabel(name);
         });
 
-        renderReminderSoundCards();
+        renderReminderSoundSelector();
         renderPerPrayerSoundSelectors();
 
         const instruction = document.getElementById('qiblaInstruction');
@@ -4269,14 +4381,30 @@ window.filterCategory = function(cat, btn) {
             });
         });
 
-        const modeSelect = document.getElementById('reminderSoundMode');
-        if (modeSelect) {
-            modeSelect.addEventListener('change', () => {
+        const soundSelect = document.getElementById('reminderSoundSelect');
+        if (soundSelect) {
+            soundSelect.addEventListener('change', () => {
+                stopReminderPreview();
                 const settings = loadReminderSettings();
-                settings.mode = modeSelect.value;
+                settings.soundId = soundSelect.value;
                 saveReminderSettings();
+                renderReminderSoundSelector();
                 showToast(getPrayerUiText().reminderSaved);
             });
+        }
+
+        const soundPreviewBtn = document.getElementById('reminderSoundPreviewBtn');
+        if (soundPreviewBtn) {
+            const runPreview = (event, isTouch = false) => {
+                if (event) {
+                    if (isTouch) event.preventDefault();
+                    event.stopPropagation();
+                }
+                const selectedSound = document.getElementById('reminderSoundSelect')?.value || loadReminderSettings().soundId;
+                previewReminderSound(selectedSound, soundPreviewBtn);
+            };
+            soundPreviewBtn.addEventListener('touchstart', (event) => runPreview(event, true), { passive: false });
+            soundPreviewBtn.addEventListener('click', (event) => runPreview(event, false));
         }
 
         const sameSoundToggle = document.getElementById('sameSoundForAllToggle');
@@ -4285,7 +4413,6 @@ window.filterCategory = function(cat, btn) {
                 const settings = loadReminderSettings();
                 settings.sameSoundForAll = !!sameSoundToggle.checked;
                 saveReminderSettings();
-                renderPerPrayerSoundSelectors();
                 showToast(getPrayerUiText().reminderSaved);
             });
         }
@@ -5078,7 +5205,7 @@ window.filterCategory = function(cat, btn) {
 
     function resolveReminderSoundId(prayerName = null) {
         const settings = loadReminderSettings();
-        if (settings.mode === 'silent') return 'silent';
+        if ((settings.soundId || '') === 'silent') return 'silent';
         if (settings.sameSoundForAll || !prayerName) return settings.soundId || 'adhan_mishary';
         return settings.prayerSounds?.[prayerName] || settings.soundId || 'adhan_mishary';
     }
@@ -5396,6 +5523,7 @@ window.filterCategory = function(cat, btn) {
         loadingReader: false,
         loadingList: false
     };
+    let quranMiniHideTimer = null;
 
     function getQuranDefaults() {
         return {
@@ -6217,9 +6345,39 @@ window.filterCategory = function(cat, btn) {
 
     function updateQuranMiniPlayerVisibility() {
         const player = document.getElementById('quranMiniPlayer');
+        const reader = document.getElementById('quranReaderScreen');
         if (!player) return;
-        const isPlaying = !!(quranState.audio && quranState.audioAyah && !quranState.audio.paused);
-        player.classList.toggle('active', isPlaying);
+
+        const blockedByReadingMode = document.body.classList.contains('quran-reading-mode');
+        const isPlaying = !!(quranState.audio && quranState.audioAyah && !quranState.audio.paused && !blockedByReadingMode);
+
+        if (reader) {
+            reader.style.setProperty('--quran-player-offset', isPlaying ? '64px' : '0px');
+        }
+
+        if (isPlaying) {
+            if (quranMiniHideTimer) {
+                clearTimeout(quranMiniHideTimer);
+                quranMiniHideTimer = null;
+            }
+            if (!player.classList.contains('active')) {
+                player.classList.add('active');
+                requestAnimationFrame(() => {
+                    player.classList.add('ready');
+                });
+            } else {
+                player.classList.add('ready');
+            }
+            return;
+        }
+
+        player.classList.remove('ready');
+        if (player.classList.contains('active')) {
+            quranMiniHideTimer = setTimeout(() => {
+                if (!player.classList.contains('ready')) player.classList.remove('active');
+                quranMiniHideTimer = null;
+            }, 200);
+        }
     }
 
     function cycleQuranSpeed() {
@@ -6615,6 +6773,7 @@ window.filterCategory = function(cat, btn) {
             readingModeBtn.addEventListener('click', () => {
                 document.body.classList.toggle('quran-reading-mode');
                 showToast(document.body.classList.contains('quran-reading-mode') ? getQuranUiText().readingModeOn : getQuranUiText().readingModeOff);
+                updateQuranMiniPlayerVisibility();
                 requestAnimationFrame(() => syncQuranReaderStickyOffsets());
             });
             readingModeBtn.dataset.bound = '1';
