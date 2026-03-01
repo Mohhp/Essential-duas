@@ -5527,6 +5527,7 @@ window.filterCategory = function(cat, btn) {
         audioPlayAll: false,
         audioPausedManually: false,
         audioFallbackAttempted: false,
+        audioSwitchingSource: false,
         loadingReader: false,
         loadingList: false
     };
@@ -6571,6 +6572,7 @@ window.filterCategory = function(cat, btn) {
         quranState.isChainedPlayback = false;
         quranState.audioPausedManually = false;
         quranState.audioFallbackAttempted = false;
+        quranState.audioSwitchingSource = false;
 
         const shouldClearSession = fullyReset || explicitStop || surahCompleted || navigatedAway;
 
@@ -6616,59 +6618,111 @@ window.filterCategory = function(cat, btn) {
         return null;
     }
 
-    function getReciterCandidateIds(reciter) {
-        const selected = String(reciter || QURAN_FALLBACK_RECITER).trim();
+    function getCanonicalReciterId(reciter) {
+        const id = String(reciter || QURAN_FALLBACK_RECITER).trim();
+        const canonical = {
+            'ar.abdurrahmansudais': 'ar.abdurrahmaansudais',
+            'ar.shuraim': 'ar.saoodshuraym'
+        };
+        return canonical[id] || id;
+    }
+
+    function getReciterAliasIds(reciter) {
+        const selected = getCanonicalReciterId(reciter);
         const aliases = {
-            'ar.abdurrahmaansudais': ['ar.abdurrahmaansudais', 'ar.abdurrahmansudais', 'ar.sudais'],
-            'ar.abdurrahmansudais': ['ar.abdurrahmaansudais', 'ar.abdurrahmansudais', 'ar.sudais'],
-            'ar.husary': ['ar.husary', 'ar.husari'],
-            'ar.abdulbasitmurattal': ['ar.abdulbasitmurattal', 'ar.abdulbasit'],
-            'ar.saoodshuraym': ['ar.saoodshuraym', 'ar.shuraim', 'ar.shuraym'],
-            'ar.shuraim': ['ar.saoodshuraym', 'ar.shuraim', 'ar.shuraym'],
-            'ar.alafasy': ['ar.alafasy']
+            'ar.alafasy': ['ar.alafasy'],
+            'ar.abdulbasitmurattal': ['ar.abdulbasitmurattal', 'ar.abdulsamad'],
+            'ar.abdurrahmaansudais': ['ar.abdurrahmaansudais', 'ar.abdurrahmansudais'],
+            'ar.husary': ['ar.husary'],
+            'ar.saoodshuraym': ['ar.saoodshuraym', 'ar.shuraim']
+        };
+        return aliases[selected] || [selected];
+    }
+
+    function formatSurahAyahCode(surahNumber, ayahNumber) {
+        const s = String(Number(surahNumber) || 0).padStart(3, '0');
+        const a = String(Number(ayahNumber) || 0).padStart(3, '0');
+        return `${s}${a}`;
+    }
+
+    function getReciterSourceTemplates(reciter) {
+        const canonical = getCanonicalReciterId(reciter);
+        const templates = {
+            'ar.alafasy': [
+                { type: 'cdn', bitrate: 128, reciterId: 'ar.alafasy', numbering: 'global' },
+                { type: 'cdn', bitrate: 64, reciterId: 'ar.alafasy', numbering: 'global' }
+            ],
+            'ar.abdulbasitmurattal': [
+                { type: 'cdn', bitrate: 128, reciterId: 'ar.abdulbasitmurattal', numbering: 'global' },
+                { type: 'cdn', bitrate: 64, reciterId: 'ar.abdulbasitmurattal', numbering: 'global' },
+                { type: 'cdn-surah', bitrate: 128, reciterId: 'ar.abdulbasitmurattal', numbering: 'surahAyah' },
+                { type: 'verses', basePath: 'AbdulBaset/Murattal', numbering: 'surahAyah' },
+                { type: 'everyayah', basePath: 'Abdul_Basit_Murattal_64kbps', numbering: 'surahAyah' }
+            ],
+            'ar.abdurrahmaansudais': [
+                { type: 'cdn', bitrate: 128, reciterId: 'ar.abdurrahmaansudais', numbering: 'global' },
+                { type: 'cdn', bitrate: 64, reciterId: 'ar.abdurrahmaansudais', numbering: 'global' },
+                { type: 'cdn', bitrate: 128, reciterId: 'ar.abdurrahmansudais', numbering: 'global' },
+                { type: 'cdn', bitrate: 64, reciterId: 'ar.abdurrahmansudais', numbering: 'global' },
+                { type: 'everyayah', basePath: 'Abdurrahmaan_As-Sudais_64kbps', numbering: 'surahAyah' }
+            ],
+            'ar.husary': [
+                { type: 'cdn', bitrate: 128, reciterId: 'ar.husary', numbering: 'global' },
+                { type: 'cdn', bitrate: 64, reciterId: 'ar.husary', numbering: 'global' }
+            ],
+            'ar.saoodshuraym': [
+                { type: 'cdn', bitrate: 128, reciterId: 'ar.saoodshuraym', numbering: 'global' },
+                { type: 'cdn', bitrate: 64, reciterId: 'ar.saoodshuraym', numbering: 'global' },
+                { type: 'cdn', bitrate: 128, reciterId: 'ar.shuraim', numbering: 'global' },
+                { type: 'cdn', bitrate: 64, reciterId: 'ar.shuraim', numbering: 'global' },
+                { type: 'everyayah', basePath: 'Saood_ash-Shuraym_64kbps', numbering: 'surahAyah' }
+            ]
         };
 
-        const picked = aliases[selected] || [selected];
-        const fallback = aliases[QURAN_FALLBACK_RECITER] || [QURAN_FALLBACK_RECITER];
-        return Array.from(new Set([...picked, ...fallback]));
+        return templates[canonical] || templates[QURAN_FALLBACK_RECITER] || [];
     }
 
-    async function probeQuranAudioUrl(url) {
-        try {
-            const response = await fetch(url, { method: 'HEAD', cache: 'no-store' });
-            return !!response?.ok;
-        } catch (error) {
-            return true;
-        }
-    }
-
-    async function fetchAyahAudioUrl(surahNumber, ayahNumber, reciter) {
+    async function fetchAyahAudioCandidates(surahNumber, ayahNumber, reciter) {
         const globalAyahNo = await getAyahGlobalNumber(surahNumber, ayahNumber);
-        const reciterIds = getReciterCandidateIds(reciter);
+        const surahAyahCode = formatSurahAyahCode(surahNumber, ayahNumber);
+        const templates = getReciterSourceTemplates(reciter);
+        const aliasIds = getReciterAliasIds(reciter);
+        const candidates = [];
 
-        if (globalAyahNo) {
-            const candidates = [];
-            reciterIds.forEach((reciterId) => {
-                candidates.push(`https://cdn.islamic.network/quran/audio/128/${reciterId}/${globalAyahNo}.mp3`);
-                candidates.push(`https://cdn.islamic.network/quran/audio/64/${reciterId}/${globalAyahNo}.mp3`);
-            });
+        templates.forEach((entry) => {
+            if (entry.numbering === 'global' && !globalAyahNo) return;
 
-            for (const candidate of candidates) {
-                if (await probeQuranAudioUrl(candidate)) return candidate;
+            if (entry.type === 'cdn') {
+                const id = entry.reciterId || aliasIds[0];
+                const ref = entry.numbering === 'global' ? globalAyahNo : surahAyahCode;
+                if (id && ref) candidates.push(`https://cdn.islamic.network/quran/audio/${entry.bitrate}/${id}/${ref}.mp3`);
+                return;
             }
 
-            return candidates[0] || null;
-        }
+            if (entry.type === 'cdn-surah') {
+                if (entry.reciterId && surahAyahCode) candidates.push(`https://cdn.islamic.network/quran/audio-surah/${entry.bitrate}/${entry.reciterId}/${surahAyahCode}.mp3`);
+                return;
+            }
+
+            if (entry.type === 'everyayah') {
+                if (entry.basePath && surahAyahCode) candidates.push(`https://everyayah.com/data/${entry.basePath}/${surahAyahCode}.mp3`);
+                return;
+            }
+
+            if (entry.type === 'verses') {
+                if (entry.basePath && surahAyahCode) candidates.push(`https://verses.quran.com/${entry.basePath}/mp3/${surahAyahCode}.mp3`);
+            }
+        });
 
         try {
-            for (const reciterId of reciterIds) {
+            for (const reciterId of aliasIds) {
                 const response = await fetch(`${QURAN_API_BASE}/ayah/${surahNumber}:${ayahNumber}/${reciterId}`);
                 const json = await response.json();
-                if (json?.data?.audio) return json.data.audio;
+                if (json?.data?.audio) candidates.push(json.data.audio);
             }
         } catch (error) {}
 
-        return null;
+        return Array.from(new Set(candidates.filter(Boolean)));
     }
 
     async function getPlayableAudioSource(audioUrl) {
@@ -6787,21 +6841,10 @@ window.filterCategory = function(cat, btn) {
                 }
             });
             quranState.audio.addEventListener('error', () => {
+                if (quranState.audioSwitchingSource) return;
                 quranState.isChainedPlayback = false;
                 if (!quranState.audioAyah) {
                     stopQuranAudio({ resetTime: true, explicitStop: true });
-                    return;
-                }
-
-                const [sNo, aNo] = quranState.audioAyah.split(':').map(Number);
-                const currentSettings = getQuranSettings();
-                if (!quranState.audioFallbackAttempted && currentSettings.reciter !== QURAN_FALLBACK_RECITER) {
-                    quranState.audioFallbackAttempted = true;
-                    currentSettings.reciter = QURAN_FALLBACK_RECITER;
-                    saveQuranSettings(currentSettings);
-                    if (quranState.view === 'settings') renderQuranSettingsSection();
-                    showToast('Audio not available for this reciter');
-                    playQuranAyahInternal(sNo, aNo, quranState.audioPlayAll, Number(quranState.audio?.currentTime) || 0, true);
                     return;
                 }
 
@@ -6816,50 +6859,75 @@ window.filterCategory = function(cat, btn) {
         updateQuranMiniPlayerLabel();
         syncQuranAudioSessionFromState(0);
 
-        const audioUrl = await fetchAyahAudioUrl(surahNumber, ayahNumber, settings.reciter);
-        console.log('[QuranAudio] resolved audio URL', { hasAudioUrl: !!audioUrl, reciter: settings.reciter });
-        if (!audioUrl) {
+        const tryPlayWithCandidates = async (candidateUrls, seekFrom = 0) => {
+            if (!candidateUrls.length) return { ok: false, usedUrl: null };
+
+            for (const candidateUrl of candidateUrls) {
+                try {
+                    quranState.audioSwitchingSource = true;
+                    const src = await getPlayableAudioSource(candidateUrl);
+
+                    if (quranState.audio && !quranState.audio.paused && (forceReload || !sameAyahAsCurrent)) {
+                        quranState.audio.pause();
+                    }
+
+                    quranState.audio.playbackRate = Number(quranState.audioRate || 1);
+                    quranState.audio.src = src;
+                    quranState.audio.currentTime = 0;
+
+                    if (seekFrom > 0) {
+                        await new Promise((resolve) => {
+                            let settled = false;
+                            const seekAndResolve = () => {
+                                if (settled) return;
+                                settled = true;
+                                try { quranState.audio.currentTime = seekFrom; } catch (error) {}
+                                resolve();
+                            };
+
+                            if (quranState.audio.readyState >= 1) {
+                                seekAndResolve();
+                                return;
+                            }
+
+                            quranState.audio.addEventListener('loadedmetadata', seekAndResolve, { once: true });
+                            quranState.audio.addEventListener('canplay', seekAndResolve, { once: true });
+                            setTimeout(seekAndResolve, 700);
+                        });
+                    }
+
+                    await quranState.audio.play();
+                    quranState.audioSwitchingSource = false;
+                    return { ok: true, usedUrl: candidateUrl };
+                } catch (error) {
+                    quranState.audioSwitchingSource = false;
+                    console.warn('[QuranAudio] candidate play failed', { candidateUrl, error: error?.message || error });
+                }
+            }
+
+            return { ok: false, usedUrl: null };
+        };
+
+        const primaryCandidates = await fetchAyahAudioCandidates(surahNumber, ayahNumber, settings.reciter);
+        console.log('[QuranAudio] candidate URLs', { reciter: settings.reciter, count: primaryCandidates.length });
+
+        if (!primaryCandidates.length) {
             showToast(getQuranUiText().noData);
             setQuranPlayerState('hidden');
             setQuranPlayButtonLoading(false);
             return;
         }
 
-        const src = await getPlayableAudioSource(audioUrl);
+        let playResult = await tryPlayWithCandidates(primaryCandidates, startTime);
 
-        if (quranState.audio && !quranState.audio.paused && (forceReload || !sameAyahAsCurrent)) {
-            quranState.audio.pause();
+        if (!playResult.ok && getCanonicalReciterId(settings.reciter) !== QURAN_FALLBACK_RECITER) {
+            quranState.audioFallbackAttempted = true;
+            showToast('Audio not available for this reciter');
+            const fallbackCandidates = await fetchAyahAudioCandidates(surahNumber, ayahNumber, QURAN_FALLBACK_RECITER);
+            playResult = await tryPlayWithCandidates(fallbackCandidates, startTime);
         }
 
-        quranState.audio.playbackRate = Number(quranState.audioRate || 1);
-        quranState.audio.src = src;
-        quranState.audio.currentTime = 0;
-
-        if (startTime > 0) {
-            await new Promise((resolve) => {
-                let settled = false;
-                const seekAndResolve = () => {
-                    if (settled) return;
-                    settled = true;
-                    try { quranState.audio.currentTime = startTime; } catch (error) {}
-                    resolve();
-                };
-
-                if (quranState.audio.readyState >= 1) {
-                    seekAndResolve();
-                    return;
-                }
-
-                quranState.audio.addEventListener('loadedmetadata', seekAndResolve, { once: true });
-                quranState.audio.addEventListener('canplay', seekAndResolve, { once: true });
-                setTimeout(seekAndResolve, 700);
-            });
-        }
-
-        try {
-            await quranState.audio.play();
-        } catch (error) {
-            console.error('[QuranAudio] play() failed', error);
+        if (!playResult.ok) {
             showToast('Audio playback failed');
             quranState.isChainedPlayback = false;
             highlightPlayingAyah();
@@ -6869,6 +6937,7 @@ window.filterCategory = function(cat, btn) {
             return;
         }
 
+        console.log('[QuranAudio] using audio source', { url: playResult.usedUrl, reciter: settings.reciter });
         setQuranPlayerState('playing');
         updateQuranMiniTime();
         setQuranPlayButtonLoading(false);
@@ -6989,9 +7058,8 @@ window.filterCategory = function(cat, btn) {
 
         const cache = await caches.open(QURAN_AUDIO_CACHE);
         for (const ayah of data.ayahs) {
-            const audioUrl = ayah?.number
-                ? `https://cdn.islamic.network/quran/audio/128/${reciter}/${ayah.number}.mp3`
-                : await fetchAyahAudioUrl(surahNumber, ayah.numberInSurah, reciter);
+            const candidates = await fetchAyahAudioCandidates(surahNumber, ayah.numberInSurah, reciter);
+            const audioUrl = candidates[0] || null;
             if (!audioUrl) continue;
             const exists = await cache.match(audioUrl, { ignoreSearch: true });
             if (exists) continue;
