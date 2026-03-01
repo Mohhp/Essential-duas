@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essential-duas-v26';
+const CACHE_NAME = 'essential-duas-v27';
 const OFFLINE_PAGE = './offline.html';
 
 const ASSETS = [

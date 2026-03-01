@@ -83,6 +83,7 @@ const PS_UI = {
     // Bottom nav
     home: 'کور',
     routine: 'معمول',
+    quranNav: 'قرآن',
     tasbeehNav: 'تسبیح',
     saved: 'خوندي',
     // Bookmarks panel
@@ -950,6 +951,7 @@ function applyLanguage(lang) {
         if (!label.getAttribute('data-en')) label.setAttribute('data-en', label.textContent);
         if (nav === 'home') label.textContent = PS_UI.home;
         else if (nav === 'routine') label.textContent = PS_UI.routine;
+        else if (nav === 'quran') label.textContent = PS_UI.quranNav;
         else if (nav === 'tasbeeh') label.textContent = PS_UI.tasbeehNav;
         else if (nav === 'saved') label.textContent = PS_UI.saved;
         else if (nav === 'prayer') label.textContent = PS_UI.prayerNav;
@@ -1050,6 +1052,7 @@ function applyLanguage(lang) {
 
     if (typeof window.refreshPrayerLanguage === 'function') window.refreshPrayerLanguage();
     if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
+    if (typeof window.refreshQuranLanguage === 'function') window.refreshQuranLanguage();
     if (typeof window.refreshAudioButtonLanguage === 'function') window.refreshAudioButtonLanguage();
 
     // Convert remaining visible digits in the DOM to Pashto digits
@@ -1085,6 +1088,7 @@ function restoreEnglish() {
 
     if (typeof window.refreshPrayerLanguage === 'function') window.refreshPrayerLanguage();
     if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
+    if (typeof window.refreshQuranLanguage === 'function') window.refreshQuranLanguage();
     if (typeof window.refreshAudioButtonLanguage === 'function') window.refreshAudioButtonLanguage();
 }
 
