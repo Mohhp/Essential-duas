@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essential-duas-v30';
+const CACHE_NAME = 'essential-duas-v31';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
 
@@ -18,13 +18,13 @@ const ASSETS = [
   './pashto.js',
   './audio/adhan-alert.wav',
   './audio/notification-tone.wav',
-  './audio/reminders/adhan-mishary.wav',
-  './audio/reminders/adhan-abdulbasit.wav',
-  './audio/reminders/adhan-short.wav',
-  './audio/reminders/takbeer.wav',
-  './audio/reminders/nasheed-soft.wav',
-  './audio/reminders/bell-chime.wav',
-  './audio/reminders/soft-ding.wav'
+  './audio/reminders/adhan-mishary.mp3',
+  './audio/reminders/adhan-abdulbasit.mp3',
+  './audio/reminders/adhan-short.mp3',
+  './audio/reminders/takbeer.mp3',
+  './audio/reminders/nasheed-soft.mp3',
+  './audio/reminders/bell-chime.mp3',
+  './audio/reminders/soft-ding.mp3'
 ];
 
 // Install — pre-cache all core assets

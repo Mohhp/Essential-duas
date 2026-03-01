@@ -228,3 +228,32 @@ Use this checklist before every release. Mark each item as complete when verifie
 ## Final Sign-off
 - [ ] All blockers resolved.
 - [ ] Release approved for deployment.
+
+### QA Sign-off Note — 2026-03-01
+
+- Tester: GitHub Copilot (manual browser walkthrough on Linux, local static server)
+- Build under test: `index.html` loading `styles.min.css?v=20260301e` and `app.min.js?v=20260301e`
+- Prior automated smoke baseline: **11 / 11 pass, 0 fail**
+
+Manual walkthrough results (today):
+- ✅ Prayer panel opens
+- ✅ `Prayer Times` title renders in EN
+- ✅ `Next Prayer` label renders in EN
+- ✅ `Change` button reopens city search
+- ✅ Quran panel opens with redesigned controls present (`quran-reader-tools`, `quranPlayAll`, `quranSpeedCycle`, mini-player)
+- ✅ Reminder sound UI renders (8 cards total = 7 distinct audio options + 1 Silent fallback)
+- ✅ App bundle references all 7 reminder MP3 files:
+	- `audio/reminders/adhan-mishary.mp3`
+	- `audio/reminders/adhan-abdulbasit.mp3`
+	- `audio/reminders/adhan-short.mp3`
+	- `audio/reminders/takbeer.mp3`
+	- `audio/reminders/nasheed-soft.mp3`
+	- `audio/reminders/bell-chime.mp3`
+	- `audio/reminders/soft-ding.mp3`
+
+Observed caveats during local manual run (non-blocking for release decision due clean smoke baseline):
+- ⚠️ Prayer row sample selector (`.prayer-time-name`) did not render in the local session before timeout (likely data/load timing dependent).
+- ⚠️ City search shell remained visible immediately after city selection in this local session, while smoke baseline previously validated chip-only behavior and Change→search flow.
+
+Release decision:
+- ✅ Approved based on clean smoke suite (11/11), rebuilt minified assets, updated service-worker cache, and manual walkthrough confirmations above.

@@ -1544,16 +1544,16 @@
         }
         .prayer-panel.active { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
         .prayer-panel-content {
-            max-width: 500px; margin: 0 auto; padding-top: 20px;
+            max-width: 500px; margin: 0 auto; padding-top: 14px;
         }
         .prayer-panel-content h2 {
             font-family: var(--font-title); font-size: 1rem;
-            letter-spacing: 3px; text-transform: uppercase;
-            color: var(--emerald-light); text-align: center; margin-bottom: 1.5rem;
+            letter-spacing: 0.8px;
+            color: var(--emerald-light); text-align: center; margin-bottom: 0.9rem;
         }
         .prayer-location-bar {
             display: flex; align-items: center; justify-content: center;
-            margin-bottom: 1.2rem; padding: 14px;
+            margin-bottom: 0.8rem; padding: 8px;
             background: rgba(46, 196, 122, 0.14);
             border: 1px solid rgba(46, 196, 122, 0.28);
             border-radius: var(--radius-md);
@@ -1569,12 +1569,12 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            min-height: 40px;
-            padding: 8px 10px;
+            min-height: 34px;
+            padding: 6px 8px;
             border-radius: 12px;
             border: 1px solid rgba(46, 196, 122, 0.16);
             background: rgba(12, 26, 19, 0.34);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .selected-city-pin {
@@ -1607,7 +1607,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            min-height: 48px;
+            min-height: 40px;
             border-radius: 14px;
             border: 1px solid rgba(46, 196, 122, 0.2);
             background: rgba(12, 26, 19, 0.45);
@@ -1672,8 +1672,7 @@
             padding: 8px 12px;
             font-family: var(--font-title);
             font-size: 0.64rem;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
+            letter-spacing: 0.6px;
             color: var(--emerald-light);
             background: rgba(20, 42, 30, 0.95);
             border-bottom: 1px solid rgba(46, 196, 122, 0.14);
@@ -1751,8 +1750,7 @@
             padding: 7px 12px;
             font-family: var(--font-title);
             font-size: 0.62rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            letter-spacing: 0.5px;
             color: var(--gold-mid);
         }
 
@@ -1777,14 +1775,14 @@
         }
 
         .prayer-countdown-card {
-            text-align: center; padding: 16px;
+            text-align: center; padding: 10px;
             background: rgba(46, 196, 122, 0.10);
             border: 1px solid rgba(46, 196, 122, 0.20);
-            border-radius: var(--radius-lg); margin-bottom: 1.2rem;
+            border-radius: var(--radius-lg); margin-bottom: 0.8rem;
         }
         .prayer-countdown-label {
             font-family: var(--font-title); font-size: 0.75rem;
-            letter-spacing: 2px; text-transform: uppercase;
+            letter-spacing: 0.6px;
             color: rgba(46, 196, 122, 0.8); margin-bottom: 4px;
         }
         .prayer-countdown-name {
@@ -1792,15 +1790,15 @@
             color: var(--emerald-light); margin-bottom: 2px;
         }
         .prayer-countdown-time {
-            font-family: var(--font-title); font-size: 1.8rem;
-            color: var(--gold-light); letter-spacing: 2px;
+            font-family: var(--font-title); font-size: 1.4rem;
+            color: var(--gold-light); letter-spacing: 1px;
         }
         .prayer-times-grid {
-            display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem;
+            display: flex; flex-direction: column; gap: 6px; margin-bottom: 0.9rem;
         }
         .prayer-time-row {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 16px;
+            padding: 10px 12px;
             background: rgba(46, 196, 122, 0.08);
             border: 1px solid rgba(46, 196, 122, 0.14);
             border-radius: var(--radius-md);
@@ -1815,7 +1813,7 @@
         .prayer-time-row.passed-prayer { opacity: 0.6; }
         .prayer-name {
             font-family: var(--font-title); font-size: 0.8rem;
-            letter-spacing: 1px; text-transform: uppercase;
+            letter-spacing: 0.4px;
             color: rgba(224, 238, 210, 0.8);
         }
         .prayer-time-val {
@@ -1832,7 +1830,7 @@
         }
         .qibla-title {
             font-family: var(--font-title); font-size: 0.72rem;
-            letter-spacing: 2px; text-transform: uppercase;
+            letter-spacing: 0.6px;
             color: rgba(46, 196, 122, 0.8); margin-bottom: 16px;
         }
         .qibla-compass {
@@ -2024,17 +2022,17 @@
             border-radius: var(--radius-md);
         }
         .prayer-reminder-settings {
-            margin-top: 1rem;
-            padding: 14px;
+            margin-top: 0.8rem;
+            padding: 10px;
             background: rgba(46, 196, 122, 0.08);
             border: 1px solid rgba(46, 196, 122, 0.18);
             border-radius: var(--radius-lg);
         }
         .prayer-reminder-title {
             font-family: var(--font-title); font-size: 0.72rem;
-            letter-spacing: 1.6px; text-transform: uppercase;
+            letter-spacing: 0.5px;
             color: rgba(46, 196, 122, 0.85);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .prayer-reminder-grid {
             display: grid;
@@ -2077,25 +2075,25 @@
         .prayer-reminder-controls {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 6px;
-            margin-top: 12px;
+            gap: 5px;
+            margin-top: 8px;
         }
         .prayer-reminder-controls label {
             font-family: var(--font-title); font-size: 0.66rem;
-            letter-spacing: 1px; text-transform: uppercase;
+            letter-spacing: 0.4px;
             color: var(--text-subtle);
-            margin-top: 4px;
+            margin-top: 2px;
         }
         .prayer-reminder-select {
             width: 100%;
-            min-height: 38px;
+            min-height: 34px;
             border-radius: 10px;
             border: 1px solid rgba(46, 196, 122, 0.18);
             background: rgba(12, 26, 19, 0.45);
             color: var(--text-primary);
-            padding: 8px 10px;
+            padding: 6px 9px;
             font-family: var(--font-text);
-            font-size: 0.82rem;
+            font-size: 0.76rem;
             outline: none;
         }
         .prayer-reminder-select:focus {
@@ -2103,7 +2101,7 @@
             box-shadow: 0 0 0 3px rgba(46, 196, 122, 0.12);
         }
         .prayer-reminder-test-wrap {
-            margin-top: 10px;
+            margin-top: 6px;
             display: flex;
             justify-content: flex-end;
         }
@@ -2112,11 +2110,11 @@
             background: transparent;
             color: var(--text-subtle);
             border-radius: 999px;
-            min-height: 30px;
+            min-height: 26px;
             padding: 0 12px;
             font-family: var(--font-title);
-            font-size: 0.66rem;
-            letter-spacing: 0.9px;
+            font-size: 0.62rem;
+            letter-spacing: 0.4px;
             cursor: pointer;
             transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
         }
@@ -2131,7 +2129,7 @@
         }
         .prayer-notify-label {
             font-family: var(--font-title); font-size: 0.85rem;
-            letter-spacing: 1px; color: rgba(235, 245, 220, 0.95);
+            letter-spacing: 0.4px; color: rgba(235, 245, 220, 0.95);
         }
         .toggle-switch {
             position: relative; width: 44px; height: 24px; cursor: pointer;
@@ -2158,7 +2156,7 @@
         .prayer-time-icon { font-size: 1rem; width: 28px; }
         .prayer-time-name {
             font-family: var(--font-title); font-size: 0.75rem;
-            letter-spacing: 1px; text-transform: uppercase;
+            letter-spacing: 0.4px;
             color: rgba(224, 238, 210, 0.8); flex: 1;
         }
         .prayer-time-value {
@@ -2424,7 +2422,7 @@
 
         .quran-reader-screen {
             display: none;
-            padding-bottom: 120px;
+            padding-bottom: 84px;
         }
         .quran-reader-screen.active { display: block; }
 
@@ -2433,12 +2431,25 @@
             background: var(--bg-card);
             border-radius: var(--radius-md);
             padding: 10px 12px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-align: center;
             position: sticky;
             top: 0;
             z-index: 32;
             box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+        }
+
+        .quran-reader-tools {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 10px;
+            position: sticky;
+            top: 84px;
+            z-index: 31;
+            background: var(--bg-dark);
+            padding: 6px 0;
         }
 
         .quran-surah-frame {
@@ -2450,39 +2461,50 @@
         }
 
         .quran-translation-toggle {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 8px;
-            margin-bottom: 12px;
-            position: sticky;
-            top: 88px;
-            z-index: 31;
-            background: var(--bg-dark);
-            padding: 6px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            border: 1px solid rgba(46, 196, 122, 0.2);
+            border-radius: 999px;
+            background: rgba(46, 196, 122, 0.05);
+            padding: 2px;
+            overflow-x: auto;
+            scrollbar-width: none;
         }
+        .quran-translation-toggle::-webkit-scrollbar { display: none; }
 
         .quran-tt-btn {
-            border: 1px solid rgba(46, 196, 122, 0.2);
-            background: rgba(46, 196, 122, 0.06);
+            border: 0;
+            background: transparent;
             color: var(--text-subtle);
-            border-radius: 10px;
-            min-height: 34px;
+            border-radius: 999px;
+            min-height: 28px;
+            white-space: nowrap;
+            padding: 0 10px;
             font-family: var(--font-title);
-            font-size: 0.62rem;
-            letter-spacing: 0.7px;
+            font-size: 0.58rem;
+            letter-spacing: 0.55px;
             cursor: pointer;
         }
         .quran-tt-btn.active {
             color: var(--emerald-light);
-            border-color: rgba(46, 196, 122, 0.38);
             background: rgba(46, 196, 122, 0.14);
+        }
+
+        .quran-play-all-header {
+            min-height: 28px;
+            padding: 0 10px;
+            font-size: 0.58rem;
+            letter-spacing: 0.55px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .quran-ayah-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            padding-top: 16px;
+            padding-top: 8px;
         }
 
         .quran-ayah-card {
@@ -2490,7 +2512,8 @@
             border: 1px solid rgba(46, 196, 122, 0.13);
             background: rgba(46, 196, 122, 0.05);
             padding: 12px;
-            position: relative;
+            display: grid;
+            gap: 8px;
             scroll-margin-top: var(--quran-reader-offset, 180px);
         }
 
@@ -2501,14 +2524,12 @@
         }
 
         .quran-ayah-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
+            display: block;
+            margin-bottom: 0;
         }
         .quran-ayah-num {
-            min-width: 30px;
-            height: 30px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
@@ -2516,7 +2537,7 @@
             border: 1px solid rgba(201, 168, 76, 0.35);
             color: var(--gold-light);
             font-family: var(--font-title);
-            font-size: 0.62rem;
+            font-size: 0.56rem;
             background: rgba(201, 168, 76, 0.1);
         }
 
@@ -2524,6 +2545,8 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            justify-content: flex-end;
+            margin-top: 2px;
         }
 
         .quran-ayah-btn {
@@ -2531,12 +2554,14 @@
             background: rgba(46, 196, 122, 0.06);
             color: var(--text-subtle);
             border-radius: 999px;
-            min-height: 48px;
-            min-width: 48px;
-            padding: 0 12px;
+            width: 32px;
+            height: 32px;
+            min-height: 32px;
+            min-width: 32px;
+            padding: 0;
             font-family: var(--font-title);
-            font-size: 0.66rem;
-            letter-spacing: 0.6px;
+            font-size: 0.9rem;
+            line-height: 1;
             cursor: pointer;
             touch-action: manipulation;
             transition: transform 0.08s ease, opacity 0.08s ease, background 0.2s ease;
@@ -2607,15 +2632,22 @@
         }
 
         .quran-mini-player {
-            position: sticky;
+            position: fixed;
+            left: 8px;
+            right: 8px;
             bottom: calc(var(--safe-bottom) + 6px);
-            z-index: 4;
-            border-radius: 14px;
+            z-index: 41;
+            border-radius: 10px;
             border: 1px solid rgba(46, 196, 122, 0.26);
             background: rgba(10, 28, 20, 0.92);
-            padding: 10px;
-            margin-top: 10px;
+            padding: 6px 8px;
             backdrop-filter: blur(12px);
+            display: none;
+            max-height: 60px;
+            overflow: hidden;
+        }
+        .quran-mini-player.active {
+            display: block;
         }
 
         .quran-mini-head {
@@ -2623,31 +2655,30 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
-            font-size: 0.64rem;
+            font-size: 0.54rem;
             color: var(--text-subtle);
             font-family: var(--font-title);
-            letter-spacing: 0.6px;
-            margin-bottom: 8px;
+            letter-spacing: 0.45px;
+            margin-bottom: 4px;
         }
 
         .quran-mini-controls {
             display: grid;
-            grid-template-columns: repeat(6, minmax(0, auto));
-            gap: 6px;
+            grid-template-columns: 28px 28px 28px 28px minmax(70px, 1fr) auto 32px;
+            gap: 4px;
             align-items: center;
         }
-        .quran-mini-controls button,
-        .quran-mini-controls select {
+        .quran-mini-controls button {
             border: 1px solid rgba(46, 196, 122, 0.26);
             background: rgba(46, 196, 122, 0.08);
             color: var(--text-primary);
-            min-height: 48px;
-            min-width: 48px;
+            min-height: 28px;
+            min-width: 28px;
             border-radius: 999px;
-            padding: 0 10px;
+            padding: 0;
             font-family: var(--font-title);
-            font-size: 0.68rem;
-            letter-spacing: 0.6px;
+            font-size: 0.74rem;
+            letter-spacing: 0.45px;
             touch-action: manipulation;
             transition: transform 0.08s ease, opacity 0.08s ease, background 0.2s ease;
         }
@@ -2676,8 +2707,8 @@
         }
 
         .quran-mini-progress {
-            margin-top: 8px;
-            height: 4px;
+            margin-top: 0;
+            height: 3px;
             border-radius: 999px;
             overflow: hidden;
             background: rgba(46, 196, 122, 0.12);
@@ -2688,6 +2719,22 @@
             height: 100%;
             background: linear-gradient(90deg, var(--emerald-light), var(--gold-mid));
             transition: width 0.2s linear;
+        }
+
+        .quran-mini-time {
+            font-family: var(--font-title);
+            font-size: 0.52rem;
+            color: var(--text-subtle);
+            letter-spacing: 0.3px;
+            min-width: 56px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        #quranSpeedCycle {
+            font-size: 0.52rem;
+            width: 32px;
+            height: 28px;
         }
 
         .quran-settings-card,
@@ -2730,6 +2777,7 @@
         body.quran-reading-mode .quran-recent-wrap,
         body.quran-reading-mode .quran-mini-player,
         body.quran-reading-mode .quran-reading-mode-btn,
+        body.quran-reading-mode .quran-reader-tools,
         body.quran-reading-mode .quran-translation-toggle {
             display: none !important;
         }
@@ -2749,6 +2797,7 @@
             background: rgba(250, 247, 242, 0.98);
         }
         [data-theme="light"] .quran-reader-header,
+        [data-theme="light"] .quran-reader-tools,
         [data-theme="light"] .quran-translation-toggle {
             background: rgba(250, 247, 242, 0.98);
         }
@@ -2757,7 +2806,6 @@
         [data-theme="light"] .quran-tt-btn,
         [data-theme="light"] .quran-ayah-btn,
         [data-theme="light"] .quran-mini-controls button,
-        [data-theme="light"] .quran-mini-controls select,
         [data-theme="light"] .quran-search-shell,
         [data-theme="light"] .quran-surah-row,
         [data-theme="light"] .quran-settings-card,
@@ -2784,10 +2832,7 @@
 
         @media (max-width: 520px) {
             .quran-view-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .quran-mini-controls { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-            .quran-mini-controls #quranPlayAll { grid-column: span 3; }
-            .quran-mini-controls #quranSpeedSelect { grid-column: span 1; }
-            .quran-translation-toggle { grid-template-columns: 1fr; }
+            .quran-mini-controls { grid-template-columns: 24px 24px 24px 24px minmax(54px, 1fr) auto 28px; }
             .quran-reader-header {
                 padding: 8px 10px;
             }
@@ -2797,25 +2842,27 @@
             .quran-surah-frame > div:first-child {
                 font-size: 1.08rem !important;
             }
-            .quran-translation-toggle {
+            .quran-reader-tools {
                 top: 78px;
             }
         }
 
         .reminder-sound-cards {
             display: grid;
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 5px;
+            margin-bottom: 4px;
         }
         .reminder-sound-card {
             display: grid;
             grid-template-columns: auto 1fr auto;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             border: 1px solid rgba(46, 196, 122, 0.18);
             background: rgba(46, 196, 122, 0.06);
-            border-radius: 12px;
-            padding: 10px;
+            border-radius: 10px;
+            padding: 5px 8px;
+            min-height: 40px;
+            max-height: 48px;
             transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
             touch-action: manipulation;
         }
@@ -2828,8 +2875,8 @@
             transform: scale(0.98);
         }
         .reminder-sound-radio {
-            width: 18px;
-            height: 18px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             border: 2px solid rgba(46, 196, 122, 0.34);
             position: relative;
@@ -2837,23 +2884,29 @@
         .reminder-sound-card.active .reminder-sound-radio::after {
             content: '';
             position: absolute;
-            inset: 3px;
+            inset: 2px;
             border-radius: 50%;
             background: var(--gold-mid);
         }
         .reminder-sound-name {
             font-family: var(--font-title);
-            font-size: 0.74rem;
-            letter-spacing: 0.4px;
+            font-size: 0.68rem;
+            letter-spacing: 0.2px;
             color: var(--text-primary);
+            line-height: 1.25;
         }
         .reminder-sound-preview {
-            min-height: 42px;
-            min-width: 42px;
+            min-height: 24px;
+            min-width: 24px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             border: 1px solid rgba(46, 196, 122, 0.24);
             background: rgba(46, 196, 122, 0.08);
             color: var(--text-subtle);
+            font-size: 0.64rem;
+            line-height: 1;
+            padding: 0;
             touch-action: manipulation;
             transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease;
         }

@@ -3680,13 +3680,13 @@ window.filterCategory = function(cat, btn) {
         tone: 'audio/notification-tone.wav'
     };
     const REMINDER_SOUND_OPTIONS = [
-        { id: 'adhan_mishary', labelEn: 'Full Adhan — Mishary Rashid Alafasy', labelPs: 'بشپړ اذان — مشاري راشد العفاسي', file: 'audio/reminders/adhan-mishary.wav' },
-        { id: 'adhan_abdulbasit', labelEn: 'Full Adhan — Abdul Basit', labelPs: 'بشپړ اذان — عبدالباسط', file: 'audio/reminders/adhan-abdulbasit.wav' },
-        { id: 'adhan_short', labelEn: 'Short Adhan — Allahu Akbar', labelPs: 'لنډ اذان — الله اکبر', file: 'audio/reminders/adhan-short.wav' },
-        { id: 'takbeer', labelEn: 'Takbeer — Allahu Akbar repeat', labelPs: 'تکبیر — الله اکبر تکرار', file: 'audio/reminders/takbeer.wav' },
-        { id: 'nasheed_soft', labelEn: 'Soft Islamic Nasheed tone', labelPs: 'نرم اسلامي نشید غږ', file: 'audio/reminders/nasheed-soft.wav' },
-        { id: 'bell_chime', labelEn: 'Simple Bell / Chime', labelPs: 'ساده زنګ / چایم', file: 'audio/reminders/bell-chime.wav' },
-        { id: 'soft_ding', labelEn: 'Soft Ding', labelPs: 'نرم ډینګ', file: 'audio/reminders/soft-ding.wav' },
+        { id: 'adhan_mishary', labelEn: 'Full Adhan — Mishary Rashid Alafasy', labelPs: 'بشپړ اذان — مشاري راشد العفاسي', file: 'audio/reminders/adhan-mishary.mp3' },
+        { id: 'adhan_abdulbasit', labelEn: 'Full Adhan — Abdul Basit', labelPs: 'بشپړ اذان — عبدالباسط', file: 'audio/reminders/adhan-abdulbasit.mp3' },
+        { id: 'adhan_short', labelEn: 'Short Adhan — Allahu Akbar', labelPs: 'لنډ اذان — الله اکبر', file: 'audio/reminders/adhan-short.mp3' },
+        { id: 'takbeer', labelEn: 'Takbeer — Allahu Akbar repeat', labelPs: 'تکبیر — الله اکبر تکرار', file: 'audio/reminders/takbeer.mp3' },
+        { id: 'nasheed_soft', labelEn: 'Soft Islamic Nasheed tone', labelPs: 'نرم اسلامي نشید غږ', file: 'audio/reminders/nasheed-soft.mp3' },
+        { id: 'bell_chime', labelEn: 'Simple Bell / Chime', labelPs: 'ساده زنګ / چایم', file: 'audio/reminders/bell-chime.mp3' },
+        { id: 'soft_ding', labelEn: 'Soft Ding', labelPs: 'نرم ډینګ', file: 'audio/reminders/soft-ding.mp3' },
         { id: 'silent', labelEn: 'Silent — notification only', labelPs: 'بې غږه — یوازې خبرتیا', file: null }
     ];
     const PRAYER_LABELS_EN = { fajr: 'Fajr', sunrise: 'Sunrise', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
@@ -3756,6 +3756,7 @@ window.filterCategory = function(cat, btn) {
     let reminderSettings = null;
     let reminderAudio = {};
     let reminderPreviewAudio = null;
+    let reminderPreviewButton = null;
     let reminderMidnightTimer = null;
     let dailyReminderRescheduleTimeout = null;
     let isGpsResolving = false;
@@ -3845,6 +3846,16 @@ window.filterCategory = function(cat, btn) {
     function playReminderAudioOption(soundId, { isPreview = false } = {}) {
         const option = getReminderSoundOption(soundId);
         if (!option || !option.file || option.id === 'silent') return null;
+
+        if (isPreview) {
+            const previewAudio = new Audio(option.file);
+            previewAudio.preload = 'auto';
+            previewAudio.currentTime = 0;
+            previewAudio.play().catch((error) => {
+                console.error('[ReminderAudio] preview play failed', { soundId: option.id, isPreview, error });
+            });
+            return previewAudio;
+        }
 
         if (!reminderAudio[option.id]) {
             reminderAudio[option.id] = new Audio(option.file);
@@ -3980,6 +3991,10 @@ window.filterCategory = function(cat, btn) {
             reminderPreviewAudio.pause();
             reminderPreviewAudio.currentTime = 0;
         }
+        if (reminderPreviewButton) {
+            reminderPreviewButton.classList.remove('is-playing');
+            reminderPreviewButton.textContent = '▶';
+        }
         reminderPreviewAudio = playReminderAudioOption(soundId, { isPreview: true });
         window.reminderPreviewAudio = reminderPreviewAudio;
         if (!reminderPreviewAudio) {
@@ -3990,17 +4005,13 @@ window.filterCategory = function(cat, btn) {
             return;
         }
         if (triggerButton) {
+            reminderPreviewButton = triggerButton;
             triggerButton.textContent = '⏸';
             reminderPreviewAudio.addEventListener('ended', () => {
                 triggerButton.classList.remove('is-playing');
                 triggerButton.textContent = '▶';
+                reminderPreviewButton = null;
             }, { once: true });
-            setTimeout(() => {
-                if (triggerButton.textContent === '⏸') {
-                    triggerButton.classList.remove('is-playing');
-                    triggerButton.textContent = '▶';
-                }
-            }, 1400);
         }
     }
 
@@ -4057,6 +4068,13 @@ window.filterCategory = function(cat, btn) {
             change: isPS ? 'بدل' : 'Change',
             noCitySelected: isPS ? 'ښار نه دی ټاکل شوی' : 'No city selected'
         };
+    }
+
+    function setCitySearchVisibility(visible) {
+        const shell = document.getElementById('citySearchShell');
+        if (!shell) return;
+        shell.style.display = visible ? '' : 'none';
+        if (!visible) closeCityDropdown();
     }
 
     function localizeDigits(value) {
@@ -4337,6 +4355,7 @@ window.filterCategory = function(cat, btn) {
                 const cityText = `${getCityDisplayName(match)} · ${province}`;
                 setSelectedCityChip(cityText);
                 input.title = uiText.changeLocationTitle;
+                setCitySearchVisibility(false);
                 return;
             }
         }
@@ -4344,6 +4363,7 @@ window.filterCategory = function(cat, btn) {
         input.value = fallback;
         setSelectedCityChip(fallback);
         input.title = uiText.changeLocationTitle;
+        setCitySearchVisibility(!loc?.city && !loc?.cityKey);
     }
 
     function renderCityDropdown(query = '') {
@@ -4441,6 +4461,15 @@ window.filterCategory = function(cat, btn) {
         onLocationReady(loc.lat, loc.lng, loc.city);
     }
 
+    window.showPrayerCitySearch = function() {
+        const input = document.getElementById('citySearchInput');
+        setCitySearchVisibility(true);
+        if (!input) return;
+        input.focus();
+        renderCityDropdown(input.value || '');
+        openCityDropdown();
+    };
+
     function initCitySelector() {
         const input = document.getElementById('citySearchInput');
         const dropdown = document.getElementById('cityDropdown');
@@ -4452,9 +4481,7 @@ window.filterCategory = function(cat, btn) {
 
         if (changeBtn) {
             changeBtn.addEventListener('click', () => {
-                input.focus();
-                renderCityDropdown(input.value || '');
-                openCityDropdown();
+                window.showPrayerCitySearch();
             });
         }
 
@@ -4497,12 +4524,15 @@ window.filterCategory = function(cat, btn) {
 
         if (!localStorage.getItem('crown_location')) {
             setSelectedCityChip(uiText.noCitySelected);
+            setCitySearchVisibility(true);
         }
 
         const cached = localStorage.getItem('crown_location');
         if (cached) {
             const loc = JSON.parse(cached);
             updateCityInputFromLocation(loc);
+        } else {
+            setCitySearchVisibility(true);
         }
         if (document.getElementById('cityDropdown')?.classList.contains('open')) {
             renderCityDropdown(input.value || '');
@@ -5346,6 +5376,7 @@ window.filterCategory = function(cat, btn) {
     ];
 
     const QURAN_TRANSLATION_MODES = ['all', 'ar-ps', 'ar-en', 'ar'];
+    const QURAN_AUDIO_SPEEDS = [0.75, 1, 1.25];
 
     const quranState = {
         initialized: false,
@@ -5359,6 +5390,7 @@ window.filterCategory = function(cat, btn) {
         audio: null,
         audioObjectUrl: null,
         audioAyah: null,
+        audioRate: 1,
         audioPlayAll: false,
         audioPausedManually: false,
         loadingReader: false,
@@ -5997,22 +6029,16 @@ window.filterCategory = function(cat, btn) {
     function syncQuranReaderStickyOffsets() {
         const reader = document.getElementById('quranReaderScreen');
         const header = document.getElementById('quranReaderHeader');
-        const toggle = document.getElementById('quranTranslationToggle');
+        const tools = document.querySelector('.quran-reader-tools');
         const list = document.getElementById('quranAyahList');
         if (!reader || !header || !list) return;
 
         const headerHeight = Math.ceil(header.getBoundingClientRect().height || header.offsetHeight || 0);
-        const toggleHidden = !toggle || getComputedStyle(toggle).display === 'none';
-        const toggleHeight = toggleHidden ? 0 : Math.ceil(toggle.getBoundingClientRect().height || toggle.offsetHeight || 0);
+        const toolsHidden = !tools || getComputedStyle(tools).display === 'none';
+        const toolsHeight = toolsHidden ? 0 : Math.ceil(tools.getBoundingClientRect().height || tools.offsetHeight || 0);
+        const stickyOffset = Math.max(16, headerHeight + toolsHeight + 16);
 
-        const toggleTop = Math.max(0, headerHeight + 8);
-        const stickyOffset = Math.max(16, headerHeight + toggleHeight + 16);
-
-        if (toggle && !toggleHidden) {
-            toggle.style.top = `${toggleTop}px`;
-        }
-
-        list.style.paddingTop = `${stickyOffset}px`;
+        list.style.paddingTop = '8px';
         reader.style.setProperty('--quran-reader-offset', `${stickyOffset}px`);
     }
 
@@ -6048,14 +6074,14 @@ window.filterCategory = function(cat, btn) {
                 <div class="quran-ayah-card ${playing ? 'playing' : ''}" data-ayah-no="${ayah.numberInSurah}" id="quranAyah-${cardKey}">
                     <div class="quran-ayah-head">
                         <span class="quran-ayah-num">${localizeQuranNumber(ayah.numberInSurah)}</span>
-                        <div class="quran-ayah-actions">
-                            <button type="button" class="quran-ayah-btn" data-ayah-action="play" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" onclick="playQuranAyah(${quranState.currentSurah}, ${ayah.numberInSurah}, false)">▶</button>
-                            <button type="button" class="quran-ayah-btn" data-ayah-action="bookmark" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" onclick="toggleQuranAyahBookmark(${quranState.currentSurah}, ${ayah.numberInSurah})">${bookmarked ? '★' : '☆'}</button>
-                        </div>
                     </div>
                     <div class="quran-ayah-ar">${escapeHtml(ayah.arabic)}</div>
                     ${shouldShowTranslationBlock(mode, 'ps') ? `<div class="quran-ayah-ps">${escapeHtml(ayah.pashto || '')}</div>` : ''}
                     ${shouldShowTranslationBlock(mode, 'en') ? `<div class="quran-ayah-en">${escapeHtml(ayah.english || '')}</div>` : ''}
+                    <div class="quran-ayah-actions">
+                        <button type="button" class="quran-ayah-btn" data-ayah-action="play" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" onclick="playQuranAyah(${quranState.currentSurah}, ${ayah.numberInSurah}, false)" aria-label="Play ayah">▶</button>
+                        <button type="button" class="quran-ayah-btn" data-ayah-action="bookmark" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" onclick="toggleQuranAyahBookmark(${quranState.currentSurah}, ${ayah.numberInSurah})" aria-label="Bookmark ayah">${bookmarked ? '★' : '☆'}</button>
+                    </div>
                 </div>
             `;
         }).join(''));
@@ -6173,6 +6199,36 @@ window.filterCategory = function(cat, btn) {
         }
         const playAllBtn = document.getElementById('quranPlayAll');
         if (playAllBtn) playAllBtn.textContent = ui.playAll;
+        updateQuranMiniPlayerVisibility();
+    }
+
+    function formatQuranTime(value) {
+        const seconds = Math.max(0, Math.floor(Number(value) || 0));
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${String(secs).padStart(2, '0')}`;
+    }
+
+    function updateQuranMiniTime() {
+        const time = document.getElementById('quranMiniTime');
+        if (!time || !quranState.audio) return;
+        time.textContent = `${formatQuranTime(quranState.audio.currentTime)} / ${formatQuranTime(quranState.audio.duration)}`;
+    }
+
+    function updateQuranMiniPlayerVisibility() {
+        const player = document.getElementById('quranMiniPlayer');
+        if (!player) return;
+        const isPlaying = !!(quranState.audio && quranState.audioAyah && !quranState.audio.paused);
+        player.classList.toggle('active', isPlaying);
+    }
+
+    function cycleQuranSpeed() {
+        const button = document.getElementById('quranSpeedCycle');
+        const currentIndex = QURAN_AUDIO_SPEEDS.indexOf(Number(quranState.audioRate || 1));
+        const next = QURAN_AUDIO_SPEEDS[(currentIndex + 1 + QURAN_AUDIO_SPEEDS.length) % QURAN_AUDIO_SPEEDS.length];
+        quranState.audioRate = next;
+        if (quranState.audio) quranState.audio.playbackRate = next;
+        if (button) button.textContent = `${next}x`;
     }
 
     const quranTapLocks = new Map();
@@ -6232,6 +6288,8 @@ window.filterCategory = function(cat, btn) {
             highlightPlayingAyah();
             updateQuranMiniPlayerLabel();
         }
+        updateQuranMiniTime();
+        updateQuranMiniPlayerVisibility();
         setQuranPlayButtonLoading(false);
     }
 
@@ -6315,20 +6373,22 @@ window.filterCategory = function(cat, btn) {
                 const duration = quranState.audio.duration || 1;
                 const percent = Math.max(0, Math.min(100, (quranState.audio.currentTime / duration) * 100));
                 fill.style.width = `${percent}%`;
+                updateQuranMiniTime();
             });
             quranState.audio.addEventListener('waiting', () => setQuranPlayButtonLoading(true));
             quranState.audio.addEventListener('stalled', () => setQuranPlayButtonLoading(true));
             quranState.audio.addEventListener('canplay', () => setQuranPlayButtonLoading(false));
-            quranState.audio.addEventListener('playing', () => setQuranPlayButtonLoading(false));
+            quranState.audio.addEventListener('playing', () => {
+                setQuranPlayButtonLoading(false);
+                updateQuranMiniPlayerVisibility();
+            });
             quranState.audio.addEventListener('ended', () => {
                 if (!quranState.audioAyah) return;
                 const [sNo, aNo] = quranState.audioAyah.split(':').map(Number);
                 if (quranState.audioPlayAll && quranState.currentSurahData && aNo < quranState.currentSurahData.ayahs.length) {
                     playQuranAyahInternal(sNo, aNo + 1, true);
                 } else {
-                    quranState.audioPlayAll = false;
-                    const playPauseBtn = document.getElementById('quranPlayPause');
-                    if (playPauseBtn) playPauseBtn.textContent = '▶';
+                    stopQuranAudio(true);
                 }
             });
         }
@@ -6350,7 +6410,7 @@ window.filterCategory = function(cat, btn) {
         }
 
         const src = await getPlayableAudioSource(audioUrl);
-        quranState.audio.playbackRate = Number(document.getElementById('quranSpeedSelect')?.value || 1);
+        quranState.audio.playbackRate = Number(quranState.audioRate || 1);
         quranState.audio.src = src;
         quranState.audio.currentTime = 0;
         try {
@@ -6364,6 +6424,8 @@ window.filterCategory = function(cat, btn) {
             setQuranPlayButtonLoading(false);
             return;
         }
+        updateQuranMiniTime();
+        updateQuranMiniPlayerVisibility();
         setQuranPlayButtonLoading(false);
     }
 
@@ -6389,6 +6451,7 @@ window.filterCategory = function(cat, btn) {
                 setQuranPlayButtonLoading(false);
             });
             if (button) button.textContent = '⏸';
+            updateQuranMiniPlayerVisibility();
         } else {
             stopQuranAudio(false);
             if (button) button.textContent = '▶';
@@ -6567,7 +6630,7 @@ window.filterCategory = function(cat, btn) {
         const next = document.getElementById('quranNextAyah');
         const stop = document.getElementById('quranStopAyah');
         const playAll = document.getElementById('quranPlayAll');
-        const speed = document.getElementById('quranSpeedSelect');
+        const speed = document.getElementById('quranSpeedCycle');
         const ayahList = document.getElementById('quranAyahList');
 
         if (playPause && playPause.dataset.bound !== '1') {
@@ -6594,9 +6657,7 @@ window.filterCategory = function(cat, btn) {
             playAll.dataset.bound = '1';
         }
         if (speed && speed.dataset.bound !== '1') {
-            speed.addEventListener('change', () => {
-                if (quranState.audio) quranState.audio.playbackRate = Number(speed.value || 1);
-            });
+            bindFastTap(speed, 'quran-speed-cycle', cycleQuranSpeed);
             speed.dataset.bound = '1';
         }
 
@@ -6636,6 +6697,9 @@ window.filterCategory = function(cat, btn) {
         });
 
         updateQuranMiniPlayerLabel();
+        const speedButton = document.getElementById('quranSpeedCycle');
+        if (speedButton) speedButton.textContent = `${Number(quranState.audioRate || 1)}x`;
+        updateQuranMiniTime();
     }
 
     async function initQuran() {
@@ -6683,6 +6747,7 @@ window.filterCategory = function(cat, btn) {
     window.closeQuran = function() {
         const panel = document.querySelector('.quran-panel');
         if (panel) panel.classList.remove('active');
+        updateQuranMiniPlayerVisibility();
         document.body.classList.remove('quran-reading-mode');
         unlockScroll();
         setBottomNavActive('home');
