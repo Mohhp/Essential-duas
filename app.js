@@ -3319,12 +3319,114 @@ window.filterCategory = function(cat, btn) {
         { key: 'maidan-wardak', en: 'Maidan Wardak', ps: 'ميدان وردګ', lat: 34.3955, lng: 68.3530 }
     ];
 
+    const CITY_META = {
+        kabul: { provinceEn: 'Kabul', provincePs: 'کابل', regionEn: 'Central', regionPs: 'مرکزي' },
+        kandahar: { provinceEn: 'Kandahar', provincePs: 'کندهار', regionEn: 'South', regionPs: 'سوېل' },
+        herat: { provinceEn: 'Herat', provincePs: 'هرات', regionEn: 'West', regionPs: 'لوېدیځ' },
+        'mazar-i-sharif': { provinceEn: 'Balkh', provincePs: 'بلخ', regionEn: 'North', regionPs: 'شمال' },
+        jalalabad: { provinceEn: 'Nangarhar', provincePs: 'ننګرهار', regionEn: 'East', regionPs: 'ختیځ' },
+        kunduz: { provinceEn: 'Kunduz', provincePs: 'کندز', regionEn: 'North', regionPs: 'شمال' },
+        'lashkar-gah': { provinceEn: 'Helmand', provincePs: 'هلمند', regionEn: 'Southwest', regionPs: 'سوېل لوېدیځ' },
+        ghazni: { provinceEn: 'Ghazni', provincePs: 'غزني', regionEn: 'Southeast', regionPs: 'سوېل ختیځ' },
+        khost: { provinceEn: 'Khost', provincePs: 'خوست', regionEn: 'Southeast', regionPs: 'سوېل ختیځ' },
+        gardez: { provinceEn: 'Paktia', provincePs: 'پکتیا', regionEn: 'Southeast', regionPs: 'سوېل ختیځ' },
+        faizabad: { provinceEn: 'Badakhshan', provincePs: 'بدخشان', regionEn: 'Northeast', regionPs: 'شمال ختیځ' },
+        'pul-e-khumri': { provinceEn: 'Baghlan', provincePs: 'بغلان', regionEn: 'North', regionPs: 'شمال' },
+        sheberghan: { provinceEn: 'Jawzjan', provincePs: 'جوزجان', regionEn: 'Northwest', regionPs: 'شمال لوېدیځ' },
+        taloqan: { provinceEn: 'Takhar', provincePs: 'تخار', regionEn: 'Northeast', regionPs: 'شمال ختیځ' },
+        zaranj: { provinceEn: 'Nimruz', provincePs: 'نیمروز', regionEn: 'Southwest', regionPs: 'سوېل لوېدیځ' },
+        bamyan: { provinceEn: 'Bamyan', provincePs: 'بامیان', regionEn: 'Central Highlands', regionPs: 'مرکزي لوړې سیمې' },
+        mehtarlam: { provinceEn: 'Laghman', provincePs: 'لغمان', regionEn: 'East', regionPs: 'ختیځ' },
+        asadabad: { provinceEn: 'Kunar', provincePs: 'کنړ', regionEn: 'East', regionPs: 'ختیځ' },
+        charikar: { provinceEn: 'Parwan', provincePs: 'پروان', regionEn: 'Central', regionPs: 'مرکزي' },
+        farah: { provinceEn: 'Farah', provincePs: 'فراه', regionEn: 'West', regionPs: 'لوېدیځ' },
+        samangan: { provinceEn: 'Samangan', provincePs: 'سمنگان', regionEn: 'North', regionPs: 'شمال' },
+        nili: { provinceEn: 'Daykundi', provincePs: 'دایکندي', regionEn: 'Central Highlands', regionPs: 'مرکزي لوړې سیمې' },
+        tarinkot: { provinceEn: 'Uruzgan', provincePs: 'اروزګان', regionEn: 'South', regionPs: 'سوېل' },
+        'maidan-wardak': { provinceEn: 'Maidan Wardak', provincePs: 'میدان وردګ', regionEn: 'Central', regionPs: 'مرکزي' }
+    };
+
     let prayerTimesData = null;
     let countdownInterval = null;
     let compassWatchId = null;
     let userQibla = null;
     let reminderSettings = null;
     let reminderAudio = { adhan: null, tone: null };
+    let reminderMidnightTimer = null;
+    let dailyReminderRescheduleTimeout = null;
+    let isGpsResolving = false;
+    let detectedGpsCityKey = null;
+    let compassEventTimer = null;
+    let latestCompassHeading = null;
+    let currentNeedleRotation = 0;
+
+    function escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function normalizeCityText(value) {
+        return String(value || '')
+            .toLowerCase()
+            .replace(/[-_]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function getCityMeta(city) {
+        const fallback = { provinceEn: city.en, provincePs: city.ps || city.en, regionEn: 'Afghanistan', regionPs: 'افغانستان' };
+        return CITY_META[city.key] || fallback;
+    }
+
+    function highlightMatch(value, query) {
+        const base = String(value || '');
+        const q = String(query || '').trim();
+        if (!q) return escapeHtml(base);
+        const lowerBase = base.toLowerCase();
+        const lowerQuery = q.toLowerCase();
+        const index = lowerBase.indexOf(lowerQuery);
+        if (index === -1) return escapeHtml(base);
+        const before = escapeHtml(base.slice(0, index));
+        const mid = escapeHtml(base.slice(index, index + q.length));
+        const after = escapeHtml(base.slice(index + q.length));
+        return `${before}<mark class="city-match">${mid}</mark>${after}`;
+    }
+
+    function findCityMatches(query) {
+        const q = normalizeCityText(query);
+        if (!q) return AFGHAN_CITIES.slice();
+
+        return AFGHAN_CITIES
+            .map((city) => {
+                const meta = getCityMeta(city);
+                const searchFields = [
+                    normalizeCityText(city.en),
+                    normalizeCityText(city.ps),
+                    normalizeCityText(city.key),
+                    normalizeCityText(meta.provinceEn),
+                    normalizeCityText(meta.provincePs),
+                    normalizeCityText(meta.regionEn),
+                    normalizeCityText(meta.regionPs)
+                ];
+                const scores = searchFields
+                    .map((field) => {
+                        if (field === q) return 0;
+                        if (field.startsWith(q)) return 1;
+                        const idx = field.indexOf(q);
+                        if (idx >= 0) return 2 + (idx / 100);
+                        return Number.POSITIVE_INFINITY;
+                    })
+                    .sort((a, b) => a - b);
+                return { city, score: scores[0] };
+            })
+            .filter(entry => Number.isFinite(entry.score))
+            .sort((a, b) => a.score - b.score)
+            .map(entry => entry.city);
+    }
 
     function preloadPrayerReminderAudio() {
         Object.entries(REMINDER_AUDIO_FILES).forEach(([key, src]) => {
@@ -3348,8 +3450,11 @@ window.filterCategory = function(cat, btn) {
             locationDenied: isPS ? (psUI?.locationDenied || 'ځای رد شو — د بیا هڅې لپاره ↻ ټک وکړئ') : 'Location denied — tap ↻ to retry',
             enableLocation: isPS ? 'د لمانځه وختونو لپاره ځای فعال کړئ.' : 'Enable location to load prayer times.',
             searchPlaceholder: isPS ? 'د افغانستان ښار ولټوئ...' : 'Search Afghan city...',
+            searchPlaceholderDual: isPS ? 'ښار ولټوئ... / Search city...' : 'Search city... / ښار ولټوئ...',
             countryLabel: isPS ? '🇦🇫 افغانستان' : '🇦🇫 Afghanistan',
-            gpsOption: isPS ? '📍 د GPS له لارې اوسنی ځای' : '📍 Use GPS current location',
+            gpsOption: isPS ? '📍 زما موقعیت وکاروئ' : '📍 Use My Location',
+            gpsDetecting: isPS ? 'ستاسې موقعیت معلومېږي...' : 'Detecting your location...',
+            gpsDetected: isPS ? 'GPS وموندل شو' : 'GPS detected',
             noMatches: isPS ? 'برابر ښار ونه موندل شو' : 'No matches',
             now: isPS ? (psUI?.now || 'اوس') : 'NOW',
             next: isPS ? (psUI?.next || 'بل') : 'NEXT',
@@ -3374,7 +3479,16 @@ window.filterCategory = function(cat, btn) {
             alertsEnabled: isPS ? (psUI?.alertsEnabled || 'د لمونځ خبرتیاوې فعالې شوې') : 'Prayer alerts enabled',
             alertsDisabled: isPS ? (psUI?.alertsDisabled || 'د لمونځ خبرتیاوې غیر فعالې شوې') : 'Prayer alerts disabled',
             alertsPermissionDenied: isPS ? (psUI?.alertsPermissionDenied || 'د خبرتیا اجازه رد شوه') : 'Notification permission denied',
-            alertsUnsupported: isPS ? (psUI?.alertsUnsupported || 'خبرتیاوې نه ملاتړ کوي') : 'Notifications not supported'
+            alertsUnsupported: isPS ? (psUI?.alertsUnsupported || 'خبرتیاوې نه ملاتړ کوي') : 'Notifications not supported',
+            reminderSet: isPS ? 'یادونه وټاکل شوه: {prayer} {time}' : 'Reminder set for {prayer} at {time}',
+            reminderSaved: isPS ? 'د یادونې تنظیمات خوندي شول' : 'Reminder settings saved',
+            inAppPrayerAlert: isPS ? 'د {prayer} لمانځه وخت شو' : 'It is time for {prayer}',
+            qiblaFacing: isPS ? 'ماشاءالله! تاسو قبلې ته برابر یاست.' : 'MashaAllah! You are facing Qibla.',
+            qiblaAlmost: isPS ? 'نږدې یاست — {delta}° توپیر' : 'Almost there — {delta}° off',
+            qiblaRotateHint: isPS ? 'موبایل وڅرخوئ — ستنه د قبلې نښې ته برابره کړئ' : 'Rotate phone until needle aligns with Qibla marker',
+            qiblaNeedleHint: isPS ? 'موبایل مو هوار ونیسئ او ورو یې وڅرخوئ' : 'Hold your phone flat and rotate gently',
+            change: isPS ? 'بدل' : 'Change',
+            noCitySelected: isPS ? 'ښار نه دی ټاکل شوی' : 'No city selected'
         };
     }
 
@@ -3432,7 +3546,9 @@ window.filterCategory = function(cat, btn) {
 
         REMINDER_PRAYERS.forEach(name => {
             const input = document.getElementById(`remPrayer-${name}`);
+            const row = input?.closest('.prayer-reminder-item');
             if (input) input.checked = !!settings.prayers[name];
+            if (row) row.classList.toggle('active', !!settings.enabled && !!settings.prayers[name]);
         });
 
         const modeSelect = document.getElementById('reminderSoundMode');
@@ -3485,26 +3601,23 @@ window.filterCategory = function(cat, btn) {
 
         const instruction = document.getElementById('qiblaInstruction');
         if (instruction) {
-            instruction.textContent = isPashtoMode()
-                ? 'موبایل مو هوار ونیسئ او وڅرخئ تر څو ستنه د قبلې نښه ته برابره شي.'
-                : 'Hold your phone flat and rotate until the needle points to the Qibla marker.';
+            instruction.textContent = getPrayerUiText().qiblaNeedleHint;
         }
 
-        const labelN = document.querySelector('.qibla-compass .compass-n');
-        const labelS = document.querySelector('.qibla-compass .compass-s');
-        const labelE = document.querySelector('.qibla-compass .compass-e');
-        const labelW = document.querySelector('.qibla-compass .compass-w');
-        if (isPashtoMode()) {
-            if (labelN) labelN.textContent = 'ش';
-            if (labelS) labelS.textContent = 'ج';
-            if (labelE) labelE.textContent = 'ختیځ';
-            if (labelW) labelW.textContent = 'لویدیځ';
-        } else {
-            if (labelN) labelN.textContent = 'N';
-            if (labelS) labelS.textContent = 'S';
-            if (labelE) labelE.textContent = 'E';
-            if (labelW) labelW.textContent = 'W';
-        }
+        const labelMap = {
+            n: { en: 'N', ps: 'ش' },
+            s: { en: 'S', ps: 'ج' },
+            e: { en: 'E', ps: 'خت' },
+            w: { en: 'W', ps: 'لو' }
+        };
+        Object.entries(labelMap).forEach(([key, labels]) => {
+            const el = document.querySelector(`.qibla-compass .compass-${key}`);
+            if (!el) return;
+            const span = el.querySelector('span');
+            const small = el.querySelector('small');
+            if (span) span.textContent = labels.en;
+            if (small) small.textContent = labels.ps;
+        });
     }
 
     function initReminderControls() {
@@ -3529,7 +3642,18 @@ window.filterCategory = function(cat, btn) {
                 const settings = loadReminderSettings();
                 settings.prayers[name] = input.checked;
                 saveReminderSettings();
-                if (settings.enabled) schedulePrayerNotifications();
+                if (input.checked) requestNotificationPermissionIfNeeded();
+                if (settings.enabled) {
+                    requestNotificationPermissionIfNeeded().then((granted) => {
+                        if (granted) {
+                            schedulePrayerNotifications();
+                            showReminderSetConfirmation(name);
+                        }
+                    });
+                } else {
+                    showToast(getPrayerUiText().reminderSaved);
+                }
+                syncReminderUi();
             });
         });
 
@@ -3539,6 +3663,7 @@ window.filterCategory = function(cat, btn) {
                 const settings = loadReminderSettings();
                 settings.mode = modeSelect.value;
                 saveReminderSettings();
+                showToast(getPrayerUiText().reminderSaved);
             });
         }
 
@@ -3548,7 +3673,12 @@ window.filterCategory = function(cat, btn) {
                 const settings = loadReminderSettings();
                 settings.offsetMinutes = Number(beforeSelect.value) || 0;
                 saveReminderSettings();
-                if (settings.enabled) schedulePrayerNotifications();
+                if (settings.enabled) {
+                    schedulePrayerNotifications();
+                    showFirstEnabledReminderConfirmation();
+                } else {
+                    showToast(getPrayerUiText().reminderSaved);
+                }
             });
         }
 
@@ -3569,59 +3699,123 @@ window.filterCategory = function(cat, btn) {
         return isPashtoMode() ? (city.ps || city.en) : city.en;
     }
 
+    function getCitySecondaryName(city) {
+        if (!city) return '';
+        return isPashtoMode() ? city.en : (city.ps || city.en);
+    }
+
+    function setSelectedCityChip(content, isHtml = false) {
+        const textEl = document.getElementById('selectedCityText');
+        const changeBtn = document.getElementById('selectedCityChange');
+        const uiText = getPrayerUiText();
+        if (textEl) {
+            if (isHtml) textEl.innerHTML = content;
+            else textEl.textContent = content;
+        }
+        if (changeBtn) changeBtn.textContent = uiText.change;
+    }
+
     function updateCityInputFromLocation(loc) {
         const input = document.getElementById('citySearchInput');
         if (!input) return;
+        const uiText = getPrayerUiText();
         if (loc?.cityKey) {
             const match = AFGHAN_CITIES.find(c => c.key === loc.cityKey);
             if (match) {
                 input.value = getCityDisplayName(match);
-                input.title = getPrayerUiText().changeLocationTitle;
+                const meta = getCityMeta(match);
+                const province = isPashtoMode() ? meta.provincePs : meta.provinceEn;
+                const cityText = `${getCityDisplayName(match)} · ${province}`;
+                setSelectedCityChip(cityText);
+                input.title = uiText.changeLocationTitle;
                 return;
             }
         }
-        input.value = loc?.city || (typeof loc?.lat === 'number' && typeof loc?.lng === 'number' ? `${loc.lat.toFixed(2)}°, ${loc.lng.toFixed(2)}°` : '');
-        input.title = getPrayerUiText().changeLocationTitle;
+        const fallback = loc?.city || (typeof loc?.lat === 'number' && typeof loc?.lng === 'number' ? `${loc.lat.toFixed(2)}°, ${loc.lng.toFixed(2)}°` : uiText.noCitySelected);
+        input.value = fallback;
+        setSelectedCityChip(fallback);
+        input.title = uiText.changeLocationTitle;
     }
 
     function renderCityDropdown(query = '') {
         const dropdown = document.getElementById('cityDropdown');
+        const shell = document.getElementById('citySearchShell');
         if (!dropdown) return;
 
-        const q = (query || '').trim().toLowerCase();
-        const list = q
-            ? AFGHAN_CITIES.filter(city => (
-                city.en.toLowerCase().includes(q)
-                || city.ps.includes(query)
-                || city.key.includes(q)
-            ))
-            : AFGHAN_CITIES;
+        const list = findCityMatches(query);
+        if (shell) shell.setAttribute('aria-expanded', 'true');
 
         const uiText = getPrayerUiText();
-        const cityRows = list.map(city => `
-            <button class="city-option" type="button" data-city-key="${city.key}">
-                <span class="city-name">${getCityDisplayName(city)}</span>
-                <span class="city-coords">${city.lat.toFixed(4)}, ${city.lng.toFixed(4)}</span>
-            </button>
-        `).join('');
+
+        const grouped = new Map();
+        list.forEach((city) => {
+            const meta = getCityMeta(city);
+            const groupLabel = isPashtoMode() ? meta.regionPs : meta.regionEn;
+            if (!grouped.has(groupLabel)) grouped.set(groupLabel, []);
+            grouped.get(groupLabel).push(city);
+        });
+
+        const groupedRows = Array.from(grouped.entries()).map(([groupName, cities]) => {
+            const cityRows = cities.map((city) => {
+                const meta = getCityMeta(city);
+                const primary = getCityDisplayName(city);
+                const secondary = getCitySecondaryName(city);
+                const province = isPashtoMode() ? meta.provincePs : meta.provinceEn;
+                const provinceSecondary = isPashtoMode() ? meta.provinceEn : meta.provincePs;
+                const highlightedPrimary = highlightMatch(primary, query);
+                const highlightedSecondary = highlightMatch(secondary, query);
+
+                return `
+                    <button class="city-option" type="button" data-city-key="${city.key}" role="option">
+                        <span>
+                            <span class="city-name">${highlightedPrimary}</span>
+                            <span class="city-subline">${highlightedSecondary}</span>
+                        </span>
+                        <span class="city-coords">${province} · ${provinceSecondary}</span>
+                    </button>
+                `;
+            }).join('');
+
+            return `
+                <div class="city-region-head">${escapeHtml(groupName)}</div>
+                ${cityRows}
+            `;
+        }).join('');
+
+        const gpsStatusText = isGpsResolving
+            ? `<span class="gps-loading" aria-hidden="true"></span><span>${uiText.gpsDetecting}</span>`
+            : `<span>📍</span><span>${uiText.gpsOption}</span>`;
+
+        const detectedLabel = detectedGpsCityKey
+            ? (() => {
+                const city = AFGHAN_CITIES.find(item => item.key === detectedGpsCityKey);
+                if (!city) return '';
+                return `<div class="city-country-head">✅ ${uiText.gpsDetected}: ${escapeHtml(getCityDisplayName(city))}</div>`;
+            })()
+            : '';
 
         dropdown.innerHTML = `
-            <button class="city-option gps-option" type="button" data-city-key="__gps__">${uiText.gpsOption}</button>
+            <button class="city-option gps-option" type="button" data-city-key="__gps__" role="option">${gpsStatusText}</button>
             <div class="city-country-head">${uiText.countryLabel}</div>
-            <div class="city-options-wrap">${cityRows || `<div class="city-empty">${uiText.noMatches}</div>`}</div>
+            ${detectedLabel}
+            <div class="city-options-wrap" role="listbox">${groupedRows || `<div class="city-empty">${uiText.noMatches}</div>`}</div>
         `;
     }
 
     function openCityDropdown() {
         const dropdown = document.getElementById('cityDropdown');
+        const shell = document.getElementById('citySearchShell');
         if (!dropdown) return;
         dropdown.classList.add('open');
+        if (shell) shell.setAttribute('aria-expanded', 'true');
     }
 
     function closeCityDropdown() {
         const dropdown = document.getElementById('cityDropdown');
+        const shell = document.getElementById('citySearchShell');
         if (!dropdown) return;
         dropdown.classList.remove('open');
+        if (shell) shell.setAttribute('aria-expanded', 'false');
     }
 
     function selectAfghanCity(city) {
@@ -3641,10 +3835,19 @@ window.filterCategory = function(cat, btn) {
     function initCitySelector() {
         const input = document.getElementById('citySearchInput');
         const dropdown = document.getElementById('cityDropdown');
+        const changeBtn = document.getElementById('selectedCityChange');
         if (!input || !dropdown || input.dataset.boundCitySelector === '1') return;
 
         const uiText = getPrayerUiText();
-        input.placeholder = uiText.searchPlaceholder;
+        input.placeholder = uiText.searchPlaceholderDual;
+
+        if (changeBtn) {
+            changeBtn.addEventListener('click', () => {
+                input.focus();
+                renderCityDropdown(input.value || '');
+                openCityDropdown();
+            });
+        }
 
         input.addEventListener('focus', () => {
             renderCityDropdown(input.value || '');
@@ -3680,7 +3883,13 @@ window.filterCategory = function(cat, btn) {
     window.refreshCitySelectorLanguage = function() {
         const input = document.getElementById('citySearchInput');
         if (!input) return;
-        input.placeholder = getPrayerUiText().searchPlaceholder;
+        const uiText = getPrayerUiText();
+        input.placeholder = uiText.searchPlaceholderDual;
+
+        if (!localStorage.getItem('crown_location')) {
+            setSelectedCityChip(uiText.noCitySelected);
+        }
+
         const cached = localStorage.getItem('crown_location');
         if (cached) {
             const loc = JSON.parse(cached);
@@ -3703,6 +3912,9 @@ window.filterCategory = function(cat, btn) {
         updateCountdown();
         refreshReminderControlLanguage();
         syncReminderUi();
+        const ring = document.getElementById('qiblaDegreeRing');
+        if (ring) ring.dataset.built = '0';
+        buildQiblaDegreeRing();
         if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
     };
 
@@ -3763,6 +3975,7 @@ window.filterCategory = function(cat, btn) {
             const loc = JSON.parse(cached);
             onLocationReady(loc.lat, loc.lng, loc.city || '');
         } else {
+            setSelectedCityChip(getPrayerUiText().noCitySelected);
             requestLocation();
         }
     };
@@ -3778,11 +3991,18 @@ window.filterCategory = function(cat, btn) {
     window.requestLocation = function() {
         const cityInput = document.getElementById('citySearchInput');
         const uiText = getPrayerUiText();
+        isGpsResolving = true;
+        detectedGpsCityKey = null;
         if (cityInput) cityInput.value = uiText.detectingLocation;
+        setSelectedCityChip(uiText.gpsDetecting);
+        if (document.getElementById('cityDropdown')?.classList.contains('open')) {
+            renderCityDropdown(cityInput?.value || '');
+        }
         renderPrayerSkeleton();
 
         if (!navigator.geolocation) {
             if (cityInput) cityInput.value = 'Geolocation not supported';
+            isGpsResolving = false;
             return;
         }
 
@@ -3815,12 +4035,19 @@ window.filterCategory = function(cat, btn) {
                     country: geodata?.address?.country || ''
                 };
 
+                isGpsResolving = false;
+                detectedGpsCityKey = selectedCity ? selectedCity.key : null;
                 localStorage.setItem('crown_location', JSON.stringify(savedLoc));
                 onLocationReady(lat, lng, city);
+                if (document.getElementById('cityDropdown')?.classList.contains('open')) {
+                    renderCityDropdown(cityInput?.value || '');
+                }
             },
             (err) => {
+                isGpsResolving = false;
                 clearPrayerSkeleton();
                 if (cityInput) cityInput.value = uiText.locationDenied;
+                setSelectedCityChip(uiText.locationDenied);
                 const grid = document.getElementById('prayerTimesGrid');
                 if (grid) grid.innerHTML = `<div style="text-align:center;padding:14px;opacity:0.7;">${uiText.enableLocation}</div>`;
             },
@@ -3846,6 +4073,7 @@ window.filterCategory = function(cat, btn) {
         } else {
             updateCityInputFromLocation({ lat, lng, city });
         }
+        isGpsResolving = false;
 
         calculateAndRenderPrayers(lat, lng);
         calculateQibla(lat, lng);
@@ -4028,6 +4256,37 @@ window.filterCategory = function(cat, btn) {
     }
 
     // ===== QIBLA COMPASS =====
+    function normalizeDegrees(angle) {
+        let normalized = angle % 360;
+        if (normalized < 0) normalized += 360;
+        return normalized;
+    }
+
+    function shortestAngleDelta(from, to) {
+        return ((to - from + 540) % 360) - 180;
+    }
+
+    function setNeedleRotation(targetAngle) {
+        const arrow = document.getElementById('qiblaArrow');
+        if (!arrow) return;
+        const normalizedTarget = normalizeDegrees(targetAngle);
+        const delta = shortestAngleDelta(currentNeedleRotation, normalizedTarget);
+        currentNeedleRotation = normalizeDegrees(currentNeedleRotation + delta);
+        arrow.style.transform = `rotate(${currentNeedleRotation}deg)`;
+    }
+
+    function buildQiblaDegreeRing() {
+        const ring = document.getElementById('qiblaDegreeRing');
+        if (!ring || ring.dataset.built === '1') return;
+        const ticks = [];
+        for (let deg = 0; deg < 360; deg += 30) {
+            ticks.push(`<span class="qibla-tick" style="transform: rotate(${deg}deg) translate(-50%, -100%);"></span>`);
+            ticks.push(`<span class="qibla-tick-label" style="transform: rotate(${deg}deg) translate(-50%, -100%);">${localizeDigits(deg)}</span>`);
+        }
+        ring.innerHTML = ticks.join('');
+        ring.dataset.built = '1';
+    }
+
     function calculateQibla(lat, lng) {
         const latR = lat * Math.PI / 180;
         const lngR = lng * Math.PI / 180;
@@ -4041,35 +4300,38 @@ window.filterCategory = function(cat, btn) {
         if (qibla < 0) qibla += 360;
 
         userQibla = qibla;
+        buildQiblaDegreeRing();
 
         const degEl = document.getElementById('qiblaDegree');
         const statusEl = document.getElementById('qiblaStatus');
         const qiblaRounded = Math.round(qibla);
+        const uiText = getPrayerUiText();
         if (degEl) {
             degEl.textContent = isPashtoMode()
                 ? `${localizeDigits(qiblaRounded)}° له شماله د قبلې لوری`
                 : `Qibla bearing: ${qiblaRounded}° from North`;
         }
         if (statusEl) {
-            statusEl.textContent = isPashtoMode()
-                ? 'موبایل وڅرخوئ — ستنه د قبلې نښې ته برابره کړئ'
-                : 'Rotate phone until needle aligns with Qibla marker';
+            statusEl.textContent = uiText.qiblaRotateHint;
         }
 
         const marker = document.getElementById('qiblaMarker');
         if (marker) marker.style.transform = `rotate(${qibla}deg)`;
 
         // Static fallback: rotate needle to Qibla if heading sensors unavailable
-        const arrow = document.getElementById('qiblaArrow');
-        if (arrow) arrow.style.transform = `translate(-50%, -100%) rotate(${qibla}deg)`;
+        setNeedleRotation(qibla);
     }
 
     function initCompass() {
+        buildQiblaDegreeRing();
+        window.removeEventListener('deviceorientationabsolute', handleCompass, true);
+        window.removeEventListener('deviceorientation', handleCompass, true);
+
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
             // iOS 13+ — needs explicit permission
             const statusEl = document.getElementById('qiblaStatus');
             if (statusEl && !sessionStorage.getItem('compass_requested')) {
-                statusEl.innerHTML = '<button class="loc-refresh" onclick="requestCompassPermission()" style="font-size:0.85rem;padding:8px 16px;">Enable Compass</button>';
+                statusEl.innerHTML = '<button class="selected-city-change" onclick="requestCompassPermission()">Enable Compass</button>';
             }
         } else if ('ondeviceorientationabsolute' in window) {
             window.addEventListener('deviceorientationabsolute', handleCompass, true);
@@ -4084,35 +4346,94 @@ window.filterCategory = function(cat, btn) {
             if (state === 'granted') {
                 window.addEventListener('deviceorientation', handleCompass, true);
                 const statusEl = document.getElementById('qiblaStatus');
-                if (statusEl) statusEl.textContent = 'Compass active — point your phone';
+                if (statusEl) statusEl.textContent = getPrayerUiText().qiblaNeedleHint;
             }
         }).catch(() => {});
     };
 
-    function handleCompass(e) {
-        let heading = e.webkitCompassHeading || (e.alpha != null ? (360 - e.alpha) : null);
-        if (heading == null || userQibla == null) return;
+    function processCompassHeading() {
+        if (latestCompassHeading == null || userQibla == null) return;
 
-        const arrow = document.getElementById('qiblaArrow');
         const section = document.getElementById('qiblaSection');
         const statusEl = document.getElementById('qiblaStatus');
-        if (arrow) {
-            arrow.style.transform = `translate(-50%, -100%) rotate(${heading}deg)`;
-        }
+        const uiText = getPrayerUiText();
 
-        const delta = Math.abs((((heading - userQibla) % 360) + 540) % 360 - 180);
+        const needleTarget = normalizeDegrees(userQibla - latestCompassHeading);
+        setNeedleRotation(needleTarget);
+
+        const delta = Math.abs(shortestAngleDelta(latestCompassHeading, userQibla));
         const aligned = delta <= 5;
         if (section) section.classList.toggle('aligned', aligned);
         if (statusEl) {
             statusEl.textContent = aligned
-                ? (isPashtoMode() ? 'ماشاءالله! تاسو قبلې ته برابر یاست.' : 'MashaAllah! You are facing Qibla.')
-                : (isPashtoMode() ? `نږدې یاست — ${localizeDigits(Math.round(delta))}° توپیر` : `Almost there — ${Math.round(delta)}° off`);
+                ? uiText.qiblaFacing
+                : uiText.qiblaAlmost.replace('{delta}', localizeDigits(Math.round(delta)));
         }
+    }
+
+    function queueCompassUpdate(heading) {
+        latestCompassHeading = normalizeDegrees(heading);
+        if (compassEventTimer) return;
+        compassEventTimer = setTimeout(() => {
+            compassEventTimer = null;
+            processCompassHeading();
+        }, 80);
+    }
+
+    function handleCompass(e) {
+        let heading = e.webkitCompassHeading || (e.alpha != null ? (360 - e.alpha) : null);
+        if (heading == null || userQibla == null) return;
+        queueCompassUpdate(heading);
     }
 
     // ===== PRAYER NOTIFICATIONS =====
     let notificationTimeouts = [];
     let dailyDuaReminderTimer = null;
+
+    function requestNotificationPermissionIfNeeded() {
+        const uiText = getPrayerUiText();
+        if (!('Notification' in window)) {
+            showToast(uiText.alertsUnsupported);
+            return Promise.resolve(false);
+        }
+
+        if (Notification.permission === 'granted') return Promise.resolve(true);
+        if (Notification.permission === 'denied') {
+            showToast(uiText.alertsPermissionDenied);
+            return Promise.resolve(false);
+        }
+
+        return Notification.requestPermission()
+            .then((permission) => {
+                if (permission === 'granted') return true;
+                showToast(uiText.alertsPermissionDenied);
+                return false;
+            })
+            .catch(() => {
+                showToast(uiText.alertsPermissionDenied);
+                return false;
+            });
+    }
+
+    function sendSystemNotification(title, options) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+        if (navigator.serviceWorker?.controller) {
+            navigator.serviceWorker.ready
+                .then((registration) => {
+                    if (registration && typeof registration.showNotification === 'function') {
+                        return registration.showNotification(title, options);
+                    }
+                    return new Notification(title, options);
+                })
+                .catch(() => {
+                    new Notification(title, options);
+                });
+            return;
+        }
+
+        new Notification(title, options);
+    }
 
     function playReminderSound(mode) {
         if (mode === 'silent') return;
@@ -4132,7 +4453,68 @@ window.filterCategory = function(cat, btn) {
         } catch (error) { /* ignore playback issues */ }
     }
 
+    function getPrayerCoordinates() {
+        try {
+            const cached = JSON.parse(localStorage.getItem('crown_location') || 'null');
+            if (!cached || typeof cached.lat !== 'number' || typeof cached.lng !== 'number') return null;
+            return { lat: cached.lat, lng: cached.lng };
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function getPrayerTimeForDate(prayerName, date) {
+        const coords = getPrayerCoordinates();
+        if (!coords || typeof adhan === 'undefined') return null;
+
+        const coordinates = new adhan.Coordinates(coords.lat, coords.lng);
+        const params = adhan.CalculationMethod.MuslimWorldLeague();
+        params.madhab = adhan.Madhab.Hanafi;
+        const pt = new adhan.PrayerTimes(coordinates, date, params);
+        return pt[prayerName] || null;
+    }
+
+    function getNextReminderDate(prayerName, offsetMinutes, now) {
+        const todayPrayer = prayerTimesData?.[prayerName] || getPrayerTimeForDate(prayerName, now);
+        if (todayPrayer) {
+            const candidate = new Date(todayPrayer);
+            candidate.setMinutes(candidate.getMinutes() - offsetMinutes);
+            if (candidate > now) return candidate;
+        }
+
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowPrayer = getPrayerTimeForDate(prayerName, tomorrow);
+        if (!tomorrowPrayer) return null;
+        const nextCandidate = new Date(tomorrowPrayer);
+        nextCandidate.setMinutes(nextCandidate.getMinutes() - offsetMinutes);
+        return nextCandidate > now ? nextCandidate : null;
+    }
+
+    function showReminderSetConfirmation(prayerName) {
+        const settings = loadReminderSettings();
+        if (!settings.enabled || !settings.prayers[prayerName]) return;
+        const when = getNextReminderDate(prayerName, settings.offsetMinutes, new Date());
+        if (!when) return;
+        const uiText = getPrayerUiText();
+        const message = uiText.reminderSet
+            .replace('{prayer}', getPrayerLabel(prayerName))
+            .replace('{time}', formatTime(when));
+        showToast(message);
+    }
+
+    function showFirstEnabledReminderConfirmation() {
+        const settings = loadReminderSettings();
+        const firstEnabled = REMINDER_PRAYERS.find(name => settings.prayers[name]);
+        if (!firstEnabled) {
+            showToast(getPrayerUiText().reminderSaved);
+            return;
+        }
+        showReminderSetConfirmation(firstEnabled);
+    }
+
     function firePrayerReminder(prayerName, isPreReminder, minutesBefore) {
+        console.log('[PrayerReminder] Timer fired', { prayerName, isPreReminder, minutesBefore, at: new Date().toISOString() });
         const uiText = getPrayerUiText();
         const localizedPrayer = getPrayerLabel(prayerName);
         const body = isPreReminder
@@ -4141,17 +4523,21 @@ window.filterCategory = function(cat, btn) {
                 .replace('{minutes}', localizeDigits(minutesBefore))
             : uiText.atTimeBody.replace('{prayer}', localizedPrayer);
 
-        if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification(`${PRAYER_ICONS[prayerName]} ${localizedPrayer}`, {
-                body,
-                icon: 'icon-192.png',
-                tag: `prayer-${prayerName}-${isPreReminder ? 'before' : 'now'}`,
-                renotify: true
-            });
-        }
+        sendSystemNotification(`${PRAYER_ICONS[prayerName]} ${localizedPrayer}`, {
+            body,
+            icon: 'icon-192.png',
+            badge: 'icon-192.png',
+            tag: `prayer-${prayerName}-${isPreReminder ? 'before' : 'now'}`,
+            renotify: true,
+            requireInteraction: false
+        });
 
         const settings = loadReminderSettings();
         playReminderSound(settings.mode);
+
+        if (!document.hidden) {
+            showToast(uiText.inAppPrayerAlert.replace('{prayer}', localizedPrayer));
+        }
     }
 
     function runReminderTest() {
@@ -4163,39 +4549,16 @@ window.filterCategory = function(cat, btn) {
 
         playReminderSound(settings.mode);
 
-        if (!('Notification' in window)) {
-            showToast(uiText.alertsUnsupported);
-            return;
-        }
-
-        const showSample = () => {
-            new Notification(`${PRAYER_ICONS[samplePrayer]} ${uiText.testReminder}`, {
+        requestNotificationPermissionIfNeeded().then((granted) => {
+            if (!granted) return;
+            sendSystemNotification(`${PRAYER_ICONS[samplePrayer]} ${uiText.testReminder}`, {
                 body,
                 icon: 'icon-192.png',
+                badge: 'icon-192.png',
                 tag: 'prayer-test-reminder',
                 renotify: true
             });
-        };
-
-        if (Notification.permission === 'granted') {
-            showSample();
-            return;
-        }
-
-        if (Notification.permission === 'default') {
-            Notification.requestPermission().then((permission) => {
-                if (permission === 'granted') {
-                    showSample();
-                } else {
-                    showToast(uiText.alertsPermissionDenied);
-                }
-            }).catch(() => {
-                showToast(uiText.alertsPermissionDenied);
-            });
-            return;
-        }
-
-        showToast(uiText.alertsPermissionDenied);
+        });
     }
 
     window.togglePrayerNotifications = function(enabled) {
@@ -4207,30 +4570,21 @@ window.filterCategory = function(cat, btn) {
 
         const uiText = getPrayerUiText();
         if (enabled) {
-            if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission().then(perm => {
-                    if (perm !== 'granted') {
-                        settings.enabled = false;
-                        localStorage.setItem('crown_notifications', 'false');
-                        saveReminderSettings();
-                        syncReminderUi();
-                        showToast(uiText.alertsPermissionDenied);
-                    } else {
-                        schedulePrayerNotifications();
-                        scheduleDailyDuaReminder();
-                    }
-                });
-            } else if ('Notification' in window && Notification.permission === 'granted') {
+            requestNotificationPermissionIfNeeded().then((granted) => {
+                if (!granted) {
+                    settings.enabled = false;
+                    localStorage.setItem('crown_notifications', 'false');
+                    saveReminderSettings();
+                    syncReminderUi();
+                    clearPrayerNotifications();
+                    clearDailyDuaReminder();
+                    return;
+                }
                 schedulePrayerNotifications();
                 scheduleDailyDuaReminder();
                 showToast(uiText.alertsEnabled);
-            } else {
-                settings.enabled = false;
-                localStorage.setItem('crown_notifications', 'false');
-                saveReminderSettings();
-                syncReminderUi();
-                showToast(uiText.alertsUnsupported);
-            }
+                showFirstEnabledReminderConfirmation();
+            });
         } else {
             clearPrayerNotifications();
             clearDailyDuaReminder();
@@ -4239,36 +4593,65 @@ window.filterCategory = function(cat, btn) {
         initDailyReminderPrompt();
     };
 
-    function schedulePrayerNotifications() {
-        clearPrayerNotifications();
-        if (!prayerTimesData) return;
+    function scheduleReminderMidnightRefresh() {
+        if (reminderMidnightTimer) {
+            clearTimeout(reminderMidnightTimer);
+            reminderMidnightTimer = null;
+        }
+
         const settings = loadReminderSettings();
         if (!settings.enabled) return;
 
         const now = new Date();
+        const nextMidnight = new Date(now);
+        nextMidnight.setHours(24, 0, 2, 0);
+        const delay = Math.max(1000, nextMidnight - now);
+        reminderMidnightTimer = setTimeout(() => {
+            const coords = getPrayerCoordinates();
+            if (coords) calculateAndRenderPrayers(coords.lat, coords.lng);
+            schedulePrayerNotifications();
+        }, delay);
+    }
+
+    function schedulePrayerNotifications() {
+        clearPrayerNotifications();
+        const settings = loadReminderSettings();
+        if (!settings.enabled) return;
+
+        const now = new Date();
+        console.log('[PrayerReminder] Scheduling start', { now: now.toISOString(), offset: settings.offsetMinutes, mode: settings.mode });
 
         REMINDER_PRAYERS.forEach(name => {
             if (!settings.prayers[name]) return;
-            const time = prayerTimesData[name];
-            if (!time) return;
+            const reminderTime = getNextReminderDate(name, settings.offsetMinutes, now);
+            if (!reminderTime) return;
 
-            const reminderTime = new Date(time);
-            reminderTime.setMinutes(reminderTime.getMinutes() - settings.offsetMinutes);
-            if (reminderTime <= now) return;
+            const delay = reminderTime.getTime() - now.getTime();
+            if (delay <= 0 || delay > 172800000) return;
 
-            const delay = reminderTime - now;
-            if (delay > 0 && delay < 86400000) { // Within 24 hours
-                const tid = setTimeout(() => {
-                    firePrayerReminder(name, settings.offsetMinutes > 0, settings.offsetMinutes);
-                }, delay);
-                notificationTimeouts.push(tid);
-            }
+            console.log('[PrayerReminder] Scheduled', {
+                prayer: name,
+                reminderAt: reminderTime.toISOString(),
+                delayMs: delay
+            });
+
+            const tid = setTimeout(() => {
+                firePrayerReminder(name, settings.offsetMinutes > 0, settings.offsetMinutes);
+                schedulePrayerNotifications();
+            }, delay);
+            notificationTimeouts.push(tid);
         });
+
+        scheduleReminderMidnightRefresh();
     }
 
     function clearPrayerNotifications() {
         notificationTimeouts.forEach(tid => clearTimeout(tid));
         notificationTimeouts = [];
+        if (reminderMidnightTimer) {
+            clearTimeout(reminderMidnightTimer);
+            reminderMidnightTimer = null;
+        }
     }
 
     function getTodayDuaSummary() {
