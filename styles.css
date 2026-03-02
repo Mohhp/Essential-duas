@@ -3631,6 +3631,23 @@
         }
         [data-theme="light"] .footer-arabic { color: rgba(78, 96, 69, 0.74); }
 
+        .app-footer {
+            text-align: center;
+            padding: 32px 16px 80px 16px;
+            opacity: 0.5;
+            font-size: 12px;
+        }
+        .app-footer p {
+            margin: 4px 0;
+        }
+        .app-footer .footer-brand,
+        .app-footer .footer-info,
+        .app-footer .footer-copyright {
+            font-family: var(--font-title);
+            letter-spacing: 0.3px;
+            color: var(--text-subtle);
+        }
+
         /* ===== NO RESULTS ===== */
         .no-results {
             text-align: center; padding: 3rem 1rem; display: none;
@@ -4495,6 +4512,13 @@
             opacity: 1;
             z-index: 2100;
             pointer-events: auto;
+        }
+
+        .quran-panel,
+        .prayer-panel {
+            will-change: opacity;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         [data-theme="light"] #mainContainer.home-panel,

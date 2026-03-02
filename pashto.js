@@ -230,6 +230,9 @@ const PS_UI = {
     // Footer
     footerText: 'تاج ټولګه',
     footerSub: 'د قرآن او سنت څخه ۶۳ اساسي دعاګانې',
+    footerBrand: 'لازمي دعاګانې',
+    footerInfo: 'د قرآن او سنت څخه ۶۳ مستندې دعاګانې',
+    footerCopyright: '© ۲۰۲۶ ټول حقونه خوندي دي',
     // Prayer panel
     prayerNav: 'لمونځ',
     prayerTimesTitle: 'د لمونځ وختونه',
@@ -1027,6 +1030,22 @@ function applyLanguage(lang) {
     if (footerText) {
         if (!footerText.getAttribute('data-en')) footerText.setAttribute('data-en', footerText.innerHTML);
         footerText.innerHTML = PS_UI.footerText + '<br>' + PS_UI.footerSub;
+    }
+
+    const appFooterBrand = document.querySelector('.app-footer .footer-brand');
+    if (appFooterBrand) {
+        if (!appFooterBrand.getAttribute('data-en')) appFooterBrand.setAttribute('data-en', appFooterBrand.textContent);
+        appFooterBrand.textContent = PS_UI.footerBrand;
+    }
+    const appFooterInfo = document.querySelector('.app-footer .footer-info');
+    if (appFooterInfo) {
+        if (!appFooterInfo.getAttribute('data-en')) appFooterInfo.setAttribute('data-en', appFooterInfo.textContent);
+        appFooterInfo.textContent = PS_UI.footerInfo;
+    }
+    const appFooterCopyright = document.querySelector('.app-footer .footer-copyright');
+    if (appFooterCopyright) {
+        if (!appFooterCopyright.getAttribute('data-en')) appFooterCopyright.setAttribute('data-en', appFooterCopyright.textContent);
+        appFooterCopyright.textContent = PS_UI.footerCopyright;
     }
 
     // Prayer panel

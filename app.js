@@ -2272,11 +2272,9 @@ window.filterCategory = function(cat, btn) {
                 openTasbeeh();
                 break;
             case 'quran':
-                setPanelLoading('quran', true, isPashtoMode() ? 'قرآن بارېږي…' : 'Loading Quran…');
                 openQuran();
                 break;
             case 'prayer':
-                setPanelLoading('prayer', true, isPashtoMode() ? 'د لمانځه وختونه بارېږي…' : 'Loading Prayer…');
                 openPrayer();
                 break;
         }
@@ -4589,6 +4587,7 @@ window.filterCategory = function(cat, btn) {
     let compassEventTimer = null;
     let latestCompassHeading = null;
     let currentNeedleRotation = 0;
+    let prayerPanelHydrated = false;
     const PRAYER_SUBTAB_STORAGE_KEY = 'crown_prayer_active_tab';
 
     function escapeHtml(value) {
@@ -5570,17 +5569,26 @@ window.filterCategory = function(cat, btn) {
         initPrayerSubtabs();
         preloadPrayerReminderAudio();
         if (typeof window.refreshPrayerLanguage === 'function') window.refreshPrayerLanguage();
-        renderPrayerSkeleton();
-        // Auto-detect location if not cached
-        const cached = localStorage.getItem('crown_location');
-        if (cached) {
-            const loc = JSON.parse(cached);
-            onLocationReady(loc.lat, loc.lng, loc.city || '');
+
+        const needsBootstrap = !prayerPanelHydrated || !prayerTimesData;
+        if (needsBootstrap) {
+            setPanelLoading('prayer', true, isPashtoMode() ? 'د لمانځه وختونه بارېږي…' : 'Loading Prayer…');
+            renderPrayerSkeleton();
+            const cached = localStorage.getItem('crown_location');
+            if (cached) {
+                const loc = JSON.parse(cached);
+                onLocationReady(loc.lat, loc.lng, loc.city || '');
+            } else {
+                setSelectedCityChip(getPrayerUiText().noCitySelected);
+                requestLocation();
+            }
         } else {
-            setSelectedCityChip(getPrayerUiText().noCitySelected);
-            requestLocation();
+            renderPrayerGrid();
+            updateCountdown();
+            startCountdown();
+            setPanelLoading('prayer', false);
         }
-        setTimeout(() => setPanelLoading('prayer', false), 260);
+
         recordInAppRoute(true);
     };
 
@@ -5652,6 +5660,7 @@ window.filterCategory = function(cat, btn) {
             (err) => {
                 isGpsResolving = false;
                 clearPrayerSkeleton();
+                setPanelLoading('prayer', false);
                 if (cityInput) cityInput.value = uiText.locationDenied;
                 setSelectedCityChip(uiText.locationDenied);
                 const grid = document.getElementById('prayerTimesGrid');
@@ -5687,6 +5696,8 @@ window.filterCategory = function(cat, btn) {
         loadReminderSettings();
         syncReminderUi();
         if (loadReminderSettings().enabled) schedulePrayerNotifications();
+        prayerPanelHydrated = true;
+        setPanelLoading('prayer', false);
     }
 
     function calculateAndRenderPrayers(lat, lng) {
@@ -5721,6 +5732,8 @@ window.filterCategory = function(cat, btn) {
         clearPrayerSkeleton();
         renderPrayerGrid();
         startCountdown();
+        prayerPanelHydrated = true;
+        setPanelLoading('prayer', false);
     }
 
     function renderPrayerGrid() {
@@ -5740,6 +5753,9 @@ window.filterCategory = function(cat, btn) {
             const reminderEnabled = REMINDER_PRAYERS.includes(name) && settings.enabled && !!settings.prayers[name];
             const scheduledReminder = activePrayerReminderSchedule[name] || null;
             const reminderFireText = scheduledReminder ? formatTime(new Date(scheduledReminder.triggerAt)) : '';
+            const reminderBadgeText = reminderEnabled
+                ? (scheduledReminder && reminderFireText && reminderFireText !== timeStr ? `🔔 ${reminderFireText}` : '🔔')
+                : '';
             const cls = isCurrent ? ' current-prayer' : isNext ? ' next-prayer' : '';
             const uiText = getPrayerUiText();
             return `<div class="prayer-time-row${cls}">
@@ -5748,8 +5764,7 @@ window.filterCategory = function(cat, btn) {
                     <span class="prayer-time-name">${getPrayerLabel(name)}</span>
                 </span>
                 <span class="prayer-time-meta">
-                    ${reminderEnabled ? '<span class="prayer-reminder-indicator" title="Reminder enabled">🔔</span>' : ''}
-                    ${scheduledReminder ? `<span class="prayer-reminder-time" title="Reminder ${scheduledReminder.offsetMinutes} min before">🔔 ${reminderFireText}</span>` : ''}
+                    ${reminderEnabled ? `<span class="prayer-reminder-time" title="${scheduledReminder ? `Reminder ${scheduledReminder.offsetMinutes} min before` : 'Reminder enabled'}">${reminderBadgeText}</span>` : ''}
                     ${isCurrent ? `<span class="prayer-now-badge">${uiText.now}</span>` : ''}
                     ${isNext ? `<span class="prayer-next-badge">${uiText.next}</span>` : ''}
                     <span class="prayer-time-value">${timeStr}</span>
@@ -8367,6 +8382,8 @@ window.filterCategory = function(cat, btn) {
     window.openQuran = async function() {
         const panel = document.querySelector('.quran-panel');
         if (!panel) return;
+        const needsInit = !quranState.initialized;
+        if (needsInit) setPanelLoading('quran', true, isPashtoMode() ? 'قرآن بارېږي…' : 'Loading Quran…');
         setActiveTabLayer('quran');
         setBottomNavActive('quran');
         await initQuran();
@@ -8377,7 +8394,7 @@ window.filterCategory = function(cat, btn) {
         recordInAppRoute(true, {
             view: IN_APP_VIEWS.QURAN_TAB
         });
-        setTimeout(() => setPanelLoading('quran', false), 260);
+        setPanelLoading('quran', false);
     };
 
     function closeQuranReader({ skipHistory = false } = {}) {
