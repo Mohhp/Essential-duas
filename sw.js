@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essential-duas-v46';
+const CACHE_NAME = 'essential-duas-v47';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
 
@@ -24,7 +24,9 @@ const ASSETS = [
   './audio/duas/dua-14.mp3',
   './audio/duas/dua-15.mp3',
   './audio/duas/dua-16.mp3',
+  './audio/duas/dua-17.mp3',
   './audio/duas/dua-21.mp3',
+  './audio/duas/dua-23.mp3',
   './audio/duas/dua-24.mp3',
   './audio/duas/dua-25.mp3',
   './audio/duas/dua-26.mp3',
@@ -37,6 +39,8 @@ const ASSETS = [
   './audio/duas/dua-41.mp3',
   './audio/duas/dua-42.mp3',
   './audio/duas/dua-46.mp3',
+  './audio/duas/dua-47.mp3',
+  './audio/duas/dua-49.mp3',
   './audio/duas/dua-51.mp3',
   './audio/duas/dua-56.mp3',
   './audio/duas/dua-57.mp3',

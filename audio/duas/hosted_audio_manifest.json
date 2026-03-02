@@ -48,11 +48,27 @@
     "status": "ok"
   },
   {
+    "dua_id": 17,
+    "source_mp3_id": 17,
+    "source_url": "http://www.hisnmuslim.com/audio/ar/46.mp3",
+    "file": "/workspaces/Essential-duas/audio/duas/dua-17.mp3",
+    "size_kb": 239.4,
+    "status": "ok"
+  },
+  {
     "dua_id": 21,
     "source_mp3_id": 74,
     "source_url": "http://www.hisnulmuslim.com/audio/74.mp3",
     "file": "/workspaces/Essential-duas/audio/duas/dua-21.mp3",
     "size_kb": 259.3,
+    "status": "ok"
+  },
+  {
+    "dua_id": 23,
+    "source_mp3_id": 23,
+    "source_url": "http://www.hisnmuslim.com/audio/ar/85.mp3",
+    "file": "/workspaces/Essential-duas/audio/duas/dua-23.mp3",
+    "size_kb": 314.4,
     "status": "ok"
   },
   {
@@ -153,10 +169,19 @@
   },
   {
     "dua_id": 47,
-    "source_mp3_id": 107,
-    "source_url": "http://www.hisnulmuslim.com/audio/107.mp3",
-    "status": "failed",
-    "error": "404 Client Error: Not Found for url: http://www.hisnulmuslim.com/audio/107.mp3"
+    "source_mp3_id": 47,
+    "source_url": "http://www.hisnmuslim.com/audio/ar/107.mp3",
+    "file": "/workspaces/Essential-duas/audio/duas/dua-47.mp3",
+    "size_kb": 416.7,
+    "status": "ok"
+  },
+  {
+    "dua_id": 49,
+    "source_mp3_id": 49,
+    "source_url": "http://www.hisnmuslim.com/audio/ar/103.mp3",
+    "file": "/workspaces/Essential-duas/audio/duas/dua-49.mp3",
+    "size_kb": 280.3,
+    "status": "ok"
   },
   {
     "dua_id": 51,
