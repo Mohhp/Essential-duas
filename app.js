@@ -1144,13 +1144,16 @@ window.filterCategory = function(cat, btn) {
         content.className = 'dua-swipe-content';
         if (bodyClone) content.appendChild(bodyClone);
 
+        const hasMappedAudio = !!DUA_AUDIO_SOURCES[Number(duaId)];
         const actions = document.createElement('div');
         actions.className = 'dua-swipe-actions';
         actions.innerHTML = `
+            ${hasMappedAudio ? `
             <div class="audio-player dua-swipe-audio" data-state="idle">
                 <button class="action-btn audio-btn" type="button">${texts.listen}</button>
                 <div class="audio-progress"><span class="audio-progress-fill"></span></div>
             </div>
+            ` : ''}
             <button class="action-btn" data-role="copy">${texts.copy}</button>
             <button class="action-btn" data-role="share">${texts.share}</button>
             <button class="action-btn ${isBookmarked ? 'bookmarked-inline' : ''}" data-role="bookmark">${isBookmarked ? texts.bookmarkOn : texts.bookmarkAdd}</button>
@@ -1158,12 +1161,10 @@ window.filterCategory = function(cat, btn) {
         `;
 
         const listenBtn = actions.querySelector('.audio-btn');
-        if (!DUA_AUDIO_SOURCES[duaId]) {
+        if (hasMappedAudio && listenBtn) {
             const player = actions.querySelector('.dua-swipe-audio');
-            if (player) player.remove();
-        } else if (listenBtn) {
+            setAudioPlayerState(player, 'idle');
             listenBtn.addEventListener('click', () => {
-                const player = actions.querySelector('.dua-swipe-audio');
                 if (player) playDuaAudio(duaId, player);
             });
         }
@@ -2550,7 +2551,9 @@ window.filterCategory = function(cat, btn) {
         try {
             const playlist = await getPlaylistForDua(duaId);
             if (!playlist.length) {
-                player.remove();
+                setAudioPlayerState(player, 'idle');
+                updateAudioProgress(player, 0);
+                showToast('Audio unavailable for this dua right now');
                 return;
             }
 
@@ -2655,7 +2658,8 @@ window.filterCategory = function(cat, btn) {
             loadTrack(0);
         } catch (error) {
             setAudioPlayerState(player, 'idle');
-            player.remove();
+            updateAudioProgress(player, 0);
+            showToast('Audio playback failed');
         }
     }
 
