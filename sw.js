@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essential-duas-v45';
+const CACHE_NAME = 'essential-duas-v46';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
 
@@ -17,7 +17,32 @@ const ASSETS = [
   './favicon.svg',
   './pashto.js',
   './audio/adhan-alert.wav',
-  './audio/notification-tone.wav'
+  './audio/notification-tone.wav',
+  './audio/duas/dua-11.mp3',
+  './audio/duas/dua-12.mp3',
+  './audio/duas/dua-13.mp3',
+  './audio/duas/dua-14.mp3',
+  './audio/duas/dua-15.mp3',
+  './audio/duas/dua-16.mp3',
+  './audio/duas/dua-21.mp3',
+  './audio/duas/dua-24.mp3',
+  './audio/duas/dua-25.mp3',
+  './audio/duas/dua-26.mp3',
+  './audio/duas/dua-27.mp3',
+  './audio/duas/dua-34.mp3',
+  './audio/duas/dua-36.mp3',
+  './audio/duas/dua-37.mp3',
+  './audio/duas/dua-38.mp3',
+  './audio/duas/dua-39.mp3',
+  './audio/duas/dua-41.mp3',
+  './audio/duas/dua-42.mp3',
+  './audio/duas/dua-46.mp3',
+  './audio/duas/dua-51.mp3',
+  './audio/duas/dua-56.mp3',
+  './audio/duas/dua-57.mp3',
+  './audio/duas/dua-58.mp3',
+  './audio/duas/dua-59.mp3',
+  './audio/duas/dua-60.mp3'
 ];
 
 // Install — pre-cache all core assets

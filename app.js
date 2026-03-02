@@ -2401,27 +2401,52 @@ window.filterCategory = function(cat, btn) {
 
     // ===== AUDIO RECITATION (API-backed) =====
     const DUA_AUDIO_SOURCES = {
-        1: { ayahs: ['1:1-7'] },
-        2: { ayahs: ['2:255'] },
-        3: { ayahs: ['21:87'] },
-        4: { ayahs: ['17:24'] },
-        5: { ayahs: ['2:285-286'] },
-        6: { ayahs: ['112:1-4', '113:1-5', '114:1-6'] },
-        7: { ayahs: ['2:201'] },
-        8: { ayahs: ['3:8'] },
-        9: { ayahs: ['7:23'] },
-        10: { ayahs: ['20:114'] },
-        29: { ayahs: ['20:25-28'] },
-        30: { ayahs: ['14:40'] },
-        31: { ayahs: ['27:19'] },
-        32: { ayahs: ['21:83'] },
-        33: { ayahs: ['3:38'] },
-        35: { ayahs: ['9:129'] },
-        40: { ayahs: ['14:41'] },
-        50: { ayahs: ['43:13-14'] },
-        52: { ayahs: ['3:147'] },
-        62: { ayahs: ['113:1-5'] },
-        63: { ayahs: ['18:39'] }
+        1: { type: 'quran', ayahs: ['1:1-7'] },
+        2: { type: 'quran', ayahs: ['2:255'] },
+        3: { type: 'quran', ayahs: ['21:87'] },
+        4: { type: 'quran', ayahs: ['17:24'] },
+        5: { type: 'quran', ayahs: ['2:285-286'] },
+        6: { type: 'quran', ayahs: ['112:1-4', '113:1-5', '114:1-6'] },
+        7: { type: 'quran', ayahs: ['2:201'] },
+        8: { type: 'quran', ayahs: ['3:8'] },
+        9: { type: 'quran', ayahs: ['7:23'] },
+        10: { type: 'quran', ayahs: ['20:114'] },
+        11: { type: 'hosted', url: 'audio/duas/dua-11.mp3' },
+        12: { type: 'hosted', url: 'audio/duas/dua-12.mp3' },
+        13: { type: 'hosted', url: 'audio/duas/dua-13.mp3' },
+        14: { type: 'hosted', url: 'audio/duas/dua-14.mp3' },
+        15: { type: 'hosted', url: 'audio/duas/dua-15.mp3' },
+        16: { type: 'hosted', url: 'audio/duas/dua-16.mp3' },
+        21: { type: 'hosted', url: 'audio/duas/dua-21.mp3' },
+        24: { type: 'hosted', url: 'audio/duas/dua-24.mp3' },
+        25: { type: 'hosted', url: 'audio/duas/dua-25.mp3' },
+        26: { type: 'hosted', url: 'audio/duas/dua-26.mp3' },
+        27: { type: 'hosted', url: 'audio/duas/dua-27.mp3' },
+        29: { type: 'quran', ayahs: ['20:25-28'] },
+        30: { type: 'quran', ayahs: ['14:40'] },
+        31: { type: 'quran', ayahs: ['27:19'] },
+        32: { type: 'quran', ayahs: ['21:83'] },
+        33: { type: 'quran', ayahs: ['3:38'] },
+        34: { type: 'hosted', url: 'audio/duas/dua-34.mp3' },
+        35: { type: 'quran', ayahs: ['9:129'] },
+        36: { type: 'hosted', url: 'audio/duas/dua-36.mp3' },
+        37: { type: 'hosted', url: 'audio/duas/dua-37.mp3' },
+        38: { type: 'hosted', url: 'audio/duas/dua-38.mp3' },
+        39: { type: 'hosted', url: 'audio/duas/dua-39.mp3' },
+        40: { type: 'quran', ayahs: ['14:41'] },
+        41: { type: 'hosted', url: 'audio/duas/dua-41.mp3' },
+        42: { type: 'hosted', url: 'audio/duas/dua-42.mp3' },
+        46: { type: 'hosted', url: 'audio/duas/dua-46.mp3' },
+        50: { type: 'quran', ayahs: ['43:13-14'] },
+        51: { type: 'hosted', url: 'audio/duas/dua-51.mp3' },
+        52: { type: 'quran', ayahs: ['3:147'] },
+        56: { type: 'hosted', url: 'audio/duas/dua-56.mp3' },
+        57: { type: 'hosted', url: 'audio/duas/dua-57.mp3' },
+        58: { type: 'hosted', url: 'audio/duas/dua-58.mp3' },
+        59: { type: 'hosted', url: 'audio/duas/dua-59.mp3' },
+        60: { type: 'hosted', url: 'audio/duas/dua-60.mp3' },
+        62: { type: 'quran', ayahs: ['113:1-5'] },
+        63: { type: 'quran', ayahs: ['18:39'] }
     };
 
     const AYAH_AUDIO_CACHE = new Map();
@@ -2515,6 +2540,11 @@ window.filterCategory = function(cat, btn) {
         const mappedId = resolveMappedDuaId(id);
         const source = mappedId ? DUA_AUDIO_SOURCES[mappedId] : null;
         if (!source) return [];
+
+        if (source.type === 'hosted' && source.url) {
+            return [source.url];
+        }
+
         const ayahKeys = expandAyahSpecs(source.ayahs);
         if (!ayahKeys.length) return [];
         const urls = await Promise.all(ayahKeys.map(resolveAyahAudioUrl));
