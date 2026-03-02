@@ -234,7 +234,7 @@
         initDuaSwipeViewer();
         initInAppNavigationUX();
         closeAllPanelsForStateApply();
-        setActiveTabLayer('home');
+        switchTab('home');
         setBottomNavActive('home');
         backToCategories();
         history.replaceState({ view: IN_APP_VIEWS.HOME }, '');
@@ -566,6 +566,8 @@
         const nextTab = TAB_LAYER_SELECTORS[tabName] ? tabName : 'home';
         setActiveTabLayer(nextTab);
         setBottomNavActive(nextTab);
+        const target = document.querySelector(TAB_LAYER_SELECTORS[nextTab]);
+        runTabFadeTransition(target);
     };
 
     let inAppCurrentRoute = 'home';
@@ -595,6 +597,7 @@
         transitionLock: false
     };
     let swipeHintTimer = null;
+    let duaViewerCloseTimer = null;
 
     function showDuaSwipeHints(direction = 'both', durationMs = 3000) {
         const viewer = document.getElementById('duaSwipeViewer');
@@ -1411,6 +1414,14 @@ window.filterCategory = function(cat, btn) {
         detailHeader?.classList.remove('visible');
         if (hero) hero.style.display = 'none';
         if (viewer) {
+            if (duaViewerCloseTimer) {
+                clearTimeout(duaViewerCloseTimer);
+                duaViewerCloseTimer = null;
+            }
+            viewer.style.display = '';
+            viewer.style.transition = '';
+            viewer.style.opacity = '1';
+            viewer.classList.remove('is-closing');
             viewer.classList.add('active');
             viewer.setAttribute('aria-hidden', 'false');
         }
@@ -1448,10 +1459,28 @@ window.filterCategory = function(cat, btn) {
     function closeDuaSwipeViewer(opts) {
         opts = opts || {};
         const viewer = document.getElementById('duaSwipeViewer');
+        const afterClose = typeof opts.onAfterClose === 'function' ? opts.onAfterClose : null;
         if (viewer) {
-            viewer.classList.remove('active');
+            if (duaViewerCloseTimer) {
+                clearTimeout(duaViewerCloseTimer);
+                duaViewerCloseTimer = null;
+            }
+            viewer.classList.add('is-closing');
             viewer.setAttribute('aria-hidden', 'true');
             viewer.classList.remove('show-swipe-hints', 'hint-left', 'hint-right');
+            viewer.style.transition = 'opacity 0.2s ease';
+            viewer.style.opacity = '0';
+            duaViewerCloseTimer = setTimeout(() => {
+                viewer.classList.remove('active');
+                viewer.classList.remove('is-closing');
+                viewer.style.display = 'none';
+                viewer.style.opacity = '1';
+                viewer.style.transition = '';
+                duaViewerCloseTimer = null;
+                if (afterClose) afterClose();
+            }, 200);
+        } else if (afterClose) {
+            afterClose();
         }
         DUA_SWIPE_STATE.active = false;
         DUA_SWIPE_STATE.ids = [];
@@ -1560,18 +1589,21 @@ window.filterCategory = function(cat, btn) {
         const hero = document.querySelector('.hero');
         const pillsRow = document.getElementById('categoryPills');
 
-        grid?.classList.remove('hidden-grid');
-        duaList?.classList.add('hidden-list');
-        detailHeader?.classList.remove('visible');
-        if (hero) hero.style.display = '';
-        if (pillsRow) pillsRow.style.display = '';
+        closeDuaSwipeViewer({
+            onAfterClose: () => {
+                grid?.classList.remove('hidden-grid');
+                duaList?.classList.add('hidden-list');
+                detailHeader?.classList.remove('visible');
+                if (hero) hero.style.display = '';
+                if (pillsRow) pillsRow.style.display = '';
 
-        if (els.searchInput) els.searchInput.value = '';
-        if (els.searchClear) els.searchClear.classList.remove('visible');
-        if (els.noResults) els.noResults.classList.remove('visible');
+                if (els.searchInput) els.searchInput.value = '';
+                if (els.searchClear) els.searchClear.classList.remove('visible');
+                if (els.noResults) els.noResults.classList.remove('visible');
 
-        localStorage.removeItem('crown_active_category');
-        closeDuaSwipeViewer();
+                localStorage.removeItem('crown_active_category');
+            }
+        });
     };
 
     // ===== BOOKMARKS PANEL =====
@@ -1772,8 +1804,7 @@ window.filterCategory = function(cat, btn) {
 
     window.openTasbeeh = function() {
         const tp = document.querySelector('.tasbeeh-panel');
-        if (tp) setActiveTabLayer('tasbeeh');
-        setBottomNavActive('tasbeeh');
+        if (tp) switchTab('tasbeeh');
         // Restore last selected dhikr
         const saved = parseInt(localStorage.getItem('crown_dhikr_selected') || '0', 10);
         currentDhikrIndex = (saved >= 0 && saved < DHIKR_LIST.length) ? saved : 0;
@@ -1802,10 +1833,7 @@ window.filterCategory = function(cat, btn) {
             saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
             tasbeehCount = 0;
         }
-        const tp = document.querySelector('.tasbeeh-panel');
-        if (tp) tp.classList.remove('active');
-        setActiveTabLayer('home');
-        setBottomNavActive('home');
+        switchTab('home');
         recordInAppRoute(false);
     };
 
@@ -2042,8 +2070,7 @@ window.filterCategory = function(cat, btn) {
             prompt.textContent = getRoutineUiText().expandPrompt;
         }
 
-        setActiveTabLayer('routine');
-        setBottomNavActive('routine');
+        switchTab('routine');
         loadRoutineDailyDua();
         const closeBtn = rp.querySelector('.etiquette-close');
         if (closeBtn) closeBtn.focus();
@@ -2060,10 +2087,7 @@ window.filterCategory = function(cat, btn) {
     };
 
     window.closeRoutine = function() {
-        const rp = document.querySelector('.routine-panel');
-        if (rp) rp.classList.remove('active');
-        setActiveTabLayer('home');
-        setBottomNavActive('home');
+        switchTab('home');
         recordInAppRoute(false);
     };
 
@@ -2253,15 +2277,10 @@ window.filterCategory = function(cat, btn) {
     window.handleBottomNav = function(action, btn) {
         scrollActiveViewToTop();
 
-        document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
-        if (btn) btn.classList.add('active');
-
-        setActiveTabLayer(action);
-
         switch (action) {
             case 'home':
                 closeAllPanelsForStateApply();
-                setActiveTabLayer('home');
+                switchTab('home');
                 backToCategories();
                 scrollActiveViewToTop();
                 break;
@@ -5560,8 +5579,7 @@ window.filterCategory = function(cat, btn) {
 
     window.openPrayer = function() {
         const pp = document.querySelector('.prayer-panel');
-        if (pp) setActiveTabLayer('prayer');
-        setBottomNavActive('prayer');
+        if (pp) switchTab('prayer');
         const closeBtn = pp?.querySelector('.etiquette-close');
         if (closeBtn) closeBtn.focus();
         initReminderControls();
@@ -5583,7 +5601,6 @@ window.filterCategory = function(cat, btn) {
                 requestLocation();
             }
         } else {
-            renderPrayerGrid();
             updateCountdown();
             startCountdown();
             setPanelLoading('prayer', false);
@@ -5593,11 +5610,8 @@ window.filterCategory = function(cat, btn) {
     };
 
     window.closePrayer = function() {
-        const pp = document.querySelector('.prayer-panel');
-        if (pp) pp.classList.remove('active');
         setPanelLoading('prayer', false);
-        setActiveTabLayer('home');
-        setBottomNavActive('home');
+        switchTab('home');
         if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
         recordInAppRoute(false);
     };
@@ -5752,7 +5766,7 @@ window.filterCategory = function(cat, btn) {
             const isNext = next === name;
             const reminderEnabled = REMINDER_PRAYERS.includes(name) && settings.enabled && !!settings.prayers[name];
             const scheduledReminder = activePrayerReminderSchedule[name] || null;
-            const reminderFireText = scheduledReminder ? formatTime(new Date(scheduledReminder.triggerAt)) : '';
+            const reminderFireText = scheduledReminder ? normalizeMeridiem(formatTime(new Date(scheduledReminder.triggerAt))) : '';
             const reminderBadgeText = reminderEnabled
                 ? (scheduledReminder && reminderFireText && reminderFireText !== timeStr ? `🔔 ${reminderFireText}` : '🔔')
                 : '';
@@ -5854,6 +5868,13 @@ window.filterCategory = function(cat, btn) {
         }
     }
 
+    function normalizeMeridiem(text) {
+        return String(text || '')
+            .replace(/\s+/g, ' ')
+            .replace(/\b(AM|PM|غ\.م|غ\.و)\s+\1\b/gi, '$1')
+            .trim();
+    }
+
     function formatTime(date) {
         if (!date) return '--:--';
         let h = date.getHours();
@@ -5863,7 +5884,7 @@ window.filterCategory = function(cat, btn) {
         h = h % 12 || 12;
         const hText = localizeDigits(h);
         const mText = localizeDigits(m);
-        return `${hText}:${mText} ${ampm}`;
+        return normalizeMeridiem(`${hText}:${mText} ${ampm}`);
     }
 
     // Track current/next prayer for efficient re-render
@@ -8384,12 +8405,13 @@ window.filterCategory = function(cat, btn) {
         if (!panel) return;
         const needsInit = !quranState.initialized;
         if (needsInit) setPanelLoading('quran', true, isPashtoMode() ? 'قرآن بارېږي…' : 'Loading Quran…');
-        setActiveTabLayer('quran');
-        setBottomNavActive('quran');
+        switchTab('quran');
         await initQuran();
         renderQuranContinueCard();
         renderQuranRecentSection();
-        setQuranView(quranState.view || localStorage.getItem(QURAN_ACTIVE_TAB_KEY) || 'surah', { skipHistory: true });
+        if (needsInit) {
+            setQuranView(quranState.view || localStorage.getItem(QURAN_ACTIVE_TAB_KEY) || 'surah', { skipHistory: true });
+        }
         updateQuranFloatingAudioUi();
         recordInAppRoute(true, {
             view: IN_APP_VIEWS.QURAN_TAB
@@ -8415,21 +8437,18 @@ window.filterCategory = function(cat, btn) {
     }
 
     function switchToHomeTab() {
-        setActiveTabLayer('home');
-        setBottomNavActive('home');
+        switchTab('home');
         backToCategories();
     }
 
     function closeQuranPanel({ skipHistory = false } = {}) {
-        const panel = document.querySelector('.quran-panel');
-        if (panel) panel.classList.remove('active');
         setPanelLoading('quran', false);
         closeQuranReader({ skipHistory: true });
         clearQuranAudioDotHoldTimer();
         closeQuranAudioPopup();
         updateQuranMiniPlayerVisibility();
         document.body.classList.remove('quran-reading-mode');
-        setActiveTabLayer('home');
+        switchTab('home');
         if (!skipHistory) {
             recordInAppRoute(false, {
                 view: IN_APP_VIEWS.HOME

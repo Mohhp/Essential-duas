@@ -7,10 +7,11 @@
         }
 
         :root {
-            --bg-dark: #1e2a3a;
-            --bg-card: rgba(27, 43, 57, 0.78);
-            --bg-surface: #223447;
-            --bg-glass: rgba(30, 49, 66, 0.64);
+            --bg-dark: #0f2533;
+            --bg-light: #f6f0e4;
+            --bg-card: #18374a;
+            --bg-surface: #1d4055;
+            --bg-glass: #1a384d;
             --gold-lightest: #f4f7ee;
             --gold-light: #e6f0da;
             --gold-mid: #c9a84c;
@@ -29,10 +30,10 @@
             --green-mid: #4cad52;
             --green-dark: #1b5e20;
             --green-deep: #0a3d0a;
-            --text-primary: rgba(243, 249, 237, 0.97);
-            --text-muted: rgba(225, 238, 221, 0.92);
-            --text-subtle: rgba(203, 226, 210, 0.86);
-            --text-faint: rgba(186, 214, 198, 0.78);
+            --text-primary: #f3f9ed;
+            --text-muted: #deebde;
+            --text-subtle: #c5dccd;
+            --text-faint: #acc6b7;
             --font-arabic: 'Noto Naskh Arabic', 'Amiri', serif;
             --font-amiri: 'Amiri', serif;
             --font-title: 'Playfair Display', serif;
@@ -56,10 +57,11 @@
 
         /* ===== LIGHT MODE ===== */
         [data-theme="light"] {
-            --bg-dark: #faf7f2;
-            --bg-card: rgba(255, 251, 244, 0.9);
-            --bg-surface: #f2ebde;
-            --bg-glass: rgba(255, 251, 245, 0.76);
+            --bg-dark: #f6f0e4;
+            --bg-light: #f6f0e4;
+            --bg-card: #f0e7d7;
+            --bg-surface: #ebe0cf;
+            --bg-glass: #eee3d1;
             --gold-lightest: #1a1a0e;
             --gold-light: #2f2a18;
             --gold-mid: #9a7a2f;
@@ -71,10 +73,10 @@
             --green-lightest: #0a3d0a;
             --green-light: #2e7d32;
             --green-mid: #1b5e20;
-            --text-primary: rgba(15, 40, 28, 0.95);
-            --text-muted: rgba(25, 60, 42, 0.82);
-            --text-subtle: rgba(25, 60, 42, 0.7);
-            --text-faint: rgba(25, 60, 42, 0.58);
+            --text-primary: #173326;
+            --text-muted: #254536;
+            --text-subtle: #365646;
+            --text-faint: #4b6a5b;
             --shadow-soft: 0 3px 12px rgba(72,52,27,0.07), 0 1px 3px rgba(72,52,27,0.05);
             --shadow-card: 0 6px 22px rgba(72,52,27,0.09), 0 2px 6px rgba(72,52,27,0.06);
             --shadow-elevated: 0 12px 34px rgba(72,52,27,0.12), 0 4px 10px rgba(72,52,27,0.08);
@@ -1068,8 +1070,6 @@
             margin-bottom: 20px; overflow: hidden;
             transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             position: relative;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             box-shadow: var(--shadow-soft);
         }
         .dua-card.hidden-card { display: none; }
@@ -1228,7 +1228,7 @@
 
         /* Arabic Text */
         .arabic-container {
-            background: linear-gradient(135deg, rgba(46, 196, 122, 0.05), rgba(12, 26, 19, 0.4));
+            background: var(--bg-surface);
             border: 1px solid rgba(46, 196, 122, 0.08);
             border-radius: var(--radius-md);
             padding: 26px 22px; margin-bottom: 14px;
@@ -1324,7 +1324,7 @@
         [data-theme="light"] .arabic-word:hover { background: rgba(13, 123, 80, 0.06); }
         [data-theme="light"] .arabic-word.active-word { background: rgba(13, 123, 80, 0.12); color: #0d7b50; }
         [data-theme="light"] .arabic-container {
-            background: linear-gradient(135deg, rgba(13, 123, 80, 0.06), rgba(255, 255, 255, 0.8));
+            background: var(--bg-surface);
             border-color: rgba(13, 123, 80, 0.12);
         }
         [data-theme="light"] .translation { color: rgba(31, 43, 31, 0.92); }
@@ -1379,7 +1379,7 @@
 
         /* How-to box */
         .how-to-box {
-            background: rgba(46, 196, 122, 0.03);
+            background: var(--bg-surface);
             border: 1px solid rgba(46, 196, 122, 0.06);
             border-radius: var(--radius-md);
             padding: 12px 14px; margin-top: 10px;
@@ -3539,12 +3539,10 @@
         /* ============================================ */
         .overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); z-index: 1500;
+            background: var(--bg-dark); z-index: 1500;
             opacity: 0; visibility: hidden;
             pointer-events: none;
             transition: opacity 0.4s ease, visibility 0.4s ease;
-            -webkit-backdrop-filter: blur(4px);
-            backdrop-filter: blur(4px);
         }
         .overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
 
@@ -4431,10 +4429,7 @@
         .pill,
         .toolbar-btn,
         .progress-panel,
-        .etiquette-panel,
-        .routine-panel,
-        .prayer-panel,
-        .tasbeeh-panel {
+        .etiquette-panel {
             transition: background-color 300ms ease, border-color 300ms ease, color 300ms ease, box-shadow 300ms ease;
         }
 
@@ -4490,11 +4485,15 @@
             z-index: 1;
             pointer-events: none;
             transform: none !important;
-            transition: none;
+            transition: opacity 0.15s ease, visibility 0.15s ease;
             -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: opacity;
+            backface-visibility: hidden;
         }
 
         #mainContainer.home-panel.active {
@@ -4549,17 +4548,59 @@
             display: none;
             align-items: center;
             justify-content: center;
-            background: rgba(10, 18, 16, 0.45);
+            background: var(--bg-dark);
             color: var(--text-primary);
             font-family: var(--font-title);
             font-size: 0.76rem;
             letter-spacing: 0.45px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             pointer-events: none;
         }
         .panel-loading-overlay.visible {
             display: flex;
+        }
+
+        .home-panel,
+        .routine-panel,
+        .quran-panel,
+        .tasbeeh-panel,
+        .prayer-panel {
+            transition: opacity 0.15s ease, visibility 0.15s ease;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            will-change: opacity;
+            backface-visibility: hidden;
+        }
+
+        .dua-card,
+        .quran-continue-card,
+        .quran-recent-wrap,
+        .quran-surah-row,
+        .quran-popular-card,
+        .quran-ayah-card,
+        .prayer-time-row,
+        .prayer-countdown-card,
+        .prayer-location-bar,
+        .qibla-section,
+        .prayer-reminder-settings,
+        .prayer-notify-row,
+        .side-panel {
+            background: var(--bg-surface);
+        }
+
+        [data-theme="light"] .dua-card,
+        [data-theme="light"] .quran-continue-card,
+        [data-theme="light"] .quran-recent-wrap,
+        [data-theme="light"] .quran-surah-row,
+        [data-theme="light"] .quran-popular-card,
+        [data-theme="light"] .quran-ayah-card,
+        [data-theme="light"] .prayer-time-row,
+        [data-theme="light"] .prayer-countdown-card,
+        [data-theme="light"] .prayer-location-bar,
+        [data-theme="light"] .qibla-section,
+        [data-theme="light"] .prayer-reminder-settings,
+        [data-theme="light"] .prayer-notify-row,
+        [data-theme="light"] .side-panel {
+            background: var(--bg-card);
         }
 
         .progress-category-bar {
@@ -4854,15 +4895,21 @@
             inset: 0;
             z-index: 1200;
             background: var(--bg-dark);
+            opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transform: translateY(10px);
-            transition: transform 0.3s ease;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
         .dua-swipe-viewer.active {
+            opacity: 1;
             visibility: visible;
             pointer-events: auto;
-            transform: translateY(0);
+        }
+        .dua-swipe-viewer.is-closing {
+            pointer-events: none;
+        }
+        [data-theme="light"] .dua-swipe-viewer {
+            background: var(--bg-light);
         }
         .dua-swipe-viewer.active ~ .in-app-back-fab,
         .dua-swipe-viewer.active ~ .in-app-top-fab,
