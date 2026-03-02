@@ -313,7 +313,7 @@
         if (!target) return;
         target.classList.add('tab-fade-target');
         target.classList.add('is-fading');
-        setTimeout(() => target.classList.remove('is-fading'), 150);
+        setTimeout(() => target.classList.remove('is-fading'), 120);
     }
 
     function initBottomNavTouchHandlers() {
@@ -867,6 +867,8 @@
             });
 
             if (!state) {
+                closeAllPanelsForStateApply();
+                switchToHomeTab();
                 updateInAppFabVisibility();
                 return;
             }
@@ -880,6 +882,20 @@
 
             if (currentRoute === IN_APP_VIEWS.QURAN_TAB && state.view === IN_APP_VIEWS.HOME) {
                 closeQuranPanel({ skipHistory: true });
+                switchToHomeTab();
+                updateInAppFabVisibility();
+                return;
+            }
+
+            if (currentRoute === IN_APP_VIEWS.QURAN_TAB && state.view === IN_APP_VIEWS.QURAN_TAB) {
+                closeQuranPanel({ skipHistory: true });
+                switchToHomeTab();
+                updateInAppFabVisibility();
+                return;
+            }
+
+            if (state.view === IN_APP_VIEWS.HOME) {
+                closeAllPanelsForStateApply();
                 switchToHomeTab();
                 updateInAppFabVisibility();
                 return;
@@ -2203,49 +2219,71 @@ window.filterCategory = function(cat, btn) {
         document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
-        // Close all panels first
-        const tp = document.querySelector('.tasbeeh-panel.active');
-        if (tp) { tp.classList.remove('active'); unlockScroll(); }
+        const closeNonTargetPanels = (targetAction) => {
+            const panelTargets = {
+                quran: '.quran-panel.active',
+                prayer: '.prayer-panel.active',
+                routine: '.routine-panel.active',
+                tasbeeh: '.tasbeeh-panel.active'
+            };
+            const targetSelector = panelTargets[targetAction] || null;
 
-        const ep = document.querySelector('.etiquette-panel.active');
-        if (ep) { ep.classList.remove('active'); unlockScroll(); }
+            const tp = document.querySelector('.tasbeeh-panel.active');
+            if (tp && targetSelector !== '.tasbeeh-panel.active') { tp.classList.remove('active'); unlockScroll(); }
 
-        const rp = document.querySelector('.routine-panel.active');
-        if (rp) { rp.classList.remove('active'); unlockScroll(); }
+            const ep = document.querySelector('.etiquette-panel.active');
+            if (ep) { ep.classList.remove('active'); unlockScroll(); }
 
-        const pp = document.querySelector('.prayer-panel.active');
-        if (pp) { pp.classList.remove('active'); unlockScroll(); }
+            const rp = document.querySelector('.routine-panel.active');
+            if (rp && targetSelector !== '.routine-panel.active') { rp.classList.remove('active'); unlockScroll(); }
 
-        const qp = document.querySelector('.quran-panel.active');
-        if (qp) { qp.classList.remove('active'); unlockScroll(); }
+            const pp = document.querySelector('.prayer-panel.active');
+            if (pp && targetSelector !== '.prayer-panel.active') { pp.classList.remove('active'); unlockScroll(); }
 
-        const bp = document.getElementById('bookmarksPanel');
-        const ov = document.querySelector('.overlay');
-        if (bp && bp.classList.contains('active')) {
-            bp.classList.remove('active');
-            if (ov) ov.classList.remove('active');
-            unlockScroll();
-        }
+            const qp = document.querySelector('.quran-panel.active');
+            if (qp && targetSelector !== '.quran-panel.active') { qp.classList.remove('active'); unlockScroll(); }
+
+            const bp = document.getElementById('bookmarksPanel');
+            const ov = document.querySelector('.overlay');
+            if (bp && bp.classList.contains('active')) {
+                bp.classList.remove('active');
+                if (ov) ov.classList.remove('active');
+                unlockScroll();
+            }
+        };
 
         // Now open the requested panel
         switch (action) {
                       case 'home':
+                closeNonTargetPanels('home');
                 backToCategories();
                 scrollActiveViewToTop();
                 break;
             case 'routine':
-                setTimeout(() => openRoutine(), 50);
+                setTimeout(() => {
+                    openRoutine();
+                    setTimeout(() => closeNonTargetPanels('routine'), 90);
+                }, 24);
                 break;
             case 'tasbeeh':
-                setTimeout(() => openTasbeeh(), 50);
+                setTimeout(() => {
+                    openTasbeeh();
+                    setTimeout(() => closeNonTargetPanels('tasbeeh'), 90);
+                }, 24);
                 break;
             case 'quran':
                 setPanelLoading('quran', true, isPashtoMode() ? 'قرآن بارېږي…' : 'Loading Quran…');
-                setTimeout(() => openQuran(), 50);
+                setTimeout(() => {
+                    openQuran();
+                    setTimeout(() => closeNonTargetPanels('quran'), 90);
+                }, 24);
                 break;
             case 'prayer':
                 setPanelLoading('prayer', true, isPashtoMode() ? 'د لمانځه وختونه بارېږي…' : 'Loading Prayer…');
-                setTimeout(() => openPrayer(), 50);
+                setTimeout(() => {
+                    openPrayer();
+                    setTimeout(() => closeNonTargetPanels('prayer'), 90);
+                }, 24);
                 break;
         }
     };
@@ -6960,7 +6998,7 @@ window.filterCategory = function(cat, btn) {
         return map[view] || map.surah;
     }
 
-    function setQuranView(view) {
+    function setQuranView(view, { skipHistory = false } = {}) {
         const allowed = new Set(['surah', 'juz', 'bookmarks', 'settings']);
         const nextView = allowed.has(view) ? view : 'surah';
         quranState.view = nextView;
@@ -7002,7 +7040,7 @@ window.filterCategory = function(cat, btn) {
         else if (nextView === 'settings') renderQuranSettingsSection();
 
         updateInAppFabVisibility();
-        if (document.querySelector('.quran-panel.active')) recordInAppRoute(false);
+        if (!skipHistory && document.querySelector('.quran-panel.active')) recordInAppRoute(false);
     }
 
     function renderQuranSurahRows() {
@@ -8312,7 +8350,7 @@ window.filterCategory = function(cat, btn) {
         renderQuranTexts();
         renderQuranContinueCard();
         renderQuranRecentSection();
-        setQuranView(quranState.view || 'surah');
+        setQuranView(quranState.view || 'surah', { skipHistory: true });
         const pashtoEdition = await ensurePashtoEdition();
         showToast(pashtoEdition ? getQuranUiText().pashtoEditionFound : getQuranUiText().noPashtoFound);
         quranState.initialized = true;
@@ -8342,7 +8380,7 @@ window.filterCategory = function(cat, btn) {
         await initQuran();
         renderQuranContinueCard();
         renderQuranRecentSection();
-        setQuranView(quranState.view || localStorage.getItem(QURAN_ACTIVE_TAB_KEY) || 'surah');
+        setQuranView(quranState.view || localStorage.getItem(QURAN_ACTIVE_TAB_KEY) || 'surah', { skipHistory: true });
         updateQuranFloatingAudioUi();
         recordInAppRoute(true, {
             view: IN_APP_VIEWS.QURAN_TAB

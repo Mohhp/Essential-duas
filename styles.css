@@ -580,7 +580,7 @@
         /* ===== HERO SECTION ===== */
         /* ============================================ */
         .hero {
-            text-align: center; padding: 2.5rem 1rem 1.8rem;
+            text-align: center; padding: 2.5rem 1rem 1.4rem;
             position: relative; overflow: hidden;
         }
         .hero::before {
@@ -845,7 +845,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 14px;
-            padding: 8px 0 10px;
+            padding: 4px 0 10px;
             transition: opacity 0.3s ease;
         }
         .category-grid.hidden-grid { display: none; }
@@ -4455,10 +4455,22 @@
         }
 
         .tab-fade-target {
-            transition: opacity 150ms ease;
+            opacity: 1;
+            transition: opacity 180ms ease;
         }
         .tab-fade-target.is-fading {
-            opacity: 0;
+            opacity: 0.94;
+        }
+
+        body,
+        #mainContainer,
+        .quran-panel,
+        .prayer-panel,
+        .routine-panel,
+        .tasbeeh-panel,
+        .etiquette-panel,
+        .progress-panel {
+            background-color: var(--bg-dark);
         }
 
         .panel-loading-overlay {
@@ -4959,23 +4971,32 @@
         .dua-swipe-back,
         .dua-swipe-arrow {
             position: absolute;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            background: transparent;
-            border-radius: 999px;
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 12px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             opacity: 0;
             cursor: pointer;
-            transition: opacity 0.35s ease, color 0.2s ease;
+            transition: opacity 0.35s ease, color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
             z-index: 4;
             width: 44px;
             height: 44px;
+            padding: 8px 12px;
         }
         .dua-swipe-back:hover,
         .dua-swipe-arrow:hover {
             color: rgba(255, 255, 255, 1);
+        }
+        .dua-swipe-back:active,
+        .dua-swipe-arrow:active {
+            color: rgba(255, 255, 255, 1);
+            background: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.22);
         }
         .dua-swipe-back {
             top: calc(var(--safe-top) + 16px);
@@ -5035,10 +5056,14 @@
         }
         [data-theme="light"] .dua-swipe-back,
         [data-theme="light"] .dua-swipe-arrow {
-            color: rgba(25, 60, 42, 0.52);
+            color: rgba(25, 60, 42, 0.7);
+            border-color: rgba(15, 80, 50, 0.2);
+            background: rgba(255, 255, 255, 0.7);
         }
         [data-theme="light"] .dua-swipe-back:hover,
-        [data-theme="light"] .dua-swipe-arrow:hover { color: rgba(25, 60, 42, 0.95); }
+        [data-theme="light"] .dua-swipe-arrow:hover,
+        [data-theme="light"] .dua-swipe-back:focus-visible,
+        [data-theme="light"] .dua-swipe-arrow:focus-visible { color: rgba(25, 60, 42, 0.95); }
         [data-theme="light"] .dua-swipe-actions {
             background: var(--bg-dark);
             border-top-color: var(--emerald-light);
