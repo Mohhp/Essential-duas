@@ -2960,99 +2960,114 @@
     <button class="etiquette-close" onclick="closePrayer()" aria-label="Close prayer panel">✕</button>
     <div class="prayer-panel-content" id="prayerPanelContent">
         <h2>Prayer Times</h2>
-        <div class="prayer-location-bar" id="prayerLocationBar">
-            <div class="loc-selector">
-                <div class="selected-city-chip" id="selectedCityChip">
-                    <span class="selected-city-pin" aria-hidden="true">📍</span>
-                    <span class="selected-city-text" id="selectedCityText">No city selected</span>
-                    <button type="button" class="selected-city-change" id="selectedCityChange" onclick="showPrayerCitySearch()">Change</button>
+        <div class="prayer-subtabs" id="prayerSubtabs" role="tablist" aria-label="Prayer sections">
+            <button type="button" class="prayer-subtab active" id="prayerSubtabTimes" data-prayer-tab="times" role="tab" aria-selected="true">🕌 Times</button>
+            <button type="button" class="prayer-subtab" id="prayerSubtabQibla" data-prayer-tab="qibla" role="tab" aria-selected="false">🧭 Qibla</button>
+            <button type="button" class="prayer-subtab" id="prayerSubtabReminders" data-prayer-tab="reminders" role="tab" aria-selected="false">🔔 Reminders</button>
+        </div>
+
+        <div class="prayer-subtab-pane prayer-tab-times active" id="prayerTabTimes" role="tabpanel">
+            <div class="prayer-location-bar" id="prayerLocationBar">
+                <div class="loc-selector">
+                    <div class="selected-city-chip" id="selectedCityChip">
+                        <span class="selected-city-pin" aria-hidden="true">📍</span>
+                        <span class="selected-city-text" id="selectedCityText">No city selected</span>
+                        <button type="button" class="selected-city-change" id="selectedCityChange" onclick="showPrayerCitySearch()">Change</button>
+                    </div>
+                    <div class="city-search-shell" id="citySearchShell" role="combobox" aria-expanded="false" aria-controls="cityDropdown" aria-haspopup="listbox">
+                        <span class="city-search-icon" aria-hidden="true">🔎</span>
+                        <input type="text" id="citySearchInput" class="city-search-input" placeholder="Search city... / ښار ولټوئ..." autocomplete="off" aria-label="Search city for prayer times">
+                    </div>
+                    <div class="city-dropdown" id="cityDropdown"></div>
                 </div>
-                <div class="city-search-shell" id="citySearchShell" role="combobox" aria-expanded="false" aria-controls="cityDropdown" aria-haspopup="listbox">
-                    <span class="city-search-icon" aria-hidden="true">🔎</span>
-                    <input type="text" id="citySearchInput" class="city-search-input" placeholder="Search city... / ښار ولټوئ..." autocomplete="off" aria-label="Search city for prayer times">
+            </div>
+            <div class="prayer-countdown-card" id="prayerCountdown">
+                <div class="prayer-countdown-label">Next Prayer</div>
+                <div class="prayer-countdown-name" id="nextPrayerName">--</div>
+                <div class="prayer-countdown-time" id="nextPrayerCountdown">--:--:--</div>
+            </div>
+            <div class="prayer-times-grid" id="prayerTimesGrid"></div>
+        </div>
+
+        <div class="prayer-subtab-pane prayer-tab-qibla" id="prayerTabQibla" role="tabpanel">
+            <div class="qibla-section" id="qiblaSection">
+                <div class="qibla-title">Qibla Direction</div>
+                <div class="qibla-compass" id="qiblaCompass">
+                    <div class="qibla-compass-inner-shadow"></div>
+                    <div class="qibla-outer-ring"></div>
+                    <div class="qibla-degree-ring" id="qiblaDegreeRing"></div>
+                    <div class="qibla-direction-label compass-n"><span>N</span><small>ش</small></div>
+                    <div class="qibla-direction-label compass-s"><span>S</span><small>ج</small></div>
+                    <div class="qibla-direction-label compass-e"><span>E</span><small>خت</small></div>
+                    <div class="qibla-direction-label compass-w"><span>W</span><small>لو</small></div>
+                    <div class="qibla-marker" id="qiblaMarker" aria-hidden="true"><span>🕋</span></div>
+                    <div class="qibla-arrow" id="qiblaArrow"></div>
+                    <div class="qibla-center-dot" aria-hidden="true"></div>
                 </div>
-                <div class="city-dropdown" id="cityDropdown"></div>
+                <div class="qibla-location" id="qiblaLocation">--</div>
+                <div class="qibla-degree" id="qiblaDegree">--°</div>
+                <div class="qibla-status" id="qiblaStatus">Enable location to see Qibla</div>
+                <div class="qibla-instruction" id="qiblaInstruction">Hold your phone flat and rotate until the needle points to the Qibla marker.</div>
             </div>
         </div>
-        <div class="prayer-countdown-card" id="prayerCountdown">
-            <div class="prayer-countdown-label">Next Prayer</div>
-            <div class="prayer-countdown-name" id="nextPrayerName">--</div>
-            <div class="prayer-countdown-time" id="nextPrayerCountdown">--:--:--</div>
-        </div>
-        <div class="prayer-times-grid" id="prayerTimesGrid"></div>
-        <div class="qibla-section" id="qiblaSection">
-            <div class="qibla-title">Qibla Direction</div>
-            <div class="qibla-compass" id="qiblaCompass">
-                <div class="qibla-compass-inner-shadow"></div>
-                <div class="qibla-outer-ring"></div>
-                <div class="qibla-degree-ring" id="qiblaDegreeRing"></div>
-                <div class="qibla-direction-label compass-n"><span>N</span><small>ش</small></div>
-                <div class="qibla-direction-label compass-s"><span>S</span><small>ج</small></div>
-                <div class="qibla-direction-label compass-e"><span>E</span><small>خت</small></div>
-                <div class="qibla-direction-label compass-w"><span>W</span><small>لو</small></div>
-                <div class="qibla-marker" id="qiblaMarker" aria-hidden="true"><span>🕋</span></div>
-                <div class="qibla-arrow" id="qiblaArrow"></div>
-                <div class="qibla-center-dot" aria-hidden="true"></div>
-            </div>
-            <div class="qibla-degree" id="qiblaDegree">--°</div>
-            <div class="qibla-status" id="qiblaStatus">Enable location to see Qibla</div>
-            <div class="qibla-instruction" id="qiblaInstruction">Hold your phone flat and rotate until the needle points to the Qibla marker.</div>
-        </div>
-        <div class="prayer-reminder-settings" id="prayerReminderSettings">
-            <div class="prayer-reminder-title" id="reminderSettingsTitle">Prayer reminders</div>
-            <div class="prayer-notify-row">
-                <span class="prayer-notify-label" id="reminderMasterLabel">🔔 Prayer alerts</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="notifyToggle">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
 
-            <div class="prayer-reminder-grid">
-                <label class="prayer-reminder-item">
-                    <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-fajr">Fajr</span><span class="reminder-bell" id="remBell-fajr" aria-hidden="true">🔔</span></span>
-                    <input type="checkbox" id="remPrayer-fajr" checked>
-                </label>
-                <label class="prayer-reminder-item">
-                    <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-dhuhr">Dhuhr</span><span class="reminder-bell" id="remBell-dhuhr" aria-hidden="true">🔔</span></span>
-                    <input type="checkbox" id="remPrayer-dhuhr" checked>
-                </label>
-                <label class="prayer-reminder-item">
-                    <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-asr">Asr</span><span class="reminder-bell" id="remBell-asr" aria-hidden="true">🔔</span></span>
-                    <input type="checkbox" id="remPrayer-asr" checked>
-                </label>
-                <label class="prayer-reminder-item">
-                    <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-maghrib">Maghrib</span><span class="reminder-bell" id="remBell-maghrib" aria-hidden="true">🔔</span></span>
-                    <input type="checkbox" id="remPrayer-maghrib" checked>
-                </label>
-                <label class="prayer-reminder-item">
-                    <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-isha">Isha</span><span class="reminder-bell" id="remBell-isha" aria-hidden="true">🔔</span></span>
-                    <input type="checkbox" id="remPrayer-isha" checked>
-                </label>
-            </div>
-
-            <div class="prayer-reminder-controls">
-                <label for="reminderSoundSelect" id="reminderSoundLabel">Reminder Sound / د یادونې غږ</label>
-                <div class="reminder-sound-row">
-                    <select id="reminderSoundSelect" class="prayer-reminder-select" aria-label="Reminder Sound / د یادونې غږ"></select>
-                    <button type="button" id="reminderSoundPreviewBtn" class="reminder-sound-preview-btn" aria-label="Preview reminder sound">🔊</button>
+        <div class="prayer-subtab-pane prayer-tab-reminders" id="prayerTabReminders" role="tabpanel">
+            <div class="prayer-reminder-settings" id="prayerReminderSettings">
+                <div class="prayer-reminder-title" id="reminderSettingsTitle">Prayer reminders</div>
+                <div class="prayer-notify-row">
+                    <span class="prayer-notify-label" id="reminderMasterLabel">🔔 Prayer alerts</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notifyToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
                 </div>
-                <label class="prayer-reminder-item reminder-compact-toggle">
-                    <span class="reminder-prayer-label-wrap"><span id="sameSoundAllLabel">Same sound for all prayers</span></span>
-                    <input type="checkbox" id="sameSoundForAllToggle" checked>
-                </label>
 
-                <label for="reminderBefore" id="reminderBeforeLabel">Remind me</label>
-                <select id="reminderBefore" class="prayer-reminder-select">
-                    <option value="0">At time</option>
-                    <option value="5">5 min before</option>
-                    <option value="10">10 min before</option>
-                    <option value="15">15 min before</option>
-                </select>
-            </div>
+                <div class="prayer-reminder-grid">
+                    <label class="prayer-reminder-item">
+                        <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-fajr">Fajr</span><span class="reminder-bell" id="remBell-fajr" aria-hidden="true">🔔</span></span>
+                        <input type="checkbox" id="remPrayer-fajr" checked>
+                    </label>
+                    <label class="prayer-reminder-item">
+                        <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-dhuhr">Dhuhr</span><span class="reminder-bell" id="remBell-dhuhr" aria-hidden="true">🔔</span></span>
+                        <input type="checkbox" id="remPrayer-dhuhr" checked>
+                    </label>
+                    <label class="prayer-reminder-item">
+                        <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-asr">Asr</span><span class="reminder-bell" id="remBell-asr" aria-hidden="true">🔔</span></span>
+                        <input type="checkbox" id="remPrayer-asr" checked>
+                    </label>
+                    <label class="prayer-reminder-item">
+                        <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-maghrib">Maghrib</span><span class="reminder-bell" id="remBell-maghrib" aria-hidden="true">🔔</span></span>
+                        <input type="checkbox" id="remPrayer-maghrib" checked>
+                    </label>
+                    <label class="prayer-reminder-item">
+                        <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-isha">Isha</span><span class="reminder-bell" id="remBell-isha" aria-hidden="true">🔔</span></span>
+                        <input type="checkbox" id="remPrayer-isha" checked>
+                    </label>
+                </div>
 
-            <div class="prayer-reminder-test-wrap">
-                <button type="button" id="reminderTestBtn" class="prayer-reminder-test-btn">Test Reminder</button>
+                <div class="prayer-reminder-controls">
+                    <label for="reminderSoundSelect" id="reminderSoundLabel">Reminder Sound / د یادونې غږ</label>
+                    <div class="reminder-sound-row">
+                        <select id="reminderSoundSelect" class="prayer-reminder-select" aria-label="Reminder Sound / د یادونې غږ"></select>
+                        <button type="button" id="reminderSoundPreviewBtn" class="reminder-sound-preview-btn" aria-label="Preview reminder sound">🔊</button>
+                    </div>
+                    <label class="prayer-reminder-item reminder-compact-toggle">
+                        <span class="reminder-prayer-label-wrap"><span id="sameSoundAllLabel">Same sound for all prayers</span></span>
+                        <input type="checkbox" id="sameSoundForAllToggle" checked>
+                    </label>
+
+                    <label for="reminderBefore" id="reminderBeforeLabel">Remind me</label>
+                    <select id="reminderBefore" class="prayer-reminder-select">
+                        <option value="0">At time</option>
+                        <option value="5">5 min before</option>
+                        <option value="10">10 min before</option>
+                        <option value="15">15 min before</option>
+                    </select>
+                </div>
+
+                <div class="prayer-reminder-test-wrap">
+                    <button type="button" id="reminderTestBtn" class="prayer-reminder-test-btn">Test Reminder</button>
+                </div>
             </div>
         </div>
     </div>

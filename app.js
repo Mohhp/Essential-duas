@@ -4349,6 +4349,7 @@ window.filterCategory = function(cat, btn) {
     let compassEventTimer = null;
     let latestCompassHeading = null;
     let currentNeedleRotation = 0;
+    const PRAYER_SUBTAB_STORAGE_KEY = 'crown_prayer_active_tab';
 
     function escapeHtml(value) {
         return String(value || '')
@@ -4726,8 +4727,55 @@ window.filterCategory = function(cat, btn) {
             qiblaRotateHint: isPS ? 'موبایل وڅرخوئ — ستنه د قبلې نښې ته برابره کړئ' : 'Rotate phone until needle aligns with Qibla marker',
             qiblaNeedleHint: isPS ? 'موبایل مو هوار ونیسئ او ورو یې وڅرخوئ' : 'Hold your phone flat and rotate gently',
             change: isPS ? 'بدل' : 'Change',
-            noCitySelected: isPS ? 'ښار نه دی ټاکل شوی' : 'No city selected'
+            noCitySelected: isPS ? 'ښار نه دی ټاکل شوی' : 'No city selected',
+            tabTimes: isPS ? '🕌 وختونه' : '🕌 Times',
+            tabQibla: isPS ? '🧭 قبله' : '🧭 Qibla',
+            tabReminders: isPS ? '🔔 یادونې' : '🔔 Reminders'
         };
+    }
+
+    function setQiblaLocationText(text) {
+        const qiblaLoc = document.getElementById('qiblaLocation');
+        if (!qiblaLoc) return;
+        qiblaLoc.textContent = text || '--';
+    }
+
+    function getSavedPrayerTab() {
+        const raw = localStorage.getItem(PRAYER_SUBTAB_STORAGE_KEY) || 'times';
+        return ['times', 'qibla', 'reminders'].includes(raw) ? raw : 'times';
+    }
+
+    function setPrayerSubtab(tabName, persist = true) {
+        const active = ['times', 'qibla', 'reminders'].includes(tabName) ? tabName : 'times';
+        document.querySelectorAll('.prayer-subtab').forEach((btn) => {
+            const isActive = btn.dataset.prayerTab === active;
+            btn.classList.toggle('active', isActive);
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        const paneMap = {
+            times: 'prayerTabTimes',
+            qibla: 'prayerTabQibla',
+            reminders: 'prayerTabReminders'
+        };
+        Object.values(paneMap).forEach((id) => {
+            const pane = document.getElementById(id);
+            if (pane) pane.classList.toggle('active', id === paneMap[active]);
+        });
+        if (persist) localStorage.setItem(PRAYER_SUBTAB_STORAGE_KEY, active);
+    }
+
+    function initPrayerSubtabs() {
+        const root = document.getElementById('prayerSubtabs');
+        if (!root) return;
+        if (root.dataset.boundTabs !== '1') {
+            root.querySelectorAll('.prayer-subtab').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    setPrayerSubtab(btn.dataset.prayerTab || 'times', true);
+                });
+            });
+            root.dataset.boundTabs = '1';
+        }
+        setPrayerSubtab(getSavedPrayerTab(), false);
     }
 
     function setCitySearchVisibility(visible) {
@@ -5024,6 +5072,7 @@ window.filterCategory = function(cat, btn) {
                 const country = isPashtoMode() ? match.countryPs : match.countryEn;
                 const cityText = `${getCityDisplayName(match)} · ${country}`;
                 setSelectedCityChip(cityText);
+                setQiblaLocationText(cityText);
                 input.title = uiText.changeLocationTitle;
                 setCitySearchVisibility(false);
                 return;
@@ -5032,6 +5081,7 @@ window.filterCategory = function(cat, btn) {
         const fallback = loc?.city || (typeof loc?.lat === 'number' && typeof loc?.lng === 'number' ? `${loc.lat.toFixed(2)}°, ${loc.lng.toFixed(2)}°` : uiText.noCitySelected);
         input.value = fallback;
         setSelectedCityChip(fallback);
+        setQiblaLocationText(fallback);
         input.title = uiText.changeLocationTitle;
         setCitySearchVisibility(!loc?.city && !loc?.cityKey);
     }
@@ -5212,6 +5262,13 @@ window.filterCategory = function(cat, btn) {
         const title = document.querySelector('.prayer-panel-content h2');
         if (title) title.textContent = isPashtoMode() ? ((typeof PS_UI !== 'undefined' && PS_UI.prayerTimesTitle) ? PS_UI.prayerTimesTitle : 'د لمونځ وختونه') : 'Prayer Times';
 
+        const tabTimes = document.getElementById('prayerSubtabTimes');
+        const tabQibla = document.getElementById('prayerSubtabQibla');
+        const tabReminders = document.getElementById('prayerSubtabReminders');
+        if (tabTimes) tabTimes.textContent = uiText.tabTimes;
+        if (tabQibla) tabQibla.textContent = uiText.tabQibla;
+        if (tabReminders) tabReminders.textContent = uiText.tabReminders;
+
         renderPrayerGrid();
         updateCountdown();
         refreshReminderControlLanguage();
@@ -5220,6 +5277,7 @@ window.filterCategory = function(cat, btn) {
         if (ring) ring.dataset.built = '0';
         buildQiblaDegreeRing();
         if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
+        initPrayerSubtabs();
     };
 
     function renderPrayerSkeleton() {
@@ -5270,6 +5328,7 @@ window.filterCategory = function(cat, btn) {
         if (closeBtn) closeBtn.focus();
         initReminderControls();
         initCitySelector();
+        initPrayerSubtabs();
         preloadPrayerReminderAudio();
         if (typeof window.refreshPrayerLanguage === 'function') window.refreshPrayerLanguage();
         renderPrayerSkeleton();
