@@ -3969,70 +3969,62 @@ window.filterCategory = function(cat, btn) {
     // ===== PRAYER TIMES & QIBLA =====
     const PRAYER_NAMES = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'];
     const REMINDER_PRAYERS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
-    const REMINDER_AUDIO_FILES = {
-        adhan: 'audio/adhan-alert.wav',
-        tone: 'audio/notification-tone.wav'
-    };
     const REMINDER_SOUND_OPTIONS = [
         {
-            id: 'adhan_mishary',
+            id: 'adhan-alafasy',
             labelEn: 'Full Adhan — Mishary Rashid Alafasy',
             labelPs: 'بشپړ اذان — مشاري راشد العفاسي',
-            source: 'remote',
-            url: 'https://server8.mp3quran.net/afs/001.mp3',
-            clipStart: 0,
-            clipDuration: 30
+            source: 'local',
+            file: 'audio/reminders/adhan-alafasy.mp3',
+            clipDuration: 40
         },
         {
-            id: 'adhan_abdulbasit',
+            id: 'adhan-abdulbasit',
             labelEn: 'Full Adhan — Abdul Basit',
             labelPs: 'بشپړ اذان — عبدالباسط',
-            source: 'remote',
-            url: 'https://server7.mp3quran.net/basit/001.mp3',
-            clipStart: 0,
-            clipDuration: 30
+            source: 'local',
+            file: 'audio/reminders/adhan-abdulbasit.mp3',
+            clipDuration: 40
         },
         {
-            id: 'adhan_short',
+            id: 'adhan-short',
             labelEn: 'Short Adhan (Opening Takbeer)',
             labelPs: 'لنډ اذان (د تکبیر پیل)',
-            source: 'remote',
-            url: 'https://server8.mp3quran.net/afs/001.mp3',
-            clipStart: 0,
+            source: 'local',
+            file: 'audio/reminders/adhan-short.mp3',
             clipDuration: 10
         },
         {
             id: 'takbeer',
             labelEn: 'Takbeer Only',
             labelPs: 'یوازې تکبیر',
-            source: 'remote',
-            url: 'https://server8.mp3quran.net/afs/001.mp3',
-            clipStart: 0,
+            source: 'local',
+            file: 'audio/reminders/takbeer.mp3',
             clipDuration: 5
         },
         {
-            id: 'nasheed_soft',
+            id: 'nasheed',
             labelEn: 'Soft Islamic Nasheed',
             labelPs: 'نرم اسلامي نشید',
-            source: 'synth',
-            synth: 'nasheed',
+            source: 'local',
+            file: 'audio/reminders/nasheed-tone.mp3',
             clipDuration: 8
         },
         {
-            id: 'bell_chime',
+            id: 'bell',
             labelEn: 'Simple Bell Chime',
             labelPs: 'ساده زنګ',
-            source: 'synth',
-            synth: 'bell',
+            source: 'local',
+            file: 'audio/reminders/bell-chime.mp3',
             clipDuration: 5
         },
         {
-            id: 'soft_ding',
+            id: 'ding',
             labelEn: 'Soft Ding',
             labelPs: 'نرم ډینګ',
-            source: 'synth',
-            synth: 'ding',
-            clipDuration: 4
+            source: 'local',
+            file: 'audio/reminders/soft-ding.mp3',
+            clipDuration: 2
         },
         {
             id: 'silent',
@@ -4042,6 +4034,15 @@ window.filterCategory = function(cat, btn) {
             clipDuration: 0
         }
     ];
+    const LEGACY_REMINDER_SOUND_ID_MAP = {
+        adhan_mishary: 'adhan-alafasy',
+        adhan_abdulbasit: 'adhan-abdulbasit',
+        adhan_short: 'adhan-short',
+        takbeer: 'takbeer',
+        nasheed_soft: 'nasheed',
+        bell_chime: 'bell',
+        soft_ding: 'ding'
+    };
     const PRAYER_LABELS_EN = { fajr: 'Fajr', sunrise: 'Sunrise', dhuhr: 'Dhuhr', asr: 'Asr', maghrib: 'Maghrib', isha: 'Isha' };
     const PRAYER_LABELS_PS = { fajr: 'سهار', sunrise: 'لمر ختل', dhuhr: 'غرمه', asr: 'مازديګر', maghrib: 'ماښام', isha: 'ماخستن' };
     const PRAYER_ICONS = { fajr: '🌅', sunrise: '☀️', dhuhr: '🕛', asr: '🌤', maghrib: '🌇', isha: '🌙' };
@@ -4432,9 +4433,9 @@ window.filterCategory = function(cat, btn) {
 
     function preloadPrayerReminderAudio() {
         REMINDER_SOUND_OPTIONS.forEach((option) => {
-            if (option.source !== 'remote' || !option.url || reminderAudio[option.id]) return;
-            const audio = new Audio(option.url);
-            audio.preload = 'metadata';
+            if (option.id === 'silent' || !option.file || reminderAudio[option.id]) return;
+            const audio = new Audio(option.file);
+            audio.preload = 'auto';
             reminderAudio[option.id] = audio;
         });
         window.reminderAudio = reminderAudio;
@@ -4519,11 +4520,7 @@ window.filterCategory = function(cat, btn) {
             ? maxDuration
             : Math.max(1, Number(option.clipDuration) || 8);
 
-        if (option.source === 'synth') {
-            return playSyntheticReminderTone(option.synth || 'ding', durationSeconds);
-        }
-
-        const src = option.url || option.file;
+        const src = option.file;
         if (!src) return null;
 
         const audio = isPreview ? new Audio(src) : (reminderAudio[option.id] || new Audio(src));
@@ -4582,7 +4579,8 @@ window.filterCategory = function(cat, btn) {
     }
 
     function getReminderSoundOption(soundId) {
-        return REMINDER_SOUND_OPTIONS.find(option => option.id === soundId) || REMINDER_SOUND_OPTIONS[0];
+        const normalized = LEGACY_REMINDER_SOUND_ID_MAP[soundId] || soundId;
+        return REMINDER_SOUND_OPTIONS.find(option => option.id === normalized) || REMINDER_SOUND_OPTIONS[0];
     }
 
     function getReminderSoundLabel(soundId) {
@@ -4599,7 +4597,7 @@ window.filterCategory = function(cat, btn) {
         select.innerHTML = REMINDER_SOUND_OPTIONS.map((option) => (`
             <option value="${option.id}">${escapeHtml(getReminderSoundLabel(option.id))}</option>
         `)).join('');
-        select.value = settings.soundId || 'adhan_mishary';
+        select.value = settings.soundId || 'adhan-alafasy';
 
         if (previewBtn) {
             const selected = getReminderSoundOption(select.value);
@@ -4750,14 +4748,14 @@ window.filterCategory = function(cat, btn) {
         return {
             enabled: false,
             mode: 'tone',
-            soundId: 'adhan_mishary',
+            soundId: 'adhan-alafasy',
             sameSoundForAll: true,
             prayerSounds: {
-                fajr: 'adhan_mishary',
-                dhuhr: 'adhan_short',
-                asr: 'adhan_short',
+                fajr: 'adhan-alafasy',
+                dhuhr: 'adhan-short',
+                asr: 'adhan-short',
                 maghrib: 'takbeer',
-                isha: 'nasheed_soft'
+                isha: 'nasheed'
             },
             offsetMinutes: 0,
             prayers: {
@@ -4774,16 +4772,24 @@ window.filterCategory = function(cat, btn) {
         if (reminderSettings) return reminderSettings;
         const defaults = getReminderDefaults();
         const validSoundIds = REMINDER_SOUND_OPTIONS.map(option => option.id);
+        const normalizeSoundId = (soundId) => {
+            const normalized = LEGACY_REMINDER_SOUND_ID_MAP[soundId] || soundId;
+            return validSoundIds.includes(normalized) ? normalized : defaults.soundId;
+        };
         try {
             const raw = JSON.parse(localStorage.getItem('crown_prayer_reminders') || 'null');
             reminderSettings = {
                 enabled: !!raw?.enabled,
                 mode: ['adhan', 'tone', 'silent'].includes(raw?.mode) ? raw.mode : defaults.mode,
-                soundId: validSoundIds.includes(raw?.soundId) ? raw.soundId : defaults.soundId,
+                soundId: normalizeSoundId(raw?.soundId),
                 sameSoundForAll: typeof raw?.sameSoundForAll === 'boolean' ? raw.sameSoundForAll : defaults.sameSoundForAll,
                 prayerSounds: {
                     ...defaults.prayerSounds,
-                    ...Object.fromEntries(Object.entries(raw?.prayerSounds || {}).filter(([name, soundId]) => REMINDER_PRAYERS.includes(name) && validSoundIds.includes(soundId)))
+                    ...Object.fromEntries(
+                        Object.entries(raw?.prayerSounds || {})
+                            .filter(([name]) => REMINDER_PRAYERS.includes(name))
+                            .map(([name, soundId]) => [name, normalizeSoundId(soundId)])
+                    )
                 },
                 offsetMinutes: [0, 5, 10, 15].includes(Number(raw?.offsetMinutes)) ? Number(raw.offsetMinutes) : defaults.offsetMinutes,
                 prayers: {
@@ -5745,8 +5751,8 @@ window.filterCategory = function(cat, btn) {
     function resolveReminderSoundId(prayerName = null) {
         const settings = loadReminderSettings();
         if ((settings.soundId || '') === 'silent') return 'silent';
-        if (settings.sameSoundForAll || !prayerName) return settings.soundId || 'adhan_mishary';
-        return settings.prayerSounds?.[prayerName] || settings.soundId || 'adhan_mishary';
+        if (settings.sameSoundForAll || !prayerName) return settings.soundId || 'adhan-alafasy';
+        return settings.prayerSounds?.[prayerName] || settings.soundId || 'adhan-alafasy';
     }
 
     function playReminderSound(soundId) {

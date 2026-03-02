@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essential-duas-v48';
+const CACHE_NAME = 'essential-duas-v49';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
 
@@ -16,8 +16,13 @@ const ASSETS = [
   './icon-512.png',
   './favicon.svg',
   './pashto.js',
-  './audio/adhan-alert.wav',
-  './audio/notification-tone.wav',
+  './audio/reminders/adhan-alafasy.mp3',
+  './audio/reminders/adhan-abdulbasit.mp3',
+  './audio/reminders/adhan-short.mp3',
+  './audio/reminders/takbeer.mp3',
+  './audio/reminders/nasheed-tone.mp3',
+  './audio/reminders/bell-chime.mp3',
+  './audio/reminders/soft-ding.mp3',
   './audio/duas/dua-11.mp3',
   './audio/duas/dua-12.mp3',
   './audio/duas/dua-13.mp3',
