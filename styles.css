@@ -4377,14 +4377,14 @@
             position: fixed;
             inset: 0;
             z-index: 1200;
-            background: transparent;
-            opacity: 0;
+            background: var(--bg-dark);
+            visibility: hidden;
             pointer-events: none;
             transform: translateY(10px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: transform 0.3s ease;
         }
         .dua-swipe-viewer.active {
-            opacity: 1;
+            visibility: visible;
             pointer-events: auto;
             transform: translateY(0);
         }
@@ -4400,7 +4400,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: rgba(46, 196, 122, 0.08);
+            background: var(--bg-surface);
             z-index: 3;
         }
         .dua-swipe-progress-fill {
@@ -4418,6 +4418,7 @@
             right: 0;
             overflow: hidden;
             padding: 0 14px;
+            background: var(--bg-dark);
         }
         .dua-swipe-track {
             display: flex;
@@ -4425,6 +4426,7 @@
             height: 100%;
             will-change: transform;
             touch-action: pan-y;
+            background: var(--bg-dark);
         }
         .dua-swipe-slide {
             flex: 0 0 calc(100% - 32px);
@@ -4436,8 +4438,8 @@
             display: flex;
             flex-direction: column;
             border-radius: var(--radius-lg);
-            background: var(--bg-card);
-            border: 1px solid rgba(46, 196, 122, 0.14);
+            background: var(--bg-surface);
+            border: 1px solid var(--emerald-light);
             box-shadow: var(--shadow-card);
             overflow: hidden;
             position: relative;
@@ -4447,9 +4449,9 @@
             position: absolute;
             inset: 8px;
             border-radius: calc(var(--radius-lg) - 4px);
-            border: 1px solid rgba(201, 168, 76, 0.14);
+            border: 1px solid var(--gold-dark);
             pointer-events: none;
-            opacity: 0.35;
+            opacity: 1;
         }
 
         .dua-swipe-meta,
@@ -4472,15 +4474,16 @@
             font-family: var(--font-title);
             font-size: 0.62rem;
             color: var(--text-faint);
-            border: 1px solid rgba(46, 196, 122, 0.15);
+            border: 1px solid var(--emerald-light);
             border-radius: 999px;
             padding: 3px 8px;
             cursor: pointer;
+            background: var(--bg-surface);
         }
         .dua-swipe-read.active {
             color: var(--emerald-light);
-            border-color: rgba(46, 196, 122, 0.35);
-            background: rgba(46, 196, 122, 0.08);
+            border-color: var(--emerald-light);
+            background: var(--bg-dark);
         }
 
         .dua-swipe-title {
@@ -4492,10 +4495,11 @@
         .dua-swipe-auth {
             font-size: 0.64rem;
             color: var(--text-subtle);
-            border: 1px solid rgba(201, 168, 76, 0.24);
+            border: 1px solid var(--gold-dark);
             border-radius: 999px;
             padding: 3px 8px;
             white-space: nowrap;
+            background: var(--bg-surface);
         }
 
         .dua-swipe-content {
@@ -4505,8 +4509,13 @@
             position: relative;
             z-index: 1;
             -webkit-overflow-scrolling: touch;
+            background: var(--bg-surface);
         }
         .dua-swipe-content .card-body-inner { padding: 0 14px 6px; }
+        .dua-swipe-content .arabic-container { background: var(--bg-dark); }
+        .dua-swipe-content .virtue-tag,
+        .dua-swipe-content .virtue-tag-ps,
+        .dua-swipe-content .how-to-box { background: var(--bg-dark); }
         .dua-swipe-content .arabic-text {
             font-size: calc(2.05rem * var(--font-scale));
             line-height: 2.2;
@@ -4523,8 +4532,8 @@
             display: flex;
             gap: 6px;
             padding: 10px 10px 12px;
-            border-top: 1px solid rgba(46, 196, 122, 0.08);
-            background: linear-gradient(180deg, rgba(20, 36, 27, 0.08), rgba(20, 36, 27, 0.2));
+            border-top: 1px solid var(--emerald-light);
+            background: var(--bg-dark);
             flex-wrap: wrap;
             justify-content: center;
         }
@@ -4546,16 +4555,14 @@
         .dua-swipe-back,
         .dua-swipe-arrow {
             position: absolute;
-            border: 1px solid rgba(46, 196, 122, 0.22);
+            border: 1px solid var(--emerald-light);
             color: var(--text-primary);
-            background: rgba(12, 26, 19, 0.45);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            background: var(--bg-dark);
             border-radius: 999px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            opacity: 0.4;
+            opacity: 1;
             cursor: pointer;
             transition: opacity 0.25s ease, transform 0.25s ease;
             z-index: 4;
@@ -4597,9 +4604,9 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: rgba(46, 196, 122, 0.2);
+            background: var(--text-subtle);
         }
-        .dua-swipe-dot.active { background: rgba(46, 196, 122, 0.9); }
+        .dua-swipe-dot.active { background: var(--emerald-light); }
 
         .dua-swipe-empty {
             margin: auto;
@@ -4608,23 +4615,28 @@
             letter-spacing: 1px;
         }
 
+        [data-theme="light"] .dua-swipe-viewer,
+        [data-theme="light"] .dua-swipe-shell,
+        [data-theme="light"] .dua-swipe-track {
+            background: var(--bg-dark);
+        }
         [data-theme="light"] .dua-swipe-card {
-            border-color: rgba(13, 123, 80, 0.14);
-            background: rgba(255, 251, 244, 0.96);
+            border-color: var(--emerald-light);
+            background: var(--bg-surface);
         }
         [data-theme="light"] .dua-swipe-card::before {
-            border-color: rgba(13, 123, 80, 0.11);
-            opacity: 0.42;
+            border-color: var(--gold-dark);
+            opacity: 1;
         }
         [data-theme="light"] .dua-swipe-back,
         [data-theme="light"] .dua-swipe-arrow {
-            background: rgba(255, 255, 255, 0.78);
-            border-color: rgba(13, 123, 80, 0.2);
+            background: var(--bg-surface);
+            border-color: var(--emerald-light);
             color: var(--text-primary);
         }
         [data-theme="light"] .dua-swipe-actions {
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(247, 241, 232, 0.7));
-            border-top-color: rgba(13, 123, 80, 0.12);
+            background: var(--bg-dark);
+            border-top-color: var(--emerald-light);
         }
 
         @media (max-width: 640px) {
