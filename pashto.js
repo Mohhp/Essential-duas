@@ -138,12 +138,17 @@ const PS_UI = {
     },
     // Routine
     routineTitle: 'وړاندیز شوی ورځنی معمول',
+    routineDuaOfDay: 'د ورځې دعا',
     routineMorning: '🌅 سهار (د فجر وروسته)',
     routineEvening: '🌇 ماښام (د عصر/مغرب وروسته)',
     routinePrayer: '🕌 په هر لمونځ کې',
     routineSleep: '🌙 د ویده کېدو دمخه',
     routineDhikr: '📿 ورځنی ذکر',
     routineEveningSame: 'د سهار اذکار په شان، سربېره پر دې:',
+    routineExpandPrompt: 'د ژباړې او حوالو د پراخولو لپاره ټک وکړئ ↓',
+    routineHidePrompt: 'د جزئیاتو د پټولو لپاره ټک وکړئ ↑',
+    routineUseTasbeeh: 'د تسبیح شمېرونکی وکاروئ',
+    routineOften: 'هر څومره ډېر وي، هومره ښه',
     // Progress
     yourJourney: 'ستاسو سفر',
     duasRead: 'لوستل شوې دعاګانې',
@@ -201,7 +206,15 @@ const PS_UI = {
         'Image downloaded!': 'انځور ډاونلوډ شو!',
         'Memorize Mode ON — tap Arabic to reveal': 'حفظ حالت فعال — عربي ښکاره کولو لپاره ټک وکړئ',
         'Memorize Mode OFF': 'حفظ حالت غیر فعال',
-        'Will review again tomorrow': 'سبا بیا بیاکتنه'
+        'Will review again tomorrow': 'سبا بیا بیاکتنه',
+        'Tasbeeh click sound ON': 'د تسبیح غږ فعال شو',
+        'Tasbeeh click sound OFF': 'د تسبیح غږ بند شو',
+        'No duas available': 'هیڅ دعا شتون نه لري',
+        'Dark Mode': 'تیاره حالت',
+        'Light Mode': 'روښانه حالت',
+        'Share template unavailable': 'د شریکولو قالب شتون نه لري',
+        'Audio not available for this reciter': 'د دې قاري لپاره غږ شتون نه لري',
+        'Review session complete': 'د بیاکتنې ناسته بشپړه شوه'
     },
     // Time banner
     timeBanner: {
@@ -262,6 +275,12 @@ const PS_UI = {
     srDays: 'ورځو کې',
     srTomorrow: 'سبا بیا بیاکتنه',
     srDue: 'پکار',
+    memFlip: 'واړوئ',
+    memPrev: '← شاته',
+    memNext: 'بل →',
+    memEasy: 'اسانه',
+    memGood: 'ښه',
+    memHard: 'ستونزمنه',
     // Daily dua share
     shareDailyDua: '↗ د نن دعا شریکه کړئ',
     // Progress share
@@ -1072,6 +1091,10 @@ function applyLanguage(lang) {
     if (typeof window.refreshPrayerLanguage === 'function') window.refreshPrayerLanguage();
     if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
     if (typeof window.refreshQuranLanguage === 'function') window.refreshQuranLanguage();
+    if (typeof window.refreshRoutineLanguage === 'function') window.refreshRoutineLanguage();
+    if (typeof window.refreshEtiquetteLanguage === 'function') window.refreshEtiquetteLanguage();
+    if (typeof window.refreshProgressLanguage === 'function') window.refreshProgressLanguage();
+    if (typeof window.refreshMemorizeLanguage === 'function') window.refreshMemorizeLanguage();
     if (typeof window.refreshAudioButtonLanguage === 'function') window.refreshAudioButtonLanguage();
     if (typeof window.refreshDuaSwipeViewerLanguage === 'function') window.refreshDuaSwipeViewerLanguage();
 
@@ -1109,6 +1132,10 @@ function restoreEnglish() {
     if (typeof window.refreshPrayerLanguage === 'function') window.refreshPrayerLanguage();
     if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
     if (typeof window.refreshQuranLanguage === 'function') window.refreshQuranLanguage();
+    if (typeof window.refreshRoutineLanguage === 'function') window.refreshRoutineLanguage();
+    if (typeof window.refreshEtiquetteLanguage === 'function') window.refreshEtiquetteLanguage();
+    if (typeof window.refreshProgressLanguage === 'function') window.refreshProgressLanguage();
+    if (typeof window.refreshMemorizeLanguage === 'function') window.refreshMemorizeLanguage();
     if (typeof window.refreshAudioButtonLanguage === 'function') window.refreshAudioButtonLanguage();
     if (typeof window.refreshDuaSwipeViewerLanguage === 'function') window.refreshDuaSwipeViewerLanguage();
 }

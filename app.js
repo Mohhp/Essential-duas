@@ -1752,28 +1752,53 @@ window.filterCategory = function(cat, btn) {
     };
 
     // ===== ETIQUETTE PANEL =====
+    function getEtiquetteTemplate() {
+        if (isPashtoMode()) {
+            return `
+                <h2>د دعا آداب</h2>
+                <div class="etiquette-item"><div class="etiquette-num">1</div><div class="etiquette-text"><strong>د الله تعالی ستاینه پیل کړئ</strong> او پر نبي ﷺ درود ووایئ. <span class="ref">(Tirmidhi 3477)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">2</div><div class="etiquette-text"><strong>بشپړ یقین ولرئ</strong> چې الله تعالی به ځواب درکړي. <span class="ref">(Tirmidhi 3479)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">3</div><div class="etiquette-text"><strong>په دعا کې دوام وکړئ</strong> او ناامیده مه کېږئ. <span class="ref">(Bukhari 6340)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">4</div><div class="etiquette-text"><strong>د زړه حضور وساتئ.</strong> له غافل زړه دعا نه قبلیږي. <span class="ref">(Tirmidhi 3479)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">5</div><div class="etiquette-text"><strong>قبلې ته مخ کړئ</strong> او لاسونه پورته کړئ. <span class="ref">(Abu Dawud 1488)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">6</div><div class="etiquette-text"><strong>د امکان په صورت کې په اوداسه کې اوسئ.</strong> پاکي دعا لوړوي.</div></div>
+                <div class="etiquette-item"><div class="etiquette-num">7</div><div class="etiquette-text"><strong>د الله ښکلي نومونه وکاروئ</strong> چې غوښتنې سره مناسب وي. <span class="ref">(Quran 7:180)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">8</div><div class="etiquette-text"><strong>مبارک وختونه وټاکئ:</strong> د شپې وروستۍ برخه، د اذان او اقامت ترمنځ، سجده، روژه، سفر، او جمعه. <span class="ref">(Muslim 757, Abu Dawud 521)</span></div></div>
+                <div class="etiquette-item"><div class="etiquette-num">9</div><div class="etiquette-text"><strong>خپل ګناهونه او اړتیا ومنئ</strong> او بیا غوښتنه وکړئ.</div></div>
+                <div class="etiquette-item"><div class="etiquette-num">10</div><div class="etiquette-text"><strong>په پای کې پر نبي ﷺ درود ووایئ.</strong> <span class="ref">(Tirmidhi 486)</span></div></div>`;
+        }
+
+        return `
+            <h2>The Etiquette of Dua</h2>
+            <div class="etiquette-item"><div class="etiquette-num">1</div><div class="etiquette-text"><strong>Begin with praise of Allah</strong> and send Salawat upon the Prophet ﷺ. <span class="ref">(Tirmidhi 3477)</span></div></div>
+            <div class="etiquette-item"><div class="etiquette-num">2</div><div class="etiquette-text"><strong>Have absolute certainty (Yaqīn)</strong> that Allah will answer. The Prophet ﷺ said: "Call upon Allah with certainty that He will respond." <span class="ref">(Tirmidhi 3479)</span></div></div>
+            <div class="etiquette-item"><div class="etiquette-num">3</div><div class="etiquette-text"><strong>Be persistent — never give up.</strong> "Your dua is answered as long as you do not say: 'I prayed but was not answered.'" <span class="ref">(Bukhari 6340)</span></div></div>
+            <div class="etiquette-item"><div class="etiquette-num">4</div><div class="etiquette-text"><strong>Presence of heart.</strong> Allah does not accept dua from a heedless, distracted heart. <span class="ref">(Tirmidhi 3479)</span></div></div>
+            <div class="etiquette-item"><div class="etiquette-num">5</div><div class="etiquette-text"><strong>Face the Qiblah</strong> and raise your hands. The Prophet ﷺ was shy to return empty hands that were raised to Him. <span class="ref">(Abu Dawud 1488)</span></div></div>
+            <div class="etiquette-item"><div class="etiquette-num">6</div><div class="etiquette-text"><strong>Be in a state of wudu</strong> (ablution) when possible. Purity elevates the dua.</div></div>
+            <div class="etiquette-item"><div class="etiquette-num">7</div><div class="etiquette-text"><strong>Use Allah's Beautiful Names</strong> that match your request. Asking for mercy? Use "Yā Raḥmān." Asking for provision? Use "Yā Razzāq." <span class="ref">(Quran 7:180)</span></div></div>
+            <div class="etiquette-item"><div class="etiquette-num">8</div><div class="etiquette-text"><strong>Seek the blessed times:</strong> Last third of the night, between Adhan and Iqamah, while prostrating, while fasting, while travelling, on Friday. <span class="ref">(Muslim 757, Abu Dawud 521)</span></div></div>
+            <div class="etiquette-item"><div class="etiquette-num">9</div><div class="etiquette-text"><strong>Admit your sins and need</strong> before asking. Acknowledge your weakness — as in the Dua of Yunus and Adam عليهما السلام.</div></div>
+            <div class="etiquette-item"><div class="etiquette-num">10</div><div class="etiquette-text"><strong>End with Salawat</strong> upon the Prophet ﷺ. "Every dua is suspended between heaven and earth until you send Salawat upon the Prophet ﷺ." <span class="ref">(Tirmidhi 486)</span></div></div>`;
+    }
+
     window.openEtiquette = function() {
         const ep = document.querySelector('.etiquette-panel');
         if (!ep) return;
-        if (!ep.querySelector('.etiquette-content').innerHTML.trim()) {
-            ep.querySelector('.etiquette-content').innerHTML = `
-                <h2>The Etiquette of Dua</h2>
-                <div class="etiquette-item"><div class="etiquette-num">1</div><div class="etiquette-text"><strong>Begin with praise of Allah</strong> and send Salawat upon the Prophet ﷺ. <span class="ref">(Tirmidhi 3477)</span></div></div>
-                <div class="etiquette-item"><div class="etiquette-num">2</div><div class="etiquette-text"><strong>Have absolute certainty (Yaqīn)</strong> that Allah will answer. The Prophet ﷺ said: "Call upon Allah with certainty that He will respond." <span class="ref">(Tirmidhi 3479)</span></div></div>
-                <div class="etiquette-item"><div class="etiquette-num">3</div><div class="etiquette-text"><strong>Be persistent — never give up.</strong> "Your dua is answered as long as you do not say: 'I prayed but was not answered.'" <span class="ref">(Bukhari 6340)</span></div></div>
-                <div class="etiquette-item"><div class="etiquette-num">4</div><div class="etiquette-text"><strong>Presence of heart.</strong> Allah does not accept dua from a heedless, distracted heart. <span class="ref">(Tirmidhi 3479)</span></div></div>
-                <div class="etiquette-item"><div class="etiquette-num">5</div><div class="etiquette-text"><strong>Face the Qiblah</strong> and raise your hands. The Prophet ﷺ was shy to return empty hands that were raised to Him. <span class="ref">(Abu Dawud 1488)</span></div></div>
-                <div class="etiquette-item"><div class="etiquette-num">6</div><div class="etiquette-text"><strong>Be in a state of wudu</strong> (ablution) when possible. Purity elevates the dua.</div></div>
-                <div class="etiquette-item"><div class="etiquette-num">7</div><div class="etiquette-text"><strong>Use Allah's Beautiful Names</strong> that match your request. Asking for mercy? Use "Yā Raḥmān." Asking for provision? Use "Yā Razzāq." <span class="ref">(Quran 7:180)</span></div></div>
-                <div class="etiquette-item"><div class="etiquette-num">8</div><div class="etiquette-text"><strong>Seek the blessed times:</strong> Last third of the night, between Adhan and Iqamah, while prostrating, while fasting, while travelling, on Friday. <span class="ref">(Muslim 757, Abu Dawud 521)</span></div></div>
-                <div class="etiquette-item"><div class="etiquette-num">9</div><div class="etiquette-text"><strong>Admit your sins and need</strong> before asking. Acknowledge your weakness — as in the Dua of Yunus and Adam عليهما السلام.</div></div>
-                <div class="etiquette-item"><div class="etiquette-num">10</div><div class="etiquette-text"><strong>End with Salawat</strong> upon the Prophet ﷺ. "Every dua is suspended between heaven and earth until you send Salawat upon the Prophet ﷺ." <span class="ref">(Tirmidhi 486)</span></div></div>`;
-        }
+        ep.querySelector('.etiquette-content').innerHTML = getEtiquetteTemplate();
         ep.classList.add('active');
         lockScroll();
         const closeBtn = ep.querySelector('.etiquette-close');
         if (closeBtn) closeBtn.focus();
         recordInAppRoute(true);
+    };
+
+    window.refreshEtiquetteLanguage = function() {
+        const ep = document.querySelector('.etiquette-panel');
+        if (!ep) return;
+        const content = ep.querySelector('.etiquette-content');
+        if (!content || !content.innerHTML.trim()) return;
+        content.innerHTML = getEtiquetteTemplate();
     };
 
     window.closeEtiquette = function() {
@@ -1783,69 +1808,102 @@ window.filterCategory = function(cat, btn) {
         recordInAppRoute(false);
     };
 
+    function getRoutineUiText() {
+        const isPS = isPashtoMode();
+        const psUI = (typeof PS_UI !== 'undefined') ? PS_UI : null;
+        return {
+            title: isPS ? (psUI?.routineTitle || 'وړاندیز شوی ورځنی معمول') : 'Recommended Daily Routine',
+            duaOfDay: isPS ? (psUI?.routineDuaOfDay || 'د ورځې دعا') : 'Dua of the Day',
+            expandPrompt: isPS ? (psUI?.routineExpandPrompt || 'د ژباړې او حوالو د پراخولو لپاره ټک وکړئ ↓') : 'Tap to expand translation & references ↓',
+            collapsePrompt: isPS ? (psUI?.routineHidePrompt || 'د جزئیاتو د پټولو لپاره ټک وکړئ ↑') : 'Tap to hide details ↑',
+            morning: isPS ? '🌅 د سهار معمول' : '🌅 MORNING (After Fajr)',
+            evening: isPS ? '🌇 د ماښام معمول' : '🌇 EVENING (After Asr/Maghrib)',
+            prayer: isPS ? '🕌 د لمانځه معمول' : '🕌 IN EVERY PRAYER',
+            sleep: isPS ? '🌙 د خوب معمول' : '🌙 BEFORE SLEEP',
+            dhikr: isPS ? '📿 د ذکر لارښوونه' : '📿 DAILY DHIKR',
+            eveningSame: isPS ? (psUI?.routineEveningSame || 'د سهار اذکار په شان، سربېره پر دې:') : 'Same as morning adhkar, plus:'
+        };
+    }
+
+    function getRoutineDuaLabel(duaId, fallbackEn) {
+        if (isPashtoMode() && typeof PS_UI !== 'undefined' && PS_UI.duaTitles && PS_UI.duaTitles[duaId]) {
+            return PS_UI.duaTitles[duaId];
+        }
+        return fallbackEn;
+    }
+
+    function renderRoutinePanelContent(rp) {
+        if (!rp) return;
+        const ui = getRoutineUiText();
+        rp.querySelector('.routine-content').innerHTML = `
+            <h2>${ui.title}</h2>
+            <div class="progress-stat-card daily-dua-progress" style="flex-direction:column;text-align:center;cursor:pointer;border-color:rgba(201,168,76,0.15);" onclick="toggleRoutineDailyDua(event);">
+                <div style="font-family:var(--font-title);font-size:0.7rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,168,76,0.8);margin-bottom:0.5rem;"><span class="sparkle">✦</span> ${ui.duaOfDay} <span class="sparkle">✦</span></div>
+                <div id="routineDailyArabic" style="font-family:var(--font-arabic);font-size:calc(1.3rem * var(--font-scale));color:var(--gold-light);direction:rtl;line-height:2.2;margin:0.4rem 0;"></div>
+                <div id="routineDailyTranslation" style="font-family:var(--font-text);font-size:0.88rem;color:var(--text-muted);font-style:italic;line-height:1.6;"></div>
+                <div id="routineDailyPrompt" style="margin-top:10px;font-size:0.7rem;color:var(--text-subtle);letter-spacing:1px;text-transform:uppercase;">${ui.expandPrompt}</div>
+            </div>
+            <div id="routineDailyExtra" style="display:none;margin-top:10px;padding:12px;background:rgba(46,196,122,0.08);border:1px solid rgba(46,196,122,0.18);border-radius:var(--radius-md);"></div>
+
+            <div class="routine-item">
+                <div class="routine-time">${ui.morning}</div>
+                <div class="routine-desc">
+                    1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">${getRoutineDuaLabel(2, 'Ayatul Kursi')}</span><br>
+                    2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">${getRoutineDuaLabel(6, '3 Quls (3x each)')}</span><br>
+                    3. <span class="dua-ref" onclick="scrollToDua(12);closeRoutine()">${getRoutineDuaLabel(12, 'Bismillah Protection (3x)')}</span><br>
+                    4. <span class="dua-ref" onclick="scrollToDua(16);closeRoutine()">${getRoutineDuaLabel(16, 'Sayyid al-Istighfar')}</span><br>
+                    5. <span class="dua-ref" onclick="scrollToDua(14);closeRoutine()">${getRoutineDuaLabel(14, 'Contentment with Allah (3x)')}</span><br>
+                    6. <span class="dua-ref" onclick="scrollToDua(35);closeRoutine()">${getRoutineDuaLabel(35, 'Hasbiyallah (7x)')}</span><br>
+                    7. <span class="dua-ref" onclick="scrollToDua(38);closeRoutine()">${getRoutineDuaLabel(38, 'Beneficial Knowledge')}</span><br>
+                    8. <span class="dua-ref" onclick="scrollToDua(34);closeRoutine()">${getRoutineDuaLabel(34, 'Morning Remembrance')}</span>
+                </div>
+            </div>
+
+            <div class="routine-item">
+                <div class="routine-time">${ui.evening}</div>
+                <div class="routine-desc">
+                    ${ui.eveningSame}<br>
+                    • <span class="dua-ref" onclick="scrollToDua(23);closeRoutine()">${getRoutineDuaLabel(23, "Asking for 'Afiyah")}</span><br>
+                    • <span class="dua-ref" onclick="scrollToDua(48);closeRoutine()">${getRoutineDuaLabel(48, 'Protection from Four Evils')}</span>
+                </div>
+            </div>
+
+            <div class="routine-item">
+                <div class="routine-time">${ui.prayer}</div>
+                <div class="routine-desc">
+                    • <span class="dua-ref" onclick="scrollToDua(1);closeRoutine()">${getRoutineDuaLabel(1, 'Al-Fatiha')}</span><br>
+                    • <span class="dua-ref" onclick="scrollToDua(13);closeRoutine()">${getRoutineDuaLabel(13, 'Four Refuges (before salam)')}</span><br>
+                    • <span class="dua-ref" onclick="scrollToDua(7);closeRoutine()">${getRoutineDuaLabel(7, 'Rabbana Atina')}</span><br>
+                    • <span class="dua-ref" onclick="scrollToDua(46);closeRoutine()">${getRoutineDuaLabel(46, 'Ibrahimic Salawat')}</span>
+                </div>
+            </div>
+
+            <div class="routine-item">
+                <div class="routine-time">${ui.sleep}</div>
+                <div class="routine-desc">
+                    1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">${getRoutineDuaLabel(2, 'Ayatul Kursi')}</span><br>
+                    2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">${getRoutineDuaLabel(6, '3 Quls (Blow & Wipe 3x)')}</span><br>
+                    3. <span class="dua-ref" onclick="scrollToDua(5);closeRoutine()">${getRoutineDuaLabel(5, 'Last 2 Verses of Al-Baqarah')}</span><br>
+                    4. <span class="dua-ref" onclick="scrollToDua(49);closeRoutine()">${getRoutineDuaLabel(49, 'Sleep Dua')}</span><br>
+                    5. <span class="dua-ref" onclick="scrollToDua(36);closeRoutine()">${getRoutineDuaLabel(36, 'Tahlil (before sleeping)')}</span>
+                </div>
+            </div>
+
+            <div class="routine-item">
+                <div class="routine-time">${ui.dhikr}</div>
+                <div class="routine-desc">
+                    • <span class="dua-ref" onclick="scrollToDua(36);closeRoutine()">${getRoutineDuaLabel(36, 'Tahlil 100x')}</span> — ${isPashtoMode() && typeof PS_UI !== 'undefined' ? (PS_UI.routineUseTasbeeh || 'د تسبیح شمېرونکی وکاروئ') : 'Use the Tasbeeh counter'}<br>
+                    • ${isPashtoMode() ? 'سبحان الله ۳۳ ځله، الحمدلله ۳۳ ځله، الله اکبر ۳۴ ځله له هر لمانځه وروسته' : 'SubhanAllah 33x, Alhamdulillah 33x, Allahu Akbar 34x after each prayer'}<br>
+                    • <span class="dua-ref" onclick="scrollToDua(19);closeRoutine()">${getRoutineDuaLabel(19, 'Ya Muqallibal Qulub')}</span> — ${isPashtoMode() && typeof PS_UI !== 'undefined' ? (PS_UI.routineOften || 'هر څومره ډېر وي، هومره ښه') : 'as often as possible'}
+                </div>
+            </div>`;
+    }
+
     // ===== ROUTINE PANEL =====
     window.openRoutine = function() {
         const rp = document.querySelector('.routine-panel');
         if (!rp) return;
-        if (!rp.querySelector('.routine-content').innerHTML.trim()) {
-            rp.querySelector('.routine-content').innerHTML = `
-                <h2>Recommended Daily Routine</h2>
-                <div class="progress-stat-card daily-dua-progress" style="flex-direction:column;text-align:center;cursor:pointer;border-color:rgba(201,168,76,0.15);" onclick="toggleRoutineDailyDua(event);">
-                    <div style="font-family:var(--font-title);font-size:0.7rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,168,76,0.8);margin-bottom:0.5rem;"><span class="sparkle">✦</span> Dua of the Day <span class="sparkle">✦</span></div>
-                    <div id="routineDailyArabic" style="font-family:var(--font-arabic);font-size:calc(1.3rem * var(--font-scale));color:var(--gold-light);direction:rtl;line-height:2.2;margin:0.4rem 0;"></div>
-                    <div id="routineDailyTranslation" style="font-family:var(--font-text);font-size:0.88rem;color:var(--text-muted);font-style:italic;line-height:1.6;"></div>
-                    <div id="routineDailyPrompt" style="margin-top:10px;font-size:0.7rem;color:var(--text-subtle);letter-spacing:1px;text-transform:uppercase;">Tap to expand translation &amp; references ↓</div>
-                </div>
-                <div id="routineDailyExtra" style="display:none;margin-top:10px;padding:12px;background:rgba(46,196,122,0.08);border:1px solid rgba(46,196,122,0.18);border-radius:var(--radius-md);"></div>
-                <div class="routine-item">
-                    <div class="routine-time">🌅 MORNING (After Fajr)</div>
-                    <div class="routine-desc">
-                        1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">Ayatul Kursi</span><br>
-                        2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">3 Quls (3x each)</span><br>
-                        3. <span class="dua-ref" onclick="scrollToDua(12);closeRoutine()">Bismillah Protection (3x)</span><br>
-                        4. <span class="dua-ref" onclick="scrollToDua(16);closeRoutine()">Sayyid al-Istighfar</span><br>
-                        5. <span class="dua-ref" onclick="scrollToDua(14);closeRoutine()">Contentment with Allah (3x)</span><br>
-                        6. <span class="dua-ref" onclick="scrollToDua(35);closeRoutine()">Hasbiyallah (7x)</span><br>
-                        7. <span class="dua-ref" onclick="scrollToDua(38);closeRoutine()">Beneficial Knowledge</span><br>
-                        8. <span class="dua-ref" onclick="scrollToDua(34);closeRoutine()">Morning Remembrance</span>
-                    </div>
-                </div>
-                <div class="routine-item">
-                    <div class="routine-time">🌇 EVENING (After Asr/Maghrib)</div>
-                    <div class="routine-desc">
-                        Same as morning adhkar, plus:<br>
-                        • <span class="dua-ref" onclick="scrollToDua(23);closeRoutine()">Asking for 'Afiyah</span><br>
-                        • <span class="dua-ref" onclick="scrollToDua(48);closeRoutine()">Protection from Four Evils</span>
-                    </div>
-                </div>
-                <div class="routine-item">
-                    <div class="routine-time">🕌 IN EVERY PRAYER</div>
-                    <div class="routine-desc">
-                        • <span class="dua-ref" onclick="scrollToDua(1);closeRoutine()">Al-Fatiha</span><br>
-                        • <span class="dua-ref" onclick="scrollToDua(13);closeRoutine()">Four Refuges (before salam)</span><br>
-                        • <span class="dua-ref" onclick="scrollToDua(7);closeRoutine()">Rabbana Atina</span><br>
-                        • <span class="dua-ref" onclick="scrollToDua(46);closeRoutine()">Ibrahimic Salawat</span>
-                    </div>
-                </div>
-                <div class="routine-item">
-                    <div class="routine-time">🌙 BEFORE SLEEP</div>
-                    <div class="routine-desc">
-                        1. <span class="dua-ref" onclick="scrollToDua(2);closeRoutine()">Ayatul Kursi</span><br>
-                        2. <span class="dua-ref" onclick="scrollToDua(6);closeRoutine()">3 Quls (Blow & Wipe 3x)</span><br>
-                        3. <span class="dua-ref" onclick="scrollToDua(5);closeRoutine()">Last 2 Verses of Al-Baqarah</span><br>
-                        4. <span class="dua-ref" onclick="scrollToDua(49);closeRoutine()">Sleep Dua</span><br>
-                        5. <span class="dua-ref" onclick="scrollToDua(36);closeRoutine()">Tahlil (before sleeping)</span>
-                    </div>
-                </div>
-                <div class="routine-item">
-                    <div class="routine-time">📿 DAILY DHIKR</div>
-                    <div class="routine-desc">
-                        • <span class="dua-ref" onclick="scrollToDua(36);closeRoutine()">Tahlil 100x</span> — Use the Tasbeeh counter<br>
-                        • SubhanAllah 33x, Alhamdulillah 33x, Allahu Akbar 34x after each prayer<br>
-                        • <span class="dua-ref" onclick="scrollToDua(19);closeRoutine()">Ya Muqallibal Qulub</span> — as often as possible
-                    </div>
-                </div>`;
-        }
+        renderRoutinePanelContent(rp);
         // clear any previously shown extra details
         const extra = rp.querySelector('#routineDailyExtra');
         const prompt = rp.querySelector('#routineDailyPrompt');
@@ -1854,7 +1912,7 @@ window.filterCategory = function(cat, btn) {
             extra.style.display = 'none';
         }
         if (prompt) {
-            prompt.textContent = 'Tap to expand translation & references ↓';
+            prompt.textContent = getRoutineUiText().expandPrompt;
         }
 
         rp.classList.add('active');
@@ -1864,6 +1922,15 @@ window.filterCategory = function(cat, btn) {
         const closeBtn = rp.querySelector('.etiquette-close');
         if (closeBtn) closeBtn.focus();
         recordInAppRoute(true);
+    };
+
+    window.refreshRoutineLanguage = function() {
+        const rp = document.querySelector('.routine-panel');
+        if (!rp) return;
+        const hadContent = !!rp.querySelector('.routine-content')?.innerHTML?.trim();
+        if (!hadContent) return;
+        renderRoutinePanelContent(rp);
+        loadRoutineDailyDua();
     };
 
     window.closeRoutine = function() {
@@ -1976,9 +2043,14 @@ window.filterCategory = function(cat, btn) {
         const card = document.querySelector(`.dua-card[data-id="${duaIndex}"]`);
         const arabicEl = document.getElementById('routineDailyArabic');
         const transEl = document.getElementById('routineDailyTranslation');
-        if (card && arabicEl) {
+        if (card && arabicEl && transEl) {
             arabicEl.innerText = card.querySelector('.arabic-text').innerText;
-            transEl.innerText = card.querySelector('.translation').innerText.substring(0, 80) + '...';
+            const isPS = isPashtoMode();
+            const translationEl = isPS
+                ? (card.querySelector('.translation-ps') || card.querySelector('.translation'))
+                : card.querySelector('.translation');
+            const raw = translationEl?.innerText?.trim() || '';
+            transEl.innerText = raw ? `${raw.substring(0, 110)}...` : '';
         }
     }
 
@@ -2123,9 +2195,19 @@ window.filterCategory = function(cat, btn) {
         recordInAppRoute(false);
     };
 
+    window.refreshProgressLanguage = function() {
+        const pp = document.querySelector('.progress-panel');
+        if (!pp) return;
+        const active = pp.classList.contains('active');
+        const content = document.getElementById('progressPanelContent');
+        if (active || (content && content.innerHTML.trim())) renderProgressPanel();
+    };
+
     function renderProgressPanel() {
         const container = document.getElementById('progressPanelContent');
         if (!container) return;
+        const isPS = isPashtoMode();
+        const psUI = (typeof PS_UI !== 'undefined') ? PS_UI : null;
 
         const total = 63;
         const readCount = STATE.read.length;
@@ -2159,7 +2241,7 @@ window.filterCategory = function(cat, btn) {
 
         // Weekly activity
         const activity = JSON.parse(localStorage.getItem('crown_activity') || '[]');
-        const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const dayNames = isPS ? ['ی','د','س','چ','پ','ج','ش'] : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         let weekHTML = '';
         for (let i = 6; i >= 0; i--) {
             const d = new Date(); d.setDate(d.getDate() - i);
@@ -2196,7 +2278,9 @@ window.filterCategory = function(cat, btn) {
             const count = catMap[cat] || 0;
             const catTotal = catTotals[cat] || 1;
             const pct = Math.round((count / catTotal) * 100);
-            const label = cat.charAt(0).toUpperCase() + cat.slice(1).replace('-', ' ');
+            const label = isPS && psUI?.cats?.[cat]
+                ? psUI.cats[cat]
+                : (cat.charAt(0).toUpperCase() + cat.slice(1).replace('-', ' '));
             catBarsHTML += `<div class="progress-category-bar">
                 <div class="progress-cat-label">${label}</div>
                 <div class="progress-cat-bar"><div class="progress-cat-fill" style="width:${pct}%;background:${catColors[cat] || '#2ec47a'}"></div></div>
@@ -2206,14 +2290,14 @@ window.filterCategory = function(cat, btn) {
 
         // Achievements
         const achievements = [
-            { icon: '🌱', name: 'First Step', earned: readCount >= 1, desc: 'Read your first dua' },
-            { icon: '📖', name: 'Bookworm', earned: bookmarkCount >= 5, desc: 'Bookmark 5 duas' },
-            { icon: '🔥', name: 'On Fire', earned: STATE.streak >= 3, desc: '3-day streak' },
-            { icon: '⭐', name: 'Dedicated', earned: STATE.streak >= 7, desc: '7-day streak' },
-            { icon: '🌍', name: 'Explorer', earned: catSet.size >= 7, desc: 'Explore 7 categories' },
-            { icon: '💪', name: 'Halfway', earned: readCount >= 32, desc: 'Read 32+ duas' },
-            { icon: '🏆', name: 'Crown Master', earned: readCount >= 63, desc: 'All 63 duas' },
-            { icon: '🔮', name: 'Scholar', earned: catSet.size >= 14, desc: 'All 14 categories' },
+            { icon: '🌱', name: isPS && psUI?.achNames?.['First Step'] ? psUI.achNames['First Step'] : 'First Step', earned: readCount >= 1, desc: isPS ? 'لومړۍ دعا مو ولوستله' : 'Read your first dua' },
+            { icon: '📖', name: isPS && psUI?.achNames?.['Bookworm'] ? psUI.achNames['Bookworm'] : 'Bookworm', earned: bookmarkCount >= 5, desc: isPS ? '۵ دعاګانې مو خوښې کړې' : 'Bookmark 5 duas' },
+            { icon: '🔥', name: isPS && psUI?.achNames?.['On Fire'] ? psUI.achNames['On Fire'] : 'On Fire', earned: STATE.streak >= 3, desc: isPS ? '۳ ورځې پرله‌پسې' : '3-day streak' },
+            { icon: '⭐', name: isPS && psUI?.achNames?.['Dedicated'] ? psUI.achNames['Dedicated'] : 'Dedicated', earned: STATE.streak >= 7, desc: isPS ? '۷ ورځې پرله‌پسې' : '7-day streak' },
+            { icon: '🌍', name: isPS && psUI?.achNames?.['Explorer'] ? psUI.achNames['Explorer'] : 'Explorer', earned: catSet.size >= 7, desc: isPS ? '۷ کټګورۍ مو وکتلې' : 'Explore 7 categories' },
+            { icon: '💪', name: isPS && psUI?.achNames?.['Halfway'] ? psUI.achNames['Halfway'] : 'Halfway', earned: readCount >= 32, desc: isPS ? '۳۲+ دعاګانې مو ولوستلې' : 'Read 32+ duas' },
+            { icon: '🏆', name: isPS && psUI?.achNames?.['Crown Master'] ? psUI.achNames['Crown Master'] : 'Crown Master', earned: readCount >= 63, desc: isPS ? 'ټولې ۶۳ دعاګانې' : 'All 63 duas' },
+            { icon: '🔮', name: isPS && psUI?.achNames?.['Scholar'] ? psUI.achNames['Scholar'] : 'Scholar', earned: catSet.size >= 14, desc: isPS ? 'ټولې ۱۴ کټګورۍ' : 'All 14 categories' },
         ];
         const earnedCount = achievements.filter(a => a.earned).length;
         let achieveHTML = achievements.map(a => `
@@ -2225,67 +2309,67 @@ window.filterCategory = function(cat, btn) {
 
         // Milestone
         let milestone = '';
-        if (readCount >= 55) milestone = '🏆 Completed the entire Crown Collection!';
-        else if (readCount >= 40) milestone = '⭐ Almost there \u2014 a true seeker of knowledge!';
-        else if (readCount >= 25) milestone = '💪 Halfway champion \u2014 keep going!';
-        else if (readCount >= 10) milestone = '🌱 Growing beautifully \u2014 10+ duas learned!';
-        else if (readCount >= 1) milestone = '✨ The journey of a thousand miles begins with one step.';
-        else milestone = '📖 Start your journey \u2014 tap "Mark Read" on any dua!';
+        if (readCount >= 55) milestone = isPS && psUI?.milestones?.all ? psUI.milestones.all : '🏆 Completed the entire Crown Collection!';
+        else if (readCount >= 40) milestone = isPS && psUI?.milestones?.m40 ? psUI.milestones.m40 : '⭐ Almost there — a true seeker of knowledge!';
+        else if (readCount >= 25) milestone = isPS && psUI?.milestones?.m25 ? psUI.milestones.m25 : '💪 Halfway champion — keep going!';
+        else if (readCount >= 10) milestone = isPS && psUI?.milestones?.m10 ? psUI.milestones.m10 : '🌱 Growing beautifully — 10+ duas learned!';
+        else if (readCount >= 1) milestone = isPS && psUI?.milestones?.m1 ? psUI.milestones.m1 : '✨ The journey of a thousand miles begins with one step.';
+        else milestone = isPS && psUI?.milestones?.m0 ? psUI.milestones.m0 : '📖 Start your journey — tap "Mark Read" on any dua!';
 
         container.innerHTML = `
-            <h2>Your Journey</h2>
+            <h2>${isPS && psUI?.yourJourney ? psUI.yourJourney : 'Your Journey'}</h2>
 
             <div class="progress-stat-card">
                 <div class="progress-stat-icon">📖</div>
                 <div class="progress-stat-info">
-                    <div class="progress-stat-label">Duas Read</div>
+                    <div class="progress-stat-label">${isPS && psUI?.duasRead ? psUI.duasRead : 'Duas Read'}</div>
                     <div class="progress-stat-value">${readCount} / ${total}</div>
                     <div class="progress-bar-visual">
                         <div class="progress-bar-fill" style="width:${readPct}%"></div>
                     </div>
-                    <div class="progress-stat-sub">${readPct}% complete</div>
+                    <div class="progress-stat-sub">${readPct}% ${isPS && psUI?.complete ? psUI.complete : 'complete'}</div>
                 </div>
             </div>
 
             <div class="progress-stat-card">
                 <div class="progress-stat-icon">🔥</div>
                 <div class="progress-stat-info">
-                    <div class="progress-stat-label">Current Streak</div>
-                    <div class="progress-stat-value">${STATE.streak} days</div>
-                    <div class="progress-stat-sub">Total days active: ${totalDays}</div>
+                    <div class="progress-stat-label">${isPS && psUI?.currentStreak ? psUI.currentStreak : 'Current Streak'}</div>
+                    <div class="progress-stat-value">${STATE.streak} ${isPS && psUI?.streakDays ? psUI.streakDays : 'days'}</div>
+                    <div class="progress-stat-sub">${isPS && psUI?.daysActive ? psUI.daysActive : 'Total days active'}: ${totalDays}</div>
                 </div>
             </div>
 
             <div class="progress-stat-card" style="flex-direction:column;">
-                <div class="progress-stat-label" style="margin-bottom:8px;">This Week</div>
+                <div class="progress-stat-label" style="margin-bottom:8px;">${isPS && psUI?.thisWeek ? psUI.thisWeek : 'This Week'}</div>
                 <div class="progress-week-grid">${weekHTML}</div>
             </div>
 
             <div class="progress-stat-card">
                 <div class="progress-stat-icon">\u2b50</div>
                 <div class="progress-stat-info">
-                    <div class="progress-stat-label">Bookmarked</div>
+                    <div class="progress-stat-label">${isPS && psUI?.bookmarked ? psUI.bookmarked : 'Bookmarked'}</div>
                     <div class="progress-stat-value">${bookmarkCount}</div>
-                    <div class="progress-stat-sub">Your favourite duas saved for quick access</div>
+                    <div class="progress-stat-sub">${isPS && psUI?.favDuas ? psUI.favDuas : 'Your favourite duas saved for quick access'}</div>
                 </div>
             </div>
 
             <div class="progress-stat-card" style="flex-direction:column;">
-                <div class="progress-stat-label" style="margin-bottom:8px;">Category Breakdown</div>
+                <div class="progress-stat-label" style="margin-bottom:8px;">${isPS && psUI?.categoryBreakdown ? psUI.categoryBreakdown : 'Category Breakdown'}</div>
                 ${catBarsHTML}
             </div>
 
             <div class="progress-stat-card" style="flex-direction:column;">
-                <div class="progress-stat-label" style="margin-bottom:8px;">Achievements (${earnedCount}/${achievements.length})</div>
+                <div class="progress-stat-label" style="margin-bottom:8px;">${isPS && psUI?.achievements ? psUI.achievements : 'Achievements'} (${earnedCount}/${achievements.length})</div>
                 <div class="progress-achievements">${achieveHTML}</div>
             </div>
 
             <div class="progress-stat-card" style="text-align:center;justify-content:center;flex-direction:column;">
                 <div style="font-size:1.2rem;margin-bottom:8px;">${milestone}</div>
             </div>
-            <button class="progress-reset-btn" onclick="if(confirm('Reset all reading progress? Bookmarks will be kept.')) { STATE.read=[]; localStorage.setItem('crown_read',JSON.stringify([])); document.querySelectorAll('.dua-card').forEach(c=>{c.classList.remove('read-card');const b=c.querySelector('.action-btn[onclick*=markRead]');if(b){b.classList.remove('read');b.innerHTML='\u2713 Mark Read';}}); updateStats(); renderProgressPanel(); showToast('Progress reset'); }">\u26a0 Reset Reading Progress</button>
+            <button class="progress-reset-btn" onclick="if(confirm(isPashtoMode() ? 'ټول د لوستلو پرمختګ بیا تنظیم شي؟ نښې به خوندي پاتې شي.' : 'Reset all reading progress? Bookmarks will be kept.')) { STATE.read=[]; localStorage.setItem('crown_read',JSON.stringify([])); document.querySelectorAll('.dua-card').forEach(c=>{c.classList.remove('read-card');const b=c.querySelector('.action-btn[onclick*=markRead]');if(b){b.classList.remove('read');b.innerHTML=isPashtoMode() ? '\u2713 لوستل شوی' : '\u2713 Mark Read';}}); updateStats(); renderProgressPanel(); showToast('Progress reset'); }">${isPS && psUI?.resetProgress ? psUI.resetProgress : '⚠ Reset Reading Progress'}</button>
 
-            <button class="progress-share-btn" onclick="shareProgress()">📤 Share Your Progress</button>
+            <button class="progress-share-btn" onclick="shareProgress()">${isPS && psUI?.shareProgress ? psUI.shareProgress : '📤 Share Your Progress'}</button>
         `;
 
 
@@ -2827,14 +2911,18 @@ window.filterCategory = function(cat, btn) {
         const card = document.querySelector(`.dua-card[data-id="${duaIndex}"]`);
         const extra = document.getElementById('routineDailyExtra');
         const prompt = document.getElementById('routineDailyPrompt');
+        const ui = getRoutineUiText();
         if (!extra || !card) return;
         if (extra.innerHTML.trim()) {
             extra.innerHTML = '';
             extra.style.display = 'none';
-            if (prompt) prompt.textContent = 'Tap to expand translation & references ↓';
+            if (prompt) prompt.textContent = ui.expandPrompt;
         } else {
             // Extract plain text to avoid copying structural HTML that may render differently
-            const transText = card.querySelector('.translation')?.textContent?.trim() || '';
+            const translationEl = isPashtoMode()
+                ? (card.querySelector('.translation-ps') || card.querySelector('.translation'))
+                : card.querySelector('.translation');
+            const transText = translationEl?.textContent?.trim() || '';
             const refText = card.querySelector('.reference .ref-text')?.textContent?.trim() || card.querySelector('.reference')?.textContent?.trim() || '';
             // Build safe DOM nodes into the extra container
             extra.innerHTML = '';
@@ -2851,7 +2939,7 @@ window.filterCategory = function(cat, btn) {
             extra.appendChild(tdiv);
             extra.appendChild(rdiv);
             extra.style.display = 'block';
-            if (prompt) prompt.textContent = 'Tap to hide details ↑';
+            if (prompt) prompt.textContent = ui.collapsePrompt;
         }
     };
 
@@ -2976,6 +3064,35 @@ window.filterCategory = function(cat, btn) {
         return index;
     }
 
+    function getMemorizeUiText() {
+        const psUI = (typeof PS_UI !== 'undefined') ? PS_UI : null;
+        return {
+            flip: isPashtoMode() ? (psUI?.memFlip || 'واړوئ') : 'Flip',
+            prev: isPashtoMode() ? (psUI?.memPrev || '← شاته') : '← Prev',
+            next: isPashtoMode() ? (psUI?.memNext || 'بل →') : 'Next →',
+            easy: isPashtoMode() ? (psUI?.memEasy || 'اسانه') : 'Easy',
+            good: isPashtoMode() ? (psUI?.memGood || 'ښه') : 'Good',
+            hard: isPashtoMode() ? (psUI?.memHard || 'ستونزمنه') : 'Hard',
+            cardOf: isPashtoMode() ? 'کارډ' : 'Card',
+            due: isPashtoMode() ? 'باقي' : 'due',
+            reviewDue: isPashtoMode() ? 'بیاکتنه پکار ده' : 'Review Due'
+        };
+    }
+
+    function applyMemorizePanelTexts() {
+        const panel = document.getElementById('memorizePanel');
+        if (!panel) return;
+        const ui = getMemorizeUiText();
+        const actionBtns = panel.querySelectorAll('.flashcard-actions .flash-btn');
+        if (actionBtns[0]) actionBtns[0].textContent = ui.flip;
+        if (actionBtns[1]) actionBtns[1].textContent = ui.prev;
+        if (actionBtns[2]) actionBtns[2].textContent = ui.next;
+        const rateBtns = panel.querySelectorAll('.flashcard-rating-row .flash-rate');
+        if (rateBtns[0]) rateBtns[0].textContent = isPashtoMode() ? 'اسانه' : 'Easy / اسانه';
+        if (rateBtns[1]) rateBtns[1].textContent = isPashtoMode() ? 'ښه' : 'Good / ښه';
+        if (rateBtns[2]) rateBtns[2].textContent = isPashtoMode() ? 'ستونزمنه' : 'Hard / ستونزمنه';
+    }
+
     function renderFlashcard() {
         const card = flashcardQueue[flashcardIndex];
         if (!card) return;
@@ -3000,7 +3117,7 @@ window.filterCategory = function(cat, btn) {
         if (progressText) {
             progressText.textContent = isPS
                 ? `${localizeDigits(currentNum)} له ${localizeDigits(totalNum)}`
-                : `Card ${currentNum} of ${totalNum}`;
+                : `${getMemorizeUiText().cardOf} ${currentNum} of ${totalNum}`;
         }
         if (progressFill) progressFill.style.width = `${Math.round((currentNum / totalNum) * 100)}%`;
 
@@ -3052,8 +3169,14 @@ window.filterCategory = function(cat, btn) {
         panel.classList.add('active');
         lockScroll();
         bindFlashcardSwipe();
+        applyMemorizePanelTexts();
         renderFlashcard();
         showToast(isPashtoMode() ? 'د حفظ فلشکارډ حالت فعال شو' : 'Flashcard memorization mode enabled');
+    };
+
+    window.refreshMemorizeLanguage = function() {
+        applyMemorizePanelTexts();
+        if (document.getElementById('memorizePanel')?.classList.contains('active')) renderFlashcard();
     };
 
     window.closeMemorizeSession = function() {
@@ -3151,7 +3274,11 @@ window.filterCategory = function(cat, btn) {
         const btn = document.getElementById('memorizeToggle');
         if (btn) {
             const due = getDueCount();
-            btn.textContent = due > 0 ? `🧠 Memorize (${due} due)` : '🧠 Memorize';
+            if (isPashtoMode()) {
+                btn.textContent = due > 0 ? `🧠 حفظ (${localizeDigits(due)} پاتې)` : '🧠 حفظ';
+            } else {
+                btn.textContent = due > 0 ? `🧠 Memorize (${due} due)` : '🧠 Memorize';
+            }
         }
 
         // Add/remove review badges on cards
@@ -3165,7 +3292,7 @@ window.filterCategory = function(cat, btn) {
                 if (titleEl) {
                     const badge = document.createElement('span');
                     badge.className = 'sr-review-badge';
-                    badge.textContent = 'Review Due';
+                    badge.textContent = getMemorizeUiText().reviewDue;
                     titleEl.appendChild(badge);
                 }
             }
@@ -6095,6 +6222,7 @@ window.filterCategory = function(cat, btn) {
     const QURAN_RECENT_KEY = 'crown_quran_recent';
     const QURAN_BOOKMARKS_KEY = 'crown_quran_bookmarks';
     const QURAN_OFFLINE_KEY = 'crown_quran_offline_surahs';
+    const QURAN_ACTIVE_TAB_KEY = 'crown_quran_active_tab';
     const QURAN_SETTINGS_KEY = 'crown_quran_settings';
     const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
     const QURAN_FALLBACK_RECITER = 'ar.alafasy';
@@ -6109,11 +6237,21 @@ window.filterCategory = function(cat, btn) {
 
     const QURAN_TRANSLATION_MODES = ['all', 'ar-ps', 'ar-en', 'ar'];
     const QURAN_AUDIO_SPEEDS = [0.75, 1, 1.25];
+    const QURAN_JUZ_STARTS = [
+        { surah: 1, ayah: 1 }, { surah: 2, ayah: 142 }, { surah: 2, ayah: 253 }, { surah: 3, ayah: 93 },
+        { surah: 4, ayah: 24 }, { surah: 4, ayah: 148 }, { surah: 5, ayah: 82 }, { surah: 6, ayah: 111 },
+        { surah: 7, ayah: 88 }, { surah: 8, ayah: 41 }, { surah: 9, ayah: 93 }, { surah: 11, ayah: 6 },
+        { surah: 12, ayah: 53 }, { surah: 15, ayah: 1 }, { surah: 17, ayah: 1 }, { surah: 18, ayah: 75 },
+        { surah: 21, ayah: 1 }, { surah: 23, ayah: 1 }, { surah: 25, ayah: 21 }, { surah: 27, ayah: 56 },
+        { surah: 29, ayah: 46 }, { surah: 33, ayah: 31 }, { surah: 36, ayah: 28 }, { surah: 39, ayah: 32 },
+        { surah: 41, ayah: 47 }, { surah: 46, ayah: 1 }, { surah: 51, ayah: 31 }, { surah: 58, ayah: 1 },
+        { surah: 67, ayah: 1 }, { surah: 78, ayah: 1 }
+    ];
     const quranState = {
         initialized: false,
         meta: null,
         surahStartOffsets: null,
-        view: 'surah',
+        view: localStorage.getItem(QURAN_ACTIVE_TAB_KEY) || 'surah',
         search: '',
         currentSurah: null,
         currentSurahData: null,
@@ -6154,10 +6292,10 @@ window.filterCategory = function(cat, btn) {
             readingMode: isPS ? 'د مطالعې حالت' : 'Reading Mode',
             readingModeOn: isPS ? 'د مطالعې حالت فعال شو' : 'Reading mode enabled',
             readingModeOff: isPS ? 'د مطالعې حالت بند شو' : 'Reading mode disabled',
-            tabSurah: isPS ? 'سورتونه' : 'Surahs',
-            tabJuz: isPS ? 'جز / پاره' : 'Juz / Para',
-            tabBookmarks: isPS ? 'نښه شوې آیتونه' : 'Bookmarks',
-            tabSettings: isPS ? 'تنظیمات' : 'Settings',
+            tabSurah: isPS ? '📖 سورتونه' : '📖 Surahs',
+            tabJuz: isPS ? '📚 جزء' : '📚 Juz',
+            tabBookmarks: isPS ? '🔖 خوښونه' : '🔖 Bookmarks',
+            tabSettings: isPS ? '⚙️ ترتیبات' : '⚙️ Settings',
             searchPlaceholder: isPS ? 'سورت ولټوئ (شمېره، عربي، انګلیسي)...' : 'Search Surah (number, Arabic, English)...',
             continueReading: isPS ? 'مطالعه دوام ورکړئ' : 'Continue Reading',
             continue: isPS ? 'دوام' : 'Continue',
@@ -6172,7 +6310,7 @@ window.filterCategory = function(cat, btn) {
             downloading: isPS ? 'کښته کېږي...' : 'Downloading...',
             downloaded: isPS ? 'آفلاین خوندي شو' : 'Saved offline',
             noData: isPS ? 'معلومات ونه موندل شول' : 'No data found',
-            noBookmarks: isPS ? 'تر اوسه نښه شوی آیت نشته' : 'No bookmarked ayahs yet',
+            noBookmarks: isPS ? 'تاسو تر اوسه هیڅ خوښونه نلرئ' : 'No bookmarks yet',
             noRecent: isPS ? 'تر اوسه هیڅ سورت نه دی لوستل شوی' : 'No surahs read yet',
             loading: isPS ? 'بارېږي...' : 'Loading...',
             bismillah: 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ',
@@ -6508,15 +6646,44 @@ window.filterCategory = function(cat, btn) {
         `;
     }
 
+    function getQuranPaneByView(view) {
+        const map = {
+            surah: document.getElementById('quranPaneSurah'),
+            juz: document.getElementById('quranPaneJuz'),
+            bookmarks: document.getElementById('quranPaneBookmarks'),
+            settings: document.getElementById('quranPaneSettings')
+        };
+        return map[view] || map.surah;
+    }
+
+    function getQuranListContainerByView(view) {
+        const map = {
+            surah: document.getElementById('quranSurahList'),
+            juz: document.getElementById('quranJuzList'),
+            bookmarks: document.getElementById('quranBookmarksList'),
+            settings: document.getElementById('quranSettingsList')
+        };
+        return map[view] || map.surah;
+    }
+
     function setQuranView(view) {
-        quranState.view = view;
+        const allowed = new Set(['surah', 'juz', 'bookmarks', 'settings']);
+        const nextView = allowed.has(view) ? view : 'surah';
+        quranState.view = nextView;
+        localStorage.setItem(QURAN_ACTIVE_TAB_KEY, nextView);
+
         document.querySelectorAll('.quran-view-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.getAttribute('data-qview') === view);
+            const active = tab.getAttribute('data-qview') === nextView;
+            tab.classList.toggle('active', active);
+            tab.setAttribute('aria-selected', active ? 'true' : 'false');
         });
 
+        document.querySelectorAll('.quran-subtab-pane').forEach(pane => pane.classList.remove('active'));
+        const activePane = getQuranPaneByView(nextView);
+        if (activePane) activePane.classList.add('active');
+
         const listScreen = document.getElementById('quranListScreen');
-        const list = document.getElementById('quranList');
-        const search = document.querySelector('.quran-search-shell');
+        const search = document.querySelector('#quranPaneSurah .quran-search-shell');
         const reader = document.getElementById('quranReaderScreen');
         const readerWasActive = !!(reader && reader.classList.contains('active'));
 
@@ -6525,26 +6692,26 @@ window.filterCategory = function(cat, btn) {
         }
 
         if (listScreen) listScreen.style.display = '';
-        if (list) list.style.display = '';
+        const activeList = getQuranListContainerByView(nextView);
+        if (activeList) activeList.style.display = '';
         if (reader) reader.classList.remove('active');
-        if (search) search.style.display = view === 'surah' ? '' : 'none';
-        if (!list) return;
+        if (search) search.style.display = nextView === 'surah' ? '' : 'none';
 
-        if (view === 'surah') {
+        if (nextView === 'surah') {
             renderQuranContinueCard();
             renderQuranRecentSection();
             renderQuranSurahRows();
         }
-        else if (view === 'juz') renderQuranJuzRows();
-        else if (view === 'bookmarks') renderQuranBookmarksSection();
-        else if (view === 'settings') renderQuranSettingsSection();
+        else if (nextView === 'juz') renderQuranJuzRows();
+        else if (nextView === 'bookmarks') renderQuranBookmarksSection();
+        else if (nextView === 'settings') renderQuranSettingsSection();
 
         updateInAppFabVisibility();
         if (document.querySelector('.quran-panel.active')) recordInAppRoute(false);
     }
 
     function renderQuranSurahRows() {
-        const list = document.getElementById('quranList');
+        const list = document.getElementById('quranSurahList');
         if (!list) return;
         const ui = getQuranUiText();
         const rows = buildQuranSurahList(quranState.search);
@@ -6552,10 +6719,10 @@ window.filterCategory = function(cat, btn) {
 
         list.innerHTML = rows.map((surah) => {
             const revelation = getRevelationMeta(surah.revelationType);
-            const titleMain = cleanSurahArabicName(surah.name);
-            const titleSub = surah.englishName;
-            const primary = isPashtoMode() ? titleMain : titleSub;
-            const secondary = isPashtoMode() ? titleSub : titleMain;
+            const primary = cleanSurahArabicName(surah.name);
+            const secondary = isPashtoMode()
+                ? (surah.englishNameTranslation || surah.englishName)
+                : surah.englishName;
             const cached = offlineSet.has(Number(surah.number));
 
             return `
@@ -6579,16 +6746,26 @@ window.filterCategory = function(cat, btn) {
     }
 
     function renderQuranJuzRows() {
-        const list = document.getElementById('quranList');
+        const list = document.getElementById('quranJuzList');
         if (!list) return;
         const ui = getQuranUiText();
 
         list.innerHTML = Array.from({ length: 30 }).map((_, index) => {
             const juzNo = index + 1;
+            const start = QURAN_JUZ_STARTS[index] || { surah: 1, ayah: 1 };
+            const surahMeta = getCurrentSurahMetaByNumber(start.surah);
+            const surahName = surahMeta
+                ? (isPashtoMode() ? cleanSurahArabicName(surahMeta.name) : surahMeta.englishName)
+                : `${isPashtoMode() ? 'سورت' : 'Surah'} ${localizeQuranNumber(start.surah)}`;
             return `
                 <div class="quran-juz-item" onclick="openQuranJuz(${juzNo})" role="button">
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <strong>${ui.juzLabel} ${localizeQuranNumber(juzNo)}</strong>
+                        <div>
+                            <strong>${ui.juzLabel} ${localizeQuranNumber(juzNo)}</strong>
+                            <div style="font-size:0.68rem;color:var(--text-subtle);margin-top:3px;">
+                                ${surahName} • ${isPashtoMode() ? 'آیت' : 'Ayah'} ${localizeQuranNumber(start.ayah)}
+                            </div>
+                        </div>
                         <button class="quran-row-btn" type="button">${ui.open}</button>
                     </div>
                 </div>
@@ -6596,43 +6773,14 @@ window.filterCategory = function(cat, btn) {
         }).join('');
     }
 
-    async function openQuranJuz(juzNumber) {
-        const list = document.getElementById('quranList');
-        if (!list) return;
-        const ui = getQuranUiText();
-        list.innerHTML = `<div class="quran-settings-card">${ui.loading}</div>`;
-        try {
-            const response = await fetch(`${QURAN_API_BASE}/juz/${juzNumber}/quran-uthmani`);
-            const json = await response.json();
-            const ayahs = json?.data?.ayahs || [];
-            const uniqueSurahNos = Array.from(new Set(ayahs.map(a => Number(a?.surah?.number)).filter(Boolean))).sort((a, b) => a - b);
-            const refs = quranState.meta?.surahs?.references || [];
-            const rows = uniqueSurahNos.map(no => refs.find(ref => Number(ref.number) === no)).filter(Boolean);
-            list.innerHTML = rows.map((surah) => {
-                const revelation = getRevelationMeta(surah.revelationType);
-                const primary = isPashtoMode() ? cleanSurahArabicName(surah.name) : surah.englishName;
-                const secondary = isPashtoMode() ? surah.englishName : cleanSurahArabicName(surah.name);
-                return `
-                    <div class="quran-surah-row" onclick="openQuranSurah(${surah.number})">
-                        <div class="quran-surah-num">${localizeQuranNumber(surah.number)}</div>
-                        <div class="quran-surah-main">
-                            <div class="quran-surah-ar" dir="rtl">${escapeHtml(primary)}</div>
-                            <div class="quran-surah-en">${escapeHtml(secondary)}</div>
-                        </div>
-                        <div class="quran-surah-meta">
-                            <span class="quran-revelation-badge">${revelation.icon} ${revelation.label}</span>
-                            <span class="quran-surah-ayahs">${localizeQuranNumber(surah.numberOfAyahs)} ${ui.ayahs}</span>
-                        </div>
-                    </div>
-                `;
-            }).join('') || `<div class="quran-settings-card">${ui.noData}</div>`;
-        } catch (error) {
-            list.innerHTML = `<div class="quran-settings-card">${ui.noData}</div>`;
-        }
+    function openQuranJuz(juzNumber) {
+        const idx = Math.max(1, Math.min(30, Number(juzNumber))) - 1;
+        const start = QURAN_JUZ_STARTS[idx] || { surah: 1, ayah: 1 };
+        openQuranSurah(start.surah, start.ayah);
     }
 
     function renderQuranBookmarksSection() {
-        const list = document.getElementById('quranList');
+        const list = document.getElementById('quranBookmarksList');
         if (!list) return;
         const ui = getQuranUiText();
         const bookmarks = getQuranBookmarks();
@@ -6648,7 +6796,7 @@ window.filterCategory = function(cat, btn) {
                 <div class="quran-bookmark-item">
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
                         <div>
-                            <div style="font-size:0.82rem;color:var(--text-primary)">${escapeHtml(item.surahLabel || `Surah ${item.surahNumber}`)}</div>
+                            <div style="font-size:0.82rem;color:var(--text-primary)">${escapeHtml(item.surahLabel || `${isPashtoMode() ? 'سورت' : 'Surah'} ${item.surahNumber}`)}</div>
                             <div style="font-size:0.66rem;color:var(--text-subtle)">${isPashtoMode() ? 'آیت' : 'Ayah'} ${localizeQuranNumber(item.ayahNumber)}</div>
                             <div style="font-size:0.76rem;color:var(--gold-light);margin-top:3px;direction:rtl;text-align:right;">${escapeHtml(item.preview || '')}</div>
                         </div>
@@ -6662,7 +6810,7 @@ window.filterCategory = function(cat, btn) {
     }
 
     function renderQuranSettingsSection() {
-        const list = document.getElementById('quranList');
+        const list = document.getElementById('quranSettingsList');
         if (!list) return;
         const ui = getQuranUiText();
         const settings = getQuranSettings();
@@ -6972,14 +7120,14 @@ window.filterCategory = function(cat, btn) {
 
     async function openQuranSurah(surahNumber, ayahNumber = 1) {
         const reader = document.getElementById('quranReaderScreen');
-        const list = document.getElementById('quranList');
+        const activeList = getQuranListContainerByView(quranState.view) || document.getElementById('quranSurahList');
         const loadMore = document.getElementById('quranLoadMore');
-        if (!reader || !list) return;
+        if (!reader || !activeList) return;
 
         quranState.currentSurah = Number(surahNumber);
         quranState.loadingReader = true;
         showQuranSkeleton(true);
-        list.style.display = 'none';
+        activeList.style.display = 'none';
         reader.classList.add('active');
         if (loadMore) loadMore.classList.remove('visible');
 
@@ -7014,7 +7162,7 @@ window.filterCategory = function(cat, btn) {
         } catch (error) {
             showToast(getQuranUiText().noData);
             reader.classList.remove('active');
-            list.style.display = '';
+            activeList.style.display = '';
         } finally {
             quranState.loadingReader = false;
             showQuranSkeleton(false);
@@ -7795,6 +7943,24 @@ window.filterCategory = function(cat, btn) {
         if (tabBookmarks) tabBookmarks.textContent = ui.tabBookmarks;
         if (tabSettings) tabSettings.textContent = ui.tabSettings;
 
+        const loadMore = document.getElementById('quranLoadMore');
+        if (loadMore) loadMore.textContent = isPashtoMode() ? 'نور آیتونه ښکاره کړئ…' : 'Load more…';
+
+        const dotPrev = document.getElementById('dot-prev');
+        const dotNext = document.getElementById('dot-next');
+        const dotStop = document.getElementById('dot-stop');
+        const dotClose = document.getElementById('dot-close');
+        if (dotPrev) dotPrev.setAttribute('aria-label', isPashtoMode() ? 'مخکینی آیت' : 'Previous ayah');
+        if (dotNext) dotNext.setAttribute('aria-label', isPashtoMode() ? 'راتلونکی آیت' : 'Next ayah');
+        if (dotStop) {
+            dotStop.setAttribute('aria-label', isPashtoMode() ? 'غږ بند کړئ' : 'Stop audio');
+            dotStop.textContent = isPashtoMode() ? '⏹ بند' : '⏹ Stop';
+        }
+        if (dotClose) {
+            dotClose.setAttribute('aria-label', isPashtoMode() ? 'د غږ کړکۍ بنده کړئ' : 'Close audio popup');
+            dotClose.textContent = isPashtoMode() ? '✕ بند' : '✕ Close';
+        }
+
         const modeBtnMap = {
             all: 'AR + PS + EN',
             'ar-ps': 'AR + PS',
@@ -7818,7 +7984,7 @@ window.filterCategory = function(cat, btn) {
         renderQuranTexts();
         renderQuranContinueCard();
         renderQuranRecentSection();
-        setQuranView('surah');
+        setQuranView(quranState.view || 'surah');
         const pashtoEdition = await ensurePashtoEdition();
         showToast(pashtoEdition ? getQuranUiText().pashtoEditionFound : getQuranUiText().noPashtoFound);
         quranState.initialized = true;
@@ -7848,7 +8014,7 @@ window.filterCategory = function(cat, btn) {
         await initQuran();
         renderQuranContinueCard();
         renderQuranRecentSection();
-        if (quranState.view === 'surah') renderQuranSurahRows();
+        setQuranView(quranState.view || localStorage.getItem(QURAN_ACTIVE_TAB_KEY) || 'surah');
         updateQuranFloatingAudioUi();
         recordInAppRoute(true);
     };
