@@ -2546,6 +2546,35 @@
             flex-shrink: 0;
         }
 
+        .quran-play-all-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .quran-restart-link {
+            border: 0;
+            background: transparent;
+            color: var(--text-subtle);
+            font-family: var(--font-title);
+            font-size: 0.56rem;
+            line-height: 1.2;
+            letter-spacing: 0.25px;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .quran-play-hint {
+            color: var(--text-subtle);
+            font-family: var(--font-title);
+            font-size: 0.54rem;
+            line-height: 1.2;
+            letter-spacing: 0.22px;
+            text-align: right;
+        }
+
         .quran-ayah-list {
             display: flex;
             flex-direction: column;
@@ -2574,6 +2603,11 @@
             box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.12), 0 6px 14px rgba(0,0,0,0.18);
         }
 
+        .quran-ayah-card.resume-target {
+            border-left: 2px solid rgba(201, 168, 76, 0.9);
+            box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.1);
+        }
+
         .quran-ayah-head {
             display: block;
             margin-bottom: 0;
@@ -2590,6 +2624,22 @@
             font-family: var(--font-title);
             font-size: 0.56rem;
             background: rgba(201, 168, 76, 0.1);
+        }
+
+        .quran-resume-banner {
+            border: 1px solid rgba(201, 168, 76, 0.28);
+            background: rgba(201, 168, 76, 0.08);
+            color: var(--gold-light);
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 0.6rem;
+            font-family: var(--font-title);
+            line-height: 1.2;
+            letter-spacing: 0.35px;
+            width: fit-content;
+            max-width: 100%;
+            text-align: left;
+            cursor: pointer;
         }
 
         .quran-ayah-actions {
