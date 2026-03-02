@@ -1054,6 +1054,7 @@ function applyLanguage(lang) {
     if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
     if (typeof window.refreshQuranLanguage === 'function') window.refreshQuranLanguage();
     if (typeof window.refreshAudioButtonLanguage === 'function') window.refreshAudioButtonLanguage();
+    if (typeof window.refreshDuaSwipeViewerLanguage === 'function') window.refreshDuaSwipeViewerLanguage();
 
     // Convert remaining visible digits in the DOM to Pashto digits
     try { convertDigitsInTree(document.body); } catch (e) { /* noop */ }
@@ -1090,6 +1091,7 @@ function restoreEnglish() {
     if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
     if (typeof window.refreshQuranLanguage === 'function') window.refreshQuranLanguage();
     if (typeof window.refreshAudioButtonLanguage === 'function') window.refreshAudioButtonLanguage();
+    if (typeof window.refreshDuaSwipeViewerLanguage === 'function') window.refreshDuaSwipeViewerLanguage();
 }
 
 // Patch showToast for Pashto — deferred until showToast exists

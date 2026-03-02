@@ -220,6 +220,9 @@
             window.location.hash = '';
         }, 1500); // After splash screen
 
+        initDuaSwipeViewer();
+        const savedCat = localStorage.getItem('crown_active_category');
+        if (savedCat) openCategory(savedCat, { skipHistory: true });
         initInAppNavigationUX();
         updateInAppFabVisibility();
     }
@@ -281,7 +284,7 @@
             const body = card?.querySelector('.card-body');
             if (body && !body.id) body.id = `dua-body-${card?.getAttribute('data-id') || index + 1}`;
             if (body) header.setAttribute('aria-controls', body.id);
-            if (!header.hasAttribute('aria-label')) header.setAttribute('aria-label', `Toggle dua: ${title}`);
+            if (!header.hasAttribute('aria-label')) header.setAttribute('aria-label', `Open dua: ${title}`);
         });
 
         document.querySelectorAll('.bookmark-btn').forEach(btn => {
@@ -449,41 +452,15 @@
 
     // ===== CARD TOGGLE =====
     window.toggleCard = function(header) {
-        const card = header.closest('.dua-card');
-        const isExpanded = card.classList.toggle('expanded');
-        header.setAttribute('aria-expanded', isExpanded);
-        if (isExpanded) wrapArabicWords();
-
-        const grid = document.getElementById('categoryGrid');
-        const inCategoryView = !!grid && grid.classList.contains('hidden-grid');
-        if (!inCategoryView) return;
-
-        if (isExpanded) {
-            recordInAppRoute(true, {
-                [IN_APP_HISTORY_FLAG]: true,
-                view: IN_APP_VIEWS.DUA_DETAIL,
-                category: localStorage.getItem('crown_active_category') || 'all',
-                duaId: Number(card.getAttribute('data-id')) || null,
-                ts: Date.now()
-            });
-        } else {
-            recordInAppRoute(false, {
-                [IN_APP_HISTORY_FLAG]: true,
-                view: IN_APP_VIEWS.CATEGORY_VIEW,
-                category: localStorage.getItem('crown_active_category') || 'all',
-                ts: Date.now()
-            });
-        }
+        const card = header?.closest('.dua-card');
+        const id = Number(card?.getAttribute('data-id')) || null;
+        if (!id) return;
+        const activeCategory = localStorage.getItem('crown_active_category') || 'all';
+        openDuaViewerAtId(id, activeCategory, { pushHistory: true });
     };
 
-    window.toggleAllCards = function(expand) {
-        els.cards.forEach(card => {
-            if (expand) card.classList.add('expanded');
-            else card.classList.remove('expanded');
-            const header = card.querySelector('.card-header');
-            if (header) header.setAttribute('aria-expanded', expand);
-        });
-        showToast(expand ? 'All Expanded' : 'All Collapsed');
+    window.toggleAllCards = function() {
+        showToast('Swipe left/right to navigate duas');
     };
 
     // ===== FONT SIZE =====
@@ -540,6 +517,28 @@
         PANEL: 'panel'
     };
 
+    const DUA_SWIPE_STATE = {
+        active: false,
+        category: 'all',
+        ids: [],
+        index: 0,
+        axisLock: null,
+        touchStartX: 0,
+        touchStartY: 0,
+        dragX: 0,
+        isDragging: false,
+        transitionLock: false
+    };
+
+    function isDuaSwipeViewerActive() {
+        return DUA_SWIPE_STATE.active;
+    }
+
+    function getCurrentSwipeDuaId() {
+        if (!DUA_SWIPE_STATE.active || !DUA_SWIPE_STATE.ids.length) return null;
+        return DUA_SWIPE_STATE.ids[DUA_SWIPE_STATE.index] || null;
+    }
+
     function isCategorySubViewActive() {
         const grid = document.getElementById('categoryGrid');
         return !!grid && grid.classList.contains('hidden-grid');
@@ -556,6 +555,11 @@
     }
 
     function getExpandedDuaCard() {
+        if (isDuaSwipeViewerActive()) {
+            const currentId = getCurrentSwipeDuaId();
+            if (!currentId) return null;
+            return document.querySelector(`#duaListSection .dua-card[data-id="${currentId}"]`);
+        }
         return document.querySelector('#duaListSection .dua-card.expanded:not(.hidden-card)');
     }
 
@@ -644,6 +648,9 @@
     }
 
     function getActiveScrollableElement() {
+        if (isDuaSwipeViewerActive()) {
+            return document.querySelector('.dua-swipe-slide.slot-current .dua-swipe-content') || window;
+        }
         if (document.querySelector('.quran-panel.active')) {
             return document.querySelector('.quran-panel');
         }
@@ -720,6 +727,7 @@
     }
 
     function closeAllPanelsForStateApply() {
+        if (isDuaSwipeViewerActive()) closeDuaSwipeViewer({ skipRoute: true });
         if (document.querySelector('.quran-panel.active')) closeQuran();
         if (document.querySelector('.prayer-panel.active')) closePrayer();
         if (document.querySelector('.routine-panel.active')) closeRoutine();
@@ -731,6 +739,7 @@
     }
 
     function collapseExpandedDuaCards() {
+        if (isDuaSwipeViewerActive()) closeDuaSwipeViewer({ skipRoute: true });
         document.querySelectorAll('#duaListSection .dua-card.expanded').forEach((card) => {
             card.classList.remove('expanded');
             const header = card.querySelector('.card-header');
@@ -755,13 +764,7 @@
                 collapseExpandedDuaCards();
             } else if (view === IN_APP_VIEWS.DUA_DETAIL) {
                 const category = state.category || 'all';
-                openCategory(category, { skipScroll: true });
-                collapseExpandedDuaCards();
-                const card = document.querySelector(`#duaListSection .dua-card[data-id="${state.duaId}"]`);
-                const header = card?.querySelector('.card-header');
-                if (card && header && !card.classList.contains('expanded')) {
-                    toggleCard(header);
-                }
+                openCategory(category, { skipScroll: true, skipHistory: true, startId: state.duaId || null });
             } else if (view === IN_APP_VIEWS.QURAN_TAB) {
                 await openQuran();
                 setQuranView('surah');
@@ -902,6 +905,7 @@
         localStorage.setItem('crown_bookmarks', JSON.stringify(STATE.bookmarks));
         updateStats();
         renderBookmarksPanel();
+        if (isDuaSwipeViewerActive() && getCurrentSwipeDuaId() === id) renderDuaSwipeViewer();
     };
 
     // ===== MARK READ =====
@@ -914,6 +918,7 @@
             if (btn) { btn.classList.add('read'); btn.innerHTML = '✓ Read'; }
             updateStats();
             showToast(`Marked as Read (${STATE.read.length}/63)`);
+            if (isDuaSwipeViewerActive() && getCurrentSwipeDuaId() === id) renderDuaSwipeViewer();
         } else {
             showToast('Already marked as read');
         }
@@ -1045,126 +1050,412 @@ window.filterCategory = function(cat, btn) {
         'evil-eye':        { icon: '🧿', title: 'Evil Eye & Envy',             subtitle: 'Prophetic shields against hasad and al-\'ayn' }
     };
 
-    window.openCategory = function(cat, opts) {
+    function getDuaIdsForCategory(cat) {
+        const cards = Array.from(document.querySelectorAll('#duaListSection .dua-card'));
+        return cards
+            .filter((card) => {
+                if (cat === 'all') return true;
+                const cats = (card.getAttribute('data-categories') || '').split(',').map(c => c.trim());
+                return cats.includes(cat);
+            })
+            .map(card => Number(card.getAttribute('data-id')))
+            .filter(Boolean);
+    }
+
+    function getViewerTexts() {
+        return isPashtoMode()
+            ? {
+                of: 'له',
+                from: 'څخه',
+                read: 'لوستل شوی ✓',
+                markRead: '✓ ولولئ',
+                listen: '🔊 اورېدل',
+                copy: '📋 کاپي',
+                share: '↗ شريک',
+                shareImage: '🖼 انځور',
+                bookmarkAdd: '☆ نښه',
+                bookmarkOn: '★ نښه',
+                backHint: 'کټګوریو ته ستنیدل'
+            }
+            : {
+                of: 'of',
+                from: '',
+                read: 'Read ✓',
+                markRead: '✓ Mark Read',
+                listen: '🔊 Listen',
+                copy: '📋 Copy',
+                share: '↗ Share',
+                shareImage: '🖼 Share Image',
+                bookmarkAdd: '☆ Bookmark',
+                bookmarkOn: '★ Bookmarked',
+                backHint: 'Back to categories'
+            };
+    }
+
+    function buildSwipeSlide(duaId, slotClass) {
+        const card = document.querySelector(`#duaListSection .dua-card[data-id="${duaId}"]`);
+        if (!card) {
+            const fallback = document.createElement('div');
+            fallback.className = `dua-swipe-slide ${slotClass || ''}`;
+            fallback.innerHTML = '<div class="dua-swipe-card"><div class="dua-swipe-empty">Dua unavailable</div></div>';
+            return fallback;
+        }
+
+        const titleEl = card.querySelector('.dua-title');
+        const titleClone = titleEl ? titleEl.cloneNode(true) : null;
+        const authBadge = titleClone?.querySelector('.auth-badge');
+        const authText = authBadge ? authBadge.textContent.trim() : '';
+        if (authBadge) authBadge.remove();
+
+        const bodyClone = card.querySelector('.card-body-inner')?.cloneNode(true);
+        if (bodyClone) bodyClone.querySelectorAll('.copy-row').forEach(row => row.remove());
+
+        const texts = getViewerTexts();
+        const isBookmarked = STATE.bookmarks.includes(duaId);
+        const isRead = STATE.read.includes(duaId);
+        const indexDisplay = DUA_SWIPE_STATE.index + 1;
+        const total = DUA_SWIPE_STATE.ids.length;
+        const progressLabel = isPashtoMode()
+            ? `${localizeDigits(indexDisplay)} ${texts.of} ${localizeDigits(total)} ${texts.from}`
+            : `${indexDisplay} ${texts.of} ${total}`;
+
+        const slide = document.createElement('div');
+        slide.className = `dua-swipe-slide ${slotClass || ''}`;
+        slide.setAttribute('data-dua-id', String(duaId));
+
+        const cardWrap = document.createElement('div');
+        cardWrap.className = 'dua-swipe-card';
+
+        const topMeta = document.createElement('div');
+        topMeta.className = 'dua-swipe-meta';
+        topMeta.innerHTML = `
+            <div class="dua-swipe-count">${progressLabel}</div>
+            <div class="dua-swipe-read ${isRead ? 'active' : ''}" data-role="read-indicator">${isRead ? texts.read : texts.markRead}</div>
+        `;
+
+        const titleRow = document.createElement('div');
+        titleRow.className = 'dua-swipe-title-row';
+        titleRow.innerHTML = `
+            <div class="dua-swipe-title">${titleClone ? titleClone.innerHTML : `Dua ${duaId}`}</div>
+            <div class="dua-swipe-auth">${authText}</div>
+        `;
+
+        const content = document.createElement('div');
+        content.className = 'dua-swipe-content';
+        if (bodyClone) content.appendChild(bodyClone);
+
+        const actions = document.createElement('div');
+        actions.className = 'dua-swipe-actions';
+        actions.innerHTML = `
+            <div class="audio-player dua-swipe-audio" data-state="idle">
+                <button class="action-btn audio-btn" type="button">${texts.listen}</button>
+                <div class="audio-progress"><span class="audio-progress-fill"></span></div>
+            </div>
+            <button class="action-btn" data-role="copy">${texts.copy}</button>
+            <button class="action-btn" data-role="share">${texts.share}</button>
+            <button class="action-btn ${isBookmarked ? 'bookmarked-inline' : ''}" data-role="bookmark">${isBookmarked ? texts.bookmarkOn : texts.bookmarkAdd}</button>
+            <button class="action-btn" data-role="image">${texts.shareImage}</button>
+        `;
+
+        const listenBtn = actions.querySelector('.audio-btn');
+        if (!DUA_AUDIO_SOURCES[duaId]) {
+            const player = actions.querySelector('.dua-swipe-audio');
+            if (player) player.remove();
+        } else if (listenBtn) {
+            listenBtn.addEventListener('click', () => {
+                const player = actions.querySelector('.dua-swipe-audio');
+                if (player) playDuaAudio(duaId, player);
+            });
+        }
+
+        const firstArabic = card.querySelector('.arabic-text')?.textContent?.trim() || '';
+        actions.querySelector('[data-role="copy"]')?.addEventListener('click', function() {
+            copyText(this, firstArabic);
+        });
+        actions.querySelector('[data-role="share"]')?.addEventListener('click', () => shareDua(duaId));
+        actions.querySelector('[data-role="image"]')?.addEventListener('click', () => shareAsImage(duaId));
+        actions.querySelector('[data-role="bookmark"]')?.addEventListener('click', () => {
+            toggleBookmark(duaId);
+            renderDuaSwipeViewer();
+        });
+        topMeta.querySelector('[data-role="read-indicator"]')?.addEventListener('click', () => {
+            markRead(null, duaId);
+            renderDuaSwipeViewer();
+        });
+
+        cardWrap.appendChild(topMeta);
+        cardWrap.appendChild(titleRow);
+        cardWrap.appendChild(content);
+        cardWrap.appendChild(actions);
+        slide.appendChild(cardWrap);
+        return slide;
+    }
+
+    function updateSwipeViewerIndicators() {
+        const total = DUA_SWIPE_STATE.ids.length;
+        const index = DUA_SWIPE_STATE.index;
+        const progress = document.getElementById('duaSwipeProgressFill');
+        if (progress) {
+            const pct = total ? ((index + 1) / total) * 100 : 0;
+            progress.style.width = `${pct}%`;
+        }
+
+        const dotsWrap = document.getElementById('duaSwipeDots');
+        if (!dotsWrap) return;
+        if (total > 10) {
+            dotsWrap.innerHTML = '';
+            dotsWrap.classList.remove('visible');
+            return;
+        }
+        dotsWrap.classList.add('visible');
+        dotsWrap.innerHTML = DUA_SWIPE_STATE.ids.map((_, i) =>
+            `<span class="dua-swipe-dot ${i === index ? 'active' : ''}"></span>`
+        ).join('');
+    }
+
+    function getSwipeStep() {
+        const track = document.getElementById('duaSwipeTrack');
+        const firstSlide = track?.querySelector('.dua-swipe-slide');
+        if (!track || !firstSlide) return 0;
+        const style = window.getComputedStyle(track);
+        const gap = parseFloat(style.columnGap || style.gap || '0') || 0;
+        return firstSlide.getBoundingClientRect().width + gap;
+    }
+
+    function setSwipeTrackPosition(baseIndex, extraX, animated) {
+        const track = document.getElementById('duaSwipeTrack');
+        if (!track) return;
+        const step = getSwipeStep();
+        if (!step) return;
+        track.style.transition = animated ? 'transform 300ms ease-out' : 'none';
+        track.style.transform = `translate3d(${(-step * baseIndex) + extraX}px, 0, 0)`;
+    }
+
+    function renderDuaSwipeViewer() {
+        const track = document.getElementById('duaSwipeTrack');
+        if (!track || !DUA_SWIPE_STATE.ids.length) return;
+        const index = DUA_SWIPE_STATE.index;
+        const prevId = index > 0 ? DUA_SWIPE_STATE.ids[index - 1] : null;
+        const currentId = DUA_SWIPE_STATE.ids[index];
+        const nextId = index < DUA_SWIPE_STATE.ids.length - 1 ? DUA_SWIPE_STATE.ids[index + 1] : null;
+
+        track.innerHTML = '';
+        track.appendChild(buildSwipeSlide(prevId || currentId, 'slot-prev'));
+        track.appendChild(buildSwipeSlide(currentId, 'slot-current'));
+        track.appendChild(buildSwipeSlide(nextId || currentId, 'slot-next'));
+
+        requestAnimationFrame(() => setSwipeTrackPosition(1, 0, false));
+        updateSwipeViewerIndicators();
+        wrapArabicWords();
+    }
+
+    function navigateSwipe(delta) {
+        if (DUA_SWIPE_STATE.transitionLock) return;
+        const targetIndex = DUA_SWIPE_STATE.index + delta;
+        if (targetIndex < 0) {
+            showToast(getViewerTexts().backHint);
+            backToCategories();
+            return;
+        }
+        if (targetIndex >= DUA_SWIPE_STATE.ids.length) {
+            showToast(isPashtoMode() ? 'وروستۍ دعا' : 'Last dua in this category');
+            return;
+        }
+
+        DUA_SWIPE_STATE.transitionLock = true;
+        setSwipeTrackPosition(delta > 0 ? 2 : 0, 0, true);
+
+        const track = document.getElementById('duaSwipeTrack');
+        const onDone = () => {
+            track?.removeEventListener('transitionend', onDone);
+            DUA_SWIPE_STATE.index = targetIndex;
+            DUA_SWIPE_STATE.transitionLock = false;
+            renderDuaSwipeViewer();
+            recordInAppRoute(false, {
+                [IN_APP_HISTORY_FLAG]: true,
+                view: IN_APP_VIEWS.DUA_DETAIL,
+                category: DUA_SWIPE_STATE.category,
+                duaId: getCurrentSwipeDuaId(),
+                ts: Date.now()
+            });
+        };
+        track?.addEventListener('transitionend', onDone);
+    }
+
+    function openDuaSwipeViewer(category, ids, startIndex, opts) {
         opts = opts || {};
         const grid = document.getElementById('categoryGrid');
         const duaList = document.getElementById('duaListSection');
         const detailHeader = document.getElementById('categoryDetailHeader');
-        const meta = CATEGORY_META[cat] || { icon: '📿', title: cat, subtitle: '' };
-
-        // Hide the grid and hero, show dua list
-        grid.classList.add('hidden-grid');
-        duaList.classList.remove('hidden-list');
         const hero = document.querySelector('.hero');
+        const viewer = document.getElementById('duaSwipeViewer');
+
+        DUA_SWIPE_STATE.active = true;
+        DUA_SWIPE_STATE.category = category;
+        DUA_SWIPE_STATE.ids = ids;
+        DUA_SWIPE_STATE.index = Math.max(0, Math.min(startIndex, ids.length - 1));
+
+        grid?.classList.add('hidden-grid');
+        duaList?.classList.add('hidden-list');
+        detailHeader?.classList.remove('visible');
         if (hero) hero.style.display = 'none';
-
-        // Set detail header (language-aware)
-        document.getElementById('cdhIcon').textContent = meta.icon;
-        const isPashto = typeof getCurrentLang === 'function' && getCurrentLang() === 'ps';
-        const psUI = typeof PS_UI !== 'undefined' ? PS_UI : null;
-        document.getElementById('cdhTitle').textContent = (isPashto && psUI && psUI.catCardTitles[cat]) ? psUI.catCardTitles[cat] : meta.title;
-        document.getElementById('cdhSubtitle').textContent = (isPashto && psUI && psUI.catCardSubtitles[cat]) ? psUI.catCardSubtitles[cat] : meta.subtitle;
-        detailHeader.classList.add('visible');
-
-        // Hide category pills — the user already chose a category
-        const pillsRow = document.getElementById('categoryPills');
-        if (pillsRow) pillsRow.style.display = 'none';
-
-        // Filter cards to this category
-        const pill = document.querySelector(`.pill[data-category="${cat}"]`);
-        filterCategory(cat, pill);
-        document.querySelectorAll('#duaListSection .dua-card.expanded').forEach((card) => {
-            card.classList.remove('expanded');
-            const header = card.querySelector('.card-header');
-            if (header) header.setAttribute('aria-expanded', 'false');
-        });
-
-        // Scroll to the dua list so user sees cards immediately
-        if (!opts.skipScroll) {
-            duaList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (viewer) {
+            viewer.classList.add('active');
+            viewer.setAttribute('aria-hidden', 'false');
         }
 
-        // Save state
-        localStorage.setItem('crown_active_category', cat);
-        recordInAppRoute(true, {
-            [IN_APP_HISTORY_FLAG]: true,
-            view: IN_APP_VIEWS.CATEGORY_VIEW,
-            category: cat,
-            ts: Date.now()
-        });
+        localStorage.setItem('crown_active_category', category);
+        renderDuaSwipeViewer();
+        if (!opts.skipHistory) {
+            recordInAppRoute(true, {
+                [IN_APP_HISTORY_FLAG]: true,
+                view: IN_APP_VIEWS.DUA_DETAIL,
+                category,
+                duaId: getCurrentSwipeDuaId(),
+                ts: Date.now()
+            });
+        }
+    }
+
+    function openDuaViewerAtId(duaId, preferredCategory, opts) {
+        const categories = (document.querySelector(`#duaListSection .dua-card[data-id="${duaId}"]`)?.getAttribute('data-categories') || '')
+            .split(',')
+            .map(c => c.trim())
+            .filter(Boolean);
+
+        const category = (preferredCategory && (preferredCategory === 'all' || categories.includes(preferredCategory)))
+            ? preferredCategory
+            : (categories[0] || 'all');
+
+        const ids = getDuaIdsForCategory(category);
+        const idx = ids.indexOf(Number(duaId));
+        const startIndex = idx >= 0 ? idx : 0;
+        openDuaSwipeViewer(category, ids, startIndex, opts || {});
+    }
+
+    function closeDuaSwipeViewer(opts) {
+        opts = opts || {};
+        const viewer = document.getElementById('duaSwipeViewer');
+        if (viewer) {
+            viewer.classList.remove('active');
+            viewer.setAttribute('aria-hidden', 'true');
+        }
+        DUA_SWIPE_STATE.active = false;
+        DUA_SWIPE_STATE.ids = [];
+        DUA_SWIPE_STATE.index = 0;
+        DUA_SWIPE_STATE.transitionLock = false;
+        if (!opts.skipRoute) {
+            recordInAppRoute(false, {
+                [IN_APP_HISTORY_FLAG]: true,
+                view: IN_APP_VIEWS.HOME,
+                ts: Date.now()
+            });
+        }
+    }
+
+    function initDuaSwipeViewer() {
+        const prevBtn = document.getElementById('duaSwipePrev');
+        const nextBtn = document.getElementById('duaSwipeNext');
+        const backBtn = document.getElementById('duaSwipeBack');
+        const shell = document.getElementById('duaSwipeShell');
+
+        if (prevBtn && !prevBtn.dataset.bound) {
+            prevBtn.addEventListener('click', () => navigateSwipe(-1));
+            prevBtn.dataset.bound = '1';
+        }
+        if (nextBtn && !nextBtn.dataset.bound) {
+            nextBtn.addEventListener('click', () => navigateSwipe(1));
+            nextBtn.dataset.bound = '1';
+        }
+        if (backBtn && !backBtn.dataset.bound) {
+            backBtn.addEventListener('click', () => backToCategories());
+            backBtn.dataset.bound = '1';
+        }
+
+        if (shell && !shell.dataset.boundSwipe) {
+            shell.addEventListener('touchstart', (e) => {
+                const touch = e.touches?.[0];
+                if (!touch || !DUA_SWIPE_STATE.active) return;
+                DUA_SWIPE_STATE.touchStartX = touch.clientX;
+                DUA_SWIPE_STATE.touchStartY = touch.clientY;
+                DUA_SWIPE_STATE.axisLock = null;
+                DUA_SWIPE_STATE.dragX = 0;
+                DUA_SWIPE_STATE.isDragging = true;
+            }, { passive: true });
+
+            shell.addEventListener('touchmove', (e) => {
+                if (!DUA_SWIPE_STATE.isDragging || !DUA_SWIPE_STATE.active) return;
+                const touch = e.touches?.[0];
+                if (!touch) return;
+
+                const dx = touch.clientX - DUA_SWIPE_STATE.touchStartX;
+                const dy = touch.clientY - DUA_SWIPE_STATE.touchStartY;
+
+                if (!DUA_SWIPE_STATE.axisLock) {
+                    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+                    DUA_SWIPE_STATE.axisLock = Math.abs(dx) > Math.abs(dy) * 1.1 ? 'x' : 'y';
+                }
+
+                if (DUA_SWIPE_STATE.axisLock !== 'x') return;
+                e.preventDefault();
+                DUA_SWIPE_STATE.dragX = Math.max(-180, Math.min(180, dx));
+                setSwipeTrackPosition(1, DUA_SWIPE_STATE.dragX, false);
+            }, { passive: false });
+
+            shell.addEventListener('touchend', () => {
+                if (!DUA_SWIPE_STATE.isDragging || !DUA_SWIPE_STATE.active) return;
+                const dx = DUA_SWIPE_STATE.dragX;
+                const axis = DUA_SWIPE_STATE.axisLock;
+                DUA_SWIPE_STATE.isDragging = false;
+                DUA_SWIPE_STATE.axisLock = null;
+                DUA_SWIPE_STATE.dragX = 0;
+
+                if (axis !== 'x') return;
+                if (Math.abs(dx) >= 50) navigateSwipe(dx < 0 ? 1 : -1);
+                else setSwipeTrackPosition(1, 0, true);
+            }, { passive: true });
+
+            shell.dataset.boundSwipe = '1';
+        }
+    }
+
+    window.refreshDuaSwipeViewerLanguage = function() {
+        if (isDuaSwipeViewerActive()) renderDuaSwipeViewer();
+    };
+
+    window.openCategory = function(cat, opts) {
+        opts = opts || {};
+        const ids = getDuaIdsForCategory(cat);
+        if (!ids.length) {
+            showToast(isPashtoMode() ? 'دعاء ونه موندل شوه' : 'No duas found');
+            return;
+        }
+
+        const startId = Number(opts.startId) || ids[0];
+        const startIndex = Math.max(0, ids.indexOf(startId));
+        openDuaSwipeViewer(cat, ids, startIndex, { skipHistory: !!opts.skipHistory });
     };
 
     window.backToCategories = function() {
         const grid = document.getElementById('categoryGrid');
         const duaList = document.getElementById('duaListSection');
         const detailHeader = document.getElementById('categoryDetailHeader');
-
-        // Show grid and hero, hide dua list
-        grid.classList.remove('hidden-grid');
-        duaList.classList.add('hidden-list');
-        detailHeader.classList.remove('visible');
         const hero = document.querySelector('.hero');
-        if (hero) hero.style.display = '';
-
-        // Restore category pills
         const pillsRow = document.getElementById('categoryPills');
+
+        grid?.classList.remove('hidden-grid');
+        duaList?.classList.add('hidden-list');
+        detailHeader?.classList.remove('visible');
+        if (hero) hero.style.display = '';
         if (pillsRow) pillsRow.style.display = '';
 
-        // Reset all card visibility
-        els.cards.forEach(card => {
-            card.classList.remove('hidden-card');
-            card.style.display = '';
-        });
-
-        // Restore all section headers
-        document.querySelectorAll('.section-header').forEach(sh => {
-            sh.style.display = '';
-        });
-
-        // Reset pills
-        if (els.pills) els.pills.forEach(p => p.classList.remove('active'));
-        const allPill = document.querySelector('.pill[data-category="all"]');
-        if (allPill) allPill.classList.add('active');
-
-        // Clear search
         if (els.searchInput) els.searchInput.value = '';
         if (els.searchClear) els.searchClear.classList.remove('visible');
+        if (els.noResults) els.noResults.classList.remove('visible');
 
-        // Drop saved state
         localStorage.removeItem('crown_active_category');
-        recordInAppRoute(false, {
-            [IN_APP_HISTORY_FLAG]: true,
-            view: IN_APP_VIEWS.HOME,
-            ts: Date.now()
-        });
+        closeDuaSwipeViewer();
     };
-
-    // Search should auto-open the dua list if grid is visible
-    (function patchSearchForGrid() {
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('focus', function() {
-                const grid = document.getElementById('categoryGrid');
-                if (grid && !grid.classList.contains('hidden-grid')) {
-                    openCategory('all', { skipScroll: true });
-                    // Scroll to search bar so it stays visible with results below
-                    const searchContainer = document.querySelector('.search-container');
-                    if (searchContainer) {
-                        searchContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }
-                }
-            });
-        }
-    })();
-
-    // Restore last category on page load if saved
-    (function restoreGridState() {
-        const savedCat = localStorage.getItem('crown_active_category');
-        if (savedCat) {
-            // User was viewing a category — restore it
-            openCategory(savedCat);
-        }
-    })();
 
     // ===== BOOKMARKS PANEL =====
     window.toggleBookmarksPanel = function() {
@@ -1230,29 +1521,9 @@ window.filterCategory = function(cat, btn) {
     }
 
     // ===== SCROLL TO DUA =====
-       window.scrollToDua = function(id) {
-        // If we're in grid view, switch to All category first
-        const grid = document.getElementById('categoryGrid');
-        if (grid && !grid.classList.contains('hidden-grid')) {
-            openCategory('all');
-        }
-        const card = document.querySelector(`.dua-card[data-id="${id}"]`);
-        if (card) {
-            card.classList.remove('hidden-card');
-            card.style.display = '';
-            card.classList.add('expanded');
-            const header = card.querySelector('.card-header');
-            if (header) header.setAttribute('aria-expanded', 'true');
-            setTimeout(() => {
-                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-            card.style.borderColor = 'var(--emerald-light)';
-            card.style.boxShadow = '0 0 20px rgba(46, 196, 122, 0.15)';
-            setTimeout(() => {
-                card.style.borderColor = '';
-                card.style.boxShadow = '';
-            }, 2500);
-        }
+    window.scrollToDua = function(id) {
+        const preferredCategory = localStorage.getItem('crown_active_category') || 'all';
+        openDuaViewerAtId(Number(id), preferredCategory, { pushHistory: true });
     };
     // ===== TASBEEH =====
     const DHIKR_LIST = [
@@ -1711,45 +1982,14 @@ window.filterCategory = function(cat, btn) {
 
         // ===== RANDOM DUA =====
     window.showRandomDua = function() {
-        const visibleCards = Array.from(els.cards).filter(c => 
-            !c.classList.contains('hidden-card') && c.style.display !== 'none'
-        );
-        if (visibleCards.length === 0) {
+        const allIds = getDuaIdsForCategory('all');
+        if (!allIds.length) {
             showToast('No duas available');
             return;
         }
-
-        const randomCard = visibleCards[Math.floor(Math.random() * visibleCards.length)];
-
-        // Collapse all first
-        els.cards.forEach(card => {
-            card.classList.remove('expanded');
-            const header = card.querySelector('.card-header');
-            if (header) header.setAttribute('aria-expanded', 'false');
-        });
-
-        // Expand random card
-        randomCard.classList.add('expanded');
-        const header = randomCard.querySelector('.card-header');
-        if (header) header.setAttribute('aria-expanded', 'true');
-
-        setTimeout(() => {
-            randomCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
-
-        randomCard.classList.add('random-glow');
-        randomCard.style.borderColor = 'var(--emerald-light)';
-        randomCard.style.boxShadow = '0 0 25px rgba(46, 196, 122, 0.2)';
-
-        setTimeout(() => {
-            randomCard.classList.remove('random-glow');
-            randomCard.style.borderColor = '';
-            randomCard.style.boxShadow = '';
-        }, 3000);
-
-        const duaNum = randomCard.querySelector('.dua-number').textContent;
-        const duaTitle = randomCard.querySelector('.dua-title').textContent.substring(0, 40);
-        showToast(`🎲 Dua #${duaNum}: ${duaTitle}...`);
+        const id = allIds[Math.floor(Math.random() * allIds.length)];
+        openDuaViewerAtId(id, 'all', { pushHistory: true });
+        showToast(isPashtoMode() ? 'تصادفي دعا' : `🎲 Random Dua #${id}`);
     };
 
     // ===== SECTION COLLAPSE/EXPAND =====
