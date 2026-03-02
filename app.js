@@ -72,9 +72,15 @@
         }
 
         // Scroll listener
-        window.addEventListener('scroll', () => {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const onPrimaryScroll = () => {
+            const homePanel = document.getElementById('mainContainer');
+            const homeIsActive = !!homePanel?.classList.contains('active');
+            const winScroll = homeIsActive
+                ? (homePanel.scrollTop || 0)
+                : (document.body.scrollTop || document.documentElement.scrollTop || 0);
+            const height = homeIsActive
+                ? Math.max(1, (homePanel.scrollHeight || 1) - (homePanel.clientHeight || 0))
+                : Math.max(1, document.documentElement.scrollHeight - document.documentElement.clientHeight);
             const scrolled = (winScroll / height) * 100;
             if (els.progressBar) els.progressBar.style.width = scrolled + "%";
 
@@ -87,7 +93,11 @@
             }
 
             updateInAppFabVisibility();
-        });
+        };
+
+        window.addEventListener('scroll', onPrimaryScroll);
+        const mainContainer = document.getElementById('mainContainer');
+        if (mainContainer) mainContainer.addEventListener('scroll', onPrimaryScroll, { passive: true });
 
         // Restore bookmarks UI
         STATE.bookmarks.forEach(id => {
@@ -222,9 +232,13 @@
         }, 1500); // After splash screen
 
         initDuaSwipeViewer();
-        const savedCat = localStorage.getItem('crown_active_category');
-        if (savedCat) openCategory(savedCat, { skipHistory: true });
         initInAppNavigationUX();
+        closeAllPanelsForStateApply();
+        setActiveTabLayer('home');
+        setBottomNavActive('home');
+        backToCategories();
+        history.replaceState({ view: IN_APP_VIEWS.HOME }, '');
+        inAppCurrentRoute = IN_APP_VIEWS.HOME;
         updateInAppFabVisibility();
     }
 
@@ -526,6 +540,33 @@
             target.setAttribute('aria-current', 'page');
         }
     }
+
+    const TAB_LAYER_SELECTORS = {
+        home: '#mainContainer',
+        routine: '.routine-panel',
+        quran: '.quran-panel',
+        tasbeeh: '.tasbeeh-panel',
+        prayer: '.prayer-panel'
+    };
+
+    function setActiveTabLayer(tabName = 'home') {
+        const nextTab = TAB_LAYER_SELECTORS[tabName] ? tabName : 'home';
+        const target = document.querySelector(TAB_LAYER_SELECTORS[nextTab]);
+        const layers = Object.values(TAB_LAYER_SELECTORS)
+            .map((selector) => document.querySelector(selector))
+            .filter(Boolean);
+
+        if (target) target.classList.add('active');
+        layers.forEach((layer) => {
+            if (layer !== target) layer.classList.remove('active');
+        });
+    }
+
+    window.switchTab = function(tabName) {
+        const nextTab = TAB_LAYER_SELECTORS[tabName] ? tabName : 'home';
+        setActiveTabLayer(nextTab);
+        setBottomNavActive(nextTab);
+    };
 
     let inAppCurrentRoute = 'home';
     const IN_APP_HISTORY_FLAG = '__essential_duas_in_app';
@@ -1731,8 +1772,7 @@ window.filterCategory = function(cat, btn) {
 
     window.openTasbeeh = function() {
         const tp = document.querySelector('.tasbeeh-panel');
-        if (tp) tp.classList.add('active');
-        lockScroll();
+        if (tp) setActiveTabLayer('tasbeeh');
         setBottomNavActive('tasbeeh');
         // Restore last selected dhikr
         const saved = parseInt(localStorage.getItem('crown_dhikr_selected') || '0', 10);
@@ -1764,7 +1804,7 @@ window.filterCategory = function(cat, btn) {
         }
         const tp = document.querySelector('.tasbeeh-panel');
         if (tp) tp.classList.remove('active');
-        unlockScroll();
+        setActiveTabLayer('home');
         setBottomNavActive('home');
         recordInAppRoute(false);
     };
@@ -2002,8 +2042,7 @@ window.filterCategory = function(cat, btn) {
             prompt.textContent = getRoutineUiText().expandPrompt;
         }
 
-        rp.classList.add('active');
-        lockScroll();
+        setActiveTabLayer('routine');
         setBottomNavActive('routine');
         loadRoutineDailyDua();
         const closeBtn = rp.querySelector('.etiquette-close');
@@ -2023,7 +2062,7 @@ window.filterCategory = function(cat, btn) {
     window.closeRoutine = function() {
         const rp = document.querySelector('.routine-panel');
         if (rp) rp.classList.remove('active');
-        unlockScroll();
+        setActiveTabLayer('home');
         setBottomNavActive('home');
         recordInAppRoute(false);
     };
@@ -2212,78 +2251,33 @@ window.filterCategory = function(cat, btn) {
     // ===== BOTTOM NAV HANDLER =====
         // ===== BOTTOM NAV HANDLER =====
     window.handleBottomNav = function(action, btn) {
-        runTabFadeTransition(document.getElementById('mainContainer'));
         scrollActiveViewToTop();
 
-        // Update active state
         document.querySelectorAll('.bottom-nav-item').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        if (btn) btn.classList.add('active');
 
-        const closeNonTargetPanels = (targetAction) => {
-            const panelTargets = {
-                quran: '.quran-panel.active',
-                prayer: '.prayer-panel.active',
-                routine: '.routine-panel.active',
-                tasbeeh: '.tasbeeh-panel.active'
-            };
-            const targetSelector = panelTargets[targetAction] || null;
+        setActiveTabLayer(action);
 
-            const tp = document.querySelector('.tasbeeh-panel.active');
-            if (tp && targetSelector !== '.tasbeeh-panel.active') { tp.classList.remove('active'); unlockScroll(); }
-
-            const ep = document.querySelector('.etiquette-panel.active');
-            if (ep) { ep.classList.remove('active'); unlockScroll(); }
-
-            const rp = document.querySelector('.routine-panel.active');
-            if (rp && targetSelector !== '.routine-panel.active') { rp.classList.remove('active'); unlockScroll(); }
-
-            const pp = document.querySelector('.prayer-panel.active');
-            if (pp && targetSelector !== '.prayer-panel.active') { pp.classList.remove('active'); unlockScroll(); }
-
-            const qp = document.querySelector('.quran-panel.active');
-            if (qp && targetSelector !== '.quran-panel.active') { qp.classList.remove('active'); unlockScroll(); }
-
-            const bp = document.getElementById('bookmarksPanel');
-            const ov = document.querySelector('.overlay');
-            if (bp && bp.classList.contains('active')) {
-                bp.classList.remove('active');
-                if (ov) ov.classList.remove('active');
-                unlockScroll();
-            }
-        };
-
-        // Now open the requested panel
         switch (action) {
-                      case 'home':
-                closeNonTargetPanels('home');
+            case 'home':
+                closeAllPanelsForStateApply();
+                setActiveTabLayer('home');
                 backToCategories();
                 scrollActiveViewToTop();
                 break;
             case 'routine':
-                setTimeout(() => {
-                    openRoutine();
-                    setTimeout(() => closeNonTargetPanels('routine'), 90);
-                }, 24);
+                openRoutine();
                 break;
             case 'tasbeeh':
-                setTimeout(() => {
-                    openTasbeeh();
-                    setTimeout(() => closeNonTargetPanels('tasbeeh'), 90);
-                }, 24);
+                openTasbeeh();
                 break;
             case 'quran':
                 setPanelLoading('quran', true, isPashtoMode() ? 'قرآن بارېږي…' : 'Loading Quran…');
-                setTimeout(() => {
-                    openQuran();
-                    setTimeout(() => closeNonTargetPanels('quran'), 90);
-                }, 24);
+                openQuran();
                 break;
             case 'prayer':
                 setPanelLoading('prayer', true, isPashtoMode() ? 'د لمانځه وختونه بارېږي…' : 'Loading Prayer…');
-                setTimeout(() => {
-                    openPrayer();
-                    setTimeout(() => closeNonTargetPanels('prayer'), 90);
-                }, 24);
+                openPrayer();
                 break;
         }
     };
@@ -5567,8 +5561,7 @@ window.filterCategory = function(cat, btn) {
 
     window.openPrayer = function() {
         const pp = document.querySelector('.prayer-panel');
-        if (pp) pp.classList.add('active');
-        lockScroll();
+        if (pp) setActiveTabLayer('prayer');
         setBottomNavActive('prayer');
         const closeBtn = pp?.querySelector('.etiquette-close');
         if (closeBtn) closeBtn.focus();
@@ -5595,7 +5588,7 @@ window.filterCategory = function(cat, btn) {
         const pp = document.querySelector('.prayer-panel');
         if (pp) pp.classList.remove('active');
         setPanelLoading('prayer', false);
-        unlockScroll();
+        setActiveTabLayer('home');
         setBottomNavActive('home');
         if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
         recordInAppRoute(false);
@@ -8374,8 +8367,7 @@ window.filterCategory = function(cat, btn) {
     window.openQuran = async function() {
         const panel = document.querySelector('.quran-panel');
         if (!panel) return;
-        panel.classList.add('active');
-        lockScroll();
+        setActiveTabLayer('quran');
         setBottomNavActive('quran');
         await initQuran();
         renderQuranContinueCard();
@@ -8406,6 +8398,7 @@ window.filterCategory = function(cat, btn) {
     }
 
     function switchToHomeTab() {
+        setActiveTabLayer('home');
         setBottomNavActive('home');
         backToCategories();
     }
@@ -8419,7 +8412,7 @@ window.filterCategory = function(cat, btn) {
         closeQuranAudioPopup();
         updateQuranMiniPlayerVisibility();
         document.body.classList.remove('quran-reading-mode');
-        unlockScroll();
+        setActiveTabLayer('home');
         if (!skipHistory) {
             recordInAppRoute(false, {
                 view: IN_APP_VIEWS.HOME
