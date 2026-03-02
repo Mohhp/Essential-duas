@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essential-duas-v44';
+const CACHE_NAME = 'essential-duas-v45';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
 

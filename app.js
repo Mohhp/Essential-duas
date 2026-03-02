@@ -1144,7 +1144,8 @@ window.filterCategory = function(cat, btn) {
         content.className = 'dua-swipe-content';
         if (bodyClone) content.appendChild(bodyClone);
 
-        const hasMappedAudio = !!DUA_AUDIO_SOURCES[Number(duaId)];
+        const mappedAudioId = resolveMappedDuaId(duaId);
+        const hasMappedAudio = !!mappedAudioId;
         const actions = document.createElement('div');
         actions.className = 'dua-swipe-actions';
         actions.innerHTML = `
@@ -1165,7 +1166,7 @@ window.filterCategory = function(cat, btn) {
             const player = actions.querySelector('.dua-swipe-audio');
             setAudioPlayerState(player, 'idle');
             listenBtn.addEventListener('click', () => {
-                if (player) playDuaAudio(duaId, player);
+                if (player) playDuaAudio(mappedAudioId, player);
             });
         }
 
@@ -2426,6 +2427,13 @@ window.filterCategory = function(cat, btn) {
     const AYAH_AUDIO_CACHE = new Map();
     let activeAudioSession = null;
 
+    function resolveMappedDuaId(rawId) {
+        const numeric = Number(rawId);
+        if (!Number.isFinite(numeric)) return null;
+        if (DUA_AUDIO_SOURCES[numeric]) return numeric;
+        return null;
+    }
+
     function getAudioUiText() {
         const isPS = isPashtoMode();
         return {
@@ -2504,7 +2512,8 @@ window.filterCategory = function(cat, btn) {
     }
 
     async function getPlaylistForDua(id) {
-        const source = DUA_AUDIO_SOURCES[id];
+        const mappedId = resolveMappedDuaId(id);
+        const source = mappedId ? DUA_AUDIO_SOURCES[mappedId] : null;
         if (!source) return [];
         const ayahKeys = expandAyahSpecs(source.ayahs);
         if (!ayahKeys.length) return [];
@@ -2529,10 +2538,16 @@ window.filterCategory = function(cat, btn) {
     }
 
     async function playDuaAudio(duaId, player) {
+        const mappedDuaId = resolveMappedDuaId(duaId);
         const btn = player?.querySelector('.audio-btn');
         if (!btn) return;
+        if (!mappedDuaId) {
+            setAudioPlayerState(player, 'idle');
+            updateAudioProgress(player, 0);
+            return;
+        }
 
-        if (activeAudioSession && activeAudioSession.duaId === duaId && activeAudioSession.player === player) {
+        if (activeAudioSession && activeAudioSession.duaId === mappedDuaId && activeAudioSession.player === player) {
             const { audio } = activeAudioSession;
             if (audio.paused) {
                 await audio.play();
@@ -2549,7 +2564,7 @@ window.filterCategory = function(cat, btn) {
         updateAudioProgress(player, 0);
 
         try {
-            const playlist = await getPlaylistForDua(duaId);
+            const playlist = await getPlaylistForDua(mappedDuaId);
             if (!playlist.length) {
                 setAudioPlayerState(player, 'idle');
                 updateAudioProgress(player, 0);
@@ -2650,7 +2665,7 @@ window.filterCategory = function(cat, btn) {
             });
 
             activeAudioSession = {
-                duaId,
+                duaId: mappedDuaId,
                 player,
                 get audio() { return audio; },
                 get preloadedAudio() { return preloadedAudio; }
@@ -2668,7 +2683,8 @@ window.filterCategory = function(cat, btn) {
             const card = row.closest('.dua-card');
             if (!card) return;
             const id = parseInt(card.getAttribute('data-id'), 10);
-            if (!DUA_AUDIO_SOURCES[id]) return;
+            const mappedId = resolveMappedDuaId(id);
+            if (!mappedId) return;
             if (row.querySelector('.audio-player')) return;
 
             const player = document.createElement('div');
@@ -2681,7 +2697,7 @@ window.filterCategory = function(cat, btn) {
 
             const btn = player.querySelector('.audio-btn');
             setAudioPlayerState(player, 'idle');
-            btn.addEventListener('click', () => playDuaAudio(id, player));
+            btn.addEventListener('click', () => playDuaAudio(mappedId, player));
             row.insertBefore(player, row.firstChild);
         });
     }
