@@ -495,7 +495,7 @@ Object.assign(PS_DUAS, {
         v: 'د لنډوالي شاهکار. د قیامت په ورځ په تله کې هیڅ شی د ښو اخلاقو نه درنه نه ده. (ترمذي ۲۰۰۲)'
     },
     23: {
-        t: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ.\nای الله زه له تا څخه په دنیا او اخرت کې د بښنې او پوره سلامتیا او خوندیتوب غوښتنه کوم.',
+        t: 'ای الله زه له تا څخه په دنیا او اخرت کې د بښنې او پوره سلامتیا او خوندیتوب غوښتنه کوم.',
         v: 'حدیث ابن ترمذی ۳۸۷۱.'
     },
     24: {
@@ -711,6 +711,27 @@ function normalizeHamza(s) {
     return s.replace(/ء+/g, 'ء');
 }
 
+function sanitizePashtoTranslationText(input) {
+    const raw = normalizeHamza(String(input || '').replace(/دعا/g, 'دعاء')).trim();
+    if (!raw) return '';
+
+    const looksArabicOnly = (line) => {
+        const sample = String(line || '').trim();
+        if (!sample) return false;
+        const hasHarakat = /[\u064B-\u065F\u0670\u06D6-\u06ED]/.test(sample);
+        const hasPashtoMarkers = /[ګڼځڅښټډړۍې]|\b(ای|زه|له|څخه|کې)\b/u.test(sample);
+        return hasHarakat && !hasPashtoMarkers;
+    };
+
+    const cleanedLines = raw
+        .split(/\n+/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .filter(line => !looksArabicOnly(line));
+
+    return cleanedLines.join('\n');
+}
+
 // Convert Pashto digits back to western digits in visible text nodes.
 function pashtoToWestern(input) {
     const map = { '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4', '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9' };
@@ -903,9 +924,7 @@ function applyLanguage(lang) {
                 const tDiv = document.createElement('div');
                 tDiv.className = 'translation-ps';
                 tDiv.setAttribute('dir', 'rtl');
-                // normalize 'دعا' -> 'دعاء' in Pashto translation text and normalize hamzas
-                let pashtoText = (PS_DUAS[id].t || '').replace(/دعا/g, 'دعاء');
-                pashtoText = normalizeHamza(pashtoText);
+                let pashtoText = sanitizePashtoTranslationText(PS_DUAS[id].t || '');
                 tDiv.textContent = pashtoText;
                 const enTrans = inner.querySelector('.translation');
                 if (enTrans && enTrans.nextSibling) {

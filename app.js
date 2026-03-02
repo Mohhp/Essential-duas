@@ -4075,6 +4075,234 @@ window.filterCategory = function(cat, btn) {
         { key: 'maidan-wardak', en: 'Maidan Wardak', ps: 'ميدان وردګ', lat: 34.3955, lng: 68.3530 }
     ];
 
+    const GLOBAL_CITY_GROUPS = [
+        {
+            key: 'afghanistan',
+            countryEn: 'Afghanistan',
+            countryPs: 'افغانستان',
+            flag: '🇦🇫',
+            cities: AFGHAN_CITIES
+        },
+        {
+            key: 'pakistan',
+            countryEn: 'Pakistan',
+            countryPs: 'پاکستان',
+            flag: '🇵🇰',
+            cities: [
+                { key: 'islamabad', en: 'Islamabad', ps: 'اسلام آباد', lat: 33.6844, lng: 73.0479 },
+                { key: 'karachi', en: 'Karachi', ps: 'کراچۍ', lat: 24.8607, lng: 67.0011 },
+                { key: 'lahore', en: 'Lahore', ps: 'لاهور', lat: 31.5204, lng: 74.3587 },
+                { key: 'peshawar', en: 'Peshawar', ps: 'پېښور', lat: 34.0151, lng: 71.5249 },
+                { key: 'quetta', en: 'Quetta', ps: 'کوټه', lat: 30.1798, lng: 66.9750 }
+            ]
+        },
+        {
+            key: 'uae',
+            countryEn: 'United Arab Emirates',
+            countryPs: 'متحده عربي امارات',
+            flag: '🇦🇪',
+            cities: [
+                { key: 'dubai', en: 'Dubai', ps: 'دوبۍ', lat: 25.2048, lng: 55.2708 },
+                { key: 'abu-dhabi', en: 'Abu Dhabi', ps: 'ابوظهبي', lat: 24.4539, lng: 54.3773 }
+            ]
+        },
+        {
+            key: 'saudi-arabia',
+            countryEn: 'Saudi Arabia',
+            countryPs: 'سعودي عربستان',
+            flag: '🇸🇦',
+            cities: [
+                { key: 'riyadh', en: 'Riyadh', ps: 'ریاض', lat: 24.7136, lng: 46.6753 },
+                { key: 'jeddah', en: 'Jeddah', ps: 'جده', lat: 21.4858, lng: 39.1925 },
+                { key: 'mecca', en: 'Mecca', ps: 'مکه', lat: 21.3891, lng: 39.8579 },
+                { key: 'medina', en: 'Medina', ps: 'مدینه', lat: 24.5247, lng: 39.5692 }
+            ]
+        },
+        {
+            key: 'turkey',
+            countryEn: 'Turkey',
+            countryPs: 'ترکیه',
+            flag: '🇹🇷',
+            cities: [
+                { key: 'istanbul', en: 'Istanbul', ps: 'استانبول', lat: 41.0082, lng: 28.9784 },
+                { key: 'ankara', en: 'Ankara', ps: 'انقره', lat: 39.9334, lng: 32.8597 }
+            ]
+        },
+        {
+            key: 'united-kingdom',
+            countryEn: 'United Kingdom',
+            countryPs: 'انګلستان',
+            flag: '🇬🇧',
+            cities: [
+                { key: 'london', en: 'London', ps: 'لندن', lat: 51.5074, lng: -0.1278 },
+                { key: 'birmingham', en: 'Birmingham', ps: 'برمنګهم', lat: 52.4862, lng: -1.8904 },
+                { key: 'manchester', en: 'Manchester', ps: 'مانچسټر', lat: 53.4808, lng: -2.2426 },
+                { key: 'bradford', en: 'Bradford', ps: 'براډفورډ', lat: 53.7960, lng: -1.7594 },
+                { key: 'leeds', en: 'Leeds', ps: 'لېډز', lat: 53.8008, lng: -1.5491 },
+                { key: 'glasgow', en: 'Glasgow', ps: 'ګلاسګو', lat: 55.8642, lng: -4.2518 },
+                { key: 'edinburgh', en: 'Edinburgh', ps: 'اېډینبرګ', lat: 55.9533, lng: -3.1883 },
+                { key: 'luton', en: 'Luton', ps: 'لوټن', lat: 51.8787, lng: -0.4200 },
+                { key: 'slough', en: 'Slough', ps: 'سلاؤ', lat: 51.5105, lng: -0.5950 },
+                { key: 'sheffield', en: 'Sheffield', ps: 'شفیلډ', lat: 53.3811, lng: -1.4701 }
+            ]
+        },
+        {
+            key: 'germany',
+            countryEn: 'Germany',
+            countryPs: 'جرمني',
+            flag: '🇩🇪',
+            cities: [
+                { key: 'hamburg', en: 'Hamburg', ps: 'هامبورګ', lat: 53.5511, lng: 9.9937 },
+                { key: 'berlin', en: 'Berlin', ps: 'برلین', lat: 52.5200, lng: 13.4050 },
+                { key: 'munich', en: 'Munich', ps: 'میونخ', lat: 48.1351, lng: 11.5820 }
+            ]
+        },
+        {
+            key: 'france',
+            countryEn: 'France',
+            countryPs: 'فرانسه',
+            flag: '🇫🇷',
+            cities: [
+                { key: 'paris', en: 'Paris', ps: 'پاریس', lat: 48.8566, lng: 2.3522 }
+            ]
+        },
+        {
+            key: 'canada',
+            countryEn: 'Canada',
+            countryPs: 'کاناډا',
+            flag: '🇨🇦',
+            cities: [
+                { key: 'toronto', en: 'Toronto', ps: 'ټورنټو', lat: 43.6532, lng: -79.3832 },
+                { key: 'vancouver', en: 'Vancouver', ps: 'وانکوور', lat: 49.2827, lng: -123.1207 },
+                { key: 'montreal', en: 'Montreal', ps: 'مونتریال', lat: 45.5017, lng: -73.5673 },
+                { key: 'calgary', en: 'Calgary', ps: 'کلګري', lat: 51.0447, lng: -114.0719 },
+                { key: 'ottawa', en: 'Ottawa', ps: 'اوټاوا', lat: 45.4215, lng: -75.6972 },
+                { key: 'edmonton', en: 'Edmonton', ps: 'اېډمونټن', lat: 53.5461, lng: -113.4938 },
+                { key: 'winnipeg', en: 'Winnipeg', ps: 'وینیپګ', lat: 49.8951, lng: -97.1384 },
+                { key: 'mississauga', en: 'Mississauga', ps: 'میسیساګا', lat: 43.5890, lng: -79.6441 }
+            ]
+        },
+        {
+            key: 'united-states',
+            countryEn: 'United States',
+            countryPs: 'متحده ایالات',
+            flag: '🇺🇸',
+            cities: [
+                { key: 'new-york', en: 'New York', ps: 'نیویارک', lat: 40.7128, lng: -74.0060 },
+                { key: 'los-angeles', en: 'Los Angeles', ps: 'لاس انجلس', lat: 34.0522, lng: -118.2437 },
+                { key: 'chicago', en: 'Chicago', ps: 'شیکاګو', lat: 41.8781, lng: -87.6298 },
+                { key: 'houston', en: 'Houston', ps: 'هوسټن', lat: 29.7604, lng: -95.3698 },
+                { key: 'phoenix', en: 'Phoenix', ps: 'فینکس', lat: 33.4484, lng: -112.0740 },
+                { key: 'san-francisco', en: 'San Francisco', ps: 'سان فرانسسکو', lat: 37.7749, lng: -122.4194 },
+                { key: 'washington-dc', en: 'Washington DC', ps: 'واشنګټن ډي سي', lat: 38.9072, lng: -77.0369 },
+                { key: 'dallas', en: 'Dallas', ps: 'ډالاس', lat: 32.7767, lng: -96.7970 },
+                { key: 'atlanta', en: 'Atlanta', ps: 'اټلانټا', lat: 33.7490, lng: -84.3880 },
+                { key: 'detroit', en: 'Detroit', ps: 'ډیټرایټ', lat: 42.3314, lng: -83.0458 },
+                { key: 'seattle', en: 'Seattle', ps: 'سیټل', lat: 47.6062, lng: -122.3321 },
+                { key: 'denver', en: 'Denver', ps: 'ډېنور', lat: 39.7392, lng: -104.9903 },
+                { key: 'boston', en: 'Boston', ps: 'بوسټن', lat: 42.3601, lng: -71.0589 },
+                { key: 'minneapolis', en: 'Minneapolis', ps: 'مینیاپولیس', lat: 44.9778, lng: -93.2650 },
+                { key: 'miami', en: 'Miami', ps: 'میامي', lat: 25.7617, lng: -80.1918 }
+            ]
+        },
+        {
+            key: 'australia',
+            countryEn: 'Australia',
+            countryPs: 'استرالیا',
+            flag: '🇦🇺',
+            cities: [
+                { key: 'sydney', en: 'Sydney', ps: 'سډني', lat: -33.8688, lng: 151.2093 },
+                { key: 'melbourne', en: 'Melbourne', ps: 'ملبورن', lat: -37.8136, lng: 144.9631 },
+                { key: 'brisbane', en: 'Brisbane', ps: 'بریزبېن', lat: -27.4698, lng: 153.0251 },
+                { key: 'perth', en: 'Perth', ps: 'پرت', lat: -31.9505, lng: 115.8605 },
+                { key: 'adelaide', en: 'Adelaide', ps: 'اډلېډ', lat: -34.9285, lng: 138.6007 },
+                { key: 'canberra', en: 'Canberra', ps: 'کانبرا', lat: -35.2809, lng: 149.1300 }
+            ]
+        },
+        {
+            key: 'netherlands',
+            countryEn: 'Netherlands',
+            countryPs: 'هالېنډ',
+            flag: '🇳🇱',
+            cities: [
+                { key: 'amsterdam', en: 'Amsterdam', ps: 'امسټرډم', lat: 52.3676, lng: 4.9041 }
+            ]
+        },
+        {
+            key: 'belgium',
+            countryEn: 'Belgium',
+            countryPs: 'بلجیم',
+            flag: '🇧🇪',
+            cities: [
+                { key: 'brussels', en: 'Brussels', ps: 'بروکسل', lat: 50.8503, lng: 4.3517 }
+            ]
+        },
+        {
+            key: 'austria',
+            countryEn: 'Austria',
+            countryPs: 'اتریش',
+            flag: '🇦🇹',
+            cities: [
+                { key: 'vienna', en: 'Vienna', ps: 'ویانا', lat: 48.2082, lng: 16.3738 }
+            ]
+        },
+        {
+            key: 'sweden',
+            countryEn: 'Sweden',
+            countryPs: 'سویډن',
+            flag: '🇸🇪',
+            cities: [
+                { key: 'stockholm', en: 'Stockholm', ps: 'سټاکهولم', lat: 59.3293, lng: 18.0686 }
+            ]
+        },
+        {
+            key: 'norway',
+            countryEn: 'Norway',
+            countryPs: 'ناروې',
+            flag: '🇳🇴',
+            cities: [
+                { key: 'oslo', en: 'Oslo', ps: 'اوسلو', lat: 59.9139, lng: 10.7522 }
+            ]
+        },
+        {
+            key: 'denmark',
+            countryEn: 'Denmark',
+            countryPs: 'ډنمارک',
+            flag: '🇩🇰',
+            cities: [
+                { key: 'copenhagen', en: 'Copenhagen', ps: 'کوپنهاګن', lat: 55.6761, lng: 12.5683 }
+            ]
+        },
+        {
+            key: 'qatar',
+            countryEn: 'Qatar',
+            countryPs: 'قطر',
+            flag: '🇶🇦',
+            cities: [
+                { key: 'doha', en: 'Doha', ps: 'دوحه', lat: 25.2854, lng: 51.5310 }
+            ]
+        },
+        {
+            key: 'kuwait',
+            countryEn: 'Kuwait',
+            countryPs: 'کویت',
+            flag: '🇰🇼',
+            cities: [
+                { key: 'kuwait-city', en: 'Kuwait City', ps: 'کویت ښار', lat: 29.3759, lng: 47.9774 }
+            ]
+        }
+    ];
+
+    const ALL_CITIES = GLOBAL_CITY_GROUPS.flatMap((group) =>
+        group.cities.map((city) => ({
+            ...city,
+            countryKey: group.key,
+            countryEn: group.countryEn,
+            countryPs: group.countryPs,
+            countryFlag: group.flag
+        }))
+    );
+
     const CITY_META = {
         kabul: { provinceEn: 'Kabul', provincePs: 'کابل', regionEn: 'Central', regionPs: 'مرکزي' },
         kandahar: { provinceEn: 'Kandahar', provincePs: 'کندهار', regionEn: 'South', regionPs: 'سوېل' },
@@ -4101,6 +4329,8 @@ window.filterCategory = function(cat, btn) {
         tarinkot: { provinceEn: 'Uruzgan', provincePs: 'اروزګان', regionEn: 'South', regionPs: 'سوېل' },
         'maidan-wardak': { provinceEn: 'Maidan Wardak', provincePs: 'میدان وردګ', regionEn: 'Central', regionPs: 'مرکزي' }
     };
+
+    const CITY_COUNTRY_ORDER = GLOBAL_CITY_GROUPS.map(group => group.key);
 
     let prayerTimesData = null;
     let countdownInterval = null;
@@ -4137,7 +4367,12 @@ window.filterCategory = function(cat, btn) {
     }
 
     function getCityMeta(city) {
-        const fallback = { provinceEn: city.en, provincePs: city.ps || city.en, regionEn: 'Afghanistan', regionPs: 'افغانستان' };
+        const fallback = {
+            provinceEn: city.en,
+            provincePs: city.ps || city.en,
+            regionEn: city.countryEn || 'Global',
+            regionPs: city.countryPs || 'نړیوال'
+        };
         return CITY_META[city.key] || fallback;
     }
 
@@ -4157,15 +4392,17 @@ window.filterCategory = function(cat, btn) {
 
     function findCityMatches(query) {
         const q = normalizeCityText(query);
-        if (!q) return AFGHAN_CITIES.slice();
+        if (!q) return ALL_CITIES.slice();
 
-        return AFGHAN_CITIES
+        return ALL_CITIES
             .map((city) => {
                 const meta = getCityMeta(city);
                 const searchFields = [
                     normalizeCityText(city.en),
                     normalizeCityText(city.ps),
                     normalizeCityText(city.key),
+                    normalizeCityText(city.countryEn),
+                    normalizeCityText(city.countryPs),
                     normalizeCityText(meta.provinceEn),
                     normalizeCityText(meta.provincePs),
                     normalizeCityText(meta.regionEn),
@@ -4183,7 +4420,13 @@ window.filterCategory = function(cat, btn) {
                 return { city, score: scores[0] };
             })
             .filter(entry => Number.isFinite(entry.score))
-            .sort((a, b) => a.score - b.score)
+            .sort((a, b) => {
+                if (a.score !== b.score) return a.score - b.score;
+                const orderA = CITY_COUNTRY_ORDER.indexOf(a.city.countryKey);
+                const orderB = CITY_COUNTRY_ORDER.indexOf(b.city.countryKey);
+                if (orderA !== orderB) return orderA - orderB;
+                return a.city.en.localeCompare(b.city.en);
+            })
             .map(entry => entry.city);
     }
 
@@ -4446,15 +4689,15 @@ window.filterCategory = function(cat, btn) {
             detectingLocation: isPS ? (psUI?.detectingLocation || 'ځای پیژندل کېږي...') : 'Detecting location...',
             locationDenied: isPS ? (psUI?.locationDenied || 'ځای رد شو — د بیا هڅې لپاره ↻ ټک وکړئ') : 'Location denied — tap ↻ to retry',
             enableLocation: isPS ? 'د لمانځه وختونو لپاره ځای فعال کړئ.' : 'Enable location to load prayer times.',
-            searchPlaceholder: isPS ? 'د افغانستان ښار ولټوئ...' : 'Search Afghan city...',
+            searchPlaceholder: isPS ? 'ښار ولټوئ...' : 'Search city...',
             searchPlaceholderDual: isPS ? 'ښار ولټوئ... / Search city...' : 'Search city... / ښار ولټوئ...',
-            countryLabel: isPS ? '🇦🇫 افغانستان' : '🇦🇫 Afghanistan',
+            countryLabel: isPS ? 'هېوادونه' : 'Countries',
             gpsOption: isPS ? '📍 زما موقعیت وکاروئ' : '📍 Use My Location',
             gpsDetecting: isPS ? 'ستاسې موقعیت معلومېږي...' : 'Detecting your location...',
             gpsDetected: isPS ? 'GPS وموندل شو' : 'GPS detected',
             noMatches: isPS ? 'برابر ښار ونه موندل شو' : 'No matches',
-            now: isPS ? (psUI?.now || 'اوس') : 'NOW',
-            next: isPS ? (psUI?.next || 'بل') : 'NEXT',
+            now: isPS ? (psUI?.now || 'اوس') : 'Now',
+            next: isPS ? (psUI?.next || 'بل') : 'Next',
             changeLocationTitle: isPS ? 'د لمانځه ځای بدل کړئ' : 'Change prayer location',
             amToken: isPS ? (psUI?.amToken || 'غ.م') : 'AM',
             pmToken: isPS ? (psUI?.pmToken || 'غ.و') : 'PM',
@@ -4768,12 +5011,12 @@ window.filterCategory = function(cat, btn) {
         if (!input) return;
         const uiText = getPrayerUiText();
         if (loc?.cityKey) {
-            const match = AFGHAN_CITIES.find(c => c.key === loc.cityKey);
+            const match = ALL_CITIES.find(c => c.key === loc.cityKey);
             if (match) {
                 input.value = getCityDisplayName(match);
                 const meta = getCityMeta(match);
-                const province = isPashtoMode() ? meta.provincePs : meta.provinceEn;
-                const cityText = `${getCityDisplayName(match)} · ${province}`;
+                const country = isPashtoMode() ? match.countryPs : match.countryEn;
+                const cityText = `${getCityDisplayName(match)} · ${country}`;
                 setSelectedCityChip(cityText);
                 input.title = uiText.changeLocationTitle;
                 setCitySearchVisibility(false);
@@ -4797,15 +5040,10 @@ window.filterCategory = function(cat, btn) {
 
         const uiText = getPrayerUiText();
 
-        const grouped = new Map();
-        list.forEach((city) => {
-            const meta = getCityMeta(city);
-            const groupLabel = isPashtoMode() ? meta.regionPs : meta.regionEn;
-            if (!grouped.has(groupLabel)) grouped.set(groupLabel, []);
-            grouped.get(groupLabel).push(city);
-        });
+        const groupedRows = GLOBAL_CITY_GROUPS.map((group) => {
+            const cities = list.filter(city => city.countryKey === group.key);
+            if (!cities.length) return '';
 
-        const groupedRows = Array.from(grouped.entries()).map(([groupName, cities]) => {
             const cityRows = cities.map((city) => {
                 const meta = getCityMeta(city);
                 const primary = getCityDisplayName(city);
@@ -4826,8 +5064,9 @@ window.filterCategory = function(cat, btn) {
                 `;
             }).join('');
 
+            const countryLabel = isPashtoMode() ? group.countryPs : group.countryEn;
             return `
-                <div class="city-region-head">${escapeHtml(groupName)}</div>
+                <div class="city-country-head">${group.flag} ${escapeHtml(countryLabel)}</div>
                 ${cityRows}
             `;
         }).join('');
@@ -4838,7 +5077,7 @@ window.filterCategory = function(cat, btn) {
 
         const detectedLabel = detectedGpsCityKey
             ? (() => {
-                const city = AFGHAN_CITIES.find(item => item.key === detectedGpsCityKey);
+                const city = ALL_CITIES.find(item => item.key === detectedGpsCityKey);
                 if (!city) return '';
                 return `<div class="city-country-head">✅ ${uiText.gpsDetected}: ${escapeHtml(getCityDisplayName(city))}</div>`;
             })()
@@ -4846,7 +5085,6 @@ window.filterCategory = function(cat, btn) {
 
         dropdown.innerHTML = `
             <button class="city-option gps-option" type="button" data-city-key="__gps__" role="option">${gpsStatusText}</button>
-            <div class="city-country-head">${uiText.countryLabel}</div>
             ${detectedLabel}
             <div class="city-options-wrap" role="listbox">${groupedRows || `<div class="city-empty">${uiText.noMatches}</div>`}</div>
         `;
@@ -4868,14 +5106,14 @@ window.filterCategory = function(cat, btn) {
         if (shell) shell.setAttribute('aria-expanded', 'false');
     }
 
-    function selectAfghanCity(city) {
+    function selectPrayerCity(city) {
         if (!city) return;
         const loc = {
             lat: city.lat,
             lng: city.lng,
             city: city.en,
             cityKey: city.key,
-            country: 'Afghanistan'
+            country: city.countryEn || 'Global'
         };
         localStorage.setItem('crown_location', JSON.stringify(loc));
         closeCityDropdown();
@@ -4930,8 +5168,8 @@ window.filterCategory = function(cat, btn) {
                 requestLocation();
                 return;
             }
-            const city = AFGHAN_CITIES.find(c => c.key === cityKey);
-            if (city) selectAfghanCity(city);
+            const city = ALL_CITIES.find(c => c.key === cityKey);
+            if (city) selectPrayerCity(city);
         });
 
         input.dataset.boundCitySelector = '1';
@@ -5186,20 +5424,27 @@ window.filterCategory = function(cat, btn) {
         const now = new Date();
         const current = getCurrentPrayer(now);
         const next = getNextPrayer(now);
+        const settings = loadReminderSettings();
 
         grid.innerHTML = PRAYER_NAMES.map(name => {
             const time = prayerTimesData[name];
             const timeStr = formatTime(time);
             const isCurrent = current === name;
             const isNext = next === name;
+            const reminderEnabled = REMINDER_PRAYERS.includes(name) && settings.enabled && !!settings.prayers[name];
             const cls = isCurrent ? ' current-prayer' : isNext ? ' next-prayer' : '';
             const uiText = getPrayerUiText();
             return `<div class="prayer-time-row${cls}">
-                <span class="prayer-time-icon">${PRAYER_ICONS[name]}</span>
-                <span class="prayer-time-name">${getPrayerLabel(name)}</span>
-                <span class="prayer-time-value">${timeStr}</span>
-                ${isCurrent ? `<span class="prayer-now-badge">${uiText.now}</span>` : ''}
-                ${isNext ? `<span class="prayer-next-badge">${uiText.next}</span>` : ''}
+                <span class="prayer-time-main">
+                    <span class="prayer-time-icon">${PRAYER_ICONS[name]}</span>
+                    <span class="prayer-time-name">${getPrayerLabel(name)}</span>
+                </span>
+                <span class="prayer-time-meta">
+                    ${reminderEnabled ? '<span class="prayer-reminder-indicator" title="Reminder enabled">🔔</span>' : ''}
+                    ${isCurrent ? `<span class="prayer-now-badge">${uiText.now}</span>` : ''}
+                    ${isNext ? `<span class="prayer-next-badge">${uiText.next}</span>` : ''}
+                    <span class="prayer-time-value">${timeStr}</span>
+                </span>
             </div>`;
         }).join('');
     }
