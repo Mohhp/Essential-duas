@@ -178,7 +178,6 @@
         [data-theme="light"] .toggle-slider::before { background: rgba(15, 40, 28, 0.4); }
         [data-theme="light"] .toggle-switch input:checked + .toggle-slider { background: rgba(13, 123, 80, 0.4); }
         [data-theme="light"] .toggle-switch input:checked + .toggle-slider::before { background: var(--emerald-light); }
-        [data-theme="light"] .etiquette-close { background: rgba(15, 80, 50, 0.08); border-color: rgba(15, 80, 50, 0.2); }
 
         /* Critical: Auth badges — darken neon colors for readability */
         [data-theme="light"] .badge-quran { background: rgba(106, 27, 128, 0.1); color: #6a1b80; border-color: rgba(106, 27, 128, 0.25); }
@@ -303,7 +302,7 @@
             letter-spacing: 2px;
             background: linear-gradient(135deg, #2ec47a, #81c784, #c9a84c);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; font-weight: 700; text-transform: uppercase;
+            background-clip: text; font-weight: 700; text-transform: none;
         }
         .fallah-sub {
             font-family: var(--font-arabic); font-size: 0.5rem;
@@ -348,7 +347,7 @@
         }
         .splash-title {
             font-family: var(--font-title); font-size: 0.7rem;
-            letter-spacing: 5px; text-transform: uppercase;
+            letter-spacing: 5px; text-transform: none;
             color: var(--emerald-light); margin-top: 28px;
             opacity: 0; animation: splashFadeIn 0.8s ease-out 0.6s forwards;
         }
@@ -442,7 +441,7 @@
             letter-spacing: 2px;
             background: linear-gradient(135deg, #2ec47a, #81c784, #c9a84c);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; font-weight: 700; text-transform: uppercase;
+            background-clip: text; font-weight: 700; text-transform: none;
         }
 
         .nav-btn {
@@ -1464,15 +1463,52 @@
             transition: opacity 0.45s ease, visibility 0.45s ease, transform 0.45s var(--transition-smooth);
         }
         .etiquette-panel.active { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
-        .etiquette-close {
-            position: fixed; top: calc(var(--safe-top) + 16px); right: 16px;
-            background: rgba(46, 196, 122, 0.12); border: 1px solid rgba(46, 196, 122, 0.25);
-            color: var(--emerald-light); width: 40px; height: 40px;
-            border-radius: 50%; font-size: 1.1rem;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            z-index: 2001; transition: all 0.3s var(--transition-smooth);
+        .etiquette-close,
+        .tasbeeh-close,
+        .memorize-close {
+            position: fixed;
+            top: calc(var(--safe-top) + 16px);
+            right: 16px;
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2201;
+            transition: color 0.2s ease;
+            padding: 0;
         }
-        .etiquette-close:hover { background: rgba(46, 196, 122, 0.2); transform: scale(1.08); }
+        .etiquette-close:hover,
+        .tasbeeh-close:hover,
+        .memorize-close:hover,
+        .etiquette-close:focus-visible,
+        .tasbeeh-close:focus-visible,
+        .memorize-close:focus-visible {
+            color: rgba(255, 255, 255, 1);
+            outline: none;
+        }
+        [data-theme="light"] .etiquette-close,
+        [data-theme="light"] .tasbeeh-close,
+        [data-theme="light"] .memorize-close {
+            color: rgba(25, 60, 42, 0.55);
+        }
+        [data-theme="light"] .etiquette-close:hover,
+        [data-theme="light"] .tasbeeh-close:hover,
+        [data-theme="light"] .memorize-close:hover,
+        [data-theme="light"] .etiquette-close:focus-visible,
+        [data-theme="light"] .tasbeeh-close:focus-visible,
+        [data-theme="light"] .memorize-close:focus-visible {
+            color: rgba(25, 60, 42, 0.95);
+        }
+        .etiquette-close {
+            z-index: 2201;
+        }
         .etiquette-content {
             max-width: 500px; margin: 0 auto; padding-top: 20px;
         }
@@ -1890,6 +1926,17 @@
             font-size: 0.78rem;
             opacity: 0.9;
             filter: drop-shadow(0 0 6px rgba(201, 168, 76, 0.24));
+        }
+        .prayer-reminder-time {
+            font-family: var(--font-text);
+            font-size: 0.67rem;
+            color: rgba(201, 168, 76, 0.94);
+            letter-spacing: 0.2px;
+            background: rgba(201, 168, 76, 0.12);
+            border: 1px solid rgba(201, 168, 76, 0.24);
+            border-radius: 999px;
+            padding: 2px 7px;
+            white-space: nowrap;
         }
         .prayer-time-row.active-prayer {
             background: rgba(46, 196, 122, 0.15);
@@ -2479,12 +2526,12 @@
 
         .quran-surah-row {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            align-items: flex-start;
+            gap: 12px;
             border-radius: 12px;
             border: 1px solid rgba(46, 196, 122, 0.14);
             background: var(--bg-card);
-            padding: 10px;
+            padding: 12px 14px;
             cursor: pointer;
             transition: all 0.25s ease;
         }
@@ -2509,48 +2556,76 @@
             flex: 1;
             min-width: 0;
         }
+        .quran-surah-name-primary {
+            font-family: var(--font-title);
+            font-size: 0.84rem;
+            color: var(--text-primary);
+            letter-spacing: 0.2px;
+            line-height: 1.32;
+        }
+        .quran-surah-name-secondary {
+            margin-top: 2px;
+            font-family: var(--font-title);
+            font-size: 0.66rem;
+            color: var(--text-subtle);
+            letter-spacing: 0.25px;
+            line-height: 1.3;
+        }
         .quran-surah-ar {
             font-family: var(--font-arabic);
-            font-size: 1.04rem;
+            font-size: 1.08rem;
             color: var(--gold-light);
-            line-height: 1.4;
+            line-height: 1.35;
             direction: rtl;
             text-align: right;
-        }
-        .quran-surah-en {
-            margin-top: 1px;
-            font-family: var(--font-title);
-            font-size: 0.7rem;
-            color: var(--text-subtle);
-            letter-spacing: 0.4px;
         }
 
         .quran-surah-meta {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 6px;
+            gap: 5px;
+            min-width: 124px;
         }
-        .quran-revelation-badge {
+        .quran-revelation-text {
             font-family: var(--font-title);
-            font-size: 0.56rem;
-            letter-spacing: 0.7px;
+            font-size: 0.62rem;
+            letter-spacing: 0.25px;
             text-transform: none;
             color: var(--text-subtle);
-            border: 1px solid rgba(46, 196, 122, 0.24);
-            border-radius: 999px;
-            padding: 2px 7px;
-            background: rgba(46, 196, 122, 0.08);
             white-space: nowrap;
         }
         .quran-surah-ayahs {
-            font-size: 0.6rem;
+            font-size: 0.64rem;
             color: var(--text-faint);
-            letter-spacing: 0.8px;
+            letter-spacing: 0.3px;
         }
-        .quran-cached {
-            font-size: 0.76rem;
+        .quran-cached-icon,
+        .quran-download-icon {
+            font-size: 0.86rem;
             color: var(--gold-mid);
+            opacity: 0.95;
+            line-height: 1;
+        }
+        .quran-download-icon {
+            border: none;
+            background: transparent;
+            color: var(--text-faint);
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            transition: color 0.2s ease, opacity 0.2s ease;
+            opacity: 0.75;
+        }
+        .quran-download-icon:hover,
+        .quran-download-icon:focus-visible {
+            color: var(--text-primary);
+            opacity: 1;
+            outline: none;
         }
 
         .quran-surah-actions {
@@ -2571,6 +2646,11 @@
             font-family: var(--font-title);
             letter-spacing: 0.6px;
             cursor: pointer;
+        }
+        .quran-reader-download-btn {
+            min-width: 34px;
+            padding: 0;
+            font-size: 0.8rem;
         }
 
         .quran-reader-screen {
@@ -2980,19 +3060,19 @@
         .in-app-back-fab,
         .in-app-top-fab {
             position: fixed;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 1px solid rgba(46, 196, 122, 0.18);
-            background: rgba(12, 26, 19, 0.62);
-            color: var(--emerald-light);
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            border: none;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.5);
             z-index: 2205;
             opacity: 0;
             pointer-events: none;
             transform: translateY(-10px);
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            transition: opacity 0.2s ease, transform 0.2s ease, color 0.2s ease;
             touch-action: manipulation;
-            font-size: 1rem;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -3004,8 +3084,8 @@
             transform: translateY(0);
         }
         .in-app-back-fab {
-            left: 12px;
-            top: calc(var(--safe-top) + 8px);
+            left: 16px;
+            top: calc(var(--safe-top) + 16px);
         }
         .in-app-top-fab {
             right: 12px;
@@ -3014,6 +3094,18 @@
         .in-app-back-fab:active,
         .in-app-top-fab:active {
             transform: scale(0.92);
+        }
+        .in-app-back-fab:hover,
+        .in-app-back-fab:focus-visible {
+            color: rgba(255, 255, 255, 1);
+            outline: none;
+        }
+        [data-theme="light"] .in-app-back-fab {
+            color: rgba(25, 60, 42, 0.58);
+        }
+        [data-theme="light"] .in-app-back-fab:hover,
+        [data-theme="light"] .in-app-back-fab:focus-visible {
+            color: rgba(25, 60, 42, 0.95);
         }
         .in-app-swipe-indicator {
             position: fixed;
@@ -3045,7 +3137,7 @@
             background: var(--bg-dark);
             z-index: 2000;
             display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            align-items: center; justify-content: flex-start;
             padding: 2rem; backdrop-filter: blur(24px) saturate(150%);
             opacity: 0; visibility: hidden; transform: scale(0.97);
             pointer-events: none;
@@ -3053,50 +3145,53 @@
         }
         .tasbeeh-panel.active { opacity: 1; visibility: visible; transform: scale(1); pointer-events: auto; }
         .tasbeeh-close {
-            position: absolute; top: calc(var(--safe-top) + 16px); right: 16px;
-            background: rgba(46, 196, 122, 0.06); border: 1px solid rgba(46, 196, 122, 0.15);
-            color: var(--emerald-light); width: 40px; height: 40px;
-            border-radius: 50%; font-size: 1.1rem;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: all 0.3s var(--transition-smooth);
+            z-index: 2201;
         }
-        .tasbeeh-close:hover { background: rgba(46, 196, 122, 0.12); transform: scale(1.08); }
         .tasbeeh-title {
             font-family: var(--font-title); font-size: 0.7rem;
             letter-spacing: 3px; text-transform: none;
-            color: rgba(46, 196, 122, 0.7); margin-bottom: 1rem;
+            color: rgba(46, 196, 122, 0.7); margin: calc(var(--safe-top) + 26px) 0 0.9rem;
         }
         .tasbeeh-arabic {
             font-family: var(--font-arabic);
             font-size: calc(1.6rem * var(--font-scale));
             color: var(--gold-light); direction: rtl;
             text-align: center; line-height: 2;
-            margin-bottom: 2rem; max-width: 90%;
+            margin-bottom: 1.25rem; max-width: 90%;
         }
         .tasbeeh-count-display {
             font-family: var(--font-title);
             font-size: 4.5rem; font-weight: 800;
             color: var(--emerald-light); line-height: 1;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             text-shadow: 0 0 40px rgba(46, 196, 122, 0.25);
         }
         .tasbeeh-target {
             font-family: var(--font-title); font-size: 0.68rem;
             letter-spacing: 1.5px; text-transform: none;
-            color: rgba(46, 196, 122, 0.7); margin-bottom: 2rem;
+            color: rgba(46, 196, 122, 0.7); margin-bottom: 1rem;
         }
         .tasbeeh-tap-btn {
             width: 168px; height: 168px; border-radius: 50%;
-            background: linear-gradient(135deg, rgba(46, 196, 122, 0.1), rgba(46, 196, 122, 0.03));
-            border: 2px solid rgba(46, 196, 122, 0.25);
+            background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.08), rgba(46, 196, 122, 0.08) 46%, rgba(46, 196, 122, 0.03));
+            border: 2px solid transparent;
+            background-clip: padding-box;
             color: var(--emerald-light); font-family: var(--font-title);
             font-size: 0.7rem; letter-spacing: 2px; text-transform: none;
             cursor: pointer; transition: all 0.15s var(--transition-smooth);
             display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 40px rgba(46, 196, 122, 0.06);
+            box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.05), 0 0 34px rgba(46, 196, 122, 0.08);
             -webkit-user-select: none; user-select: none;
             position: relative;
             overflow: hidden;
+        }
+        .tasbeeh-tap-btn::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.55), rgba(46, 196, 122, 0.42), rgba(201, 168, 76, 0.55));
+            z-index: -1;
         }
         .tasbeeh-tap-btn:active {
             transform: scale(0.92);
@@ -3104,22 +3199,22 @@
             box-shadow: 0 0 60px rgba(46, 196, 122, 0.15);
         }
         .tasbeeh-controls {
-            display: flex; gap: 10px; margin-top: 1.5rem;
+            display: flex; gap: 8px; margin-top: 1rem;
         }
         .tasbeeh-ctrl-btn {
-            padding: 12px 22px; border-radius: 50px;
-            background: rgba(46, 196, 122, 0.04);
-            border: 1px solid rgba(46, 196, 122, 0.1);
+            padding: 8px 14px; border-radius: 20px;
+            background: rgba(46, 196, 122, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             color: var(--text-subtle);
-            font-family: var(--font-title); font-size: 0.65rem;
-            letter-spacing: 1.5px; text-transform: none;
+            font-family: var(--font-title); font-size: 0.6rem;
+            letter-spacing: 0.5px; text-transform: none;
             cursor: pointer; transition: all 0.3s var(--transition-smooth);
         }
         .tasbeeh-ctrl-btn:hover {
             background: rgba(46, 196, 122, 0.1); color: var(--emerald-light);
         }
         .tasbeeh-presets {
-            display: flex; gap: 6px; margin-top: 1rem;
+            display: flex; gap: 6px; margin-top: 0.75rem;
         }
         .tasbeeh-preset {
             padding: 10px 18px; border-radius: 50px;
@@ -3185,7 +3280,7 @@
         .tasbeeh-lifetime {
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 1.5px; text-transform: none;
-            color: var(--text-subtle); margin-top: 1.2rem;
+            color: var(--text-subtle); margin-top: 0.8rem;
         }
         .tasbeeh-lifetime span { color: var(--gold-mid); }
 
@@ -3574,16 +3669,7 @@
             pointer-events: auto;
         }
         .memorize-close {
-            position: absolute;
-            top: calc(var(--safe-top) + 14px);
-            right: 16px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid rgba(46, 196, 122, 0.28);
-            background: rgba(46, 196, 122, 0.08);
-            color: var(--emerald-light);
-            font-size: 1.05rem;
+            font-size: 18px;
         }
         .memorize-panel-content {
             max-width: 540px;
@@ -4629,13 +4715,22 @@
         .dua-swipe-content {
             flex: 1;
             overflow-y: auto;
-            padding: 4px 2px 6px;
+            padding: 4px 0 6px;
             position: relative;
             z-index: 1;
             -webkit-overflow-scrolling: touch;
             background: var(--bg-surface);
         }
-        .dua-swipe-content .card-body-inner { padding: 0 14px 6px; }
+        .dua-swipe-content .card-body-inner { padding: 0 16px 8px; }
+        .dua-swipe-content .translation,
+        .dua-swipe-content .translation-ps,
+        .dua-swipe-content .transliteration,
+        .dua-swipe-content .reference,
+        .dua-swipe-content .virtue-tag,
+        .dua-swipe-content .virtue-tag-ps,
+        .dua-swipe-content .how-to-box {
+            overflow-wrap: anywhere;
+        }
         .dua-swipe-content .arabic-container { background: var(--bg-dark); }
         .dua-swipe-content .virtue-tag,
         .dua-swipe-content .virtue-tag-ps,
@@ -4679,39 +4774,40 @@
         .dua-swipe-back,
         .dua-swipe-arrow {
             position: absolute;
-            border: 1px solid var(--emerald-light);
-            color: var(--text-primary);
-            background: var(--bg-dark);
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            background: transparent;
             border-radius: 999px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            opacity: 1;
+            opacity: 0;
             cursor: pointer;
-            transition: opacity 0.25s ease, transform 0.25s ease;
+            transition: opacity 0.35s ease, color 0.2s ease;
             z-index: 4;
+            width: 44px;
+            height: 44px;
         }
         .dua-swipe-back:hover,
         .dua-swipe-arrow:hover {
-            opacity: 0.8;
-            transform: scale(1.04);
+            color: rgba(255, 255, 255, 1);
         }
         .dua-swipe-back {
-            top: calc(var(--nav-height) + var(--safe-top) + 10px);
-            left: 10px;
-            width: 32px;
-            height: 32px;
-            font-size: 1rem;
+            top: calc(var(--safe-top) + 16px);
+            left: 16px;
+            font-size: 20px;
         }
         .dua-swipe-arrow {
             top: 50%;
-            width: 32px;
-            height: 32px;
-            font-size: 0.95rem;
+            font-size: 20px;
             transform: translateY(-50%);
         }
-        .dua-swipe-arrow.left { left: 6px; }
-        .dua-swipe-arrow.right { right: 6px; }
+        .dua-swipe-arrow.left { left: 8px; }
+        .dua-swipe-arrow.right { right: 8px; }
+        .dua-swipe-viewer.show-swipe-hints .dua-swipe-arrow { opacity: 0.2; }
+        .dua-swipe-viewer.show-swipe-hints.hint-left .dua-swipe-arrow.left,
+        .dua-swipe-viewer.show-swipe-hints.hint-right .dua-swipe-arrow.right { opacity: 0.35; }
+        .dua-swipe-viewer.show-swipe-hints .dua-swipe-back { opacity: 0.75; }
 
         .dua-swipe-dots {
             position: absolute;
@@ -4754,10 +4850,10 @@
         }
         [data-theme="light"] .dua-swipe-back,
         [data-theme="light"] .dua-swipe-arrow {
-            background: var(--bg-surface);
-            border-color: var(--emerald-light);
-            color: var(--text-primary);
+            color: rgba(25, 60, 42, 0.52);
         }
+        [data-theme="light"] .dua-swipe-back:hover,
+        [data-theme="light"] .dua-swipe-arrow:hover { color: rgba(25, 60, 42, 0.95); }
         [data-theme="light"] .dua-swipe-actions {
             background: var(--bg-dark);
             border-top-color: var(--emerald-light);

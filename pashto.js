@@ -1014,7 +1014,7 @@ function applyLanguage(lang) {
     if (targetLabel) {
         if (!targetLabel.getAttribute('data-en')) targetLabel.setAttribute('data-en', targetLabel.textContent);
         const t = targetLabel.textContent;
-        if (t.includes('OPEN COUNT')) targetLabel.textContent = PS_UI.openCount;
+        if (/open\s*count/i.test(t)) targetLabel.textContent = PS_UI.openCount;
         else {
             let num = t.replace(/[^0-9]/g, '');
             if (typeof toPashtoDigits === 'function') num = toPashtoDigits(num);

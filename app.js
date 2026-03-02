@@ -529,6 +529,21 @@
         isDragging: false,
         transitionLock: false
     };
+    let swipeHintTimer = null;
+
+    function showDuaSwipeHints(direction = 'both', durationMs = 3000) {
+        const viewer = document.getElementById('duaSwipeViewer');
+        if (!viewer) return;
+        viewer.classList.remove('hint-left', 'hint-right');
+        viewer.classList.add('show-swipe-hints');
+        if (direction === 'left') viewer.classList.add('hint-left');
+        if (direction === 'right') viewer.classList.add('hint-right');
+        if (swipeHintTimer) clearTimeout(swipeHintTimer);
+        swipeHintTimer = setTimeout(() => {
+            viewer.classList.remove('show-swipe-hints', 'hint-left', 'hint-right');
+            swipeHintTimer = null;
+        }, Math.max(600, durationMs));
+    }
 
     function isDuaSwipeViewerActive() {
         return DUA_SWIPE_STATE.active;
@@ -823,6 +838,8 @@
                         closeAllPanelsForStateApply();
                         if (isCategorySubViewActive()) backToCategories();
                         collapseExpandedDuaCards();
+                        const homeState = getInAppStateFromDom();
+                        history.pushState(homeState, '');
                     } finally {
                         inAppHistorySuppressed = false;
                     }
@@ -1265,6 +1282,7 @@ window.filterCategory = function(cat, btn) {
         }
 
         DUA_SWIPE_STATE.transitionLock = true;
+        showDuaSwipeHints(delta > 0 ? 'right' : 'left', 900);
         setSwipeTrackPosition(delta > 0 ? 2 : 0, 0, true);
 
         const track = document.getElementById('duaSwipeTrack');
@@ -1308,6 +1326,7 @@ window.filterCategory = function(cat, btn) {
 
         localStorage.setItem('crown_active_category', category);
         renderDuaSwipeViewer();
+        showDuaSwipeHints('both', 3000);
         if (!opts.skipHistory) {
             recordInAppRoute(true, {
                 [IN_APP_HISTORY_FLAG]: true,
@@ -1341,11 +1360,16 @@ window.filterCategory = function(cat, btn) {
         if (viewer) {
             viewer.classList.remove('active');
             viewer.setAttribute('aria-hidden', 'true');
+            viewer.classList.remove('show-swipe-hints', 'hint-left', 'hint-right');
         }
         DUA_SWIPE_STATE.active = false;
         DUA_SWIPE_STATE.ids = [];
         DUA_SWIPE_STATE.index = 0;
         DUA_SWIPE_STATE.transitionLock = false;
+        if (swipeHintTimer) {
+            clearTimeout(swipeHintTimer);
+            swipeHintTimer = null;
+        }
         if (!opts.skipRoute) {
             recordInAppRoute(false, {
                 [IN_APP_HISTORY_FLAG]: true,
@@ -1469,7 +1493,7 @@ window.filterCategory = function(cat, btn) {
             div.innerHTML = `
                 <div class="panel-header">
                     <div class="panel-title">Your Saved Duas</div>
-                    <button class="panel-close" onclick="toggleBookmarksPanel()">✕</button>
+                    <button class="panel-close" onclick="toggleBookmarksPanel()">×</button>
                 </div>
                 <div id="bookmarkListContainer"></div>`;
             document.body.appendChild(div);
@@ -1579,7 +1603,20 @@ window.filterCategory = function(cat, btn) {
         const lifetimeEl = document.getElementById('tasbeehLifetime');
         if (arEl) arEl.textContent = d.ar;
         if (virtueEl) virtueEl.textContent = d.virtue;
-        if (lifetimeEl) lifetimeEl.innerHTML = `TOTAL: <span>${getOverallTotal().toLocaleString()}</span>`;
+        if (lifetimeEl) lifetimeEl.innerHTML = `Total: <span>${getOverallTotal().toLocaleString()}</span>`;
+    }
+
+    function formatTasbeehTargetLabel(target) {
+        const value = Number(target) || 0;
+        if (value === 0) {
+            return isPashtoMode() && typeof PS_UI !== 'undefined'
+                ? (PS_UI.openCount || 'خلاص شمېرنه')
+                : 'Open count';
+        }
+        const label = isPashtoMode() && typeof PS_UI !== 'undefined'
+            ? (PS_UI.target || 'هدف')
+            : 'Target';
+        return `${label}: ${value}`;
     }
 
     function updateTasbeehSoundToggle() {
@@ -1634,7 +1671,7 @@ window.filterCategory = function(cat, btn) {
         const display = document.getElementById('tasbeehDisplay');
         if (display) display.textContent = '0';
         const tt = document.getElementById('tasbeehTargetLabel');
-        if (tt) tt.textContent = `TARGET: ${tasbeehTarget}`;
+        if (tt) tt.textContent = formatTasbeehTargetLabel(tasbeehTarget);
         // Update preset active states
         document.querySelectorAll('.tasbeeh-preset').forEach(p => p.classList.remove('active'));
         updateTasbeehUI();
@@ -1655,7 +1692,7 @@ window.filterCategory = function(cat, btn) {
         renderDhikrSelector();
         updateTasbeehUI();
         const tt = document.getElementById('tasbeehTargetLabel');
-        if (tt) tt.textContent = `TARGET: ${tasbeehTarget}`;
+        if (tt) tt.textContent = formatTasbeehTargetLabel(tasbeehTarget);
         updateTasbeehSoundToggle();
         const closeBtn = document.querySelector('.tasbeeh-close');
         if (closeBtn) closeBtn.focus();
@@ -1666,7 +1703,7 @@ window.filterCategory = function(cat, btn) {
         openTasbeeh();
         tasbeehTarget = (target === 36) ? 100 : 33;
         const tt = document.getElementById('tasbeehTargetLabel');
-        if (tt) tt.textContent = `TARGET: ${tasbeehTarget}`;
+        if (tt) tt.textContent = formatTasbeehTargetLabel(tasbeehTarget);
     };
 
     window.closeTasbeeh = function() {
@@ -1737,7 +1774,7 @@ window.filterCategory = function(cat, btn) {
     window.setTasbeehTarget = function(t) {
         tasbeehTarget = t;
         const tt = document.getElementById('tasbeehTargetLabel');
-        if (tt) tt.textContent = t === 0 ? 'OPEN COUNT' : `TARGET: ${t}`;
+        if (tt) tt.textContent = formatTasbeehTargetLabel(t);
         resetTasbeeh();
         document.querySelectorAll('.tasbeeh-preset').forEach(p => p.classList.remove('active'));
         const activePreset = document.querySelector(`.tasbeeh-preset[onclick="setTasbeehTarget(${t})"]`);
@@ -1814,13 +1851,13 @@ window.filterCategory = function(cat, btn) {
         return {
             title: isPS ? (psUI?.routineTitle || 'وړاندیز شوی ورځنی معمول') : 'Recommended Daily Routine',
             duaOfDay: isPS ? (psUI?.routineDuaOfDay || 'د ورځې دعا') : 'Dua of the Day',
-            expandPrompt: isPS ? (psUI?.routineExpandPrompt || 'د ژباړې او حوالو د پراخولو لپاره ټک وکړئ ↓') : 'Tap to expand translation & references ↓',
+            expandPrompt: isPS ? (psUI?.routineExpandPrompt || 'د ژباړې او حوالو د پراخولو لپاره ټک وکړئ') : 'Tap to expand translation & references',
             collapsePrompt: isPS ? (psUI?.routineHidePrompt || 'د جزئیاتو د پټولو لپاره ټک وکړئ ↑') : 'Tap to hide details ↑',
-            morning: isPS ? '🌅 د سهار معمول' : '🌅 MORNING (After Fajr)',
-            evening: isPS ? '🌇 د ماښام معمول' : '🌇 EVENING (After Asr/Maghrib)',
-            prayer: isPS ? '🕌 د لمانځه معمول' : '🕌 IN EVERY PRAYER',
-            sleep: isPS ? '🌙 د خوب معمول' : '🌙 BEFORE SLEEP',
-            dhikr: isPS ? '📿 د ذکر لارښوونه' : '📿 DAILY DHIKR',
+            morning: isPS ? (psUI?.routineMorning || '🌅 سهار (د فجر وروسته)') : '🌅 Morning (After Fajr)',
+            evening: isPS ? (psUI?.routineEvening || '🌇 ماښام (د عصر/مغرب وروسته)') : '🌇 Evening (After Asr/Maghrib)',
+            prayer: isPS ? (psUI?.routinePrayer || '🕌 په هر لمونځ کې') : '🕌 In Every Prayer',
+            sleep: isPS ? (psUI?.routineSleep || '🌙 د ویده کېدو دمخه') : '🌙 Before Sleep',
+            dhikr: isPS ? (psUI?.routineDhikr || '📿 ورځنی ذکر') : '📿 Daily Dhikr',
             eveningSame: isPS ? (psUI?.routineEveningSame || 'د سهار اذکار په شان، سربېره پر دې:') : 'Same as morning adhkar, plus:'
         };
     }
@@ -1838,10 +1875,10 @@ window.filterCategory = function(cat, btn) {
         rp.querySelector('.routine-content').innerHTML = `
             <h2>${ui.title}</h2>
             <div class="progress-stat-card daily-dua-progress" style="flex-direction:column;text-align:center;cursor:pointer;border-color:rgba(201,168,76,0.15);" onclick="toggleRoutineDailyDua(event);">
-                <div style="font-family:var(--font-title);font-size:0.7rem;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,168,76,0.8);margin-bottom:0.5rem;"><span class="sparkle">✦</span> ${ui.duaOfDay} <span class="sparkle">✦</span></div>
+                <div style="font-family:var(--font-title);font-size:0.72rem;letter-spacing:0.5px;text-transform:none;color:rgba(201,168,76,0.8);margin-bottom:0.5rem;"><span class="sparkle">✦</span> ${ui.duaOfDay} <span class="sparkle">✦</span></div>
                 <div id="routineDailyArabic" style="font-family:var(--font-arabic);font-size:calc(1.3rem * var(--font-scale));color:var(--gold-light);direction:rtl;line-height:2.2;margin:0.4rem 0;"></div>
                 <div id="routineDailyTranslation" style="font-family:var(--font-text);font-size:0.88rem;color:var(--text-muted);font-style:italic;line-height:1.6;"></div>
-                <div id="routineDailyPrompt" style="margin-top:10px;font-size:0.7rem;color:var(--text-subtle);letter-spacing:1px;text-transform:uppercase;">${ui.expandPrompt}</div>
+                <div id="routineDailyPrompt" style="margin-top:10px;font-size:0.7rem;color:var(--text-faint);letter-spacing:0.2px;text-transform:none;">${ui.expandPrompt}</div>
             </div>
             <div id="routineDailyExtra" style="display:none;margin-top:10px;padding:12px;background:rgba(46,196,122,0.08);border:1px solid rgba(46,196,122,0.18);border-radius:var(--radius-md);"></div>
 
@@ -2046,10 +2083,16 @@ window.filterCategory = function(cat, btn) {
         if (card && arabicEl && transEl) {
             arabicEl.innerText = card.querySelector('.arabic-text').innerText;
             const isPS = isPashtoMode();
-            const translationEl = isPS
-                ? (card.querySelector('.translation-ps') || card.querySelector('.translation'))
-                : card.querySelector('.translation');
-            const raw = translationEl?.innerText?.trim() || '';
+            let raw = '';
+            if (isPS && typeof PS_DUAS !== 'undefined' && PS_DUAS[duaIndex]?.t) {
+                raw = String(PS_DUAS[duaIndex].t || '').trim();
+            }
+            if (!raw) {
+                const translationEl = isPS
+                    ? (card.querySelector('.translation-ps') || card.querySelector('.translation'))
+                    : card.querySelector('.translation');
+                raw = translationEl?.innerText?.trim() || '';
+            }
             transEl.innerText = raw ? `${raw.substring(0, 110)}...` : '';
         }
     }
@@ -2177,7 +2220,7 @@ window.filterCategory = function(cat, btn) {
             pp.className = 'progress-panel';
             pp.setAttribute('onclick', 'if(event.target===this) closeProgress()');
             pp.innerHTML = `
-                <button class="etiquette-close" onclick="closeProgress()">✕</button>
+                <button class="etiquette-close" onclick="closeProgress()">×</button>
                 <div class="progress-panel-content" id="progressPanelContent"></div>`;
             document.body.appendChild(pp);
         }
@@ -2418,28 +2461,28 @@ window.filterCategory = function(cat, btn) {
         wrap.innerHTML = `
             <div style="text-align:center;margin-bottom:20px;">
                 <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:16px;color:#2ec47a;margin-bottom:4px;">ف</div>
-                <div style="font-family:'Playfair Display',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#2ec47a;margin-bottom:6px;">Essential Duas by فلاح</div>
-                <div style="font-family:'Playfair Display',serif;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:#e0eccc;font-weight:600;">My Journey</div>
+                <div style="font-family:'Playfair Display',serif;font-size:11px;letter-spacing:1px;text-transform:none;color:#2ec47a;margin-bottom:6px;">Essential Duas by فلاح</div>
+                <div style="font-family:'Playfair Display',serif;font-size:16px;letter-spacing:0.5px;text-transform:none;color:#e0eccc;font-weight:600;">My Journey</div>
             </div>
             <div style="display:flex;gap:12px;margin-bottom:16px;">
                 <div style="flex:1;background:rgba(46,196,122,0.06);border:1px solid rgba(46,196,122,0.12);border-radius:14px;padding:16px;text-align:center;">
                     <div style="font-family:'Playfair Display',serif;font-size:24px;color:#d4af37;">${readCount}<span style="font-size:14px;color:rgba(224,238,210,0.5);">/${total}</span></div>
-                    <div style="font-family:'Playfair Display',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Duas Read</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:8px;letter-spacing:0.5px;text-transform:none;color:rgba(224,238,210,0.5);margin-top:4px;">Duas Read</div>
                 </div>
                 <div style="flex:1;background:rgba(46,196,122,0.06);border:1px solid rgba(46,196,122,0.12);border-radius:14px;padding:16px;text-align:center;">
                     <div style="font-family:'Playfair Display',serif;font-size:24px;color:#d4af37;">${streak}</div>
-                    <div style="font-family:'Playfair Display',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Day Streak</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:8px;letter-spacing:0.5px;text-transform:none;color:rgba(224,238,210,0.5);margin-top:4px;">Day Streak</div>
                 </div>
                 <div style="flex:1;background:rgba(46,196,122,0.06);border:1px solid rgba(46,196,122,0.12);border-radius:14px;padding:16px;text-align:center;">
                     <div style="font-family:'Playfair Display',serif;font-size:24px;color:#d4af37;">${bookmarkCount}</div>
-                    <div style="font-family:'Playfair Display',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(224,238,210,0.5);margin-top:4px;">Saved</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:8px;letter-spacing:0.5px;text-transform:none;color:rgba(224,238,210,0.5);margin-top:4px;">Saved</div>
                 </div>
             </div>
             ${earned ? `<div style="text-align:center;font-size:1.4rem;margin-bottom:12px;letter-spacing:4px;">${earned}</div>` : ''}
             <div style="text-align:center;font-family:'Playfair Display',serif;font-size:14px;color:rgba(224,238,210,0.85);margin-bottom:16px;">${milestone}</div>
             <div style="display:flex;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(46,196,122,0.1);">
-                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.55);">${readPct}% Complete</span>
-                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(160,210,180,0.35);">فلاح · mohhp.github.io/Essential-duas</span>
+                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:0.3px;text-transform:none;color:rgba(160,210,180,0.55);">${readPct}% Complete</span>
+                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:0.3px;text-transform:none;color:rgba(160,210,180,0.35);">فلاح · mohhp.github.io/Essential-duas</span>
             </div>
         `;
         document.body.appendChild(wrap);
@@ -3965,7 +4008,7 @@ window.filterCategory = function(cat, btn) {
             <div class="word-popup-arrow arrow-bottom"></div>
             <div class="word-popup-arabic"></div>
             <div class="word-popup-divider"></div>
-            <div class="word-popup-root-label">ROOT LETTERS</div>
+            <div class="word-popup-root-label">Root letters</div>
             <div class="word-popup-root"></div>
             <div class="word-popup-divider"></div>
             <div class="word-popup-meaning"></div>
@@ -5624,6 +5667,8 @@ window.filterCategory = function(cat, btn) {
             const isCurrent = current === name;
             const isNext = next === name;
             const reminderEnabled = REMINDER_PRAYERS.includes(name) && settings.enabled && !!settings.prayers[name];
+            const scheduledReminder = activePrayerReminderSchedule[name] || null;
+            const reminderFireText = scheduledReminder ? formatTime(new Date(scheduledReminder.triggerAt)) : '';
             const cls = isCurrent ? ' current-prayer' : isNext ? ' next-prayer' : '';
             const uiText = getPrayerUiText();
             return `<div class="prayer-time-row${cls}">
@@ -5633,6 +5678,7 @@ window.filterCategory = function(cat, btn) {
                 </span>
                 <span class="prayer-time-meta">
                     ${reminderEnabled ? '<span class="prayer-reminder-indicator" title="Reminder enabled">🔔</span>' : ''}
+                    ${scheduledReminder ? `<span class="prayer-reminder-time" title="Reminder ${scheduledReminder.offsetMinutes} min before">🔔 ${reminderFireText}</span>` : ''}
                     ${isCurrent ? `<span class="prayer-now-badge">${uiText.now}</span>` : ''}
                     ${isNext ? `<span class="prayer-next-badge">${uiText.next}</span>` : ''}
                     <span class="prayer-time-value">${timeStr}</span>
@@ -5888,9 +5934,47 @@ window.filterCategory = function(cat, btn) {
     // ===== PRAYER NOTIFICATIONS =====
     let notificationTimeouts = [];
     let dailyDuaReminderTimer = null;
+    let activePrayerReminderSchedule = {};
+
+    function getReminderSchedulePayload() {
+        return Object.entries(activePrayerReminderSchedule).map(([prayerName, details]) => ({
+            prayerName,
+            triggerAt: details.triggerAt,
+            offsetMinutes: details.offsetMinutes,
+            icon: PRAYER_ICONS[prayerName] || '🕌',
+            label: getPrayerLabel(prayerName)
+        }));
+    }
+
+    function syncPrayerReminderStateToServiceWorker(reason = 'schedule') {
+        if (!('serviceWorker' in navigator)) return;
+        const payload = {
+            type: 'SYNC_PRAYER_REMINDERS',
+            reason,
+            generatedAt: Date.now(),
+            timezoneOffsetMinutes: new Date().getTimezoneOffset(),
+            reminders: getReminderSchedulePayload()
+        };
+
+        navigator.serviceWorker.ready
+            .then((registration) => {
+                if (registration?.active) registration.active.postMessage(payload);
+                if ('sync' in registration) {
+                    registration.sync.register('prayer-reminder-check').catch(() => {});
+                }
+                if ('periodicSync' in registration && Notification.permission === 'granted') {
+                    registration.periodicSync.register('prayer-reminder-check', { minInterval: 15 * 60 * 1000 }).catch(() => {});
+                }
+            })
+            .catch(() => {});
+    }
 
     function requestNotificationPermissionIfNeeded() {
         const uiText = getPrayerUiText();
+        console.log('[PrayerReminder] Notification permission check', {
+            supported: 'Notification' in window,
+            permission: typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
+        });
         if (!('Notification' in window)) {
             showToast(uiText.alertsUnsupported);
             return Promise.resolve(false);
@@ -5963,6 +6047,12 @@ window.filterCategory = function(cat, btn) {
         const params = adhan.CalculationMethod.MuslimWorldLeague();
         params.madhab = adhan.Madhab.Hanafi;
         const pt = new adhan.PrayerTimes(coordinates, date, params);
+        console.log('[PrayerReminder] Prayer time parsed', {
+            prayerName,
+            localDate: date.toString(),
+            timezoneOffsetMinutes: date.getTimezoneOffset(),
+            parsedPrayerTime: pt[prayerName] ? new Date(pt[prayerName]).toString() : null
+        });
         return pt[prayerName] || null;
     }
 
@@ -5971,6 +6061,13 @@ window.filterCategory = function(cat, btn) {
         if (todayPrayer) {
             const candidate = new Date(todayPrayer);
             candidate.setMinutes(candidate.getMinutes() - offsetMinutes);
+            console.log('[PrayerReminder] Candidate reminder (today)', {
+                prayerName,
+                prayerAt: new Date(todayPrayer).toString(),
+                reminderAt: candidate.toString(),
+                now: now.toString(),
+                offsetMinutes
+            });
             if (candidate > now) return candidate;
         }
 
@@ -5980,6 +6077,13 @@ window.filterCategory = function(cat, btn) {
         if (!tomorrowPrayer) return null;
         const nextCandidate = new Date(tomorrowPrayer);
         nextCandidate.setMinutes(nextCandidate.getMinutes() - offsetMinutes);
+        console.log('[PrayerReminder] Candidate reminder (tomorrow)', {
+            prayerName,
+            prayerAt: new Date(tomorrowPrayer).toString(),
+            reminderAt: nextCandidate.toString(),
+            now: now.toString(),
+            offsetMinutes
+        });
         return nextCandidate > now ? nextCandidate : null;
     }
 
@@ -6006,7 +6110,13 @@ window.filterCategory = function(cat, btn) {
     }
 
     function firePrayerReminder(prayerName, isPreReminder, minutesBefore) {
-        console.log('[PrayerReminder] Timer fired', { prayerName, isPreReminder, minutesBefore, at: new Date().toISOString() });
+        console.log('[PrayerReminder] Timer fired', {
+            prayerName,
+            isPreReminder,
+            minutesBefore,
+            firedAtLocal: new Date().toString(),
+            firedAtISO: new Date().toISOString()
+        });
         const uiText = getPrayerUiText();
         const localizedPrayer = getPrayerLabel(prayerName);
         const body = isPreReminder
@@ -6085,6 +6195,7 @@ window.filterCategory = function(cat, btn) {
 
     function scheduleReminderMidnightRefresh() {
         if (reminderMidnightTimer) {
+            console.log('[PrayerReminder] Clearing previous midnight refresh timer');
             clearTimeout(reminderMidnightTimer);
             reminderMidnightTimer = null;
         }
@@ -6096,7 +6207,13 @@ window.filterCategory = function(cat, btn) {
         const nextMidnight = new Date(now);
         nextMidnight.setHours(24, 0, 2, 0);
         const delay = Math.max(1000, nextMidnight - now);
+        console.log('[PrayerReminder] Scheduling midnight refresh', {
+            now: now.toString(),
+            nextMidnight: nextMidnight.toString(),
+            delayMs: delay
+        });
         reminderMidnightTimer = setTimeout(() => {
+            console.log('[PrayerReminder] Midnight refresh fired', { firedAt: new Date().toString() });
             const coords = getPrayerCoordinates();
             if (coords) calculateAndRenderPrayers(coords.lat, coords.lng);
             schedulePrayerNotifications();
@@ -6109,7 +6226,14 @@ window.filterCategory = function(cat, btn) {
         if (!settings.enabled) return;
 
         const now = new Date();
-        console.log('[PrayerReminder] Scheduling start', { now: now.toISOString(), offset: settings.offsetMinutes, mode: settings.mode });
+        console.log('[PrayerReminder] Scheduling start', {
+            now: now.toString(),
+            nowISO: now.toISOString(),
+            timezoneOffsetMinutes: now.getTimezoneOffset(),
+            offset: settings.offsetMinutes,
+            mode: settings.mode,
+            permission: typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
+        });
 
         REMINDER_PRAYERS.forEach(name => {
             if (!settings.prayers[name]) return;
@@ -6121,27 +6245,46 @@ window.filterCategory = function(cat, btn) {
 
             console.log('[PrayerReminder] Scheduled', {
                 prayer: name,
-                reminderAt: reminderTime.toISOString(),
+                reminderAtLocal: reminderTime.toString(),
+                reminderAtISO: reminderTime.toISOString(),
+                currentTimeLocal: now.toString(),
                 delayMs: delay
             });
 
+            activePrayerReminderSchedule[name] = {
+                triggerAt: reminderTime.getTime(),
+                offsetMinutes: settings.offsetMinutes,
+                createdAt: now.getTime()
+            };
+
             const tid = setTimeout(() => {
                 firePrayerReminder(name, settings.offsetMinutes > 0, settings.offsetMinutes);
+                delete activePrayerReminderSchedule[name];
+                syncPrayerReminderStateToServiceWorker('timer-fired');
                 schedulePrayerNotifications();
             }, delay);
             notificationTimeouts.push(tid);
         });
 
+        renderPrayerGrid();
+        syncPrayerReminderStateToServiceWorker('schedule');
         scheduleReminderMidnightRefresh();
     }
 
     function clearPrayerNotifications() {
+        console.log('[PrayerReminder] Clearing reminder timers', {
+            timerCount: notificationTimeouts.length,
+            hasMidnightTimer: !!reminderMidnightTimer
+        });
         notificationTimeouts.forEach(tid => clearTimeout(tid));
         notificationTimeouts = [];
+        activePrayerReminderSchedule = {};
         if (reminderMidnightTimer) {
             clearTimeout(reminderMidnightTimer);
             reminderMidnightTimer = null;
         }
+        renderPrayerGrid();
+        syncPrayerReminderStateToServiceWorker('clear');
     }
 
     function getTodayDuaSummary() {
@@ -6615,7 +6758,7 @@ window.filterCategory = function(cat, btn) {
         const surahName = isPashtoMode() ? cleanSurahArabicName(meta.name) : meta.englishName;
         card.innerHTML = `
             <div class="quran-continue-inner">
-                <div style="font-family:var(--font-title);font-size:0.68rem;letter-spacing:1px;color:var(--emerald-light);text-transform:uppercase;margin-bottom:6px;">${ui.continueReading}</div>
+                <div style="font-family:var(--font-title);font-size:0.68rem;letter-spacing:0.35px;color:var(--emerald-light);text-transform:none;margin-bottom:6px;">${ui.continueReading}</div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
                     <div>
                         <div style="font-size:0.88rem;color:var(--text-primary);">${surahName}</div>
@@ -6637,7 +6780,7 @@ window.filterCategory = function(cat, btn) {
         }
 
         wrap.innerHTML = `
-            <div style="font-family:var(--font-title);font-size:0.68rem;letter-spacing:1px;color:var(--gold-mid);text-transform:uppercase;margin-bottom:6px;">${ui.recentlyRead}</div>
+            <div style="font-family:var(--font-title);font-size:0.68rem;letter-spacing:0.35px;color:var(--gold-mid);text-transform:none;margin-bottom:6px;">${ui.recentlyRead}</div>
             ${items.slice(0, 5).map((item) => {
                 const meta = getCurrentSurahMetaByNumber(item.surahNumber);
                 const surahName = meta ? (isPashtoMode() ? cleanSurahArabicName(meta.name) : meta.englishName) : `#${item.surahNumber}`;
@@ -6719,26 +6862,29 @@ window.filterCategory = function(cat, btn) {
 
         list.innerHTML = rows.map((surah) => {
             const revelation = getRevelationMeta(surah.revelationType);
-            const primary = cleanSurahArabicName(surah.name);
-            const secondary = isPashtoMode()
+            const primary = isPashtoMode()
                 ? (surah.englishNameTranslation || surah.englishName)
                 : surah.englishName;
+            const secondary = isPashtoMode()
+                ? surah.englishName
+                : (surah.englishNameTranslation || surah.englishName);
+            const arabicName = cleanSurahArabicName(surah.name);
             const cached = offlineSet.has(Number(surah.number));
 
             return `
                 <div class="quran-surah-row" onclick="openQuranSurah(${surah.number})">
                     <div class="quran-surah-num">${localizeQuranNumber(surah.number)}</div>
                     <div class="quran-surah-main">
-                        <div class="quran-surah-ar" dir="rtl">${escapeHtml(primary)}</div>
-                        <div class="quran-surah-en">${escapeHtml(secondary)}</div>
+                        <div class="quran-surah-name-primary">${escapeHtml(primary)}</div>
+                        <div class="quran-surah-name-secondary">${escapeHtml(secondary)}</div>
                     </div>
                     <div class="quran-surah-meta">
-                        <span class="quran-revelation-badge">${revelation.icon} ${revelation.label}</span>
+                        <div class="quran-surah-ar" dir="rtl">${escapeHtml(arabicName)}</div>
                         <span class="quran-surah-ayahs">${localizeQuranNumber(surah.numberOfAyahs)} ${ui.ayahs}</span>
-                        ${cached ? `<span class="quran-cached" title="${ui.cached}">⬇</span>` : ''}
-                    </div>
-                    <div class="quran-surah-actions" onclick="event.stopPropagation()">
-                        <button class="quran-row-btn" type="button" onclick="downloadQuranSurahOffline(${surah.number})">${ui.downloadOffline}</button>
+                        <span class="quran-revelation-text">${revelation.label}</span>
+                        ${cached
+                            ? `<span class="quran-cached-icon" title="${ui.cached}">✓</span>`
+                            : `<button class="quran-download-icon" type="button" title="${ui.downloadOffline}" onclick="event.stopPropagation(); downloadQuranSurahOffline(${surah.number});">↓</button>`}
                     </div>
                 </div>
             `;
@@ -6802,7 +6948,7 @@ window.filterCategory = function(cat, btn) {
                         </div>
                         <div style="display:flex;gap:6px;">
                             <button class="quran-row-btn" type="button" onclick="openQuranSurah(${item.surahNumber}, ${item.ayahNumber})">${ui.open}</button>
-                            <button class="quran-row-btn" type="button" onclick="removeQuranBookmark(${item.surahNumber}, ${item.ayahNumber})">✕</button>
+                            <button class="quran-row-btn" type="button" onclick="removeQuranBookmark(${item.surahNumber}, ${item.ayahNumber})">×</button>
                         </div>
                     </div>
                 </div>
@@ -6948,6 +7094,7 @@ window.filterCategory = function(cat, btn) {
                 <div style="font-family:var(--font-title);font-size:0.7rem;color:var(--text-subtle);margin-top:2px;">${escapeHtml(data.englishName)} &bull; ${localizeQuranNumber(data.numberOfAyahs)} ${ui.ayahs}</div>
                 <div style="margin-top:4px;font-size:0.62rem;color:var(--text-subtle);">${rev.icon} ${rev.label}</div>
             </div>
+            <button class="quran-row-btn quran-reader-download-btn" type="button" onclick="downloadQuranSurahOffline(${Number(data.surahNumber)})" title="${ui.downloadOffline}">${getOfflineSurahs().map(Number).includes(Number(data.surahNumber)) ? '✓' : '↓'}</button>
             ${Number(data.surahNumber) === 9 ? '' : `<div style="font-family:var(--font-arabic);font-size:1.2rem;line-height:2;color:var(--gold-light);margin-top:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.12);">${ui.bismillah}</div>`}
         `;
 
@@ -7770,6 +7917,9 @@ window.filterCategory = function(cat, btn) {
             markSurahOffline(Number(surahNumber));
             showToast(`${ui.downloaded}: ${isPashtoMode() ? 'سورت' : 'Surah'} ${localizeQuranNumber(surahNumber)}`);
             if (quranState.view === 'surah') renderQuranSurahRows();
+            if (quranState.currentSurahData && Number(quranState.currentSurah) === Number(surahNumber)) {
+                renderQuranReaderHeader(quranState.currentSurahData);
+            }
         } catch (error) {
             showToast(ui.noData);
         }
@@ -7958,7 +8108,7 @@ window.filterCategory = function(cat, btn) {
         }
         if (dotClose) {
             dotClose.setAttribute('aria-label', isPashtoMode() ? 'د غږ کړکۍ بنده کړئ' : 'Close audio popup');
-            dotClose.textContent = isPashtoMode() ? '✕ بند' : '✕ Close';
+            dotClose.textContent = isPashtoMode() ? '× بند' : '× Close';
         }
 
         const modeBtnMap = {
@@ -8041,6 +8191,18 @@ window.filterCategory = function(cat, btn) {
         navigator.serviceWorker.addEventListener('message', (event) => {
             if (event.data && event.data.type === 'SW_UPDATED') {
                 showToast('App updated! Refresh for the latest version.');
+            } else if (event.data && event.data.type === 'SW_PRAYER_REMINDER_DUE') {
+                const { prayerName } = event.data;
+                console.log('[PrayerReminder] Received due reminder from service worker', {
+                    prayerName,
+                    triggerAt: event.data.triggerAt,
+                    reason: event.data.reason,
+                    receivedAt: new Date().toString()
+                });
+                if (prayerName && activePrayerReminderSchedule[prayerName]) {
+                    delete activePrayerReminderSchedule[prayerName];
+                    renderPrayerGrid();
+                }
             }
         });
     }

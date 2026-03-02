@@ -1,6 +1,69 @@
-const CACHE_NAME = 'essential-duas-v51';
+const CACHE_NAME = 'essential-duas-v52';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
+const PRAYER_REMINDER_DUE_WINDOW_MS = 15 * 1000;
+const PRAYER_REMINDER_GRACE_MS = 10 * 60 * 1000;
+
+let prayerReminderState = {
+  generatedAt: 0,
+  timezoneOffsetMinutes: null,
+  reminders: []
+};
+const firedReminderMap = new Map();
+
+function cleanupFiredReminderMap(nowTs) {
+  for (const [key, firedAt] of firedReminderMap.entries()) {
+    if (nowTs - firedAt > 24 * 60 * 60 * 1000) firedReminderMap.delete(key);
+  }
+}
+
+async function broadcastReminderDue(payload) {
+  const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  windows.forEach((client) => client.postMessage(payload));
+}
+
+async function checkDuePrayerReminders(reason = 'manual') {
+  const nowTs = Date.now();
+  cleanupFiredReminderMap(nowTs);
+
+  const reminders = Array.isArray(prayerReminderState.reminders) ? prayerReminderState.reminders : [];
+  const dueReminders = reminders.filter((entry) => {
+    if (!entry || typeof entry.triggerAt !== 'number' || !entry.prayerName) return false;
+    const diff = entry.triggerAt - nowTs;
+    return diff <= PRAYER_REMINDER_DUE_WINDOW_MS && diff >= -PRAYER_REMINDER_GRACE_MS;
+  });
+
+  await Promise.all(dueReminders.map(async (entry) => {
+    const reminderKey = `${entry.prayerName}-${entry.triggerAt}`;
+    if (firedReminderMap.has(reminderKey)) return;
+    firedReminderMap.set(reminderKey, nowTs);
+
+    const title = `${entry.icon || '🕌'} Prayer reminder`;
+    const body = entry.offsetMinutes > 0
+      ? `${entry.label || entry.prayerName} in ${entry.offsetMinutes} minutes.`
+      : `${entry.label || entry.prayerName} time is now.`;
+
+    await self.registration.showNotification(title, {
+      body,
+      icon: './icon-192.png',
+      badge: './icon-192.png',
+      tag: `prayer-reminder-${entry.prayerName}-${entry.triggerAt}`,
+      renotify: false,
+      data: {
+        prayerName: entry.prayerName,
+        triggerAt: entry.triggerAt,
+        reason
+      }
+    });
+
+    await broadcastReminderDue({
+      type: 'SW_PRAYER_REMINDER_DUE',
+      prayerName: entry.prayerName,
+      triggerAt: entry.triggerAt,
+      reason
+    });
+  }));
+}
 
 const ASSETS = [
   './',
@@ -84,6 +147,33 @@ self.addEventListener('activate', (event) => {
     })
   );
   self.clients.claim();
+});
+
+self.addEventListener('message', (event) => {
+  const data = event.data || {};
+  if (data.type === 'SYNC_PRAYER_REMINDERS') {
+    prayerReminderState = {
+      generatedAt: data.generatedAt || Date.now(),
+      timezoneOffsetMinutes: data.timezoneOffsetMinutes,
+      reminders: Array.isArray(data.reminders) ? data.reminders : []
+    };
+    event.waitUntil(checkDuePrayerReminders(data.reason || 'sync-message'));
+  }
+  if (data.type === 'FORCE_PRAYER_REMINDER_CHECK') {
+    event.waitUntil(checkDuePrayerReminders('forced-message'));
+  }
+});
+
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'prayer-reminder-check') {
+    event.waitUntil(checkDuePrayerReminders('background-sync'));
+  }
+});
+
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'prayer-reminder-check') {
+    event.waitUntil(checkDuePrayerReminders('periodic-sync'));
+  }
 });
 
 // Fetch — network first, cache fallback, offline page as last resort
