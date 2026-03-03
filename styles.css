@@ -3459,32 +3459,32 @@
         }
         .tasbeeh-arabic {
             font-family: var(--font-arabic);
-            font-size: calc(1.6rem * var(--font-scale));
+            font-size: calc(1.45rem * var(--font-scale));
             color: var(--gold-light); direction: rtl;
-            text-align: center; line-height: 2;
-            margin-bottom: 1.25rem; max-width: 90%;
+            text-align: center; line-height: 1.8;
+            margin-bottom: 0.7rem; max-width: 90%;
         }
         .tasbeeh-count-display {
             font-family: var(--font-title);
-            font-size: 4.5rem; font-weight: 800;
+            font-size: 4.05rem; font-weight: 800;
             color: var(--emerald-light); line-height: 1;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.2rem;
             text-shadow: 0 0 40px rgba(46, 196, 122, 0.25);
         }
         .tasbeeh-target {
-            font-family: var(--font-title); font-size: 0.68rem;
-            letter-spacing: 1.5px; text-transform: none;
-            color: rgba(46, 196, 122, 0.7); margin-bottom: 1rem;
+            font-family: var(--font-title); font-size: 0.66rem;
+            letter-spacing: 1.3px; text-transform: none;
+            color: rgba(46, 196, 122, 0.7); margin-bottom: 0.7rem;
         }
         .tasbeeh-tap-btn {
-            --tap-size: min(62vw, 200px);
+            --tap-size: min(56vw, 170px);
             width: var(--tap-size);
             height: var(--tap-size);
-            min-width: 180px;
-            min-height: 180px;
+            min-width: 152px;
+            min-height: 152px;
             aspect-ratio: 1 / 1;
             border-radius: 50%;
-            margin: 14px auto 12px;
+            margin: 8px auto 8px;
             display: grid;
             place-items: center;
             position: relative;
@@ -3570,7 +3570,7 @@
             opacity: 0.9;
         }
         .tasbeeh-controls {
-            display: flex; gap: 8px; margin-top: 1rem;
+            display: flex; gap: 8px; margin-top: 0.7rem;
         }
         .tasbeeh-ctrl-btn {
             padding: 8px 14px; border-radius: 20px;
@@ -3585,7 +3585,7 @@
             background: rgba(46, 196, 122, 0.1); color: var(--emerald-light);
         }
         .tasbeeh-presets {
-            display: flex; gap: 6px; margin-top: 0.75rem;
+            display: flex; gap: 6px; margin-top: 0.55rem;
         }
         .tasbeeh-preset {
             padding: 10px 18px; border-radius: 50px;
@@ -3604,9 +3604,9 @@
         .dhikr-selector {
             display: flex; gap: 8px; overflow-x: auto;
             width: 100%; max-width: 400px;
-            min-height: 64px;
+            min-height: 56px;
             overflow-y: visible;
-            padding: 6px 2px 10px; margin-bottom: 0.9rem;
+            padding: 6px 2px 8px; margin-bottom: 0.55rem;
             scrollbar-width: none; -ms-overflow-style: none;
             scroll-snap-type: x mandatory;
         }
@@ -3643,10 +3643,10 @@
 
         /* Dhikr virtue hint */
         .tasbeeh-virtue {
-            font-family: var(--font-text); font-size: 0.75rem;
+            font-family: var(--font-text); font-size: 0.7rem;
             color: var(--text-subtle); font-style: italic;
             text-align: center; max-width: 300px;
-            margin-bottom: 1.5rem; line-height: 1.5;
+            margin-bottom: 0.9rem; line-height: 1.35;
             transition: opacity 0.3s ease;
         }
 
@@ -3654,7 +3654,7 @@
         .tasbeeh-lifetime {
             font-family: var(--font-title); font-size: 0.5rem;
             letter-spacing: 1.5px; text-transform: none;
-            color: var(--text-subtle); margin-top: 0.8rem;
+            color: var(--text-subtle); margin-top: 0.55rem;
         }
         .tasbeeh-lifetime span { color: var(--gold-mid); }
 
@@ -4771,7 +4771,7 @@
 
         .tasbeeh-panel {
             bottom: 0 !important;
-            padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 30px) !important;
+            padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 8px) !important;
             -webkit-transform: none !important;
             transform: none !important;
             will-change: auto !important;
@@ -5105,14 +5105,28 @@
             .arabic-text { font-size: calc(1.35rem * var(--font-scale)); }
             .dua-title { font-size: calc(0.72rem * var(--font-scale)); }
             .container { padding-left: 8px; padding-right: 8px; }
-            .tasbeeh-count-display { font-size: 3.5rem; }
+            .tasbeeh-panel {
+                padding-top: calc(var(--safe-top) + 6px);
+                padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 6px) !important;
+            }
+            .tasbeeh-panel .panel-back-btn {
+                margin-top: 4px;
+                margin-bottom: 4px;
+            }
+            .tasbeeh-title {
+                margin: 4px 0 0.55rem;
+            }
+            .tasbeeh-count-display { font-size: 3.05rem; }
             .tasbeeh-tap-btn {
-                --tap-size: min(64vw, 190px);
+                --tap-size: min(52vw, 160px);
                 width: var(--tap-size);
                 height: var(--tap-size);
-                min-width: 170px;
-                min-height: 170px;
+                min-width: 142px;
+                min-height: 142px;
             }
+            .tasbeeh-virtue { margin-bottom: 0.65rem; }
+            .tasbeeh-controls { margin-top: 0.55rem; }
+            .tasbeeh-presets { margin-top: 0.45rem; }
 
             /* Nav overflow */
             .nav-actions { position: relative; }
