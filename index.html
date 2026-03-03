@@ -94,6 +94,7 @@
 
 <!-- ===== MAIN CONTENT ===== -->
 <div class="container home-panel active" id="mainContainer" role="main" aria-label="Essential Duas content">
+    <div class="pull-refresh-indicator" id="pullRefreshIndicator" aria-hidden="true">↻ Pull to refresh</div>
 
     <!-- ===== HERO SECTION ===== -->
     <section class="hero">
@@ -138,6 +139,8 @@
                     <button class="daily-reminder-btn" onclick="dismissDailyDuaPrompt()">Not now</button>
                 </div>
             </div>
+
+            <div class="home-progress-summary" id="homeProgressSummary" aria-live="polite">Duas read today: 0 · Quran streak: 0 · Last: None</div>
 
         </div>
     </section>
@@ -3032,6 +3035,7 @@
                 <div class="prayer-countdown-time" id="nextPrayerCountdown">--:--:--</div>
             </div>
             <div class="prayer-times-grid" id="prayerTimesGrid"></div>
+            <div class="prayer-reminder-status" id="prayerReminderStatus" aria-live="polite">Reminders are off</div>
         </div>
 
         <div class="prayer-subtab-pane prayer-tab-qibla" id="prayerTabQibla" role="tabpanel">

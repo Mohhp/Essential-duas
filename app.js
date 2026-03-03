@@ -65,6 +65,7 @@
         enhanceAccessibility();
         setBottomNavActive('home');
         initBottomNavTouchHandlers();
+        initHomePullToRefresh();
 
         // Search listener
         if (els.searchInput) {
@@ -1004,6 +1005,7 @@
     window.toggleBookmark = function(id) {
         const index = STATE.bookmarks.indexOf(id);
         const btn = document.querySelector(`.dua-card[data-id="${id}"] .bookmark-btn`);
+        safeVibrate(15);
         if (index === -1) {
             STATE.bookmarks.push(id);
             if (btn) { btn.classList.add('bookmarked'); btn.innerHTML = '★'; }
@@ -1375,6 +1377,7 @@ window.filterCategory = function(cat, btn) {
             return;
         }
 
+        safeVibrate(5);
         DUA_SWIPE_STATE.transitionLock = true;
         showDuaSwipeHints(delta > 0 ? 'right' : 'left', 900);
         setSwipeTrackPosition(delta > 0 ? 2 : 0, 0, true);
@@ -2147,6 +2150,24 @@ window.filterCategory = function(cat, btn) {
             const offset = circumference - (read / total) * circumference;
             ring.style.strokeDashoffset = offset;
         }
+
+        const summary = document.getElementById('homeProgressSummary');
+        if (summary) {
+            const isPS = isPashtoMode();
+            const readToday = STATE.read.length;
+            const quranLastRead = (() => {
+                try { return JSON.parse(localStorage.getItem('crown_quran_last_read') || 'null'); }
+                catch (_) { return null; }
+            })();
+            const quranStreak = Number(localStorage.getItem('crown_quran_streak') || 0);
+            const quranLabel = quranLastRead?.surahName
+                ? quranLastRead.surahName
+                : (isPS ? 'نه شته' : 'None');
+
+            summary.textContent = isPS
+                ? `د نن لوستل شوې دعاګانې: ${localizeDigits(readToday)} · د قرآن لړۍ: ${localizeDigits(quranStreak)} · وروستی: ${quranLabel}`
+                : `Duas read today: ${readToday} · Quran streak: ${quranStreak} · Last: ${quranLabel}`;
+        }
     }
     window.updateStats = updateStats;
 
@@ -2157,6 +2178,80 @@ window.filterCategory = function(cat, btn) {
         els.toast.innerText = msg;
         els.toast.classList.add('show');
         setTimeout(() => els.toast.classList.remove('show'), 3000);
+    }
+
+    function safeVibrate(pattern) {
+        try {
+            if (navigator?.vibrate) navigator.vibrate(pattern);
+        } catch (_) {}
+    }
+
+    function refreshHomeContentData() {
+        loadDailyDua();
+        updateStats();
+
+        const cached = localStorage.getItem('crown_location');
+        if (cached && typeof adhan !== 'undefined') {
+            try {
+                const loc = JSON.parse(cached);
+                calculateAndRenderPrayers(loc.lat, loc.lng);
+            } catch (_) {}
+        }
+    }
+
+    function initHomePullToRefresh() {
+        const homePanel = document.getElementById('mainContainer');
+        const indicator = document.getElementById('pullRefreshIndicator');
+        if (!homePanel || !indicator || homePanel.dataset.pullRefreshBound === '1') return;
+
+        let startY = 0;
+        let pulling = false;
+        let refreshTriggered = false;
+        const threshold = 80;
+
+        homePanel.addEventListener('touchstart', (event) => {
+            if (!homePanel.classList.contains('active')) return;
+            if (homePanel.scrollTop > 0) return;
+            const touch = event.touches?.[0];
+            if (!touch) return;
+            startY = touch.clientY;
+            pulling = true;
+            refreshTriggered = false;
+            indicator.classList.remove('armed', 'refreshing');
+            indicator.classList.add('visible');
+        }, { passive: true });
+
+        homePanel.addEventListener('touchmove', (event) => {
+            if (!pulling) return;
+            const touch = event.touches?.[0];
+            if (!touch) return;
+            const deltaY = Math.max(0, touch.clientY - startY);
+            const translateY = Math.min(80, deltaY * 0.5);
+            indicator.style.transform = `translate(-50%, ${translateY}px)`;
+            const isArmed = deltaY >= threshold;
+            indicator.classList.toggle('armed', isArmed);
+            if (isArmed && !refreshTriggered) {
+                refreshTriggered = true;
+                safeVibrate(10);
+            }
+        }, { passive: true });
+
+        homePanel.addEventListener('touchend', () => {
+            if (!pulling) return;
+            pulling = false;
+            indicator.style.transform = 'translate(-50%, -12px)';
+            if (refreshTriggered) {
+                indicator.classList.add('refreshing');
+                refreshHomeContentData();
+                setTimeout(() => {
+                    indicator.classList.remove('visible', 'armed', 'refreshing');
+                }, 700);
+            } else {
+                indicator.classList.remove('visible', 'armed', 'refreshing');
+            }
+        }, { passive: true });
+
+        homePanel.dataset.pullRefreshBound = '1';
     }
 
     function checkStreak() {
@@ -2275,6 +2370,7 @@ window.filterCategory = function(cat, btn) {
     // ===== BOTTOM NAV HANDLER =====
         // ===== BOTTOM NAV HANDLER =====
     window.handleBottomNav = function(action, btn) {
+        safeVibrate(10);
         scrollActiveViewToTop();
 
         switch (action) {
@@ -4980,6 +5076,8 @@ window.filterCategory = function(cat, btn) {
             reminderSet: isPS ? 'یادونه وټاکل شوه: {prayer} {time}' : 'Reminder set for {prayer} at {time}',
             reminderSaved: isPS ? 'د یادونې تنظیمات خوندي شول' : 'Reminder settings saved',
             inAppPrayerAlert: isPS ? 'د {prayer} لمانځه وخت شو' : 'It is time for {prayer}',
+            remindersActiveNext: isPS ? 'یادونې فعاله دي — راتلونکې: {prayer} په {time}' : 'Reminders active — next: {prayer} at {time}',
+            remindersInactive: isPS ? 'یادونې غیرفعاله دي' : 'Reminders inactive',
             qiblaFacing: isPS ? 'ماشاءالله! تاسو قبلې ته برابر یاست.' : 'MashaAllah! You are facing Qibla.',
             qiblaAlmost: isPS ? 'نږدې یاست — {delta}° توپیر' : 'Almost there — {delta}° off',
             qiblaRotateHint: isPS ? 'موبایل وڅرخوئ — ستنه د قبلې نښې ته برابره کړئ' : 'Rotate phone until needle aligns with Qibla marker',
@@ -5134,6 +5232,8 @@ window.filterCategory = function(cat, btn) {
 
         const beforeSelect = document.getElementById('reminderBefore');
         if (beforeSelect) beforeSelect.value = String(settings.offsetMinutes);
+
+        renderPrayerReminderStatusLine();
     }
 
     function refreshReminderControlLanguage() {
@@ -5761,15 +5861,18 @@ window.filterCategory = function(cat, btn) {
 
         grid.innerHTML = PRAYER_NAMES.map(name => {
             const time = prayerTimesData[name];
-            const timeStr = formatTime(time);
+            const timeStr = formatDisplayTime(time, `prayer-grid-${name}`);
             const isCurrent = current === name;
             const isNext = next === name;
             const reminderEnabled = REMINDER_PRAYERS.includes(name) && settings.enabled && !!settings.prayers[name];
             const scheduledReminder = activePrayerReminderSchedule[name] || null;
-            const reminderFireText = scheduledReminder ? normalizeMeridiem(formatTime(new Date(scheduledReminder.triggerAt))) : '';
+            const reminderFireText = scheduledReminder ? formatDisplayTime(new Date(scheduledReminder.triggerAt), `reminder-badge-${name}`) : '';
             const reminderBadgeText = reminderEnabled
                 ? (scheduledReminder && reminderFireText && reminderFireText !== timeStr ? `🔔 ${reminderFireText}` : '🔔')
                 : '';
+            if (reminderBadgeText) {
+                console.log('TIME STRING:', reminderBadgeText, { context: `reminder-badge-${name}` });
+            }
             const cls = isCurrent ? ' current-prayer' : isNext ? ' next-prayer' : '';
             const uiText = getPrayerUiText();
             return `<div class="prayer-time-row${cls}">
@@ -5869,10 +5972,18 @@ window.filterCategory = function(cat, btn) {
     }
 
     function normalizeMeridiem(text) {
+        const tokenPattern = '(?:AM|PM|غ\\.م|غ\\.و)';
+        const duplicateTokenRegex = new RegExp(`\\b(${tokenPattern})(?:\\s+\\1\\b)+`, 'gi');
         return String(text || '')
             .replace(/\s+/g, ' ')
-            .replace(/\b(AM|PM|غ\.م|غ\.و)\s+\1\b/gi, '$1')
+            .replace(duplicateTokenRegex, '$1')
             .trim();
+    }
+
+    function formatDisplayTime(date, context = 'general') {
+        const timeString = normalizeMeridiem(formatTime(date));
+        console.log('TIME STRING:', timeString, { context });
+        return timeString;
     }
 
     function formatTime(date) {
@@ -6042,6 +6153,100 @@ window.filterCategory = function(cat, btn) {
     let notificationTimeouts = [];
     let dailyDuaReminderTimer = null;
     let activePrayerReminderSchedule = {};
+    let prayerReminderPollInterval = null;
+    const firedPrayerReminderKeys = new Set();
+
+    function getReminderKey(prayerName, triggerAt) {
+        return `${prayerName}:${Number(triggerAt) || 0}`;
+    }
+
+    function hasReminderFired(prayerName, triggerAt) {
+        return firedPrayerReminderKeys.has(getReminderKey(prayerName, triggerAt));
+    }
+
+    function markReminderFired(prayerName, triggerAt) {
+        firedPrayerReminderKeys.add(getReminderKey(prayerName, triggerAt));
+    }
+
+    function clearFiredReminderMarks() {
+        firedPrayerReminderKeys.clear();
+    }
+
+    function renderPrayerReminderStatusLine() {
+        const statusEl = document.getElementById('prayerReminderStatus');
+        if (!statusEl) return;
+
+        const uiText = getPrayerUiText();
+        const settings = loadReminderSettings();
+        if (!settings.enabled) {
+            statusEl.textContent = uiText.remindersInactive;
+            statusEl.classList.remove('active');
+            return;
+        }
+
+        const nowTs = Date.now();
+        const nextEntry = Object.entries(activePrayerReminderSchedule)
+            .map(([name, details]) => ({ name, details }))
+            .filter(({ details }) => details && typeof details.triggerAt === 'number' && details.triggerAt > nowTs)
+            .sort((a, b) => a.details.triggerAt - b.details.triggerAt)[0];
+
+        if (!nextEntry) {
+            statusEl.textContent = uiText.remindersInactive;
+            statusEl.classList.remove('active');
+            return;
+        }
+
+        const timeText = formatDisplayTime(new Date(nextEntry.details.triggerAt), `status-line-${nextEntry.name}`);
+        statusEl.textContent = uiText.remindersActiveNext
+            .replace('{prayer}', getPrayerLabel(nextEntry.name))
+            .replace('{time}', timeText);
+        statusEl.classList.add('active');
+    }
+
+    function stopPrayerReminderPolling() {
+        if (prayerReminderPollInterval) {
+            clearInterval(prayerReminderPollInterval);
+            prayerReminderPollInterval = null;
+        }
+    }
+
+    function runPrayerReminderPollingCheck(source = 'poll') {
+        const now = Date.now();
+        const due = [];
+
+        Object.entries(activePrayerReminderSchedule).forEach(([prayerName, details]) => {
+            if (!details || typeof details.triggerAt !== 'number') return;
+            const diffMs = Math.abs(now - details.triggerAt);
+            if (diffMs < 30000 && !hasReminderFired(prayerName, details.triggerAt)) {
+                console.log(`Polling caught ${prayerName} — firing reminder`, {
+                    source,
+                    now: new Date(now).toString(),
+                    fireAt: new Date(details.triggerAt).toString(),
+                    diffMs
+                });
+                due.push({ prayerName, details });
+            }
+        });
+
+        due.forEach(({ prayerName, details }) => {
+            markReminderFired(prayerName, details.triggerAt);
+            firePrayerReminder(prayerName, details.offsetMinutes > 0, details.offsetMinutes);
+            delete activePrayerReminderSchedule[prayerName];
+        });
+
+        if (due.length) {
+            syncPrayerReminderStateToServiceWorker('poll-fired');
+            schedulePrayerNotifications();
+        }
+    }
+
+    function startPrayerReminderPolling() {
+        stopPrayerReminderPolling();
+        prayerReminderPollInterval = setInterval(() => {
+            runPrayerReminderPollingCheck('interval');
+        }, 30000);
+        runPrayerReminderPollingCheck('initial');
+    }
 
     function getReminderSchedulePayload() {
         return Object.entries(activePrayerReminderSchedule).map(([prayerName, details]) => ({
@@ -6078,6 +6283,8 @@ window.filterCategory = function(cat, btn) {
 
     function requestNotificationPermissionIfNeeded() {
         const uiText = getPrayerUiText();
+        console.log('=== REMINDER SETUP ===');
+        console.log('Notification permission:', typeof Notification !== 'undefined' ? Notification.permission : 'unsupported');
         console.log('[PrayerReminder] Notification permission check', {
             supported: 'Notification' in window,
             permission: typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
@@ -6089,17 +6296,21 @@ window.filterCategory = function(cat, btn) {
 
         if (Notification.permission === 'granted') return Promise.resolve(true);
         if (Notification.permission === 'denied') {
+            console.log('BLOCKED — cannot send notifications');
             showToast(uiText.alertsPermissionDenied);
             return Promise.resolve(false);
         }
 
         return Notification.requestPermission()
             .then((permission) => {
+                console.log('Permission result:', permission);
                 if (permission === 'granted') return true;
+                console.log('BLOCKED — cannot send notifications');
                 showToast(uiText.alertsPermissionDenied);
                 return false;
             })
             .catch(() => {
+                console.log('BLOCKED — cannot send notifications');
                 showToast(uiText.alertsPermissionDenied);
                 return false;
             });
@@ -6202,7 +6413,7 @@ window.filterCategory = function(cat, btn) {
         const uiText = getPrayerUiText();
         const message = uiText.reminderSet
             .replace('{prayer}', getPrayerLabel(prayerName))
-            .replace('{time}', formatTime(when));
+            .replace('{time}', formatDisplayTime(when, `reminder-set-${prayerName}`));
         showToast(message);
     }
 
@@ -6321,6 +6532,7 @@ window.filterCategory = function(cat, btn) {
         });
         reminderMidnightTimer = setTimeout(() => {
             console.log('[PrayerReminder] Midnight refresh fired', { firedAt: new Date().toString() });
+            clearFiredReminderMarks();
             const coords = getPrayerCoordinates();
             if (coords) calculateAndRenderPrayers(coords.lat, coords.lng);
             schedulePrayerNotifications();
@@ -6333,6 +6545,20 @@ window.filterCategory = function(cat, btn) {
         if (!settings.enabled) return;
 
         const now = new Date();
+        console.log('=== REMINDER SETUP ===');
+        console.log('Current time:', now.toLocaleTimeString());
+        console.log('Prayer times calculated:');
+        REMINDER_PRAYERS.forEach((prayerName) => {
+            const prayerAt = prayerTimesData?.[prayerName] || getPrayerTimeForDate(prayerName, now);
+            console.log(`  ${getPrayerLabel(prayerName)}:`, prayerAt ? new Date(prayerAt).toLocaleTimeString() : 'N/A');
+        });
+
+        const enabledPrayers = REMINDER_PRAYERS.filter((name) => !!settings.prayers[name]);
+        console.log('Enabled reminders:', enabledPrayers);
+        console.log('Selected sound:', resolveReminderSoundId());
+        console.log('Offset minutes:', settings.offsetMinutes);
+        console.log('Notification permission:', typeof Notification !== 'undefined' ? Notification.permission : 'unsupported');
+
         console.log('[PrayerReminder] Scheduling start', {
             now: now.toString(),
             nowISO: now.toISOString(),
@@ -6348,7 +6574,10 @@ window.filterCategory = function(cat, btn) {
             if (!reminderTime) return;
 
             const delay = reminderTime.getTime() - now.getTime();
-            if (delay <= 0 || delay > 172800000) return;
+            if (delay <= 0 || delay > 172800000) {
+                console.log(`${name} already passed — skip`);
+                return;
+            }
 
             console.log('[PrayerReminder] Scheduled', {
                 prayer: name,
@@ -6358,22 +6587,32 @@ window.filterCategory = function(cat, btn) {
                 delayMs: delay
             });
 
+            const triggerAt = reminderTime.getTime();
             activePrayerReminderSchedule[name] = {
-                triggerAt: reminderTime.getTime(),
+                triggerAt,
                 offsetMinutes: settings.offsetMinutes,
                 createdAt: now.getTime()
             };
 
+            console.log(`Timer set for ${name}:`);
+            console.log(`  Fire at: ${new Date(triggerAt).toLocaleTimeString()}`);
+            console.log(`  MS until fire: ${delay}`);
+
             const tid = setTimeout(() => {
+                if (hasReminderFired(name, triggerAt)) return;
+                markReminderFired(name, triggerAt);
                 firePrayerReminder(name, settings.offsetMinutes > 0, settings.offsetMinutes);
                 delete activePrayerReminderSchedule[name];
                 syncPrayerReminderStateToServiceWorker('timer-fired');
                 schedulePrayerNotifications();
             }, delay);
+            console.log(`  Timer ID: ${String(tid)}`);
             notificationTimeouts.push(tid);
         });
 
+        startPrayerReminderPolling();
         renderPrayerGrid();
+        renderPrayerReminderStatusLine();
         syncPrayerReminderStateToServiceWorker('schedule');
         scheduleReminderMidnightRefresh();
     }
@@ -6386,11 +6625,14 @@ window.filterCategory = function(cat, btn) {
         notificationTimeouts.forEach(tid => clearTimeout(tid));
         notificationTimeouts = [];
         activePrayerReminderSchedule = {};
+        stopPrayerReminderPolling();
         if (reminderMidnightTimer) {
             clearTimeout(reminderMidnightTimer);
             reminderMidnightTimer = null;
         }
+        clearFiredReminderMarks();
         renderPrayerGrid();
+        renderPrayerReminderStatusLine();
         syncPrayerReminderStateToServiceWorker('clear');
     }
 

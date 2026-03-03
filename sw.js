@@ -1,4 +1,4 @@
-const CACHE_NAME = 'essential-duas-v57';
+const CACHE_NAME = 'essential-duas-v58';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
 const PRAYER_REMINDER_DUE_WINDOW_MS = 15 * 1000;
