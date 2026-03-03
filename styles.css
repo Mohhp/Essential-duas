@@ -3477,11 +3477,11 @@
             color: rgba(46, 196, 122, 0.7); margin-bottom: 0.7rem;
         }
         .tasbeeh-tap-btn {
-            --tap-size: min(56vw, 170px);
+            --tap-size: min(28vw, 85px);
             width: var(--tap-size);
             height: var(--tap-size);
-            min-width: 152px;
-            min-height: 152px;
+            min-width: 76px;
+            min-height: 76px;
             aspect-ratio: 1 / 1;
             border-radius: 50%;
             margin: 8px auto 8px;
@@ -5118,11 +5118,11 @@
             }
             .tasbeeh-count-display { font-size: 3.05rem; }
             .tasbeeh-tap-btn {
-                --tap-size: min(52vw, 160px);
+                --tap-size: min(26vw, 80px);
                 width: var(--tap-size);
                 height: var(--tap-size);
-                min-width: 142px;
-                min-height: 142px;
+                min-width: 71px;
+                min-height: 71px;
             }
             .tasbeeh-virtue { margin-bottom: 0.65rem; }
             .tasbeeh-controls { margin-top: 0.55rem; }
