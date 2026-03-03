@@ -602,6 +602,10 @@
             --tab-accent: #c49b2a;
             --tab-accent-rgb: 196, 155, 42;
         }
+        .bottom-nav-item[data-nav='tasbeeh'] {
+            --tab-accent: #8d6ad9;
+            --tab-accent-rgb: 141, 106, 217;
+        }
         .bottom-nav-item[data-nav='more'] {
             --tab-accent: #5a6a7a;
             --tab-accent-rgb: 90, 106, 122;
@@ -2073,6 +2077,22 @@
             flex-shrink: 0;
             filter: drop-shadow(0 0 6px rgba(201, 168, 76, 0.24));
         }
+        .prayer-bell-toggle {
+            border: none;
+            background: transparent;
+            padding: 0;
+            cursor: pointer;
+            transition: transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
+        }
+        .prayer-bell-toggle:active {
+            transform: scale(0.9);
+        }
+        .prayer-bell-toggle.active {
+            filter: drop-shadow(0 0 10px rgba(201, 168, 76, 0.34));
+        }
+        .prayer-bell-static {
+            opacity: 0.55;
+        }
         .prayer-time-row {
             display: flex; align-items: center; justify-content: space-between;
             gap: 10px;
@@ -2241,67 +2261,72 @@
             top: 50%;
             left: 50%;
             width: 4px;
-            height: calc(min(46vw, 160px) - 20px);
+            height: calc(min(46vw, 160px) - 30px);
             margin-left: -2px;
-            margin-top: calc((min(46vw, 160px) - 20px) * -1);
-            transform-origin: 50% calc(min(46vw, 160px) - 20px);
+            margin-top: calc((min(46vw, 160px) - 30px) * -1);
+            transform-origin: 50% calc(min(46vw, 160px) - 30px);
             pointer-events: none;
-            z-index: 6;
+            z-index: 5;
         }
         .qibla-marker span {
             position: absolute;
-            top: -11px;
+            top: -9px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: clamp(1rem, 3.2vw, 1.3rem);
-            filter: drop-shadow(0 0 8px rgba(201, 168, 76, 0.55));
+            font-size: clamp(0.82rem, 2.8vw, 1.05rem);
+            opacity: 0.9;
+            filter: drop-shadow(0 0 6px rgba(201, 168, 76, 0.42));
         }
         .qibla-arrow {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 12px;
-            height: calc(min(46vw, 160px) - 28px);
-            margin-left: -6px;
-            margin-top: calc((min(46vw, 160px) - 28px) * -1);
-            transform-origin: center calc(min(46vw, 160px) - 28px);
+            width: 10px;
+            height: calc(min(46vw, 160px) - 54px);
+            margin-left: -5px;
+            margin-top: calc((min(46vw, 160px) - 54px) * -1);
+            transform-origin: center calc(min(46vw, 160px) - 54px);
             transition: transform 500ms ease-out;
             will-change: transform;
             z-index: 7;
+            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.32));
         }
         .qibla-arrow::before {
             content: '';
             position: absolute;
-            top: -14px;
+            top: -13px;
             left: 50%;
             width: 0;
             height: 0;
-            border-left: 7px solid transparent;
-            border-right: 7px solid transparent;
-            border-bottom: 16px solid #dcb45d;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 15px solid #e5be67;
             transform: translateX(-50%);
-            filter: drop-shadow(0 0 7px rgba(201, 168, 76, 0.45));
+            filter: drop-shadow(0 0 6px rgba(201, 168, 76, 0.38));
         }
 
         .qibla-arrow::after {
             content: '';
             position: absolute;
             inset: 0;
-            border-radius: 10px;
-            background: linear-gradient(to top, rgba(145, 153, 162, 0.92) 0 42%, rgba(201, 168, 76, 0.95) 42% 100%);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.28);
+            border-radius: 999px;
+            background:
+                linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 35%),
+                linear-gradient(to top, rgba(108, 125, 143, 0.94) 0 54%, rgba(225, 193, 113, 0.98) 54% 100%);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), 0 0 8px rgba(0, 0, 0, 0.2);
         }
 
         .qibla-center-dot {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             transform: translate(-50%, -50%);
             border-radius: 50%;
-            border: 2px solid rgba(201, 168, 76, 0.58);
-            background: radial-gradient(circle, rgba(244, 247, 238, 0.9), rgba(46, 196, 122, 0.45));
+            border: 1.5px solid rgba(201, 168, 76, 0.62);
+            background: radial-gradient(circle, rgba(246, 248, 241, 0.95) 0 35%, rgba(46, 196, 122, 0.52) 100%);
+            box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.12), 0 0 10px rgba(0, 0, 0, 0.28);
             z-index: 9;
         }
         .qibla-degree {

@@ -1,8 +1,8 @@
-const CACHE_NAME = 'essential-duas-v73';
+const CACHE_NAME = 'essential-duas-v74';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
-const PRAYER_REMINDER_DUE_WINDOW_MS = 15 * 1000;
-const PRAYER_REMINDER_GRACE_MS = 10 * 60 * 1000;
+const PRAYER_REMINDER_DUE_WINDOW_MS = 2 * 60 * 1000;
+const PRAYER_REMINDER_GRACE_MS = 3 * 60 * 60 * 1000;
 
 let prayerReminderState = {
   generatedAt: 0,

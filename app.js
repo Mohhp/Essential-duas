@@ -580,6 +580,7 @@
         home: '#mainContainer',
         duas: '#mainContainer',
         quran: '.quran-panel',
+        tasbeeh: '.tasbeeh-panel',
         more: '.more-panel'
     };
 
@@ -1872,12 +1873,12 @@ window.filterCategory = function(cat, btn) {
         }
     }
 
-    function showAuxPanel(selector) {
+    function showAuxPanel(selector, navName = 'more') {
         const target = document.querySelector(selector);
         if (!target) return;
         document.querySelectorAll('.panel').forEach((panel) => panel.classList.remove('active'));
         target.classList.add('active');
-        setBottomNavActive('more');
+        setBottomNavActive(navName);
     }
 
     window.selectDhikr = function(index) {
@@ -1902,7 +1903,7 @@ window.filterCategory = function(cat, btn) {
 
     window.openTasbeeh = function() {
         const tp = document.querySelector('.tasbeeh-panel');
-        if (tp) showAuxPanel('.tasbeeh-panel');
+        if (tp) showAuxPanel('.tasbeeh-panel', 'tasbeeh');
         if (tp) tp.scrollTop = 0;
         // Restore last selected dhikr
         const saved = parseInt(localStorage.getItem('crown_dhikr_selected') || '0', 10);
@@ -2587,10 +2588,40 @@ window.filterCategory = function(cat, btn) {
             return;
         }
 
+        let nextTarget = nextStart;
+        if (next === 'fajr' && nextStart && now >= nextStart) {
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const cached = localStorage.getItem('crown_location');
+            if (cached && typeof adhan !== 'undefined') {
+                try {
+                    const loc = JSON.parse(cached);
+                    const coords = new adhan.Coordinates(loc.lat, loc.lng);
+                    const params = adhan.CalculationMethod.MuslimWorldLeague();
+                    params.madhab = adhan.Madhab.Hanafi;
+                    const tomorrowTimes = new adhan.PrayerTimes(coords, tomorrow, params);
+                    nextTarget = tomorrowTimes.fajr;
+                } catch (_) {
+                    nextTarget = new Date(nextStart.getTime() + 24 * 60 * 60 * 1000);
+                }
+            } else {
+                nextTarget = new Date(nextStart.getTime() + 24 * 60 * 60 * 1000);
+            }
+        }
+
+        while (nextTarget && nextTarget <= now) {
+            nextTarget = new Date(nextTarget.getTime() + 24 * 60 * 60 * 1000);
+        }
+
         card.classList.remove('is-now');
         name.textContent = getPrayerLabel(next);
-        time.textContent = formatDisplayTime(nextStart, 'dashboard-next');
-        const diffMs = Math.max(0, nextStart - now);
+        if (!nextTarget) {
+            time.textContent = '--:--';
+            countdown.textContent = '--';
+            return;
+        }
+        time.textContent = formatDisplayTime(nextTarget, 'dashboard-next');
+        const diffMs = Math.max(0, nextTarget - now);
         const h = Math.floor(diffMs / 3600000);
         const m = Math.floor((diffMs % 3600000) / 60000);
         countdown.textContent = isPashtoMode()
@@ -2661,6 +2692,7 @@ window.filterCategory = function(cat, btn) {
             ['tabHomeLabel', ui.tabHome],
             ['tabQuranLabel', ui.tabQuran],
             ['tabDuasLabel', ui.tabDuas],
+            ['tabTasbeehLabel', ui.tasbeeh],
             ['tabMoreLabel', ui.tabMore],
             ['moreTitle', ui.more],
             ['moreFeaturesHeader', ui.features],
@@ -2969,6 +3001,9 @@ window.filterCategory = function(cat, btn) {
                 break;
             case 'quran':
                 openQuran();
+                break;
+            case 'tasbeeh':
+                openTasbeeh();
                 break;
             case 'more':
                 openMorePanel();
@@ -6303,6 +6338,7 @@ window.filterCategory = function(cat, btn) {
         const closeBtn = pp?.querySelector('.panel-back-btn');
         if (closeBtn) closeBtn.focus();
         initReminderControls();
+        initPrayerGridBellActions();
         initCitySelector();
         initPrayerSubtabs();
         preloadPrayerReminderAudio();
@@ -6486,6 +6522,7 @@ window.filterCategory = function(cat, btn) {
             const timeStr = formatDisplayTime(time, `prayer-grid-${name}`);
             const isCurrent = current === name;
             const isNext = next === name;
+            const canToggleReminder = REMINDER_PRAYERS.includes(name);
             const reminderEnabled = REMINDER_PRAYERS.includes(name) && settings.enabled && !!settings.prayers[name];
             const cls = isCurrent ? ' current-prayer' : isNext ? ' next-prayer' : '';
             const uiText = getPrayerUiText();
@@ -6494,15 +6531,88 @@ window.filterCategory = function(cat, btn) {
                 : isNext
                     ? `<span class="prayer-badge">${uiText.next}</span>`
                     : '<span class="prayer-badge prayer-badge-empty" aria-hidden="true"></span>';
+            const bellLabel = reminderEnabled ? (isPashtoMode() ? 'یادونه فعاله ده' : 'Reminder ON') : (isPashtoMode() ? 'یادونه بنده ده' : 'Reminder OFF');
+            const bellControl = canToggleReminder
+                ? `<button type="button" class="prayer-bell prayer-bell-toggle${reminderEnabled ? ' active' : ''}" data-prayer="${name}" aria-pressed="${reminderEnabled ? 'true' : 'false'}" title="${bellLabel}" aria-label="${getPrayerLabel(name)}: ${bellLabel}">${reminderEnabled ? '🔔' : '🔕'}</button>`
+                : `<span class="prayer-bell prayer-bell-static" aria-hidden="true">—</span>`;
 
             return `<div class="prayer-row${cls}">
                 <span class="prayer-name">${getPrayerLabel(name)}</span>
                 ${badge}
                 <span class="prayer-time">${timeStr}</span>
-                <span class="prayer-bell" title="${reminderEnabled ? 'Reminder ON' : 'Reminder OFF'}">${reminderEnabled ? '🔔' : '🔕'}</span>
+                ${bellControl}
             </div>`;
         }).join('');
     }
+
+    function initPrayerGridBellActions() {
+        const grid = document.getElementById('prayerTimesGrid');
+        if (!grid || grid.dataset.boundReminderBells === '1') return;
+
+        grid.addEventListener('click', (event) => {
+            const bellBtn = event.target.closest('.prayer-bell-toggle[data-prayer]');
+            if (!bellBtn) return;
+            event.preventDefault();
+            const prayerName = bellBtn.getAttribute('data-prayer');
+            if (!prayerName) return;
+            window.togglePrayerReminderFor(prayerName);
+        });
+
+        grid.dataset.boundReminderBells = '1';
+    }
+
+    window.togglePrayerReminderFor = function(prayerName) {
+        if (!REMINDER_PRAYERS.includes(prayerName)) return;
+
+        const settings = loadReminderSettings();
+        const nextEnabled = !settings.prayers[prayerName];
+        settings.prayers[prayerName] = nextEnabled;
+
+        const commitAndRender = () => {
+            const hasAnyEnabledPrayer = REMINDER_PRAYERS.some((name) => !!settings.prayers[name]);
+            if (!hasAnyEnabledPrayer) settings.enabled = false;
+
+            localStorage.setItem('crown_notifications', settings.enabled ? 'true' : 'false');
+            saveReminderSettings();
+            syncReminderUi();
+            renderPrayerGrid();
+
+            if (settings.enabled) {
+                schedulePrayerNotifications();
+                if (nextEnabled) showReminderSetConfirmation(prayerName);
+                else showToast(getPrayerUiText().reminderSaved);
+            } else {
+                clearPrayerNotifications();
+                showToast(getPrayerUiText().alertsDisabled);
+            }
+
+            initDailyReminderPrompt();
+        };
+
+        if (nextEnabled && !settings.enabled) {
+            settings.enabled = true;
+            saveReminderSettings();
+            window.togglePrayerNotifications(true);
+            renderPrayerGrid();
+            return;
+        }
+
+        if (nextEnabled) {
+            requestNotificationPermissionIfNeeded().then((granted) => {
+                if (!granted) {
+                    settings.prayers[prayerName] = false;
+                    saveReminderSettings();
+                    syncReminderUi();
+                    renderPrayerGrid();
+                    return;
+                }
+                commitAndRender();
+            });
+            return;
+        }
+
+        commitAndRender();
+    };
 
     function getCurrentPrayer(now) {
         if (!prayerTimesData) return null;
@@ -6775,6 +6885,7 @@ window.filterCategory = function(cat, btn) {
     let activePrayerReminderSchedule = {};
     let prayerReminderPollInterval = null;
     const firedPrayerReminderKeys = new Set();
+    const PRAYER_REMINDER_LATE_GRACE_MS = 90 * 60 * 1000;
 
     function getReminderKey(prayerName, triggerAt) {
         return `${prayerName}:${Number(triggerAt) || 0}`;
@@ -6842,13 +6953,13 @@ window.filterCategory = function(cat, btn) {
 
         Object.entries(activePrayerReminderSchedule).forEach(([prayerName, details]) => {
             if (!details || typeof details.triggerAt !== 'number') return;
-            const diffMs = Math.abs(now - details.triggerAt);
-            if (diffMs < 30000 && !hasReminderFired(prayerName, details.triggerAt)) {
+            const lateByMs = now - details.triggerAt;
+            if (lateByMs >= -30000 && lateByMs <= PRAYER_REMINDER_LATE_GRACE_MS && !hasReminderFired(prayerName, details.triggerAt)) {
                 console.log(`Polling caught ${prayerName} — firing reminder`, {
                     source,
                     now: new Date(now).toString(),
                     fireAt: new Date(details.triggerAt).toString(),
-                    diffMs
+                    lateByMs
                 });
                 due.push({ prayerName, details });
             }
