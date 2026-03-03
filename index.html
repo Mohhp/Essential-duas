@@ -64,9 +64,6 @@
             <span class="fallah-sub">فلاح</span>
         </div>
     </div>
-    <div class="nav-actions">
-        <button class="nav-btn nav-bell" id="topReminderBell" onclick="handleBottomNav('more')" title="Reminder status" aria-label="Reminder status" hidden>🔔</button>
-    </div>
 </nav>
 
 <!-- ===== PROGRESS BAR ===== -->
@@ -81,7 +78,8 @@
 
     <section class="home-dashboard" id="homeDashboard">
         <div class="dashboard-greeting" id="dashboardGreeting">Assalamu Alaikum — Good Morning</div>
-        <div class="dashboard-date" id="dashboardDate">Tuesday, March 3, 2026</div>
+        <div class="dashboard-date" id="dashboardDate">Rabi al-Awwal 14, 1447</div>
+        <div class="dashboard-date dashboard-date-secondary" id="dashboardDateSecondary">March 3, 2026</div>
 
         <button class="dashboard-prayer-card" id="dashboardNextPrayerCard" onclick="openPrayerFromDashboard()" aria-label="Open prayer times">
             <div class="dashboard-prayer-label" id="dashboardPrayerLabel">Next Prayer</div>
@@ -89,11 +87,12 @@
             <div class="dashboard-prayer-time" id="dashboardPrayerTime">12:30 PM</div>
             <div class="dashboard-prayer-countdown" id="dashboardPrayerCountdown">in 2h 15m</div>
             <div class="dashboard-prayer-location" id="dashboardPrayerLocation">London</div>
+            <div class="dashboard-reminder-debug" id="dashboardReminderDebug">Reminder: OFF</div>
         </button>
 
-        <button class="dashboard-suggestion-card" id="dashboardSuggestionCard" onclick="openDashboardSuggestion()" aria-label="Open suggestion">
-            <div class="dashboard-suggestion-title" id="dashboardSuggestionTitle">Dua of the Day</div>
-            <div class="dashboard-suggestion-sub" id="dashboardSuggestionSub">A focused reminder for right now</div>
+        <button class="dashboard-suggestion-card" id="dashboardSuggestionCard" onclick="openDashboardSuggestion()" aria-label="Continue Quran">
+            <div class="dashboard-suggestion-title" id="dashboardSuggestionTitle">Continue Quran</div>
+            <div class="dashboard-suggestion-sub" id="dashboardSuggestionSub">Resume your last read surah</div>
             <span class="dashboard-suggestion-cta" id="dashboardSuggestionCta">Continue</span>
         </button>
 
@@ -111,6 +110,8 @@
                 <span class="dashboard-quick-icon">🧭</span><span class="dashboard-quick-label" id="quickQiblaLabel">Qibla</span>
             </button>
         </div>
+
+        <div class="dashboard-tip-card" id="dashboardTipCard">Tip: Raise your hands when making dua</div>
 
     </section>
 
@@ -3094,6 +3095,7 @@
 
                 <div class="prayer-reminder-test-wrap">
                     <button type="button" id="reminderTestBtn" class="prayer-reminder-test-btn">Test Reminder</button>
+                    <button type="button" id="reminderTest10sBtn" class="prayer-reminder-test-btn">Test in 10 seconds</button>
                 </div>
             </div>
         </div>
@@ -3126,8 +3128,8 @@
             <div class="more-row settings-row">
                 <span class="more-icon">🔤</span><span class="more-label" id="moreFontLabel">Font Size</span>
                 <div class="more-inline-font">
-                    <button class="more-inline-btn" onclick="adjustFontSize(-0.1)">A-</button>
-                    <button class="more-inline-btn" onclick="adjustFontSize(0.1)">A+</button>
+                    <button class="more-inline-btn font-decrease">A-</button>
+                    <button class="more-inline-btn font-increase">A+</button>
                 </div>
             </div>
         </div>
