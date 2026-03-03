@@ -57,9 +57,24 @@
         renderBookmarksPanel();
         wrapArabicWords();
         initDailyReminderPrompt();
+        initHomeDashboard();
+        initDuasTabSearch();
+        renderDuasBookmarksSection();
 
         // Apply saved language preference first (defaults to Pashto on first run)
         if (typeof applyLanguage === 'function') applyLanguage();
+        if (typeof window.toggleLanguage === 'function' && !window.__wrappedToggleLanguageForDashboard) {
+            const originalToggleLanguage = window.toggleLanguage;
+            window.toggleLanguage = function(...args) {
+                const result = originalToggleLanguage.apply(this, args);
+                setTimeout(() => {
+                    refreshHomeDashboard();
+                    renderDuasBookmarksSection();
+                }, 0);
+                return result;
+            };
+            window.__wrappedToggleLanguageForDashboard = true;
+        }
 
         showOnboardingIfFirstTime();
         enhanceAccessibility();
@@ -67,7 +82,7 @@
         initBottomNavTouchHandlers();
         initHomePullToRefresh();
 
-        // Search listener
+        // Legacy search listener (kept for compatibility if input exists)
         if (els.searchInput) {
             els.searchInput.addEventListener('input', (e) => filterDuas(e.target.value));
         }
@@ -318,7 +333,7 @@
             }
         });
 
-        document.querySelectorAll('.tasbeeh-panel, .etiquette-panel, .routine-panel, .prayer-panel, .quran-panel, .progress-panel, .side-panel').forEach(panel => {
+        document.querySelectorAll('.tasbeeh-panel, .etiquette-panel, .routine-panel, .prayer-panel, .quran-panel, .more-panel, .progress-panel, .side-panel').forEach(panel => {
             panel.setAttribute('role', 'dialog');
             panel.setAttribute('aria-modal', 'true');
         });
@@ -544,11 +559,17 @@
 
     const TAB_LAYER_SELECTORS = {
         home: '#mainContainer',
-        routine: '.routine-panel',
+        duas: '#mainContainer',
         quran: '.quran-panel',
-        tasbeeh: '.tasbeeh-panel',
-        prayer: '.prayer-panel'
+        more: '.more-panel'
     };
+
+    function setMainContainerMode(mode = 'home') {
+        const main = document.getElementById('mainContainer');
+        if (!main) return;
+        const nextMode = mode === 'duas' ? 'duas' : 'home';
+        main.setAttribute('data-main-mode', nextMode);
+    }
 
     function setActiveTabLayer(tabName = 'home') {
         const nextTab = TAB_LAYER_SELECTORS[tabName] ? tabName : 'home';
@@ -561,6 +582,9 @@
         layers.forEach((layer) => {
             if (layer !== target) layer.classList.remove('active');
         });
+
+        if (nextTab === 'duas') setMainContainerMode('duas');
+        if (nextTab === 'home') setMainContainerMode('home');
     }
 
     window.switchTab = function(tabName) {
@@ -578,6 +602,7 @@
 
     const IN_APP_VIEWS = {
         HOME: 'home',
+        DUAS_TAB: 'duas_tab',
         CATEGORY_VIEW: 'category_view',
         DUA_DETAIL: 'dua_detail',
         QURAN_TAB: 'quran_panel',
@@ -633,6 +658,7 @@
             || document.querySelector('.prayer-panel.active')
             || document.querySelector('.routine-panel.active')
             || document.querySelector('.tasbeeh-panel.active')
+            || document.querySelector('.more-panel.active')
             || document.querySelector('.etiquette-panel.active')
             || document.querySelector('.progress-panel.active')
             || document.querySelector('#bookmarksPanel.active');
@@ -675,7 +701,8 @@
             ['.tasbeeh-panel.active', 'tasbeeh'],
             ['.etiquette-panel.active', 'etiquette'],
             ['.progress-panel.active', 'progress'],
-            ['#bookmarksPanel.active', 'bookmarks']
+            ['#bookmarksPanel.active', 'bookmarks'],
+            ['.more-panel.active', 'more']
         ];
 
         for (const [selector, panelName] of panelMap) {
@@ -687,6 +714,16 @@
                     ts: Date.now()
                 };
             }
+        }
+
+        const mainMode = document.getElementById('mainContainer')?.getAttribute('data-main-mode') || 'home';
+        if (mainMode === 'duas' && !isCategorySubViewActive()) {
+            return {
+                [IN_APP_HISTORY_FLAG]: true,
+                view: IN_APP_VIEWS.DUAS_TAB,
+                category: localStorage.getItem('crown_active_category') || 'all',
+                ts: Date.now()
+            };
         }
 
         if (isCategorySubViewActive()) {
@@ -752,6 +789,9 @@
         }
         if (document.querySelector('.progress-panel.active')) {
             return document.querySelector('.progress-panel');
+        }
+        if (document.querySelector('.more-panel.active')) {
+            return document.querySelector('.more-panel');
         }
         return document.scrollingElement || document.documentElement || document.body || window;
     }
@@ -819,6 +859,7 @@
         if (document.querySelector('.prayer-panel.active')) closePrayer();
         if (document.querySelector('.routine-panel.active')) closeRoutine();
         if (document.querySelector('.tasbeeh-panel.active')) closeTasbeeh();
+        if (document.querySelector('.more-panel.active')) closeMorePanel();
         if (document.querySelector('.etiquette-panel.active')) closeEtiquette();
         if (document.querySelector('.progress-panel.active')) closeProgress();
         const bookmarksPanel = document.getElementById('bookmarksPanel');
@@ -846,6 +887,10 @@
             if (view === IN_APP_VIEWS.HOME) {
                 if (isCategorySubViewActive()) backToCategories();
                 collapseExpandedDuaCards();
+            } else if (view === IN_APP_VIEWS.DUAS_TAB) {
+                switchTab('duas');
+                backToCategories();
+                collapseExpandedDuaCards();
             } else if (view === IN_APP_VIEWS.CATEGORY_VIEW) {
                 openCategory(state.category || 'all', { skipScroll: true });
                 collapseExpandedDuaCards();
@@ -864,6 +909,7 @@
                 if (panel === 'prayer') openPrayer();
                 else if (panel === 'routine') openRoutine();
                 else if (panel === 'tasbeeh') openTasbeeh();
+                else if (panel === 'more') openMorePanel();
                 else if (panel === 'etiquette') openEtiquette();
                 else if (panel === 'progress') openProgress();
                 else if (panel === 'bookmarks') toggleBookmarksPanel();
@@ -991,7 +1037,7 @@
         document.addEventListener('scroll', updateInAppFabVisibility, { passive: true });
         const mainContainer = document.getElementById('mainContainer');
         if (mainContainer) mainContainer.addEventListener('scroll', updateInAppFabVisibility, { passive: true });
-        document.querySelectorAll('.quran-panel, .prayer-panel, .routine-panel, .tasbeeh-panel, .etiquette-panel').forEach((panel) => {
+        document.querySelectorAll('.quran-panel, .prayer-panel, .routine-panel, .tasbeeh-panel, .etiquette-panel, .more-panel').forEach((panel) => {
             panel.addEventListener('scroll', updateInAppFabVisibility, { passive: true });
         });
 
@@ -1641,7 +1687,7 @@ window.filterCategory = function(cat, btn) {
 
         if (isOpening) {
             lockScroll();
-            setBottomNavActive('saved');
+            setBottomNavActive('duas');
             recordInAppRoute(true);
         } else {
             unlockScroll();
@@ -1785,6 +1831,14 @@ window.filterCategory = function(cat, btn) {
         }
     }
 
+    function showAuxPanel(selector) {
+        const target = document.querySelector(selector);
+        if (!target) return;
+        document.querySelectorAll('.panel').forEach((panel) => panel.classList.remove('active'));
+        target.classList.add('active');
+        setBottomNavActive('more');
+    }
+
     window.selectDhikr = function(index) {
         // Save current session count before switching
         if (tasbeehCount > 0) {
@@ -1807,7 +1861,7 @@ window.filterCategory = function(cat, btn) {
 
     window.openTasbeeh = function() {
         const tp = document.querySelector('.tasbeeh-panel');
-        if (tp) switchTab('tasbeeh');
+        if (tp) showAuxPanel('.tasbeeh-panel');
         // Restore last selected dhikr
         const saved = parseInt(localStorage.getItem('crown_dhikr_selected') || '0', 10);
         currentDhikrIndex = (saved >= 0 && saved < DHIKR_LIST.length) ? saved : 0;
@@ -1836,7 +1890,7 @@ window.filterCategory = function(cat, btn) {
             saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
             tasbeehCount = 0;
         }
-        switchTab('home');
+        openMorePanel();
         recordInAppRoute(false);
     };
 
@@ -2073,7 +2127,7 @@ window.filterCategory = function(cat, btn) {
             prompt.textContent = getRoutineUiText().expandPrompt;
         }
 
-        switchTab('routine');
+        showAuxPanel('.routine-panel');
         loadRoutineDailyDua();
         const closeBtn = rp.querySelector('.etiquette-close');
         if (closeBtn) closeBtn.focus();
@@ -2090,7 +2144,7 @@ window.filterCategory = function(cat, btn) {
     };
 
     window.closeRoutine = function() {
-        switchTab('home');
+        openMorePanel();
         recordInAppRoute(false);
     };
 
@@ -2168,8 +2222,343 @@ window.filterCategory = function(cat, btn) {
                 ? `د نن لوستل شوې دعاګانې: ${localizeDigits(readToday)} · د قرآن لړۍ: ${localizeDigits(quranStreak)} · وروستی: ${quranLabel}`
                 : `Duas read today: ${readToday} · Quran streak: ${quranStreak} · Last: ${quranLabel}`;
         }
+
+            refreshHomeDashboardProgress();
+            renderDuasBookmarksSection();
     }
     window.updateStats = updateStats;
+
+    function getDashboardText() {
+        if (isPashtoMode()) {
+            return {
+                goodMorning: 'السلام علیکم — صبح بخیر',
+                goodAfternoon: 'السلام علیکم — غرمه مو پخ خير',
+                goodEvening: 'السلام علیکم — ماښام مو پخ خير',
+                nextPrayer: 'راتلونکی لمونځ',
+                nowPrefix: 'اوس',
+                inPrefix: 'په',
+                continue: 'دوام',
+                duasToday: 'نن دعاګانې',
+                streak: 'لړۍ',
+                days: 'ورځې',
+                quran: 'قرآن',
+                duas: 'دعاګانې',
+                tasbeeh: 'تسبیح',
+                qibla: 'قبله',
+                bookmarked: 'خوندي دعاګانې',
+                searchPlaceholder: 'دعا ولټوئ...',
+                tabHome: 'کور',
+                tabQuran: 'قرآن',
+                tabDuas: 'دعاګانې',
+                tabMore: 'نور',
+                more: 'نور',
+                progress: 'زما پرمختګ',
+                prayerTimes: 'د لمانځه وختونه',
+                tasbeehCounter: 'تسبیح شمېرونکی',
+                memorization: 'حفظ',
+                language: 'ژبه',
+                theme: 'بڼه',
+                font: 'د لیک کچه',
+                about: 'په اړه',
+                share: 'اپ شریکه کړئ',
+                rate: 'اپ درجه بندي کړئ',
+                morningDuas: 'د سهار دعاګانې — خپله ورځ پیل کړئ',
+                eveningDuas: 'د ماښام دعاګانې',
+                fridayKahf: 'سورة الکهف ولولئ',
+                continueQuran: 'د قرآن دوام',
+                duaOfDay: 'د ورځې دعا'
+            };
+        }
+
+        return {
+            goodMorning: 'Assalamu Alaikum — Good Morning',
+            goodAfternoon: 'Assalamu Alaikum — Good Afternoon',
+            goodEvening: 'Assalamu Alaikum — Good Evening',
+            nextPrayer: 'Next Prayer',
+            nowPrefix: 'NOW',
+            inPrefix: 'in',
+            continue: 'Continue',
+            duasToday: 'Duas today',
+            streak: 'Streak',
+            days: 'days',
+            quran: 'Quran',
+            duas: 'Duas',
+            tasbeeh: 'Tasbeeh',
+            qibla: 'Qibla',
+            bookmarked: 'Bookmarked Duas',
+            searchPlaceholder: 'Search duas...',
+            tabHome: 'Home',
+            tabQuran: 'Quran',
+            tabDuas: 'Duas',
+            tabMore: 'More',
+            more: 'More',
+            progress: 'My Progress',
+            prayerTimes: 'Prayer Times',
+            tasbeehCounter: 'Tasbeeh Counter',
+            memorization: 'Memorization',
+            language: 'Language',
+            theme: 'Theme',
+            font: 'Font Size',
+            about: 'About',
+            share: 'Share App',
+            rate: 'Rate App',
+            morningDuas: 'Morning Duas — Start your day',
+            eveningDuas: 'Evening Duas',
+            fridayKahf: 'Read Surah Al-Kahf',
+            continueQuran: 'Continue Quran',
+            duaOfDay: 'Dua of the Day'
+        };
+    }
+
+    function refreshHomeDashboardProgress() {
+        const ring = document.getElementById('dashboardRingFill');
+        const ringText = document.getElementById('dashboardRingText');
+        const progressSub = document.getElementById('dashboardProgressSub');
+        const progressTitle = document.getElementById('dashboardProgressTitle');
+        if (!ring || !ringText || !progressSub || !progressTitle) return;
+
+        const ui = getDashboardText();
+        const goal = 5;
+        const readToday = Math.min(STATE.read.length, goal);
+        const circumference = 2 * Math.PI * 16;
+        const ratio = Math.max(0, Math.min(1, readToday / goal));
+        ring.style.strokeDasharray = `${circumference}`;
+        ring.style.strokeDashoffset = `${circumference - (circumference * ratio)}`;
+        ringText.textContent = `${localizeDigits(readToday)}/${localizeDigits(goal)}`;
+        progressTitle.textContent = ui.duasToday;
+        progressSub.textContent = `${ui.streak}: ${localizeDigits(STATE.streak)} ${ui.days}`;
+    }
+
+    function getDailyTip() {
+        const tips = isPashtoMode()
+            ? [
+                'لارښوونه: د دعا پر مهال خپل لاسونه پورته کړئ',
+                'لارښوونه: لومړی د الله ستاینه وکړئ بیا غوښتنه وکړئ',
+                'لارښوونه: پر نبي ﷺ درود ووایئ'
+            ]
+            : [
+                'Tip: Raise your hands when making dua',
+                'Tip: Begin with praising Allah before asking',
+                'Tip: Send salawat upon the Prophet ﷺ'
+            ];
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+        return tips[dayOfYear % tips.length];
+    }
+
+    function formatDashboardDate() {
+        const locale = isPashtoMode() ? 'ps-AF-u-ca-islamic' : 'en-US-u-ca-islamic';
+        try {
+            return new Intl.DateTimeFormat(locale, { dateStyle: 'full' }).format(new Date());
+        } catch (_) {
+            return new Date().toLocaleDateString(isPashtoMode() ? 'ps-AF' : 'en-US', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+        }
+    }
+
+    function refreshHomeDashboardGreeting() {
+        const greeting = document.getElementById('dashboardGreeting');
+        const dateEl = document.getElementById('dashboardDate');
+        if (!greeting || !dateEl) return;
+        const ui = getDashboardText();
+        const hour = new Date().getHours();
+        if (hour < 12) greeting.textContent = ui.goodMorning;
+        else if (hour < 17) greeting.textContent = ui.goodAfternoon;
+        else greeting.textContent = ui.goodEvening;
+        dateEl.textContent = formatDashboardDate();
+    }
+
+    function getSmartSuggestion() {
+        const ui = getDashboardText();
+        const now = new Date();
+        const day = now.getDay();
+        const hour = now.getHours();
+        const lastRead = (() => {
+            try { return JSON.parse(localStorage.getItem('crown_quran_last_read') || 'null'); }
+            catch (_) { return null; }
+        })();
+
+        if (lastRead?.surahNumber) {
+            const surah = lastRead.surahName || `Surah ${lastRead.surahNumber}`;
+            return {
+                title: ui.continueQuran,
+                sub: `${surah} — Ayah ${localizeDigits(lastRead.ayahNumber || 1)}`,
+                action: () => openQuranSurah(lastRead.surahNumber, lastRead.ayahNumber || 1)
+            };
+        }
+        if (day === 5) {
+            return { title: ui.fridayKahf, sub: '', action: () => openQuranSurah(18, 1) };
+        }
+        if (hour < 12) {
+            return { title: ui.morningDuas, sub: '', action: () => { switchTab('duas'); openCategory('morning-evening'); } };
+        }
+        if (hour >= 17) {
+            return { title: ui.eveningDuas, sub: '', action: () => { switchTab('duas'); openCategory('morning-evening'); } };
+        }
+        return { title: ui.duaOfDay, sub: '', action: () => showRandomDua() };
+    }
+
+    function refreshHomeNextPrayerCard() {
+        const label = document.getElementById('dashboardPrayerLabel');
+        const name = document.getElementById('dashboardPrayerName');
+        const time = document.getElementById('dashboardPrayerTime');
+        const countdown = document.getElementById('dashboardPrayerCountdown');
+        const location = document.getElementById('dashboardPrayerLocation');
+        const card = document.getElementById('dashboardNextPrayerCard');
+        if (!label || !name || !time || !countdown || !location || !card) return;
+
+        const ui = getDashboardText();
+        label.textContent = ui.nextPrayer;
+        const loc = (() => {
+            try { return JSON.parse(localStorage.getItem('crown_location') || 'null'); }
+            catch (_) { return null; }
+        })();
+        const cityText = loc?.city || (isPashtoMode() ? 'نامعلوم' : 'Unknown');
+        location.textContent = cityText;
+
+        if (!prayerTimesData) {
+            name.textContent = '--';
+            time.textContent = '--:--';
+            countdown.textContent = '--';
+            card.classList.remove('is-now');
+            return;
+        }
+
+        const now = new Date();
+        const current = getCurrentPrayer(now);
+        const next = getNextPrayer(now);
+        const currentStart = current ? prayerTimesData[current] : null;
+        const nextStart = next ? prayerTimesData[next] : null;
+        const withinNow = currentStart && now >= currentStart && now - currentStart < 15 * 60 * 1000;
+
+        if (withinNow && current) {
+            name.textContent = getPrayerLabel(current);
+            time.textContent = formatDisplayTime(currentStart, 'dashboard-now');
+            countdown.textContent = `${ui.nowPrefix} — ${getPrayerLabel(current)}`;
+            card.classList.add('is-now');
+            return;
+        }
+
+        card.classList.remove('is-now');
+        name.textContent = getPrayerLabel(next);
+        time.textContent = formatDisplayTime(nextStart, 'dashboard-next');
+        const diffMs = Math.max(0, nextStart - now);
+        const h = Math.floor(diffMs / 3600000);
+        const m = Math.floor((diffMs % 3600000) / 60000);
+        countdown.textContent = isPashtoMode()
+            ? `په ${localizeDigits(h)} ساعته ${localizeDigits(m)} دقیقو کې`
+            : `${ui.inPrefix} ${h}h ${m}m`;
+    }
+
+    function refreshHomeSmartSuggestion() {
+        const title = document.getElementById('dashboardSuggestionTitle');
+        const sub = document.getElementById('dashboardSuggestionSub');
+        const cta = document.getElementById('dashboardSuggestionCta');
+        if (!title || !sub || !cta) return;
+        const ui = getDashboardText();
+        const suggestion = getSmartSuggestion();
+        title.textContent = suggestion.title;
+        sub.textContent = suggestion.sub || '';
+        cta.textContent = ui.continue;
+        window.__dashboardSuggestionAction = suggestion.action;
+    }
+
+    window.openDashboardSuggestion = function() {
+        if (typeof window.__dashboardSuggestionAction === 'function') {
+            window.__dashboardSuggestionAction();
+        }
+    };
+
+    window.openPrayerFromDashboard = function() {
+        openPrayer();
+    };
+
+    window.openPrayerQiblaFromDashboard = function() {
+        openPrayer();
+        setPrayerSubtab('qibla');
+    };
+
+    function refreshDashboardLabels() {
+        const ui = getDashboardText();
+        const ids = [
+            ['quickQuranLabel', ui.quran],
+            ['quickDuasLabel', ui.duas],
+            ['quickTasbeehLabel', ui.tasbeeh],
+            ['quickQiblaLabel', ui.qibla],
+            ['duasBookmarksTitle', ui.bookmarked],
+            ['tabHomeLabel', ui.tabHome],
+            ['tabQuranLabel', ui.tabQuran],
+            ['tabDuasLabel', ui.tabDuas],
+            ['tabMoreLabel', ui.tabMore],
+            ['moreTitle', ui.more],
+            ['morePrayerLabel', ui.prayerTimes],
+            ['moreTasbeehLabel', ui.tasbeehCounter],
+            ['moreMemorizeLabel', ui.memorization],
+            ['moreProgressLabel', ui.progress],
+            ['moreThemeLabel', ui.theme],
+            ['moreLanguageLabel', ui.language],
+            ['moreFontLabel', ui.font],
+            ['moreAboutLabel', ui.about],
+            ['moreShareLabel', ui.share],
+            ['moreRateLabel', ui.rate]
+        ];
+        ids.forEach(([id, text]) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        });
+        const duasSearch = document.getElementById('duasSearchInput');
+        if (duasSearch) duasSearch.placeholder = ui.searchPlaceholder;
+    }
+
+    function refreshHomeDashboard() {
+        refreshDashboardLabels();
+        refreshHomeDashboardGreeting();
+        refreshHomeNextPrayerCard();
+        refreshHomeSmartSuggestion();
+        refreshHomeDashboardProgress();
+        const tip = document.getElementById('dashboardTipCard');
+        if (tip) tip.textContent = getDailyTip();
+    }
+    window.refreshHomeDashboard = refreshHomeDashboard;
+
+    function initHomeDashboard() {
+        refreshHomeDashboard();
+        if (!window.__dashboardRefreshTimer) {
+            window.__dashboardRefreshTimer = setInterval(() => {
+                refreshHomeNextPrayerCard();
+            }, 30000);
+        }
+    }
+
+    function initDuasTabSearch() {
+        const input = document.getElementById('duasSearchInput');
+        if (!input || input.dataset.bound === '1') return;
+        input.addEventListener('input', () => {
+            const query = (input.value || '').trim();
+            switchTab('duas');
+            openCategory('all', { skipScroll: true });
+            filterDuas(query);
+        });
+        input.dataset.bound = '1';
+    }
+
+    function renderDuasBookmarksSection() {
+        const section = document.getElementById('duasBookmarksSection');
+        const list = document.getElementById('duasBookmarksList');
+        if (!section || !list) return;
+
+        if (!STATE.bookmarks.length) {
+            section.hidden = true;
+            list.innerHTML = '';
+            return;
+        }
+
+        section.hidden = false;
+        list.innerHTML = STATE.bookmarks.slice(0, 8).map((id) => {
+            const title = document.querySelector(`.dua-card[data-id="${id}"] .dua-title`)?.textContent?.trim() || `Dua ${id}`;
+            return `<button class="duas-bookmark-chip" onclick="scrollToDua(${id})">${escapeHtml(title)}</button>`;
+        }).join('');
+    }
 
     function showToast(msg) {
         // toast lives after the <script> tag, so cache it lazily on first use
@@ -2379,20 +2768,50 @@ window.filterCategory = function(cat, btn) {
                 switchTab('home');
                 backToCategories();
                 scrollActiveViewToTop();
+                recordInAppRoute(true, { view: IN_APP_VIEWS.HOME, ts: Date.now() });
                 break;
-            case 'routine':
-                openRoutine();
-                break;
-            case 'tasbeeh':
-                openTasbeeh();
+            case 'duas':
+                closeAllPanelsForStateApply();
+                switchTab('duas');
+                backToCategories();
+                recordInAppRoute(true, { view: IN_APP_VIEWS.DUAS_TAB, ts: Date.now() });
                 break;
             case 'quran':
                 openQuran();
                 break;
-            case 'prayer':
-                openPrayer();
+            case 'more':
+                openMorePanel();
                 break;
         }
+    };
+
+    window.openMorePanel = function() {
+        switchTab('more');
+        recordInAppRoute(true, {
+            view: IN_APP_VIEWS.PANEL,
+            panel: 'more'
+        });
+    };
+
+    window.closeMorePanel = function() {
+        switchTab('home');
+        recordInAppRoute(false, {
+            view: IN_APP_VIEWS.HOME
+        });
+    };
+
+    window.openPrayerFromMore = function() {
+        openPrayer();
+    };
+
+    window.openAboutFromMore = function() {
+        const section = document.getElementById('moreAboutSection');
+        if (!section) return;
+        section.hidden = !section.hidden;
+    };
+
+    window.rateApp = function() {
+        window.open('https://play.google.com/store/apps/details?id=com.fallah.essentialduas', '_blank', 'noopener');
     };
 
     // ===== PROGRESS PANEL =====
@@ -5636,6 +6055,7 @@ window.filterCategory = function(cat, btn) {
         buildQiblaDegreeRing();
         if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
         initPrayerSubtabs();
+        if (typeof window.refreshHomeDashboard === 'function') window.refreshHomeDashboard();
     };
 
     function renderPrayerSkeleton() {
@@ -5679,7 +6099,7 @@ window.filterCategory = function(cat, btn) {
 
     window.openPrayer = function() {
         const pp = document.querySelector('.prayer-panel');
-        if (pp) switchTab('prayer');
+        if (pp) showAuxPanel('.prayer-panel');
         const closeBtn = pp?.querySelector('.etiquette-close');
         if (closeBtn) closeBtn.focus();
         initReminderControls();
@@ -5711,7 +6131,7 @@ window.filterCategory = function(cat, btn) {
 
     window.closePrayer = function() {
         setPanelLoading('prayer', false);
-        switchTab('home');
+        openMorePanel();
         if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
         recordInAppRoute(false);
     };
@@ -5812,6 +6232,7 @@ window.filterCategory = function(cat, btn) {
         if (loadReminderSettings().enabled) schedulePrayerNotifications();
         prayerPanelHydrated = true;
         setPanelLoading('prayer', false);
+        refreshHomeNextPrayerCard();
     }
 
     function calculateAndRenderPrayers(lat, lng) {
@@ -5848,6 +6269,7 @@ window.filterCategory = function(cat, btn) {
         startCountdown();
         prayerPanelHydrated = true;
         setPanelLoading('prayer', false);
+        refreshHomeNextPrayerCard();
     }
 
     function renderPrayerGrid() {
@@ -5968,12 +6390,13 @@ window.filterCategory = function(cat, btn) {
             _lastCurrentPrayer = newCurrent;
             _lastNextPrayer = newNext;
             renderPrayerGrid();
+            refreshHomeNextPrayerCard();
         }
     }
 
     function normalizeMeridiem(text) {
-        const tokenPattern = '(?:AM|PM|غ\\.م|غ\\.و)';
-        const duplicateTokenRegex = new RegExp(`\\b(${tokenPattern})(?:\\s+\\1\\b)+`, 'gi');
+        const tokenPattern = '(AM|PM|غ\\.م|غ\\.و)';
+        const duplicateTokenRegex = new RegExp(`(${tokenPattern})(?:\\s+${tokenPattern})+`, 'gi');
         return String(text || '')
             .replace(/\s+/g, ' ')
             .replace(duplicateTokenRegex, '$1')
@@ -5981,9 +6404,7 @@ window.filterCategory = function(cat, btn) {
     }
 
     function formatDisplayTime(date, context = 'general') {
-        const timeString = normalizeMeridiem(formatTime(date));
-        console.log('TIME STRING:', timeString, { context });
-        return timeString;
+        return normalizeMeridiem(formatTime(date));
     }
 
     function formatTime(date) {

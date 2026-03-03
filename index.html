@@ -32,7 +32,7 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
     <!-- Production assets (default) -->
-    <link rel="stylesheet" href="styles.min.css?v=20260302k">
+    <link rel="stylesheet" href="styles.min.css?v=20260303a">
     <!-- Development assets (uncomment for local debugging) -->
     <!-- <link rel="stylesheet" href="styles.css?v=20260301f"> -->
 </head>
@@ -65,25 +65,7 @@
         </div>
     </div>
     <div class="nav-actions">
-        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" aria-label="Toggle theme" id="themeToggle">☀</button>
-        <button class="nav-overflow-toggle" onclick="toggleNavOverflow(event)" title="More options" aria-label="More options" aria-expanded="false" id="navOverflowBtn">⋮</button>
-        <div class="nav-overflow-menu" id="navOverflowMenu" role="menu">
-            <div class="overflow-control-row">
-                <div class="lang-toggle" id="langToggle" onclick="toggleLanguage()" title="Switch language" aria-label="Toggle language" role="menuitem">
-                    <span id="langEN" class="active-lang">EN</span>
-                    <span id="langPS">پښتو</span>
-                </div>
-            </div>
-            <div class="overflow-control-row">
-                <div class="font-controls" role="menuitem">
-                    <button class="font-btn" onclick="adjustFontSize(-0.1)" title="Smaller text" aria-label="Decrease font size">A-</button>
-                    <button class="font-btn" onclick="adjustFontSize(0.1)" title="Larger text" aria-label="Increase font size">A+</button>
-                </div>
-            </div>
-            <button class="nav-btn" role="menuitem" onclick="openEtiquette(); closeNavOverflow()">📖 <span class="overflow-label">Etiquette</span></button>
-            <button class="nav-btn" role="menuitem" onclick="openProgress(); closeNavOverflow()">📊 <span class="overflow-label">Progress</span></button>
-            <button class="nav-btn" role="menuitem" onclick="sharePage(); closeNavOverflow()">↗ <span class="overflow-label">Share</span></button>
-        </div>
+        <button class="nav-btn" onclick="openMorePanel()" title="Open more" aria-label="Open more">☰</button>
     </div>
 </nav>
 
@@ -93,60 +75,70 @@
 </div>
 
 <!-- ===== MAIN CONTENT ===== -->
-<div class="container home-panel active" id="mainContainer" role="main" aria-label="Essential Duas content">
+<div class="app-content" id="appContent">
+<div class="container home-panel panel active" id="mainContainer" data-main-mode="home" role="main" aria-label="Essential Duas content">
     <div class="pull-refresh-indicator" id="pullRefreshIndicator" aria-hidden="true">↻ Pull to refresh</div>
 
-    <!-- ===== HERO SECTION ===== -->
-    <section class="hero">
-        <div class="hero-content">
-            <div class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+    <section class="home-dashboard" id="homeDashboard">
+        <div class="dashboard-greeting" id="dashboardGreeting">Assalamu Alaikum — Good Morning</div>
+        <div class="dashboard-date" id="dashboardDate">Tuesday, March 3, 2026</div>
 
-            <div class="hero-ornament">
-                <span class="line"></span>
-                <span>✦</span>
-                <span class="line"></span>
+        <button class="dashboard-prayer-card" id="dashboardNextPrayerCard" onclick="openPrayerFromDashboard()" aria-label="Open prayer times">
+            <div class="dashboard-prayer-label" id="dashboardPrayerLabel">Next Prayer</div>
+            <div class="dashboard-prayer-name" id="dashboardPrayerName">Dhuhr</div>
+            <div class="dashboard-prayer-time" id="dashboardPrayerTime">12:30 PM</div>
+            <div class="dashboard-prayer-countdown" id="dashboardPrayerCountdown">in 2h 15m</div>
+            <div class="dashboard-prayer-location" id="dashboardPrayerLocation">London</div>
+        </button>
+
+        <button class="dashboard-suggestion-card" id="dashboardSuggestionCard" onclick="openDashboardSuggestion()" aria-label="Open suggestion">
+            <div class="dashboard-suggestion-title" id="dashboardSuggestionTitle">Dua of the Day</div>
+            <div class="dashboard-suggestion-sub" id="dashboardSuggestionSub">A focused reminder for right now</div>
+            <span class="dashboard-suggestion-cta" id="dashboardSuggestionCta">Continue</span>
+        </button>
+
+        <button class="dashboard-progress-ring-card" id="dashboardProgressCard" onclick="openProgress()" aria-label="Open progress details">
+            <div class="dashboard-ring-wrap">
+                <svg viewBox="0 0 40 40" class="dashboard-ring-svg" aria-hidden="true">
+                    <circle cx="20" cy="20" r="16" class="dashboard-ring-bg"></circle>
+                    <circle cx="20" cy="20" r="16" class="dashboard-ring-fill" id="dashboardRingFill"></circle>
+                </svg>
+                <span class="dashboard-ring-text" id="dashboardRingText">0/5</span>
             </div>
-
-            <h1 class="gold-text">Essential Duas</h1>
-            <div class="subtitle">The Crown Collection from Quran & Sunnah</div>
-            <div class="sadaqa-banner" style="
-                margin-top: 14px;
-                padding: 8px 20px;
-                border-radius: 50px;
-                background: linear-gradient(135deg, rgba(46,196,122,0.10), rgba(201,168,76,0.10));
-                border: 1px solid rgba(46,196,122,0.18);
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                font-family: var(--font-text);
-                font-size: 0.78rem;
-                color: var(--gold-light);
-                font-style: italic;
-                letter-spacing: 0.3px;
-                backdrop-filter: blur(8px);
-                -webkit-backdrop-filter: blur(8px);
-                transition: all 0.3s ease;
-            ">
-                <span style="font-style:normal;font-size:0.9rem;">🤲</span>
-                <span>Share this with someone — it may be your <span style="color:var(--gold-mid);font-weight:600;">Sadaqa Jariya</span></span>
+            <div class="dashboard-progress-meta">
+                <div class="dashboard-progress-title" id="dashboardProgressTitle">Duas today</div>
+                <div class="dashboard-progress-sub" id="dashboardProgressSub">Streak: 0 days</div>
             </div>
+        </button>
 
-            <div class="daily-reminder-prompt" id="dailyReminderPrompt">
-                <div class="daily-reminder-title">🔔 Daily Dua Reminder</div>
-                <div class="daily-reminder-sub">Would you like a gentle daily reminder for the dua of the day?</div>
-                <div class="daily-reminder-actions">
-                    <button class="daily-reminder-btn primary" onclick="enableDailyDuaReminders()">Yes, remind me</button>
-                    <button class="daily-reminder-btn" onclick="dismissDailyDuaPrompt()">Not now</button>
-                </div>
-            </div>
-
-            <div class="home-progress-summary" id="homeProgressSummary" aria-live="polite">Duas read today: 0 · Quran streak: 0 · Last: None</div>
-
+        <div class="dashboard-quick-grid" id="dashboardQuickGrid">
+            <button class="dashboard-quick-tile" onclick="handleBottomNav('quran')" aria-label="Open Quran">
+                <span class="dashboard-quick-icon">📖</span><span class="dashboard-quick-label" id="quickQuranLabel">Quran</span>
+            </button>
+            <button class="dashboard-quick-tile" onclick="handleBottomNav('duas')" aria-label="Open Duas">
+                <span class="dashboard-quick-icon">🤲</span><span class="dashboard-quick-label" id="quickDuasLabel">Duas</span>
+            </button>
+            <button class="dashboard-quick-tile" onclick="openTasbeeh()" aria-label="Open Tasbeeh">
+                <span class="dashboard-quick-icon">📿</span><span class="dashboard-quick-label" id="quickTasbeehLabel">Tasbeeh</span>
+            </button>
+            <button class="dashboard-quick-tile" onclick="openPrayerQiblaFromDashboard()" aria-label="Open Qibla">
+                <span class="dashboard-quick-icon">🧭</span><span class="dashboard-quick-label" id="quickQiblaLabel">Qibla</span>
+            </button>
         </div>
+
+        <div class="dashboard-tip-card" id="dashboardTipCard">Tip: Raise your hands when making dua</div>
     </section>
 
-    <!-- ===== CATEGORY GRID ===== -->
-    <div class="category-grid" id="categoryGrid">
+    <section class="duas-tab-shell" id="duasTabShell">
+        <div class="duas-tab-search-wrap">
+            <input id="duasSearchInput" class="duas-tab-search" type="search" placeholder="Search duas..." aria-label="Search duas">
+        </div>
+        <div class="duas-bookmarks" id="duasBookmarksSection" hidden>
+            <div class="duas-bookmarks-title" id="duasBookmarksTitle">Bookmarked Duas</div>
+            <div class="duas-bookmarks-list" id="duasBookmarksList"></div>
+        </div>
+
+        <div class="category-grid" id="categoryGrid">
         <div class="cat-card featured" data-cat="all" onclick="openCategory('all')">
             <div class="cat-card-wave"></div>
             <div class="cat-card-icon">📿</div>
@@ -237,7 +229,8 @@
             <div class="cat-card-name">Evil Eye & Envy</div>
             <div class="cat-card-count">4 Duas</div>
         </div>
-    </div>
+        </div>
+    </section>
 
     <!-- ===== DUA LIST SECTION (hidden by default, shown on category tap) ===== -->
     <div class="dua-list-section hidden-list" id="duaListSection">
@@ -2846,7 +2839,7 @@
 </div> <!-- ===== END .dua-list-section ===== -->
 
 <!-- ===== HOME FOOTER ===== -->
-<footer class="footer">
+<footer class="footer" style="display:none;">
     <div class="footer-ornament">
         <span class="line"></span>
         <span class="diamond">✦</span>
@@ -2890,7 +2883,7 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (default) -->
-<script src="app.min.js?v=20260302k"></script>
+<script src="app.min.js?v=20260303a"></script>
 <!-- Development assets (uncomment for local debugging) -->
 <!-- <script src="app.js?v=20260301f"></script> -->
 
@@ -2898,7 +2891,7 @@
 <div class="overlay" onclick="toggleBookmarksPanel()"></div>
 
 <!-- ===== TASBEEH PANEL ===== -->
-<div class="tasbeeh-panel" onclick="if(event.target === this) closeTasbeeh()">
+<div class="tasbeeh-panel panel" onclick="if(event.target === this) closeTasbeeh()">
     <button class="tasbeeh-close" onclick="closeTasbeeh()" aria-label="Close Tasbeeh panel">×</button>
     <div class="tasbeeh-title">Digital Tasbeeh</div>
     <div class="dhikr-selector" id="dhikrSelector"></div>
@@ -2920,19 +2913,19 @@
 </div>
 
 <!-- ===== ETIQUETTE PANEL ===== -->
-<div class="etiquette-panel" onclick="if(event.target === this) closeEtiquette()">
+<div class="etiquette-panel panel" onclick="if(event.target === this) closeEtiquette()">
     <button class="etiquette-close" onclick="closeEtiquette()" aria-label="Close etiquette panel">×</button>
     <div class="etiquette-content"></div>
 </div>
 
 <!-- ===== ROUTINE PANEL ===== -->
-<div class="routine-panel" onclick="if(event.target === this) closeRoutine()">
+<div class="routine-panel panel" onclick="if(event.target === this) closeRoutine()">
     <button class="etiquette-close" onclick="closeRoutine()" aria-label="Close routine panel">×</button>
     <div class="routine-content"></div>
 </div>
 
 <!-- ===== QURAN PANEL ===== -->
-<div class="quran-panel" onclick="if(event.target === this) closeQuran()">
+<div class="quran-panel panel" onclick="if(event.target === this) closeQuran()">
     <button class="etiquette-close" onclick="closeQuran()" aria-label="Close Quran panel">×</button>
     <div class="quran-panel-content" id="quranPanelContent">
         <div class="panel-loading-overlay" id="quranPanelLoading" aria-hidden="true">Loading…</div>
@@ -3003,7 +2996,7 @@
 </div>
 
 <!-- ===== PRAYER PANEL ===== -->
-<div class="prayer-panel" onclick="if(event.target === this) closePrayer()">
+<div class="prayer-panel panel" onclick="if(event.target === this) closePrayer()">
     <button class="etiquette-close" onclick="closePrayer()" aria-label="Close prayer panel">×</button>
     <div class="prayer-panel-content" id="prayerPanelContent">
         <div class="panel-loading-overlay" id="prayerPanelLoading" aria-hidden="true">Loading…</div>
@@ -3122,6 +3115,45 @@
     </div>
 </div>
 
+<!-- ===== MORE PANEL ===== -->
+<div class="more-panel panel" onclick="if(event.target === this) closeMorePanel()">
+    <button class="etiquette-close" onclick="closeMorePanel()" aria-label="Close more panel">×</button>
+    <div class="more-panel-content" id="morePanelContent">
+        <h2 id="moreTitle">More</h2>
+        <div class="more-list" id="moreList">
+            <button class="more-row" onclick="openPrayerFromMore()"><span class="more-icon">🕌</span><span class="more-label" id="morePrayerLabel">Prayer Times</span><span class="more-arrow">›</span></button>
+            <button class="more-row" onclick="openTasbeeh()"><span class="more-icon">📿</span><span class="more-label" id="moreTasbeehLabel">Tasbeeh Counter</span><span class="more-arrow">›</span></button>
+            <button class="more-row" onclick="toggleMemorizeMode()"><span class="more-icon">🧠</span><span class="more-label" id="moreMemorizeLabel">Memorization</span><span class="more-arrow">›</span></button>
+            <button class="more-row" onclick="openProgress()"><span class="more-icon">📊</span><span class="more-label" id="moreProgressLabel">My Progress</span><span class="more-arrow">›</span></button>
+
+            <div class="more-row settings-row">
+                <span class="more-icon">🌙</span><span class="more-label" id="moreThemeLabel">Theme</span>
+                <button class="more-inline-btn" id="moreThemeToggle" onclick="toggleTheme()">Dark / Light</button>
+            </div>
+            <div class="more-row settings-row">
+                <span class="more-icon">🌐</span><span class="more-label" id="moreLanguageLabel">Language</span>
+                <button class="more-inline-btn" id="moreLanguageToggle" onclick="toggleLanguage()">Pashto / English</button>
+            </div>
+            <div class="more-row settings-row">
+                <span class="more-icon">🔤</span><span class="more-label" id="moreFontLabel">Font Size</span>
+                <div class="more-inline-font">
+                    <button class="more-inline-btn" onclick="adjustFontSize(-0.1)">A-</button>
+                    <button class="more-inline-btn" onclick="adjustFontSize(0.1)">A+</button>
+                </div>
+            </div>
+
+            <button class="more-row" onclick="openAboutFromMore()"><span class="more-icon">📋</span><span class="more-label" id="moreAboutLabel">About</span><span class="more-arrow">›</span></button>
+            <button class="more-row" onclick="sharePage()"><span class="more-icon">🔗</span><span class="more-label" id="moreShareLabel">Share App</span><span class="more-arrow">›</span></button>
+            <button class="more-row" onclick="rateApp()"><span class="more-icon">⭐</span><span class="more-label" id="moreRateLabel">Rate App</span><span class="more-arrow">›</span></button>
+        </div>
+        <div class="more-about" id="moreAboutSection" hidden>
+            <h3 id="aboutHeading">About</h3>
+            <p id="aboutBody">Essential Duas by Engineer Mohammad Falah · Version 1.0.0 · © 2026.</p>
+        </div>
+    </div>
+</div>
+</div>
+
 <!-- ===== TOAST ===== -->
 <div class="toast" id="toast" role="alert" aria-live="polite"></div>
 
@@ -3184,24 +3216,20 @@
 <!-- ===== BOTTOM NAV (Always last before </body>) ===== -->
 <nav class="bottom-nav" id="bottomNav" aria-label="Bottom navigation">
     <button class="bottom-nav-item active" data-nav="home" onclick="handleBottomNav('home', this)">
-        <span class="icon">🏠</span>
-        <span>Home</span>
-    </button>
-    <button class="bottom-nav-item" data-nav="routine" onclick="handleBottomNav('routine', this)">
-        <span class="icon">📅</span>
-        <span>Routine</span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path></svg></span>
+        <span id="tabHomeLabel">Home</span>
     </button>
     <button class="bottom-nav-item" data-nav="quran" onclick="handleBottomNav('quran', this)">
-        <span class="icon">📖</span>
-        <span>Quran</span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17.5a.5.5 0 0 1-.5.5H6.5A2.5 2.5 0 0 0 4 23V5.5z"></path><path d="M8 7h8"></path><path d="M8 11h8"></path></svg></span>
+        <span id="tabQuranLabel">Quran</span>
     </button>
-    <button class="bottom-nav-item" data-nav="tasbeeh" onclick="handleBottomNav('tasbeeh', this)">
-        <span class="icon">📿</span>
-        <span>Tasbeeh</span>
+    <button class="bottom-nav-item" data-nav="duas" onclick="handleBottomNav('duas', this)">
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3"></path><path d="M6.5 6.5L8.8 8.8"></path><path d="M17.5 6.5L15.2 8.8"></path><path d="M4 12h3"></path><path d="M17 12h3"></path><path d="M9 12c0 1.7 1.3 3 3 3s3-1.3 3-3"></path><path d="M12 15v6"></path></svg></span>
+        <span id="tabDuasLabel">Duas</span>
     </button>
-    <button class="bottom-nav-item" data-nav="prayer" onclick="handleBottomNav('prayer', this)">
-        <span class="icon">🕌</span>
-        <span>Prayer</span>
+    <button class="bottom-nav-item" data-nav="more" onclick="handleBottomNav('more', this)">
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14"></path><path d="M5 12h14"></path><path d="M5 17h14"></path></svg></span>
+        <span id="tabMoreLabel">More</span>
     </button>
 </nav>
 
