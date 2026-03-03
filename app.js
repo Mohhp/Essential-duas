@@ -2514,11 +2514,8 @@ window.filterCategory = function(cat, btn) {
         const greeting = document.getElementById('dashboardGreeting');
         const dateEl = document.getElementById('dashboardDate');
         if (!greeting || !dateEl) return;
-        const ui = getDashboardText();
-        const hour = new Date().getHours();
-        if (hour < 12) greeting.textContent = ui.goodMorning;
-        else if (hour < 17) greeting.textContent = ui.goodAfternoon;
-        else greeting.textContent = ui.goodEvening;
+        greeting.textContent = '';
+        greeting.setAttribute('aria-hidden', 'true');
         const formattedDate = formatDashboardDate();
         if (isPashtoMode()) dateEl.innerHTML = formattedDate;
         else dateEl.textContent = formattedDate;
