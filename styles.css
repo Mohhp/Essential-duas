@@ -3433,7 +3433,7 @@
         .tasbeeh-title {
             font-family: var(--font-title); font-size: 0.7rem;
             letter-spacing: 3px; text-transform: none;
-            color: rgba(46, 196, 122, 0.7); margin: calc(var(--safe-top) + 26px) 0 0.9rem;
+            color: rgba(46, 196, 122, 0.7); margin: 8px 0 0.9rem;
         }
         .tasbeeh-arabic {
             font-family: var(--font-arabic);
@@ -4676,6 +4676,19 @@
             will-change: opacity;
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
+        }
+
+        .tasbeeh-panel {
+            bottom: 0 !important;
+            padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 30px) !important;
+            -webkit-transform: none !important;
+            transform: none !important;
+            will-change: auto !important;
+            backface-visibility: visible !important;
+        }
+
+        .tasbeeh-panel.active {
+            transform: none !important;
         }
 
         [data-theme="light"] #mainContainer.home-panel,
