@@ -1890,6 +1890,7 @@ window.filterCategory = function(cat, btn) {
     window.openTasbeeh = function() {
         const tp = document.querySelector('.tasbeeh-panel');
         if (tp) showAuxPanel('.tasbeeh-panel');
+        if (tp) tp.scrollTop = 0;
         // Restore last selected dhikr
         const saved = parseInt(localStorage.getItem('crown_dhikr_selected') || '0', 10);
         currentDhikrIndex = (saved >= 0 && saved < DHIKR_LIST.length) ? saved : 0;
@@ -2967,6 +2968,8 @@ window.filterCategory = function(cat, btn) {
 
     window.openMorePanel = function() {
         switchTab('more');
+        const morePanel = document.querySelector('.more-panel');
+        if (morePanel) morePanel.scrollTop = 0;
         recordInAppRoute(true, {
             view: IN_APP_VIEWS.PANEL,
             panel: 'more'
@@ -3024,6 +3027,7 @@ window.filterCategory = function(cat, btn) {
         if (!ap) return;
         renderAboutPanelContent();
         showAuxPanel('.about-panel');
+        ap.scrollTop = 0;
         recordInAppRoute(true, {
             view: IN_APP_VIEWS.PANEL,
             panel: 'about',
@@ -6285,6 +6289,7 @@ window.filterCategory = function(cat, btn) {
     window.openPrayer = function() {
         const pp = document.querySelector('.prayer-panel');
         if (pp) showAuxPanel('.prayer-panel');
+        if (pp) pp.scrollTop = 0;
         const closeBtn = pp?.querySelector('.panel-back-btn');
         if (closeBtn) closeBtn.focus();
         initReminderControls();
