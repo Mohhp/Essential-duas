@@ -1685,7 +1685,7 @@
             flex-direction: column;
             min-height: 0;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
         }
         .prayer-panel-content h2 {
             font-family: var(--font-title); font-size: 1rem;
@@ -1750,6 +1750,9 @@
         .prayer-tab-qibla,
         .prayer-tab-reminders {
             gap: 0.45rem;
+        }
+        .prayer-tab-times {
+            padding-bottom: calc(var(--safe-bottom) + 14px);
         }
         .prayer-location-bar {
             display: flex; align-items: center; justify-content: center;
@@ -2353,7 +2356,8 @@
             box-shadow: var(--shadow-soft);
         }
         .prayer-reminder-status {
-            margin-top: 8px;
+            margin-top: 0;
+            margin-bottom: 8px;
             padding: 8px 10px;
             border-radius: 10px;
             border: 1px solid rgba(46, 196, 122, 0.16);
@@ -5506,6 +5510,11 @@
             pointer-events: auto;
             visibility: visible;
             z-index: 10;
+        }
+
+        .app-content .prayer-panel .prayer-panel-content {
+            height: auto;
+            min-height: 100%;
         }
 
         #mainContainer.container {

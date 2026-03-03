@@ -879,21 +879,26 @@
 
     function closeAllPanelsForStateApply() {
         if (isDuaSwipeViewerActive()) closeDuaSwipeViewer({ skipRoute: true });
-        if (document.querySelector('.quran-panel.active')) closeQuranPanel({ skipHistory: true });
-        if (document.querySelector('.prayer-panel.active')) closePrayer();
-        if (document.querySelector('.routine-panel.active')) closeRoutine();
-        if (document.querySelector('.tasbeeh-panel.active')) closeTasbeeh();
-        if (document.querySelector('.more-panel.active')) closeMorePanel();
-        if (document.querySelector('.about-panel.active')) {
-            const aboutPanel = document.querySelector('.about-panel');
-            if (aboutPanel) aboutPanel.classList.remove('active');
+
+        closeQuranReader({ skipHistory: true });
+        setPanelLoading('quran', false);
+        setPanelLoading('prayer', false);
+
+        document.querySelectorAll('.quran-panel, .prayer-panel, .routine-panel, .tasbeeh-panel, .etiquette-panel, .more-panel, .about-panel, .progress-panel').forEach((panel) => {
+            panel.classList.remove('active');
+        });
+
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
         }
-        if (document.querySelector('.etiquette-panel.active')) closeEtiquette();
-        if (document.querySelector('.progress-panel.active')) {
-            const progressPanel = document.querySelector('.progress-panel');
-            if (progressPanel) progressPanel.classList.remove('active');
-            unlockScroll();
-        }
+
+        clearQuranAudioDotHoldTimer();
+        closeQuranAudioPopup();
+        updateQuranMiniPlayerVisibility();
+        document.body.classList.remove('quran-reading-mode');
+        unlockScroll();
+
         const bookmarksPanel = document.getElementById('bookmarksPanel');
         if (bookmarksPanel?.classList.contains('active')) toggleBookmarksPanel();
     }
