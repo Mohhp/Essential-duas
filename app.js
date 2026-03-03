@@ -2381,21 +2381,76 @@ window.filterCategory = function(cat, btn) {
 
     function formatDashboardDate() {
         const isPS = isPashtoMode();
-        const hijriLocale = isPS ? 'ar-u-ca-islamic-umalqura' : 'en-u-ca-islamic-umalqura';
         const gregLocale = isPS ? 'ps-AF' : 'en-US';
         const now = new Date();
         try {
-            const hijri = new Intl.DateTimeFormat(hijriLocale, {
-                month: 'long',
-                day: 'numeric',
+            const arabicMonthRaw = new Intl.DateTimeFormat('ar-u-ca-islamic-umalqura', {
+                month: 'long'
+            }).format(now);
+            const hijriDayRaw = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+                day: 'numeric'
+            }).format(now);
+            const hijriYearRaw = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
                 year: 'numeric'
-            }).format(now).replace(/\bBC\b/gi, 'AH');
+            }).format(now);
+
+            const normalizeArabicMonthKey = (value) => String(value || '')
+                .trim()
+                .replace(/\u0640/g, '')
+                .replace(/\s+/g, ' ')
+                .replace(/أ/g, 'ا')
+                .replace(/إ/g, 'ا')
+                .replace(/آ/g, 'ا')
+                .replace(/ى/g, 'ي');
+
+            const monthMapEnglish = {
+                'محرم': 'Muharram',
+                'صفر': 'Safar',
+                'ربيع الاول': 'Rabi al-Awwal',
+                'ربيع الاخر': 'Rabi al-Thani',
+                'جمادي الاولي': 'Jumada al-Ula',
+                'جمادي الاخره': 'Jumada al-Thani',
+                'رجب': 'Rajab',
+                'شعبان': 'Sha\'ban',
+                'رمضان': 'Ramadan',
+                'شوال': 'Shawwal',
+                'ذو القعده': 'Dhu al-Qi\'dah',
+                'ذو الحجه': 'Dhu al-Hijjah'
+            };
+
+            const monthMapPashto = {
+                'محرم': 'محرم',
+                'صفر': 'صفر',
+                'ربيع الاول': 'ربیع الاول',
+                'ربيع الاخر': 'ربیع الثانی',
+                'جمادي الاولي': 'جمادی الاولی',
+                'جمادي الاخره': 'جمادی الثانی',
+                'رجب': 'رجب',
+                'شعبان': 'شعبان',
+                'رمضان': 'رمضان',
+                'شوال': 'شوال',
+                'ذو القعده': 'ذوالقعده',
+                'ذو الحجه': 'ذوالحجه'
+            };
+
+            const monthKey = normalizeArabicMonthKey(arabicMonthRaw);
+            const monthName = isPS
+                ? (monthMapPashto[monthKey] || arabicMonthRaw)
+                : (monthMapEnglish[monthKey] || arabicMonthRaw);
+
+            const hijriDay = String(hijriDayRaw || '').replace(/\D+/g, '') || hijriDayRaw;
+            const hijriYear = String(hijriYearRaw || '').replace(/\s*(AH|BC|هـ)/gi, '').replace(/\D+/g, '') || hijriYearRaw;
+
             const greg = new Intl.DateTimeFormat(gregLocale, {
                 month: 'long',
                 day: 'numeric',
                 year: 'numeric'
             }).format(now);
-            return `${hijri} · ${greg}`;
+
+            if (isPS) {
+                return `${monthName} ${localizeDigits(hijriDay)}، ${localizeDigits(hijriYear)} · ${greg}`;
+            }
+            return `${monthName} ${hijriDay}, ${hijriYear} · ${greg}`;
         } catch (_) {
             const hijriFallback = isPS ? 'هجري نېټه' : 'Hijri date';
             const gregFallback = new Date().toLocaleDateString(gregLocale, {

@@ -3329,6 +3329,14 @@
             font-size: 20px;
         }
         .in-app-top-fab { display: none !important; }
+
+        .etiquette-close,
+        .tasbeeh-close {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
         .in-app-back-fab:active,
         .in-app-top-fab:active {
             transform: scale(0.92);
