@@ -5670,9 +5670,9 @@ window.filterCategory = function(cat, btn) {
             qiblaNeedleHint: isPS ? 'موبایل مو هوار ونیسئ او ورو یې وڅرخوئ' : 'Hold your phone flat and rotate gently',
             change: isPS ? 'بدل' : 'Change',
             noCitySelected: isPS ? 'ښار نه دی ټاکل شوی' : 'No city selected',
-            tabTimes: isPS ? '🕌 وختونه' : '🕌 Times',
-            tabQibla: isPS ? '🧭 قبله' : '🧭 Qibla',
-            tabReminders: isPS ? '🔔 یادونې' : '🔔 Reminders'
+            tabTimes: isPS ? 'وختونه' : 'Times',
+            tabQibla: isPS ? 'قبله' : 'Qibla',
+            tabReminders: isPS ? 'یادونې' : 'Reminders'
         };
     }
 
@@ -6476,7 +6476,6 @@ window.filterCategory = function(cat, btn) {
                     : '<span class="prayer-badge prayer-badge-empty" aria-hidden="true"></span>';
 
             return `<div class="prayer-row${cls}">
-                <span class="prayer-icon">${PRAYER_ICONS[name]}</span>
                 <span class="prayer-name">${getPrayerLabel(name)}</span>
                 ${badge}
                 <span class="prayer-time">${timeStr}</span>
