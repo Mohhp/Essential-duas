@@ -180,6 +180,9 @@
         // --- Keyboard Accessibility ---
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                const ap = document.querySelector('.about-panel.active');
+                if (ap) { closeAboutPanel(); return; }
+
                 const pp = document.querySelector('.progress-panel.active');
                 if (pp) { closeProgress(); return; }
 
@@ -333,7 +336,7 @@
             }
         });
 
-        document.querySelectorAll('.tasbeeh-panel, .etiquette-panel, .routine-panel, .prayer-panel, .quran-panel, .more-panel, .progress-panel, .side-panel').forEach(panel => {
+        document.querySelectorAll('.tasbeeh-panel, .etiquette-panel, .routine-panel, .prayer-panel, .quran-panel, .more-panel, .about-panel, .progress-panel, .side-panel').forEach(panel => {
             panel.setAttribute('role', 'dialog');
             panel.setAttribute('aria-modal', 'true');
         });
@@ -658,6 +661,7 @@
             || document.querySelector('.prayer-panel.active')
             || document.querySelector('.routine-panel.active')
             || document.querySelector('.tasbeeh-panel.active')
+            || document.querySelector('.about-panel.active')
             || document.querySelector('.more-panel.active')
             || document.querySelector('.etiquette-panel.active')
             || document.querySelector('.progress-panel.active')
@@ -702,6 +706,7 @@
             ['.etiquette-panel.active', 'etiquette'],
             ['.progress-panel.active', 'progress'],
             ['#bookmarksPanel.active', 'bookmarks'],
+            ['.about-panel.active', 'about'],
             ['.more-panel.active', 'more']
         ];
 
@@ -790,6 +795,9 @@
         if (document.querySelector('.progress-panel.active')) {
             return document.querySelector('.progress-panel');
         }
+        if (document.querySelector('.about-panel.active')) {
+            return document.querySelector('.about-panel');
+        }
         if (document.querySelector('.more-panel.active')) {
             return document.querySelector('.more-panel');
         }
@@ -860,8 +868,16 @@
         if (document.querySelector('.routine-panel.active')) closeRoutine();
         if (document.querySelector('.tasbeeh-panel.active')) closeTasbeeh();
         if (document.querySelector('.more-panel.active')) closeMorePanel();
+        if (document.querySelector('.about-panel.active')) {
+            const aboutPanel = document.querySelector('.about-panel');
+            if (aboutPanel) aboutPanel.classList.remove('active');
+        }
         if (document.querySelector('.etiquette-panel.active')) closeEtiquette();
-        if (document.querySelector('.progress-panel.active')) closeProgress();
+        if (document.querySelector('.progress-panel.active')) {
+            const progressPanel = document.querySelector('.progress-panel');
+            if (progressPanel) progressPanel.classList.remove('active');
+            unlockScroll();
+        }
         const bookmarksPanel = document.getElementById('bookmarksPanel');
         if (bookmarksPanel?.classList.contains('active')) toggleBookmarksPanel();
     }
@@ -910,6 +926,7 @@
                 else if (panel === 'routine') openRoutine();
                 else if (panel === 'tasbeeh') openTasbeeh();
                 else if (panel === 'more') openMorePanel();
+                else if (panel === 'about') openAboutPanel();
                 else if (panel === 'etiquette') openEtiquette();
                 else if (panel === 'progress') openProgress();
                 else if (panel === 'bookmarks') toggleBookmarksPanel();
@@ -1998,7 +2015,7 @@ window.filterCategory = function(cat, btn) {
         const ep = document.querySelector('.etiquette-panel');
         if (!ep) return;
         ep.querySelector('.etiquette-content').innerHTML = getEtiquetteTemplate();
-        ep.classList.add('active');
+        showAuxPanel('.etiquette-panel');
         lockScroll();
         const closeBtn = ep.querySelector('.etiquette-close');
         if (closeBtn) closeBtn.focus();
@@ -2016,6 +2033,7 @@ window.filterCategory = function(cat, btn) {
     window.closeEtiquette = function() {
         const ep = document.querySelector('.etiquette-panel');
         if (ep) ep.classList.remove('active');
+        openMorePanel();
         unlockScroll();
         recordInAppRoute(false);
     };
@@ -2231,6 +2249,7 @@ window.filterCategory = function(cat, btn) {
     function getDashboardText() {
         if (isPashtoMode()) {
             return {
+                appTitle: 'لازمي دعاګانې',
                 goodMorning: 'السلام علیکم — صبح بخیر',
                 goodAfternoon: 'السلام علیکم — غرمه مو پخ خير',
                 goodEvening: 'السلام علیکم — ماښام مو پخ خير',
@@ -2252,10 +2271,14 @@ window.filterCategory = function(cat, btn) {
                 tabDuas: 'دعاګانې',
                 tabMore: 'نور',
                 more: 'نور',
+                features: 'ځانګړنې',
+                preferences: 'تنظیمات',
+                appSection: 'اپ',
                 progress: 'زما پرمختګ',
                 prayerTimes: 'د لمانځه وختونه',
+                qiblaDirection: 'د قبلې لوری',
                 tasbeehCounter: 'تسبیح شمېرونکی',
-                memorization: 'حفظ',
+                etiquette: 'د دعا آداب',
                 language: 'ژبه',
                 theme: 'بڼه',
                 font: 'د لیک کچه',
@@ -2271,6 +2294,7 @@ window.filterCategory = function(cat, btn) {
         }
 
         return {
+            appTitle: 'Essential Duas',
             goodMorning: 'Assalamu Alaikum — Good Morning',
             goodAfternoon: 'Assalamu Alaikum — Good Afternoon',
             goodEvening: 'Assalamu Alaikum — Good Evening',
@@ -2292,10 +2316,14 @@ window.filterCategory = function(cat, btn) {
             tabDuas: 'Duas',
             tabMore: 'More',
             more: 'More',
+            features: 'Features',
+            preferences: 'Preferences',
+            appSection: 'App',
             progress: 'My Progress',
             prayerTimes: 'Prayer Times',
+            qiblaDirection: 'Qibla Direction',
             tasbeehCounter: 'Tasbeeh Counter',
-            memorization: 'Memorization',
+            etiquette: 'Etiquette of Dua',
             language: 'Language',
             theme: 'Theme',
             font: 'Font Size',
@@ -2481,6 +2509,7 @@ window.filterCategory = function(cat, btn) {
     function refreshDashboardLabels() {
         const ui = getDashboardText();
         const ids = [
+            ['topBrandText', ui.appTitle],
             ['quickQuranLabel', ui.quran],
             ['quickDuasLabel', ui.duas],
             ['quickTasbeehLabel', ui.tasbeeh],
@@ -2491,9 +2520,13 @@ window.filterCategory = function(cat, btn) {
             ['tabDuasLabel', ui.tabDuas],
             ['tabMoreLabel', ui.tabMore],
             ['moreTitle', ui.more],
+            ['moreFeaturesHeader', ui.features],
+            ['morePreferencesHeader', ui.preferences],
+            ['moreAppHeader', ui.appSection],
             ['morePrayerLabel', ui.prayerTimes],
+            ['moreQiblaLabel', ui.qiblaDirection],
             ['moreTasbeehLabel', ui.tasbeehCounter],
-            ['moreMemorizeLabel', ui.memorization],
+            ['moreEtiquetteLabel', ui.etiquette],
             ['moreProgressLabel', ui.progress],
             ['moreThemeLabel', ui.theme],
             ['moreLanguageLabel', ui.language],
@@ -2506,6 +2539,9 @@ window.filterCategory = function(cat, btn) {
             const el = document.getElementById(id);
             if (el) el.textContent = text;
         });
+        syncMorePreferenceControls();
+        renderAboutPanelContent();
+        refreshTopReminderBell();
         const duasSearch = document.getElementById('duasSearchInput');
         if (duasSearch) duasSearch.placeholder = ui.searchPlaceholder;
     }
@@ -2516,8 +2552,6 @@ window.filterCategory = function(cat, btn) {
         refreshHomeNextPrayerCard();
         refreshHomeSmartSuggestion();
         refreshHomeDashboardProgress();
-        const tip = document.getElementById('dashboardTipCard');
-        if (tip) tip.textContent = getDailyTip();
     }
     window.refreshHomeDashboard = refreshHomeDashboard;
 
@@ -2804,10 +2838,67 @@ window.filterCategory = function(cat, btn) {
         openPrayer();
     };
 
+    window.openQiblaFromMore = function() {
+        openPrayer();
+        setPrayerSubtab('qibla');
+    };
+
     window.openAboutFromMore = function() {
-        const section = document.getElementById('moreAboutSection');
-        if (!section) return;
-        section.hidden = !section.hidden;
+        openAboutPanel();
+    };
+
+    function syncMorePreferenceControls() {
+        const themeSwitch = document.getElementById('moreThemeSwitch');
+        if (themeSwitch) themeSwitch.checked = document.documentElement.getAttribute('data-theme') !== 'light';
+        const languageSwitch = document.getElementById('moreLanguageSwitch');
+        if (languageSwitch) languageSwitch.checked = isPashtoMode();
+    }
+
+    function refreshTopReminderBell() {
+        const bell = document.getElementById('topReminderBell');
+        if (!bell) return;
+        const settings = loadReminderSettings();
+        bell.hidden = !settings.enabled;
+    }
+
+    function renderAboutPanelContent() {
+        const isPS = isPashtoMode();
+        const map = {
+            aboutAppName: isPS ? 'لازمي دعاګانې v2.0.0' : 'Essential Duas v2.0.0',
+            aboutDescription: isPS
+                ? 'د قرآن او سنتو مستندې دعاګانې په یو منظم او ساده بڼه کې.'
+                : 'A focused collection of authentic duas from Quran and Sunnah.',
+            aboutDeveloper: isPS ? 'پراختیاکوونکی: انجینر محمد فلاح' : 'Developer: Engineer Mohammad Falah',
+            aboutCopyright: isPS ? 'کاپي رایټ © 2026' : 'Copyright © 2026',
+            aboutEmail: isPS ? 'اړیکه: support@essentialduas.app' : 'Contact: support@essentialduas.app',
+            aboutPrivacyLink: isPS ? 'د محرمیت تګلاره' : 'Privacy Policy',
+            aboutLicenses: isPS ? 'اوپن سورس لایسنسونه: Adhan.js او د وېب پلاتفورم API ګانې' : 'Open-source libraries: Adhan.js and web platform APIs'
+        };
+        Object.entries(map).forEach(([id, text]) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        });
+    }
+
+    window.openAboutPanel = function() {
+        const ap = document.querySelector('.about-panel');
+        if (!ap) return;
+        renderAboutPanelContent();
+        showAuxPanel('.about-panel');
+        recordInAppRoute(true, {
+            view: IN_APP_VIEWS.PANEL,
+            panel: 'about',
+            ts: Date.now()
+        });
+    };
+
+    window.closeAboutPanel = function() {
+        openMorePanel();
+        recordInAppRoute(false, {
+            view: IN_APP_VIEWS.PANEL,
+            panel: 'more',
+            ts: Date.now()
+        });
     };
 
     window.rateApp = function() {
@@ -2828,7 +2919,7 @@ window.filterCategory = function(cat, btn) {
         }
         enhanceAccessibility();
         renderProgressPanel();
-        pp.classList.add('active');
+        showAuxPanel('.progress-panel');
         lockScroll();
         recordInAppRoute(true);
     };
@@ -2836,6 +2927,7 @@ window.filterCategory = function(cat, btn) {
     window.closeProgress = function() {
         const pp = document.querySelector('.progress-panel');
         if (pp) pp.classList.remove('active');
+        openMorePanel();
         unlockScroll();
         recordInAppRoute(false);
     };
@@ -3623,6 +3715,7 @@ window.filterCategory = function(cat, btn) {
         }
         const btn = document.getElementById('themeToggle');
         if (btn) btn.innerHTML = isLight ? '☀' : '🌙';
+        syncMorePreferenceControls();
         showToast(isLight ? 'Dark Mode' : 'Light Mode');
     };
 
@@ -6395,12 +6488,19 @@ window.filterCategory = function(cat, btn) {
     }
 
     function normalizeMeridiem(text) {
-        const tokenPattern = '(AM|PM|غ\\.م|غ\\.و)';
-        const duplicateTokenRegex = new RegExp(`(${tokenPattern})(?:\\s+${tokenPattern})+`, 'gi');
-        return String(text || '')
-            .replace(/\s+/g, ' ')
-            .replace(duplicateTokenRegex, '$1')
-            .trim();
+        const raw = String(text || '').replace(/\s+/g, ' ').trim();
+        if (!raw) return '';
+
+        const tokenRegex = /(A\.?M\.?|P\.?M\.?|AM|PM|غ\.م|غ\.و)/gi;
+        const matches = raw.match(tokenRegex) || [];
+        if (!matches.length) return raw;
+
+        const isPm = matches.some((token) => /p\.?m\.?|pm|غ\.و/i.test(token));
+        const uiText = getPrayerUiText();
+        const normalizedToken = isPm ? uiText.pmToken : uiText.amToken;
+        const base = raw.replace(tokenRegex, '').replace(/\s+/g, ' ').trim();
+
+        return base ? `${base} ${normalizedToken}` : normalizedToken;
     }
 
     function formatDisplayTime(date, context = 'general') {
@@ -7034,6 +7134,7 @@ window.filterCategory = function(cat, btn) {
         startPrayerReminderPolling();
         renderPrayerGrid();
         renderPrayerReminderStatusLine();
+        refreshTopReminderBell();
         syncPrayerReminderStateToServiceWorker('schedule');
         scheduleReminderMidnightRefresh();
     }
@@ -7054,6 +7155,7 @@ window.filterCategory = function(cat, btn) {
         clearFiredReminderMarks();
         renderPrayerGrid();
         renderPrayerReminderStatusLine();
+        refreshTopReminderBell();
         syncPrayerReminderStateToServiceWorker('clear');
     }
 

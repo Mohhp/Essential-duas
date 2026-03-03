@@ -32,7 +32,7 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
     <!-- Production assets (default) -->
-    <link rel="stylesheet" href="styles.min.css?v=20260303a">
+    <link rel="stylesheet" href="styles.min.css?v=20260303b">
     <!-- Development assets (uncomment for local debugging) -->
     <!-- <link rel="stylesheet" href="styles.css?v=20260301f"> -->
 </head>
@@ -60,12 +60,12 @@
             <span class="fallah-fa">ف</span>
         </div>
         <div class="fallah-text">
-            <span class="fallah-brand">Essential Duas</span>
+            <span class="fallah-brand" id="topBrandText">Essential Duas</span>
             <span class="fallah-sub">فلاح</span>
         </div>
     </div>
     <div class="nav-actions">
-        <button class="nav-btn" onclick="openMorePanel()" title="Open more" aria-label="Open more">☰</button>
+        <button class="nav-btn nav-bell" id="topReminderBell" onclick="handleBottomNav('more')" title="Reminder status" aria-label="Reminder status" hidden>🔔</button>
     </div>
 </nav>
 
@@ -97,20 +97,6 @@
             <span class="dashboard-suggestion-cta" id="dashboardSuggestionCta">Continue</span>
         </button>
 
-        <button class="dashboard-progress-ring-card" id="dashboardProgressCard" onclick="openProgress()" aria-label="Open progress details">
-            <div class="dashboard-ring-wrap">
-                <svg viewBox="0 0 40 40" class="dashboard-ring-svg" aria-hidden="true">
-                    <circle cx="20" cy="20" r="16" class="dashboard-ring-bg"></circle>
-                    <circle cx="20" cy="20" r="16" class="dashboard-ring-fill" id="dashboardRingFill"></circle>
-                </svg>
-                <span class="dashboard-ring-text" id="dashboardRingText">0/5</span>
-            </div>
-            <div class="dashboard-progress-meta">
-                <div class="dashboard-progress-title" id="dashboardProgressTitle">Duas today</div>
-                <div class="dashboard-progress-sub" id="dashboardProgressSub">Streak: 0 days</div>
-            </div>
-        </button>
-
         <div class="dashboard-quick-grid" id="dashboardQuickGrid">
             <button class="dashboard-quick-tile" onclick="handleBottomNav('quran')" aria-label="Open Quran">
                 <span class="dashboard-quick-icon">📖</span><span class="dashboard-quick-label" id="quickQuranLabel">Quran</span>
@@ -126,7 +112,6 @@
             </button>
         </div>
 
-        <div class="dashboard-tip-card" id="dashboardTipCard">Tip: Raise your hands when making dua</div>
     </section>
 
     <section class="duas-tab-shell" id="duasTabShell">
@@ -2883,7 +2868,7 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (default) -->
-<script src="app.min.js?v=20260303a"></script>
+<script src="app.min.js?v=20260303b"></script>
 <!-- Development assets (uncomment for local debugging) -->
 <!-- <script src="app.js?v=20260301f"></script> -->
 
@@ -3120,20 +3105,24 @@
     <button class="etiquette-close" onclick="closeMorePanel()" aria-label="Close more panel">×</button>
     <div class="more-panel-content" id="morePanelContent">
         <h2 id="moreTitle">More</h2>
+        <div class="more-section-title" id="moreFeaturesHeader">Features</div>
         <div class="more-list" id="moreList">
             <button class="more-row" onclick="openPrayerFromMore()"><span class="more-icon">🕌</span><span class="more-label" id="morePrayerLabel">Prayer Times</span><span class="more-arrow">›</span></button>
+            <button class="more-row" onclick="openQiblaFromMore()"><span class="more-icon">🧭</span><span class="more-label" id="moreQiblaLabel">Qibla Direction</span><span class="more-arrow">›</span></button>
             <button class="more-row" onclick="openTasbeeh()"><span class="more-icon">📿</span><span class="more-label" id="moreTasbeehLabel">Tasbeeh Counter</span><span class="more-arrow">›</span></button>
-            <button class="more-row" onclick="toggleMemorizeMode()"><span class="more-icon">🧠</span><span class="more-label" id="moreMemorizeLabel">Memorization</span><span class="more-arrow">›</span></button>
-            <button class="more-row" onclick="openProgress()"><span class="more-icon">📊</span><span class="more-label" id="moreProgressLabel">My Progress</span><span class="more-arrow">›</span></button>
+            <button class="more-row" onclick="openEtiquette()"><span class="more-icon">🕋</span><span class="more-label" id="moreEtiquetteLabel">Etiquette of Dua</span><span class="more-arrow">›</span></button>
+        </div>
 
-            <div class="more-row settings-row">
+        <div class="more-section-title" id="morePreferencesHeader">Preferences</div>
+        <div class="more-list">
+            <label class="more-row settings-row" for="moreThemeSwitch">
                 <span class="more-icon">🌙</span><span class="more-label" id="moreThemeLabel">Theme</span>
-                <button class="more-inline-btn" id="moreThemeToggle" onclick="toggleTheme()">Dark / Light</button>
-            </div>
-            <div class="more-row settings-row">
+                <span class="more-switch-wrap"><input type="checkbox" id="moreThemeSwitch" class="more-switch-input" onchange="toggleTheme()"><span class="more-switch"></span></span>
+            </label>
+            <label class="more-row settings-row" for="moreLanguageSwitch">
                 <span class="more-icon">🌐</span><span class="more-label" id="moreLanguageLabel">Language</span>
-                <button class="more-inline-btn" id="moreLanguageToggle" onclick="toggleLanguage()">Pashto / English</button>
-            </div>
+                <span class="more-switch-wrap"><input type="checkbox" id="moreLanguageSwitch" class="more-switch-input" onchange="toggleLanguage()"><span class="more-switch"></span></span>
+            </label>
             <div class="more-row settings-row">
                 <span class="more-icon">🔤</span><span class="more-label" id="moreFontLabel">Font Size</span>
                 <div class="more-inline-font">
@@ -3141,14 +3130,35 @@
                     <button class="more-inline-btn" onclick="adjustFontSize(0.1)">A+</button>
                 </div>
             </div>
+        </div>
 
-            <button class="more-row" onclick="openAboutFromMore()"><span class="more-icon">📋</span><span class="more-label" id="moreAboutLabel">About</span><span class="more-arrow">›</span></button>
+        <div class="more-section-title" id="moreAppHeader">App</div>
+        <div class="more-list">
+            <button class="more-row" onclick="openProgress()"><span class="more-icon">📊</span><span class="more-label" id="moreProgressLabel">My Progress</span><span class="more-arrow">›</span></button>
             <button class="more-row" onclick="sharePage()"><span class="more-icon">🔗</span><span class="more-label" id="moreShareLabel">Share App</span><span class="more-arrow">›</span></button>
             <button class="more-row" onclick="rateApp()"><span class="more-icon">⭐</span><span class="more-label" id="moreRateLabel">Rate App</span><span class="more-arrow">›</span></button>
+            <button class="more-row" onclick="openAboutFromMore()"><span class="more-icon">📋</span><span class="more-label" id="moreAboutLabel">About</span><span class="more-arrow">›</span></button>
         </div>
-        <div class="more-about" id="moreAboutSection" hidden>
-            <h3 id="aboutHeading">About</h3>
-            <p id="aboutBody">Essential Duas by Engineer Mohammad Falah · Version 1.0.0 · © 2026.</p>
+    </div>
+</div>
+
+<div class="about-panel panel" onclick="if(event.target===this) closeAboutPanel()">
+    <button class="etiquette-close" onclick="closeAboutPanel()" aria-label="Back">‹</button>
+    <div class="about-panel-content" id="aboutPanelContent">
+        <div class="about-logo-mark">
+            <div class="fallah-mark">
+                <div class="fallah-crescent"></div>
+                <span class="fallah-fa">ف</span>
+            </div>
+        </div>
+        <h2 id="aboutAppName">Essential Duas v2.0.0</h2>
+        <p id="aboutDescription">A focused collection of authentic duas from Quran and Sunnah.</p>
+        <div class="about-meta">
+            <div id="aboutDeveloper">Developer: Engineer Mohammad Falah</div>
+            <div id="aboutCopyright">Copyright © 2026</div>
+            <div id="aboutEmail">Contact: support@essentialduas.app</div>
+            <a href="privacy.html" target="_blank" rel="noopener" id="aboutPrivacyLink">Privacy Policy</a>
+            <div id="aboutLicenses">Open-source libraries: Adhan.js and web platform APIs</div>
         </div>
     </div>
 </div>
