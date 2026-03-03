@@ -590,6 +590,16 @@
         main.setAttribute('data-main-mode', nextMode);
     }
 
+    function resetMainContainerScroll() {
+        const main = document.getElementById('mainContainer');
+        if (!main) return;
+        try {
+            main.scrollTo({ top: 0, behavior: 'auto' });
+        } catch (_) {
+            main.scrollTop = 0;
+        }
+    }
+
     function setActiveTabLayer(tabName = 'home') {
         const nextTab = TAB_LAYER_SELECTORS[tabName] ? tabName : 'home';
         const target = document.querySelector(TAB_LAYER_SELECTORS[nextTab]);
@@ -612,6 +622,9 @@
         setBottomNavActive(nextTab);
         const target = document.querySelector(TAB_LAYER_SELECTORS[nextTab]);
         runTabFadeTransition(target);
+        if (nextTab === 'home' || nextTab === 'duas') {
+            requestAnimationFrame(resetMainContainerScroll);
+        }
         updateInAppFabVisibility();
     };
 

@@ -2,6 +2,17 @@
 
 Use this checklist before every release. Mark each item as complete when verified.
 
+## Release Gate (Go / No-Go)
+
+- [ ] Final status: **GO** / **NO-GO**
+- [ ] Critical blockers count: `0`
+- [ ] High-severity issues accepted: `0`
+- [ ] Build under test (`styles.min.css` / `app.min.js` version):
+- [ ] Required device matrix completed (iPhone, Galaxy/Android, Tablet)
+- [ ] Back-navigation policy verified (system back + contextual in-app back)
+- [ ] QA owner sign-off:
+- [ ] Date/time (UTC):
+
 ## Release Info
 
 - [ ] Version / tag:
@@ -16,16 +27,19 @@ Use this checklist before every release. Mark each item as complete when verifie
 ## 1) Navigation & Back Stack
 
 ### Floating Back FAB
+
 - [ ] Open a dua category and scroll down; back FAB appears.
 - [ ] Tap back FAB; returns to home/category grid.
 - [ ] Open Quran reader and scroll; back FAB appears.
 
 ### Swipe Back (left edge)
+
 - [ ] Start swipe within left ~30px edge.
 - [ ] Swipe right (~80px+); app navigates back one in-app state.
 - [ ] Swipe indicator appears during gesture and disappears after release.
 
 ### System/Browser Back Behavior
+
 - [ ] From Quran reader, back returns to Quran tab/list (not exit).
 - [ ] From Quran tab/list, back returns to home.
 - [ ] From category view, back returns to home.
@@ -33,11 +47,13 @@ Use this checklist before every release. Mark each item as complete when verifie
 - [ ] On home, back exits app/browser history (no in-app intercept).
 
 ### Required Back Chains
+
 - [ ] Home → Category View → Dua Detail → back → Category View → back → Home.
 - [ ] Home → Quran Tab → Surah Reader → back → Quran Tab → back → Home.
 - [ ] Home → Prayer Panel → back → Home.
 
 ### Scroll-to-Top FAB
+
 - [ ] In home scroll context, top FAB appears when scrollTop > 300.
 - [ ] In category view scroll context, top FAB appears when scrollTop > 300.
 - [ ] In Quran reader scroll context, top FAB appears when scrollTop > 300.
@@ -49,11 +65,13 @@ Use this checklist before every release. Mark each item as complete when verifie
 ## 2) Quran Reader
 
 ### Surah Loading & Reader State
+
 - [ ] Open Al-Fatiha; ayahs load correctly.
 - [ ] Open Al-Baqarah; incremental/lazy rendering works.
 - [ ] Open At-Tawbah; Bismillah line is hidden as expected.
 
 ### Sticky Header & Spacing
+
 - [ ] Header stays sticky while scrolling.
 - [ ] First ayah is not hidden behind header.
 - [ ] No overlap between sticky header/translation controls and ayah content.
@@ -63,6 +81,7 @@ Use this checklist before every release. Mark each item as complete when verifie
 - [ ] Verify in dark + light themes.
 
 ### Reader Controls & Modes
+
 - [ ] Translation mode toggles (AR+PS+EN, AR+PS, AR+EN, AR only) work.
 - [ ] Reading mode toggles on/off correctly and maintains readable spacing.
 - [ ] Continue reading and recent surah sections update correctly.
@@ -73,11 +92,13 @@ Use this checklist before every release. Mark each item as complete when verifie
 ## 3) Audio Player (Quran)
 
 ### Tap Responsiveness
+
 - [ ] Play on ayah card responds immediately.
 - [ ] Play/Pause control tap target is at least 48x48.
 - [ ] Prev / Next / Stop controls tap reliably.
 
 ### Playback UX
+
 - [ ] Loading spinner appears while buffering.
 - [ ] Pause stops immediately.
 - [ ] Stop resets progress and clears current ayah highlight.
@@ -85,6 +106,7 @@ Use this checklist before every release. Mark each item as complete when verifie
 - [ ] Mini player label updates to current Surah/Ayah.
 
 ### Reciter / Speed / Play-All
+
 - [ ] Reciter switching works and persists.
 - [ ] Speed selection updates playback rate.
 - [ ] Play-all advances ayahs and stops at end correctly.
@@ -94,12 +116,14 @@ Use this checklist before every release. Mark each item as complete when verifie
 ## 4) Prayer Reminders
 
 ### Reminder Settings UI
+
 - [ ] Prayer reminder panel opens and settings render.
 - [ ] Master reminders toggle works.
 - [ ] Per-prayer toggles (Fajr/Dhuhr/Asr/Maghrib/Isha) work.
 - [ ] Reminder offset (At time / 5 / 10 / 15 min) saves and reloads.
 
 ### Sound Selection
+
 - [ ] All reminder sound cards display.
 - [ ] Sound preview button exists for playable options.
 - [ ] Selecting a sound persists after reload.
@@ -108,6 +132,7 @@ Use this checklist before every release. Mark each item as complete when verifie
 - [ ] Per-prayer selections persist.
 
 ### Preview & Test Behavior
+
 - [ ] Preview tap gives visual feedback.
 - [ ] Preview plays selected file.
 - [ ] Test Reminder uses current selected sound path.
@@ -199,17 +224,20 @@ Use this checklist before every release. Mark each item as complete when verifie
 ## 13) Accessibility
 
 ### Keyboard & Focus
+
 - [ ] Interactive elements are reachable via keyboard.
 - [ ] Enter/Space activates card headers and key buttons.
 - [ ] Focus is visible and logical in panels.
 - [ ] Escape closes open overlays/panels where designed.
 
 ### Semantics & ARIA
+
 - [ ] Buttons and toggles have labels/aria-labels.
 - [ ] Toast/alerts use polite live region behavior.
 - [ ] Dialog/panel close controls have accessible names.
 
 ### Touch & Readability
+
 - [ ] Critical touch targets are 48x48 minimum.
 - [ ] Text contrast is acceptable in dark/light modes.
 - [ ] Motion/animations do not block interaction.
@@ -225,7 +253,41 @@ Use this checklist before every release. Mark each item as complete when verifie
 - [ ] Offline checks pass.
 - [ ] EN/PS + dark/light sanity pass.
 
+---
+
+## 15) Device Matrix (Must-Pass)
+
+### iPhone (Safari + Added-to-Home-Screen PWA)
+
+- [ ] Home first screen is fully visible on load (no clipped top card/content).
+- [ ] Duas tab opens at top and search bar is visible immediately.
+- [ ] Scrolling does not hide top content under status/nav areas.
+- [ ] Bottom nav is fully tappable above safe-area inset.
+- [ ] In-app back chains work even if browser back UI is not visible.
+
+### Galaxy / Android (Chrome + gesture back)
+
+- [ ] Left/right edge system gesture back triggers one-step in-app history.
+- [ ] Home → Duas → Category → Dua detail back chain is correct.
+- [ ] Home route does not trap back; second back exits as expected.
+- [ ] No accidental horizontal clipping/overflow in any tab.
+
+### Tablet (iPad + Android tablet, portrait + landscape)
+
+- [ ] Home layout remains readable with no oversized spacing gaps.
+- [ ] Duas category grid uses tablet columns correctly and cards are not cut off.
+- [ ] Search bar remains visible and sticky behavior is correct in Duas mode.
+- [ ] Bottom nav and top nav remain anchored and non-overlapping in both orientations.
+
+### Back Navigation Policy (Expected Product Behavior)
+
+- [ ] Keep contextual back controls where they serve in-app flow: category view (`Back to categories`), panel close/back controls, and Quran reader/context back paths.
+- [ ] Do not add a global always-visible back button on Home.
+- [ ] System/browser back should continue to work as primary platform back mechanism.
+- [ ] If platform back UI is absent (some iOS contexts), in-app contextual back still allows full return to Home.
+
 ## Final Sign-off
+
 - [ ] All blockers resolved.
 - [ ] Release approved for deployment.
 
@@ -236,6 +298,7 @@ Use this checklist before every release. Mark each item as complete when verifie
 - Prior automated smoke baseline: **11 / 11 pass, 0 fail**
 
 Manual walkthrough results (today):
+
 - ✅ Prayer panel opens
 - ✅ `Prayer Times` title renders in EN
 - ✅ `Next Prayer` label renders in EN
@@ -243,17 +306,32 @@ Manual walkthrough results (today):
 - ✅ Quran panel opens with redesigned controls present (`quran-reader-tools`, `quranPlayAll`, `quranSpeedCycle`, mini-player)
 - ✅ Reminder sound UI renders (8 cards total = 7 distinct audio options + 1 Silent fallback)
 - ✅ App bundle references all 7 reminder MP3 files:
-	- `audio/reminders/adhan-mishary.mp3`
-	- `audio/reminders/adhan-abdulbasit.mp3`
-	- `audio/reminders/adhan-short.mp3`
-	- `audio/reminders/takbeer.mp3`
-	- `audio/reminders/nasheed-soft.mp3`
-	- `audio/reminders/bell-chime.mp3`
-	- `audio/reminders/soft-ding.mp3`
+  - `audio/reminders/adhan-mishary.mp3`
+  - `audio/reminders/adhan-abdulbasit.mp3`
+  - `audio/reminders/adhan-short.mp3`
+  - `audio/reminders/takbeer.mp3`
+  - `audio/reminders/nasheed-soft.mp3`
+  - `audio/reminders/bell-chime.mp3`
+  - `audio/reminders/soft-ding.mp3`
 
 Observed caveats during local manual run (non-blocking for release decision due clean smoke baseline):
+
 - ⚠️ Prayer row sample selector (`.prayer-time-name`) did not render in the local session before timeout (likely data/load timing dependent).
 - ⚠️ City search shell remained visible immediately after city selection in this local session, while smoke baseline previously validated chip-only behavior and Change→search flow.
 
 Release decision:
+
 - ✅ Approved based on clean smoke suite (11/11), rebuilt minified assets, updated service-worker cache, and manual walkthrough confirmations above.
+
+### QA Sign-off Addendum — 2026-03-03 (Responsive + Navigation)
+
+- Build under test: `index.html` loading `styles.min.css?v=20260303p` and `app.min.js?v=20260303p`
+- Scope: iPhone first-screen visibility, Duas search visibility, viewport/safe-area behavior, Galaxy gesture-back behavior, tablet layout coverage.
+
+Required pass criteria for this addendum:
+
+- [ ] iPhone main page renders full first viewport with no clipping.
+- [ ] Duas search input is visible on entry to Duas tab.
+- [ ] Tab switches (`Home`/`Duas`) reset scroll to top consistently.
+- [ ] Galaxy gesture back follows in-app history chain correctly.
+- [ ] Tablet portrait/landscape layout has no overlap or truncated cards.

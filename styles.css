@@ -5498,7 +5498,9 @@
             left: 0;
             right: 0;
             top: calc(var(--nav-height) + var(--safe-top) + 2px);
-            height: calc(100vh - var(--nav-height) - var(--safe-top) - var(--bottom-nav-height) - var(--safe-bottom) - 2px);
+            bottom: calc(var(--bottom-nav-height) + var(--safe-bottom));
+            height: auto;
+            min-height: 0;
             overflow: hidden;
             background: var(--bg-dark);
             isolation: isolate;
@@ -5522,6 +5524,22 @@
             z-index: 1;
         }
 
+        .app-content > #mainContainer.home-panel,
+        .app-content > .routine-panel,
+        .app-content > .quran-panel,
+        .app-content > .tasbeeh-panel,
+        .app-content > .prayer-panel,
+        .app-content > .more-panel,
+        .app-content > .about-panel,
+        .app-content > .etiquette-panel,
+        .app-content > .progress-panel {
+            position: absolute !important;
+            top: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            left: 0 !important;
+        }
+
         .app-content .panel.active {
             opacity: 1;
             pointer-events: auto;
@@ -5538,7 +5556,7 @@
             max-width: 660px;
             margin: 0 auto;
             width: 100%;
-            padding: 12px 16px 20px;
+            padding: 12px 16px calc(var(--safe-bottom) + 28px);
         }
 
         .home-dashboard {
@@ -5740,6 +5758,16 @@
 
         .duas-tab-shell { display: none; }
         .duas-tab-search-wrap { margin-bottom: 8px; }
+        #mainContainer[data-main-mode="duas"] .duas-tab-search-wrap {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            padding: 2px 0 8px;
+            background: var(--bg-dark);
+        }
+        [data-theme='light'] #mainContainer[data-main-mode="duas"] .duas-tab-search-wrap {
+            background: var(--bg-light);
+        }
         .duas-tab-search {
             width: 100%;
             border-radius: 12px;
@@ -5764,6 +5792,26 @@
         #mainContainer[data-main-mode="home"] .duas-tab-shell { display: none !important; }
         #mainContainer[data-main-mode="duas"] .home-dashboard { display: none !important; }
         #mainContainer[data-main-mode="duas"] .duas-tab-shell { display: block !important; }
+
+        .bottom-nav {
+            min-height: calc(var(--bottom-nav-height) + var(--safe-bottom));
+        }
+
+        @media (min-width: 768px) {
+            #mainContainer.container {
+                max-width: 920px;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            #mainContainer[data-main-mode="duas"] .category-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            #mainContainer[data-main-mode="duas"] .cat-card.featured {
+                grid-column: 1 / -1;
+            }
+        }
 
         .more-panel-content {
             max-width: 620px;
