@@ -618,7 +618,6 @@
     let inAppCurrentRoute = 'home';
     const IN_APP_HISTORY_FLAG = '__essential_duas_in_app';
     let inAppHistorySuppressed = false;
-    let inAppTopVisible = false;
 
     const IN_APP_VIEWS = {
         HOME: 'home',
@@ -839,24 +838,8 @@
 
     function updateInAppFabVisibility() {
         const backBtn = document.getElementById('inAppBackBtn');
-        const topBtn = document.getElementById('inAppTopBtn');
         const route = getInAppRoute();
         if (backBtn) backBtn.classList.toggle('visible', shouldShowBackFab(route));
-
-        const scroller = getActiveScrollableElement();
-        const scrollTop = scroller === window
-            ? (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0)
-            : Math.max(
-                scroller.scrollTop || 0,
-                window.scrollY || 0,
-                document.documentElement.scrollTop || 0,
-                document.body.scrollTop || 0
-            );
-
-        if (scrollTop > 500) inAppTopVisible = true;
-        else if (scrollTop < 100) inAppTopVisible = false;
-
-        if (topBtn) topBtn.classList.toggle('visible', inAppTopVisible);
     }
 
     function recordInAppRoute(push = false, forcedState = null) {
@@ -978,7 +961,6 @@
 
     function initInAppNavigationUX() {
         const backBtn = document.getElementById('inAppBackBtn');
-        const topBtn = document.getElementById('inAppTopBtn');
 
         if (backBtn && backBtn.dataset.bound !== '1') {
             backBtn.addEventListener('touchstart', (event) => {
@@ -987,15 +969,6 @@
             }, { passive: false });
             backBtn.addEventListener('click', triggerInAppBack);
             backBtn.dataset.bound = '1';
-        }
-
-        if (topBtn && topBtn.dataset.bound !== '1') {
-            topBtn.addEventListener('touchstart', (event) => {
-                event.preventDefault();
-                scrollActiveViewToTop();
-            }, { passive: false });
-            topBtn.addEventListener('click', scrollActiveViewToTop);
-            topBtn.dataset.bound = '1';
         }
 
         window.addEventListener('popstate', (event) => {
@@ -2408,7 +2381,7 @@ window.filterCategory = function(cat, btn) {
 
     function formatDashboardDate() {
         const isPS = isPashtoMode();
-        const hijriLocale = isPS ? 'ps-AF-u-ca-islamic' : 'en-US-u-ca-islamic';
+        const hijriLocale = isPS ? 'ar-u-ca-islamic-umalqura' : 'en-u-ca-islamic-umalqura';
         const gregLocale = isPS ? 'ps-AF' : 'en-US';
         const now = new Date();
         try {
