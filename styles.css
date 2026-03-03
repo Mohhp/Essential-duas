@@ -1673,14 +1673,9 @@
             transition: opacity 0.45s ease, visibility 0.45s ease, transform 0.45s var(--transition-smooth);
         }
         .prayer-panel.active { opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
-        .prayer-panel .panel-back-btn {
-            align-self: flex-start;
-            margin-top: 2px;
-            margin-bottom: 6px;
-        }
         .prayer-panel-content {
             max-width: 500px; margin: 0 auto; padding-top: 0;
-            height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 12px);
+            height: 100%;
             display: flex;
             flex-direction: column;
             min-height: 0;
@@ -1742,7 +1737,8 @@
             display: flex;
             flex-direction: column;
             opacity: 1;
-            overflow-y: visible;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             padding-bottom: 6px;
         }
@@ -1752,7 +1748,7 @@
             gap: 0.45rem;
         }
         .prayer-tab-times {
-            padding-bottom: calc(var(--safe-bottom) + 56px);
+            padding-bottom: calc(var(--safe-bottom) + var(--bottom-nav-height) + 28px);
         }
         .prayer-location-bar {
             display: flex; align-items: center; justify-content: center;
@@ -3516,7 +3512,9 @@
         .dhikr-selector {
             display: flex; gap: 8px; overflow-x: auto;
             width: 100%; max-width: 400px;
-            padding: 4px 2px 12px; margin-bottom: 1.2rem;
+            min-height: 72px;
+            overflow-y: visible;
+            padding: 8px 2px 14px; margin-bottom: 1.2rem;
             scrollbar-width: none; -ms-overflow-style: none;
             scroll-snap-type: x mandatory;
         }
@@ -3524,11 +3522,12 @@
         .dhikr-option {
             flex-shrink: 0; scroll-snap-align: center;
             display: flex; flex-direction: column; align-items: center;
+            justify-content: center;
             gap: 3px; padding: 10px 14px; border-radius: var(--radius-lg);
             background: rgba(46, 196, 122, 0.03);
             border: 1px solid rgba(46, 196, 122, 0.08);
             cursor: pointer; transition: all 0.3s var(--transition-smooth);
-            min-width: 72px; text-align: center;
+            min-width: 72px; min-height: 56px; text-align: center;
             -webkit-user-select: none; user-select: none;
         }
         .dhikr-option:active { transform: scale(0.96); }
@@ -3539,7 +3538,7 @@
         }
         .dhikr-option-ar {
             font-family: var(--font-arabic); font-size: 0.85rem;
-            color: var(--gold-light); direction: rtl; line-height: 1.4;
+            color: var(--gold-light); direction: rtl; line-height: 1.8;
             white-space: nowrap;
         }
         .dhikr-option.active .dhikr-option-ar { color: var(--emerald-light); }
