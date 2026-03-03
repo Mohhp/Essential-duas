@@ -602,10 +602,6 @@
             --tab-accent: #c49b2a;
             --tab-accent-rgb: 196, 155, 42;
         }
-        .bottom-nav-item[data-nav='tasbeeh'] {
-            --tab-accent: #8d6ad9;
-            --tab-accent-rgb: 141, 106, 217;
-        }
         .bottom-nav-item[data-nav='more'] {
             --tab-accent: #5a6a7a;
             --tab-accent-rgb: 90, 106, 122;

@@ -580,7 +580,6 @@
         home: '#mainContainer',
         duas: '#mainContainer',
         quran: '.quran-panel',
-        tasbeeh: '.tasbeeh-panel',
         more: '.more-panel'
     };
 
@@ -1903,7 +1902,7 @@ window.filterCategory = function(cat, btn) {
 
     window.openTasbeeh = function() {
         const tp = document.querySelector('.tasbeeh-panel');
-        if (tp) showAuxPanel('.tasbeeh-panel', 'tasbeeh');
+        if (tp) showAuxPanel('.tasbeeh-panel');
         if (tp) tp.scrollTop = 0;
         // Restore last selected dhikr
         const saved = parseInt(localStorage.getItem('crown_dhikr_selected') || '0', 10);
@@ -1915,6 +1914,15 @@ window.filterCategory = function(cat, btn) {
         const tt = document.getElementById('tasbeehTargetLabel');
         if (tt) tt.textContent = formatTasbeehTargetLabel(tasbeehTarget);
         updateTasbeehSoundToggle();
+        const tapBtn = document.querySelector('.tasbeeh-tap-btn');
+        if (tapBtn && !tapBtn.dataset.inputBound) {
+            tapBtn.addEventListener('pointerdown', (event) => {
+                if (event.pointerType === 'mouse') return;
+                event.preventDefault();
+                window.tapTasbeeh(event);
+            }, { passive: false });
+            tapBtn.dataset.inputBound = '1';
+        }
         const closeBtn = document.querySelector('.tasbeeh-panel .panel-back-btn');
         if (closeBtn) closeBtn.focus();
         recordInAppRoute(true);
@@ -1937,7 +1945,13 @@ window.filterCategory = function(cat, btn) {
         recordInAppRoute(false);
     };
 
+    let lastTasbeehTapAt = 0;
+
     window.tapTasbeeh = function(event) {
+        const nowTap = Date.now();
+        if (nowTap - lastTasbeehTapAt < 220) return;
+        lastTasbeehTapAt = nowTap;
+
         tasbeehCount++;
         const display = document.getElementById('tasbeehDisplay');
         const btn = document.querySelector('.tasbeeh-tap-btn');
@@ -2692,7 +2706,6 @@ window.filterCategory = function(cat, btn) {
             ['tabHomeLabel', ui.tabHome],
             ['tabQuranLabel', ui.tabQuran],
             ['tabDuasLabel', ui.tabDuas],
-            ['tabTasbeehLabel', ui.tasbeeh],
             ['tabMoreLabel', ui.tabMore],
             ['moreTitle', ui.more],
             ['moreFeaturesHeader', ui.features],
@@ -3001,9 +3014,6 @@ window.filterCategory = function(cat, btn) {
                 break;
             case 'quran':
                 openQuran();
-                break;
-            case 'tasbeeh':
-                openTasbeeh();
                 break;
             case 'more':
                 openMorePanel();
