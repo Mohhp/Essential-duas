@@ -2447,8 +2447,36 @@ window.filterCategory = function(cat, btn) {
                 year: 'numeric'
             }).format(now);
 
+            const pashtoGregorianMonths = {
+                january: 'جنوري',
+                february: 'فبروري',
+                march: 'مارچ',
+                april: 'اپریل',
+                may: 'مۍ',
+                june: 'جون',
+                july: 'جولای',
+                august: 'اګست',
+                september: 'سپتمبر',
+                october: 'اکتوبر',
+                november: 'نومبر',
+                december: 'دسمبر'
+            };
+
+            const localizePashtoGregorian = (value) => {
+                const cleaned = String(value || '').trim();
+                const match = cleaned.match(/^([^\d\s,،]+)\s+([\d۰-۹]+)[,،]?\s*([\d۰-۹]+)$/u);
+                if (!match) return localizeDigits(cleaned);
+                const monthEn = match[1].toLowerCase();
+                const day = localizeDigits(match[2]);
+                const year = localizeDigits(match[3]);
+                const monthPs = pashtoGregorianMonths[monthEn] || match[1];
+                return `${monthPs} ${day}، ${year}`;
+            };
+
             if (isPS) {
-                return `${monthName} ${localizeDigits(hijriDay)}، ${localizeDigits(hijriYear)} · ${greg}`;
+                const hijriPart = `${monthName} ${localizeDigits(hijriDay)}، ${localizeDigits(hijriYear)}`;
+                const gregPart = localizePashtoGregorian(greg);
+                return `<span dir="rtl">${hijriPart} · ${gregPart}</span>`;
             }
             return `${monthName} ${hijriDay}, ${hijriYear} · ${greg}`;
         } catch (_) {
@@ -2456,6 +2484,9 @@ window.filterCategory = function(cat, btn) {
             const gregFallback = new Date().toLocaleDateString(gregLocale, {
                 month: 'long', day: 'numeric', year: 'numeric'
             });
+            if (isPS) {
+                return `<span dir="rtl">${hijriFallback} · ${localizeDigits(gregFallback)}</span>`;
+            }
             return `${hijriFallback} · ${gregFallback}`;
         }
     }
@@ -2469,7 +2500,9 @@ window.filterCategory = function(cat, btn) {
         if (hour < 12) greeting.textContent = ui.goodMorning;
         else if (hour < 17) greeting.textContent = ui.goodAfternoon;
         else greeting.textContent = ui.goodEvening;
-        dateEl.textContent = formatDashboardDate();
+        const formattedDate = formatDashboardDate();
+        if (isPashtoMode()) dateEl.innerHTML = formattedDate;
+        else dateEl.textContent = formattedDate;
     }
 
     function getSmartSuggestion() {
@@ -6247,7 +6280,7 @@ window.filterCategory = function(cat, btn) {
     window.openPrayer = function() {
         const pp = document.querySelector('.prayer-panel');
         if (pp) showAuxPanel('.prayer-panel');
-        const closeBtn = pp?.querySelector('.etiquette-close');
+        const closeBtn = pp?.querySelector('.prayer-close');
         if (closeBtn) closeBtn.focus();
         initReminderControls();
         initCitySelector();
@@ -6434,27 +6467,20 @@ window.filterCategory = function(cat, btn) {
             const isCurrent = current === name;
             const isNext = next === name;
             const reminderEnabled = REMINDER_PRAYERS.includes(name) && settings.enabled && !!settings.prayers[name];
-            const scheduledReminder = activePrayerReminderSchedule[name] || null;
-            const reminderFireText = scheduledReminder ? formatDisplayTime(new Date(scheduledReminder.triggerAt), `reminder-badge-${name}`) : '';
-            const reminderBadgeText = reminderEnabled
-                ? (scheduledReminder && reminderFireText && reminderFireText !== timeStr ? `🔔 ${reminderFireText}` : '🔔')
-                : '';
-            if (reminderBadgeText) {
-                console.log('TIME STRING:', reminderBadgeText, { context: `reminder-badge-${name}` });
-            }
             const cls = isCurrent ? ' current-prayer' : isNext ? ' next-prayer' : '';
             const uiText = getPrayerUiText();
-            return `<div class="prayer-time-row${cls}">
-                <span class="prayer-time-main">
-                    <span class="prayer-time-icon">${PRAYER_ICONS[name]}</span>
-                    <span class="prayer-time-name">${getPrayerLabel(name)}</span>
-                </span>
-                <span class="prayer-time-meta">
-                    ${reminderEnabled ? `<span class="prayer-reminder-time" title="${scheduledReminder ? `Reminder ${scheduledReminder.offsetMinutes} min before` : 'Reminder enabled'}">${reminderBadgeText}</span>` : ''}
-                    ${isCurrent ? `<span class="prayer-now-badge">${uiText.now}</span>` : ''}
-                    ${isNext ? `<span class="prayer-next-badge">${uiText.next}</span>` : ''}
-                    <span class="prayer-time-value">${timeStr}</span>
-                </span>
+            const badge = isCurrent
+                ? `<span class="prayer-badge">${uiText.now}</span>`
+                : isNext
+                    ? `<span class="prayer-badge">${uiText.next}</span>`
+                    : '<span class="prayer-badge prayer-badge-empty" aria-hidden="true"></span>';
+
+            return `<div class="prayer-row${cls}">
+                <span class="prayer-icon">${PRAYER_ICONS[name]}</span>
+                <span class="prayer-name">${getPrayerLabel(name)}</span>
+                ${badge}
+                <span class="prayer-time">${timeStr}</span>
+                <span class="prayer-bell" title="${reminderEnabled ? 'Reminder ON' : 'Reminder OFF'}">${reminderEnabled ? '🔔' : '🔕'}</span>
             </div>`;
         }).join('');
     }
