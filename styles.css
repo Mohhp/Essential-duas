@@ -3477,7 +3477,7 @@
             color: rgba(46, 196, 122, 0.7); margin-bottom: 1rem;
         }
         .tasbeeh-tap-btn {
-            --tap-size: min(64vw, 220px);
+            --tap-size: clamp(220px, 78vw, 300px);
             width: var(--tap-size);
             height: var(--tap-size);
             aspect-ratio: 1 / 1;
@@ -5104,7 +5104,7 @@
             .dua-title { font-size: calc(0.72rem * var(--font-scale)); }
             .container { padding-left: 8px; padding-right: 8px; }
             .tasbeeh-count-display { font-size: 3.5rem; }
-            .tasbeeh-tap-btn { --tap-size: min(58vw, 170px); width: var(--tap-size); height: var(--tap-size); }
+            .tasbeeh-tap-btn { --tap-size: clamp(210px, 74vw, 260px); width: var(--tap-size); height: var(--tap-size); }
 
             /* Nav overflow */
             .nav-actions { position: relative; }
