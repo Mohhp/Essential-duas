@@ -2277,11 +2277,11 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 16px;
-            height: calc(min(46vw, 160px) - 70px);
-            margin-left: -8px;
-            margin-top: calc((min(46vw, 160px) - 70px) * -1);
-            transform-origin: center calc(min(46vw, 160px) - 70px);
+            width: 14px;
+            height: calc(min(46vw, 160px) - 84px);
+            margin-left: -7px;
+            margin-top: calc((min(46vw, 160px) - 84px) * -1);
+            transform-origin: center calc(min(46vw, 160px) - 84px);
             transition: transform 500ms ease-out;
             will-change: transform;
             z-index: 7;
@@ -2292,22 +2292,22 @@
         }
         .qibla-arrow-head {
             position: absolute;
-            top: -12px;
+            top: -10px;
             left: 50%;
             width: 0;
             height: 0;
-            border-left: 9px solid transparent;
-            border-right: 9px solid transparent;
-            border-bottom: 18px solid #e6c270;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 13px solid #e6c270;
             transform: translateX(-50%);
             filter: drop-shadow(0 0 7px rgba(201, 168, 76, 0.46));
         }
         .qibla-arrow-shaft {
             position: absolute;
-            top: 6px;
+            top: 5px;
             bottom: 0;
             left: 50%;
-            width: 8px;
+            width: 5px;
             transform: translateX(-50%);
             border-radius: 999px;
             background:
@@ -3597,11 +3597,11 @@
         .tasbeeh-ctrl-btn {
             padding: 8px 14px; border-radius: 20px;
             background: rgba(46, 196, 122, 0.06);
-            width: 14px;
-            height: calc(min(46vw, 160px) - 84px);
-            margin-left: -7px;
-            margin-top: calc((min(46vw, 160px) - 84px) * -1);
-            transform-origin: center calc(min(46vw, 160px) - 84px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-subtle);
+            font-family: var(--font-title); font-size: 0.6rem;
+            letter-spacing: 0.5px; text-transform: none;
+            cursor: pointer; transition: all 0.3s var(--transition-smooth);
         }
         .tasbeeh-ctrl-btn:hover {
             background: rgba(46, 196, 122, 0.1); color: var(--emerald-light);
@@ -3612,22 +3612,22 @@
         .tasbeeh-preset {
             padding: 10px 18px; border-radius: 50px;
             background: rgba(46, 196, 122, 0.04);
-            top: -10px;
+            border: 1px solid rgba(46, 196, 122, 0.08);
             color: var(--text-subtle);
             font-family: var(--font-title); font-size: 0.65rem;
             cursor: pointer; transition: all 0.25s var(--transition-smooth);
-            border-left: 7px solid transparent;
-            border-right: 7px solid transparent;
-            border-bottom: 13px solid #e6c270;
+        }
+        .tasbeeh-preset:hover, .tasbeeh-preset.active {
+            border-color: rgba(46, 196, 122, 0.3); color: var(--emerald-light);
             background: rgba(46, 196, 122, 0.08);
         }
 
         /* Dhikr Selector */
         .dhikr-selector {
-            top: 5px;
+            display: flex; gap: 8px; overflow-x: auto;
             width: 100%; max-width: 400px;
             min-height: 72px;
-            width: 5px;
+            overflow-y: visible;
             padding: 8px 2px 14px; margin-bottom: 1.2rem;
             scrollbar-width: none; -ms-overflow-style: none;
             scroll-snap-type: x mandatory;
