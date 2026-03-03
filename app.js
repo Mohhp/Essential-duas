@@ -612,6 +612,7 @@
         setBottomNavActive(nextTab);
         const target = document.querySelector(TAB_LAYER_SELECTORS[nextTab]);
         runTabFadeTransition(target);
+        updateInAppFabVisibility();
     };
 
     let inAppCurrentRoute = 'home';
@@ -823,7 +824,16 @@
     function shouldShowBackFab(route, state = null) {
         const effectiveState = state || getInAppStateFromDom();
         if (!route || route === IN_APP_VIEWS.HOME || route === IN_APP_VIEWS.DUAS_TAB || route === IN_APP_VIEWS.QURAN_TAB) return false;
-        if (route === IN_APP_VIEWS.PANEL) return effectiveState?.panel !== 'more';
+        if (route === IN_APP_VIEWS.PANEL) {
+            const panelName = effectiveState?.panel;
+            return panelName === 'prayer'
+                || panelName === 'routine'
+                || panelName === 'tasbeeh'
+                || panelName === 'about'
+                || panelName === 'etiquette'
+                || panelName === 'progress'
+                || panelName === 'bookmarks';
+        }
         return true;
     }
 
@@ -2412,30 +2422,26 @@ window.filterCategory = function(cat, btn) {
                 day: 'numeric',
                 year: 'numeric'
             }).format(now);
-            return { hijri, greg };
+            return `${hijri} · ${greg}`;
         } catch (_) {
-            return {
-                hijri: isPS ? 'هجري نېټه' : 'Hijri date',
-                greg: new Date().toLocaleDateString(gregLocale, {
-                    month: 'long', day: 'numeric', year: 'numeric'
-                })
-            };
+            const hijriFallback = isPS ? 'هجري نېټه' : 'Hijri date';
+            const gregFallback = new Date().toLocaleDateString(gregLocale, {
+                month: 'long', day: 'numeric', year: 'numeric'
+            });
+            return `${hijriFallback} · ${gregFallback}`;
         }
     }
 
     function refreshHomeDashboardGreeting() {
         const greeting = document.getElementById('dashboardGreeting');
         const dateEl = document.getElementById('dashboardDate');
-        const dateSecondaryEl = document.getElementById('dashboardDateSecondary');
         if (!greeting || !dateEl) return;
         const ui = getDashboardText();
         const hour = new Date().getHours();
         if (hour < 12) greeting.textContent = ui.goodMorning;
         else if (hour < 17) greeting.textContent = ui.goodAfternoon;
         else greeting.textContent = ui.goodEvening;
-        const lines = formatDashboardDate();
-        dateEl.textContent = lines.hijri;
-        if (dateSecondaryEl) dateSecondaryEl.textContent = lines.greg;
+        dateEl.textContent = formatDashboardDate();
     }
 
     function getSmartSuggestion() {
@@ -2449,38 +2455,18 @@ window.filterCategory = function(cat, btn) {
             const surah = lastRead.surahName || `Surah ${lastRead.surahNumber}`;
             return {
                 title: ui.continueQuran,
-                sub: `${surah} — Ayah ${localizeDigits(lastRead.ayahNumber || 1)}`,
-                action: () => openQuranSurah(lastRead.surahNumber, lastRead.ayahNumber || 1)
+                sub: `${ui.continueQuran} · ${surah} Ayah ${localizeDigits(lastRead.ayahNumber || 1)}`,
+                action: () => {
+                    switchTab('quran');
+                    openQuranSurah(lastRead.surahNumber, lastRead.ayahNumber || 1);
+                }
             };
         }
         return {
             title: ui.continueQuran,
-            sub: isPashtoMode() ? 'د سورتونو لېست پرانیزئ' : 'Open surah list',
+            sub: isPashtoMode() ? 'د قرآن دوام · د سورتونو لېست پرانیزئ' : 'Continue Quran · Open surah list',
             action: () => switchTab('quran')
         };
-    }
-
-    function refreshHomeReminderDebug() {
-        const debugEl = document.getElementById('dashboardReminderDebug');
-        if (!debugEl) return;
-        const settings = loadReminderSettings();
-        if (!settings.enabled) {
-            debugEl.textContent = isPashtoMode() ? 'یادونه: بنده' : 'Reminder: OFF';
-            return;
-        }
-        const nowTs = Date.now();
-        const nextEntry = Object.entries(activePrayerReminderSchedule)
-            .map(([name, details]) => ({ name, details }))
-            .filter(({ details }) => details?.triggerAt && details.triggerAt > nowTs)
-            .sort((a, b) => a.details.triggerAt - b.details.triggerAt)[0];
-        if (!nextEntry) {
-            debugEl.textContent = isPashtoMode() ? 'یادونه: فعاله' : 'Reminder: ON';
-            return;
-        }
-        const timeText = formatDisplayTime(new Date(nextEntry.details.triggerAt), `home-debug-${nextEntry.name}`);
-        debugEl.textContent = isPashtoMode()
-            ? `یادونه: فعاله — ${timeText}`
-            : `Reminder: ON — fires at ${timeText}`;
     }
 
     function refreshHomeNextPrayerCard() {
@@ -2536,13 +2522,11 @@ window.filterCategory = function(cat, btn) {
     }
 
     function refreshHomeSmartSuggestion() {
-        const title = document.getElementById('dashboardSuggestionTitle');
         const sub = document.getElementById('dashboardSuggestionSub');
         const cta = document.getElementById('dashboardSuggestionCta');
-        if (!title || !sub || !cta) return;
+        if (!sub || !cta) return;
         const ui = getDashboardText();
         const suggestion = getSmartSuggestion();
-        title.textContent = suggestion.title;
         sub.textContent = suggestion.sub || '';
         cta.textContent = ui.continue;
         window.__dashboardSuggestionAction = suggestion.action;
@@ -2559,6 +2543,25 @@ window.filterCategory = function(cat, btn) {
             window.__dashboardSuggestionAction();
         }
     };
+
+    function bindDashboardSuggestionCard() {
+        const card = document.getElementById('dashboardSuggestionCard');
+        if (!card || card.dataset.bound === '1') return;
+
+        const trigger = () => {
+            card.classList.add('touch-feedback');
+            setTimeout(() => card.classList.remove('touch-feedback'), 140);
+            window.openDashboardSuggestion();
+        };
+
+        card.style.cursor = 'pointer';
+        card.addEventListener('touchstart', (event) => {
+            event.preventDefault();
+            trigger();
+        }, { passive: false });
+        card.addEventListener('click', trigger);
+        card.dataset.bound = '1';
+    }
 
     window.openPrayerFromDashboard = function() {
         openPrayer();
@@ -2612,7 +2615,6 @@ window.filterCategory = function(cat, btn) {
         refreshDashboardLabels();
         refreshHomeDashboardGreeting();
         refreshHomeNextPrayerCard();
-        refreshHomeReminderDebug();
         refreshHomeSmartSuggestion();
         refreshHomeDailyTip();
         refreshHomeDashboardProgress();
@@ -2621,10 +2623,10 @@ window.filterCategory = function(cat, btn) {
 
     function initHomeDashboard() {
         refreshHomeDashboard();
+        bindDashboardSuggestionCard();
         if (!window.__dashboardRefreshTimer) {
             window.__dashboardRefreshTimer = setInterval(() => {
                 refreshHomeNextPrayerCard();
-                refreshHomeReminderDebug();
             }, 30000);
         }
     }
@@ -3789,66 +3791,6 @@ window.filterCategory = function(cat, btn) {
         syncMorePreferenceControls();
         showToast(isLight ? 'Dark Mode' : 'Light Mode');
     };
-
-    // ===== NAV OVERFLOW MENU =====
-    function positionNavOverflowMenu() {
-        const menu = document.getElementById('navOverflowMenu');
-        if (!menu || !menu.classList.contains('open')) return;
-
-        menu.style.left = '';
-        menu.style.right = '';
-
-        const viewportPadding = 4;
-        let rect = menu.getBoundingClientRect();
-
-        if (rect.right > (window.innerWidth - viewportPadding)) {
-            menu.style.right = 'auto';
-            menu.style.left = '0';
-            rect = menu.getBoundingClientRect();
-        }
-
-        if (rect.left < viewportPadding) {
-            menu.style.left = `${viewportPadding}px`;
-        }
-    }
-
-    window.toggleNavOverflow = function(e) {
-        e.stopPropagation();
-        const menu = document.getElementById('navOverflowMenu');
-        const btn = document.getElementById('navOverflowBtn');
-        const isOpen = menu.classList.toggle('open');
-        btn.setAttribute('aria-expanded', isOpen);
-        if (isOpen) {
-            requestAnimationFrame(positionNavOverflowMenu);
-        } else {
-            menu.style.left = '';
-            menu.style.right = '';
-        }
-    };
-    window.closeNavOverflow = function() {
-        const menu = document.getElementById('navOverflowMenu');
-        const btn = document.getElementById('navOverflowBtn');
-        if (menu) {
-            menu.classList.remove('open');
-            menu.style.left = '';
-            menu.style.right = '';
-        }
-        if (btn) btn.setAttribute('aria-expanded', 'false');
-    };
-
-    window.addEventListener('resize', positionNavOverflowMenu);
-    window.addEventListener('orientationchange', positionNavOverflowMenu);
-
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('navOverflowMenu');
-        const btn = document.getElementById('navOverflowBtn');
-        if (menu && !menu.contains(e.target) && e.target !== btn) {
-            menu.classList.remove('open');
-            menu.style.left = '';
-            menu.style.right = '';
-            if (btn) btn.setAttribute('aria-expanded', 'false');
-        }
-    });
 
     // ===== MEMORIZATION MODE =====
     let flashcardQueue = [];
@@ -6849,7 +6791,7 @@ window.filterCategory = function(cat, btn) {
             syncPrayerReminderStateToServiceWorker('poll-fired');
             schedulePrayerNotifications();
         }
-        refreshHomeReminderDebug();
+        refreshHomeNextPrayerCard();
     }
 
     function startPrayerReminderPolling() {
@@ -7092,23 +7034,24 @@ window.filterCategory = function(cat, btn) {
     }
 
     function runReminderTestInTenSeconds() {
-        const uiText = getPrayerUiText();
-        const samplePrayer = getNextPrayer(new Date()) || 'fajr';
-        const localizedPrayer = getPrayerLabel(samplePrayer);
-        showToast(isPashtoMode() ? 'ازمویښتي یادونه په ۱۰ ثانیو کې' : 'Test reminder in 10 seconds');
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission().catch(() => {});
+        }
+
+        alert('Test reminder set — will fire in 10 seconds');
 
         setTimeout(() => {
-            playReminderSound(resolveReminderSoundId(samplePrayer));
-            requestNotificationPermissionIfNeeded().then((granted) => {
-                if (!granted) return;
-                sendSystemNotification(`${PRAYER_ICONS[samplePrayer]} ${uiText.testReminder}`, {
-                    body: uiText.testReminderBody.replace('{prayer}', localizedPrayer),
-                    icon: 'icon-192.png',
-                    badge: 'icon-192.png',
-                    tag: 'prayer-test-reminder-10s',
-                    renotify: true
+            const audio = new Audio('audio/reminders/adhan-alafasy.mp3');
+            audio.play().catch(() => {});
+
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Prayer Time', {
+                    body: 'Test reminder - Dhuhr',
+                    icon: 'icon-192.png'
                 });
-            });
+            }
+
+            alert('REMINDER FIRED!');
         }, 10000);
     }
 
@@ -7246,7 +7189,7 @@ window.filterCategory = function(cat, btn) {
         startPrayerReminderPolling();
         renderPrayerGrid();
         renderPrayerReminderStatusLine();
-        refreshHomeReminderDebug();
+        refreshHomeNextPrayerCard();
         syncPrayerReminderStateToServiceWorker('schedule');
         scheduleReminderMidnightRefresh();
     }
@@ -7267,7 +7210,7 @@ window.filterCategory = function(cat, btn) {
         clearFiredReminderMarks();
         renderPrayerGrid();
         renderPrayerReminderStatusLine();
-        refreshHomeReminderDebug();
+        refreshHomeNextPrayerCard();
         syncPrayerReminderStateToServiceWorker('clear');
     }
 

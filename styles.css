@@ -526,7 +526,7 @@
             transition: all 0.3s var(--transition-smooth);
             border: none;
             background: transparent;
-            color: rgba(225, 238, 221, 0.56); font-size: 0.63rem;
+            color: rgba(255, 255, 255, 0.4); font-size: 0.63rem;
             font-family: var(--font-title); letter-spacing: 0.5px;
             position: relative;
             flex: 1;
@@ -534,21 +534,59 @@
             z-index: 9001;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
+            transition: color 0.24s var(--transition-smooth), background 0.24s var(--transition-smooth), transform 0.24s var(--transition-smooth);
         }
         .bottom-nav-item.active {
-            color: var(--emerald-light);
-            background: rgba(46, 196, 122, 0.13);
-            box-shadow: inset 0 0 22px rgba(46, 196, 122, 0.12), 0 -2px 16px rgba(46, 196, 122, 0.12);
+            color: var(--tab-accent, var(--emerald-light));
+            background: transparent;
+            box-shadow: none;
         }
         .bottom-nav-item.active::before {
-            content: ''; position: absolute; top: -1px; left: 50%;
-            transform: translateX(-50%); width: calc(100% - 18px); height: 2px;
-            background: var(--emerald-light); border-radius: 2px;
+            display: none;
         }
-        .bottom-nav-item .icon { font-size: 1.2rem; line-height: 1; transition: transform 0.25s var(--transition-spring); }
+        .bottom-nav-item .icon {
+            font-size: 1.2rem;
+            line-height: 1;
+            transition: transform 0.25s var(--transition-spring);
+            position: relative;
+            z-index: 0;
+        }
+        .bottom-nav-item .icon::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 999px;
+            transform: translate(-50%, -50%);
+            transition: width 0.24s var(--transition-smooth), height 0.24s var(--transition-smooth), background 0.24s var(--transition-smooth);
+            z-index: -1;
+        }
         .bottom-nav-item:active .icon { transform: scale(0.9); }
         .bottom-nav-item.active .icon {
-            filter: drop-shadow(0 0 6px rgba(46, 196, 122, 0.35));
+            filter: none;
+        }
+        .bottom-nav-item.active .icon::before {
+            width: 32px;
+            height: 32px;
+            background: rgba(var(--tab-accent-rgb, 46, 196, 122), 0.1);
+        }
+        .bottom-nav-item[data-nav='home'] {
+            --tab-accent: #2d8659;
+            --tab-accent-rgb: 45, 134, 89;
+        }
+        .bottom-nav-item[data-nav='quran'] {
+            --tab-accent: #1a8a7a;
+            --tab-accent-rgb: 26, 138, 122;
+        }
+        .bottom-nav-item[data-nav='duas'] {
+            --tab-accent: #c49b2a;
+            --tab-accent-rgb: 196, 155, 42;
+        }
+        .bottom-nav-item[data-nav='more'] {
+            --tab-accent: #5a6a7a;
+            --tab-accent-rgb: 90, 106, 122;
         }
 
         /* ============================================ */
@@ -5392,6 +5430,7 @@
             height: calc(100vh - var(--nav-height) - var(--safe-top) - var(--bottom-nav-height) - var(--safe-bottom) - 2px);
             overflow: hidden;
             background: var(--bg-dark);
+            isolation: isolate;
         }
 
         [data-theme='light'] .app-content {
@@ -5401,13 +5440,13 @@
         .app-content .panel {
             position: absolute !important;
             inset: 0;
-            background: inherit !important;
+            background: var(--bg-dark) !important;
             overflow-y: auto;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.2s ease;
             -webkit-overflow-scrolling: touch;
-            visibility: visible !important;
+            visibility: hidden;
             transform: none !important;
             z-index: 1;
         }
@@ -5415,7 +5454,8 @@
         .app-content .panel.active {
             opacity: 1;
             pointer-events: auto;
-            z-index: 2;
+            visibility: visible;
+            z-index: 10;
         }
 
         #mainContainer.container {
@@ -5427,8 +5467,8 @@
 
         .home-dashboard {
             display: grid;
-            grid-template-rows: auto auto auto auto;
-            gap: 16px;
+            grid-template-rows: auto;
+            gap: 0;
             align-content: start;
             min-height: auto;
         }
@@ -5440,12 +5480,15 @@
             letter-spacing: 0.3px;
         }
         .dashboard-date {
-            margin-top: -4px;
-            font-size: 0.78rem;
+            margin-top: 2px;
+            font-size: 0.73rem;
             color: var(--text-subtle);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .dashboard-date-secondary {
-            margin-top: -6px;
+            margin-top: 0;
             font-size: 0.74rem;
             color: var(--text-faint);
         }
@@ -5467,7 +5510,8 @@
         .dashboard-prayer-card {
             border-radius: var(--radius-lg);
             width: 100%;
-            padding: 24px 18px;
+            margin-top: 12px;
+            padding: 14px 14px;
             text-align: left;
             background:
                 radial-gradient(circle at 78% 20%, rgba(201,168,76,0.14), transparent 50%),
@@ -5480,37 +5524,54 @@
             0%, 100% { box-shadow: 0 0 0 0 rgba(46,196,122,0.16); }
             50% { box-shadow: 0 0 0 6px rgba(46,196,122,0.04); }
         }
-        .dashboard-prayer-label { font-size: 0.78rem; color: var(--text-subtle); letter-spacing: 0.5px; }
-        .dashboard-prayer-name { font-family: var(--font-title); font-size: 1.75rem; font-weight: 700; color: var(--text-primary); margin-top: 5px; }
-        .dashboard-prayer-time { font-size: 1.5rem; color: var(--gold-light); line-height: 1.2; }
-        .dashboard-prayer-countdown { font-size: 1.12rem; color: var(--emerald-light); margin-top: 6px; }
-        .dashboard-prayer-location { font-size: 0.82rem; color: var(--text-faint); margin-top: 8px; }
-        .dashboard-reminder-debug { font-size: 0.72rem; color: var(--text-subtle); margin-top: 8px; opacity: 0.9; }
+        .dashboard-prayer-label { font-size: 0.72rem; color: var(--text-subtle); letter-spacing: 0.4px; }
+        .dashboard-prayer-name { font-family: var(--font-title); font-size: 1.34rem; font-weight: 700; color: var(--text-primary); margin-top: 3px; }
+        .dashboard-prayer-time { font-size: 1.14rem; color: var(--gold-light); line-height: 1.2; margin-top: 1px; }
+        .dashboard-prayer-countdown { font-size: 0.9rem; color: var(--emerald-light); margin-top: 4px; }
+        .dashboard-prayer-location { font-size: 0.76rem; color: var(--text-faint); margin-top: 4px; }
+        .dashboard-reminder-debug { display: none; }
 
         .dashboard-suggestion-card {
             border-radius: var(--radius-md);
             width: 100%;
-            padding: 18px;
+            margin-top: 12px;
+            padding: 10px 12px;
             text-align: left;
             cursor: pointer;
             touch-action: manipulation;
             transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.2s ease;
         }
+        .dashboard-suggestion-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
         .dashboard-suggestion-card:active { transform: scale(0.985); opacity: 0.92; }
+        .dashboard-suggestion-card.touch-feedback { opacity: 0.76; }
         .dashboard-suggestion-title { font-size: 1rem; color: var(--text-primary); }
-        .dashboard-suggestion-sub { font-size: 0.84rem; color: var(--text-subtle); margin-top: 4px; }
+        .dashboard-suggestion-sub {
+            font-size: 0.8rem;
+            color: var(--text-subtle);
+            margin-top: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
         .dashboard-suggestion-cta {
-            margin-top: 10px;
+            margin-top: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 34px;
+            min-height: 28px;
             border-radius: 999px;
-            padding: 0 14px;
+            padding: 0 10px;
             border: 1px solid rgba(46, 196, 122, 0.28);
             background: rgba(46, 196, 122, 0.14);
             color: var(--emerald-light);
-            font-size: 0.72rem;
+            font-size: 0.68rem;
+            white-space: nowrap;
         }
 
         .dashboard-progress-ring-card {
@@ -5531,25 +5592,27 @@
         .dashboard-quick-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
+            margin-top: 16px;
             gap: 12px;
         }
         .dashboard-quick-tile {
             border-radius: var(--radius-md);
-            min-height: 100px;
+            min-height: 82px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 7px;
+            gap: 5px;
             transition: transform 0.15s ease, opacity 0.15s ease;
             touch-action: manipulation;
         }
         .dashboard-quick-tile:active { transform: scale(0.98); opacity: 0.92; }
-        .dashboard-quick-icon { font-size: 2.25rem; }
-        .dashboard-quick-label { font-size: 1rem; color: var(--text-primary); }
+        .dashboard-quick-icon { font-size: 1.7rem; }
+        .dashboard-quick-label { font-size: 0.84rem; color: var(--text-primary); }
 
         .dashboard-tip-card {
             border-radius: var(--radius-md);
+            margin-top: 12px;
             padding: 12px 14px;
             font-size: 0.8rem;
             color: var(--text-subtle);
@@ -5727,11 +5790,11 @@
 
         [data-theme='light'] .bottom-nav button,
         [data-theme='light'] .bottom-nav .bottom-nav-item {
-            color: rgba(0, 0, 0, 0.5);
+            color: rgba(0, 0, 0, 0.35);
         }
         [data-theme='light'] .bottom-nav button.active,
         [data-theme='light'] .bottom-nav .bottom-nav-item.active {
-            color: #1a5c3a;
+            color: var(--tab-accent, #1a5c3a);
         }
 
         .progress-bar { display: none; }
