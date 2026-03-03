@@ -1680,7 +1680,7 @@
         }
         .prayer-panel-content {
             max-width: 500px; margin: 0 auto; padding-top: 0;
-            height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - var(--bottom-nav-height) - 20px);
+            height: calc(100dvh - var(--safe-top) - var(--safe-bottom) - 12px);
             display: flex;
             flex-direction: column;
             min-height: 0;
@@ -1742,7 +1742,7 @@
             display: flex;
             flex-direction: column;
             opacity: 1;
-            overflow-y: auto;
+            overflow-y: visible;
             scrollbar-width: thin;
             padding-bottom: 6px;
         }
