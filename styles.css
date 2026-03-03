@@ -1665,7 +1665,7 @@
         .prayer-panel {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: var(--bg-dark);
-            z-index: 2000; overflow-y: auto;
+            z-index: 2000; overflow: hidden;
             padding: calc(var(--safe-top) + 6px) 12px calc(var(--safe-bottom) + 10px);
             backdrop-filter: blur(24px) saturate(150%);
             opacity: 0; visibility: hidden; transform: translateY(20px);
@@ -1680,7 +1680,7 @@
             flex-direction: column;
             min-height: 0;
             position: relative;
-            overflow: visible;
+            overflow: hidden;
         }
         .prayer-panel-content h2 {
             font-family: var(--font-title); font-size: 1rem;
@@ -1740,7 +1740,7 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
-            padding-bottom: 6px;
+            padding-bottom: calc(var(--safe-bottom) + 18px);
         }
         .prayer-tab-times,
         .prayer-tab-qibla,
@@ -1748,7 +1748,7 @@
             gap: 0.45rem;
         }
         .prayer-tab-times {
-            padding-bottom: calc(var(--safe-bottom) + var(--bottom-nav-height) + 28px);
+            padding-bottom: calc(var(--safe-bottom) + 26px);
         }
         .prayer-location-bar {
             display: flex; align-items: center; justify-content: center;
@@ -2001,6 +2001,7 @@
             min-height: auto;
             overflow: visible;
             padding-right: 2px;
+            padding-bottom: 14px;
         }
         .prayer-row {
             display: flex;
