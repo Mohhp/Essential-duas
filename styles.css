@@ -2277,11 +2277,11 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 14px;
-            height: calc(min(46vw, 160px) - 84px);
-            margin-left: -7px;
-            margin-top: calc((min(46vw, 160px) - 84px) * -1);
-            transform-origin: center calc(min(46vw, 160px) - 84px);
+            width: 10px;
+            height: calc(min(46vw, 160px) - 100px);
+            margin-left: -5px;
+            margin-top: calc((min(46vw, 160px) - 100px) * -1);
+            transform-origin: center calc(min(46vw, 160px) - 100px);
             transition: transform 500ms ease-out;
             will-change: transform;
             z-index: 7;
@@ -2292,22 +2292,22 @@
         }
         .qibla-arrow-head {
             position: absolute;
-            top: -10px;
+            top: -7px;
             left: 50%;
             width: 0;
             height: 0;
-            border-left: 7px solid transparent;
-            border-right: 7px solid transparent;
-            border-bottom: 13px solid #e6c270;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 10px solid #e6c270;
             transform: translateX(-50%);
             filter: drop-shadow(0 0 7px rgba(201, 168, 76, 0.46));
         }
         .qibla-arrow-shaft {
             position: absolute;
-            top: 5px;
+            top: 4px;
             bottom: 0;
             left: 50%;
-            width: 5px;
+            width: 3px;
             transform: translateX(-50%);
             border-radius: 999px;
             background:
@@ -3477,12 +3477,12 @@
             color: rgba(46, 196, 122, 0.7); margin-bottom: 1rem;
         }
         .tasbeeh-tap-btn {
-            --tap-size: min(72vw, 290px);
+            --tap-size: min(64vw, 220px);
             width: var(--tap-size);
             height: var(--tap-size);
             aspect-ratio: 1 / 1;
             border-radius: 50%;
-            margin: 18px auto 14px;
+            margin: 14px auto 12px;
             display: grid;
             place-items: center;
             position: relative;
@@ -3490,15 +3490,14 @@
             overflow: hidden;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
-            border: 1.6px solid rgba(106, 245, 192, 0.46);
+            border: 1.4px solid rgba(106, 245, 192, 0.4);
             background:
-                radial-gradient(circle at 33% 24%, rgba(98, 245, 188, 0.28), rgba(98, 245, 188, 0.07) 34%, rgba(5, 15, 24, 0.92) 72%),
+                radial-gradient(circle at 35% 28%, rgba(98, 245, 188, 0.22), rgba(98, 245, 188, 0.05) 35%, rgba(5, 15, 24, 0.94) 72%),
                 linear-gradient(180deg, rgba(8, 30, 45, 0.98), rgba(6, 20, 34, 0.98));
             box-shadow:
-                inset 0 0 0 9px rgba(9, 36, 49, 0.60),
-                inset 0 18px 34px rgba(134, 255, 217, 0.07),
-                0 14px 32px rgba(0, 0, 0, 0.38),
-                0 0 24px rgba(70, 217, 166, 0.24);
+                inset 0 0 0 8px rgba(9, 36, 49, 0.58),
+                0 12px 26px rgba(0, 0, 0, 0.34),
+                0 0 18px rgba(70, 217, 166, 0.2);
             -webkit-user-select: none;
             user-select: none;
             color: var(--emerald-light);
@@ -3516,37 +3515,20 @@
             pointer-events: none;
         }
         .tasbeeh-tap-btn .tap-gloss {
-            position: absolute;
-            width: 72%;
-            height: 28%;
-            top: 12%;
-            left: 14%;
-            border-radius: 999px;
-            background: linear-gradient(180deg, rgba(214, 255, 239, 0.24), rgba(214, 255, 239, 0));
+            display: none;
         }
         .tasbeeh-tap-btn .tap-ring {
             position: absolute;
-            inset: 14px;
+            inset: 12px;
             border-radius: 50%;
-            border: 1.5px solid rgba(118, 255, 204, 0.34);
+            border: 1.2px solid rgba(118, 255, 204, 0.34);
             box-shadow: inset 0 0 0 1px rgba(7, 29, 39, 0.55);
         }
         .tasbeeh-tap-btn .tap-bead-ring {
-            position: absolute;
-            inset: 0;
+            display: none;
         }
         .tasbeeh-tap-btn .tap-bead-ring .bead {
-            --d: 10px;
-            position: absolute;
-            width: var(--d);
-            height: var(--d);
-            border-radius: 50%;
-            left: 50%;
-            top: 50%;
-            margin-left: calc(var(--d) / -2);
-            margin-top: calc(var(--d) / -2);
-            background: radial-gradient(circle at 35% 30%, #d9fff0 0%, #8df0c8 34%, #2db88a 100%);
-            box-shadow: 0 1px 6px rgba(62, 210, 158, 0.45);
+            display: none;
         }
         .tasbeeh-tap-btn .b1  { transform: rotate(0deg) translateY(calc(var(--tap-size) / -2 + 24px)); }
         .tasbeeh-tap-btn .b2  { transform: rotate(30deg) translateY(calc(var(--tap-size) / -2 + 24px)); }
@@ -3561,27 +3543,21 @@
         .tasbeeh-tap-btn .b11 { transform: rotate(300deg) translateY(calc(var(--tap-size) / -2 + 24px)); }
         .tasbeeh-tap-btn .b12 { transform: rotate(330deg) translateY(calc(var(--tap-size) / -2 + 24px)); }
         .tasbeeh-tap-btn .tap-center {
-            position: absolute;
-            width: 40%;
-            height: 40%;
-            border-radius: 50%;
-            background: radial-gradient(circle at 32% 28%, rgba(137, 255, 217, 0.36), rgba(65, 198, 153, 0.18) 45%, rgba(8, 30, 42, 0.95) 100%);
-            border: 1px solid rgba(121, 255, 206, 0.36);
-            box-shadow: inset 0 0 14px rgba(92, 255, 198, 0.16);
+            display: none;
         }
         .tasbeeh-tap-btn .tap-text {
             position: relative;
             z-index: 2;
             font-weight: 700;
             letter-spacing: 0.08em;
-            font-size: clamp(1.02rem, 3.9vw, 1.24rem);
+            font-size: clamp(1rem, 3.5vw, 1.15rem);
             color: #dffff3;
-            text-shadow: 0 2px 10px rgba(57, 199, 150, 0.45);
+            text-shadow: 0 2px 8px rgba(57, 199, 150, 0.4);
             text-transform: none;
         }
         .tasbeeh-tap-btn:active {
-            transform: scale(0.92);
-            box-shadow: inset 0 0 0 9px rgba(9, 36, 49, 0.72), 0 10px 24px rgba(0, 0, 0, 0.42), 0 0 28px rgba(70, 217, 166, 0.32);
+            transform: scale(0.96);
+            box-shadow: inset 0 0 0 8px rgba(9, 36, 49, 0.7), 0 8px 20px rgba(0, 0, 0, 0.38), 0 0 22px rgba(70, 217, 166, 0.28);
         }
         .prayer-reminder-helper {
             margin: 6px 0 10px;
@@ -3626,9 +3602,9 @@
         .dhikr-selector {
             display: flex; gap: 8px; overflow-x: auto;
             width: 100%; max-width: 400px;
-            min-height: 72px;
+            min-height: 64px;
             overflow-y: visible;
-            padding: 8px 2px 14px; margin-bottom: 1.2rem;
+            padding: 6px 2px 10px; margin-bottom: 0.9rem;
             scrollbar-width: none; -ms-overflow-style: none;
             scroll-snap-type: x mandatory;
         }
@@ -5128,7 +5104,7 @@
             .dua-title { font-size: calc(0.72rem * var(--font-scale)); }
             .container { padding-left: 8px; padding-right: 8px; }
             .tasbeeh-count-display { font-size: 3.5rem; }
-            .tasbeeh-tap-btn { --tap-size: min(62vw, 190px); width: var(--tap-size); height: var(--tap-size); }
+            .tasbeeh-tap-btn { --tap-size: min(58vw, 170px); width: var(--tap-size); height: var(--tap-size); }
 
             /* Nav overflow */
             .nav-actions { position: relative; }
