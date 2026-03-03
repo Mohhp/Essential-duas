@@ -1895,7 +1895,7 @@ window.filterCategory = function(cat, btn) {
         const tt = document.getElementById('tasbeehTargetLabel');
         if (tt) tt.textContent = formatTasbeehTargetLabel(tasbeehTarget);
         updateTasbeehSoundToggle();
-        const closeBtn = document.querySelector('.tasbeeh-close');
+        const closeBtn = document.querySelector('.tasbeeh-panel .panel-back-btn');
         if (closeBtn) closeBtn.focus();
         recordInAppRoute(true);
     };
@@ -2023,7 +2023,7 @@ window.filterCategory = function(cat, btn) {
         ep.querySelector('.etiquette-content').innerHTML = getEtiquetteTemplate();
         showAuxPanel('.etiquette-panel');
         lockScroll();
-        const closeBtn = ep.querySelector('.etiquette-close');
+        const closeBtn = ep.querySelector('.panel-back-btn');
         if (closeBtn) closeBtn.focus();
         recordInAppRoute(true);
     };
@@ -2153,7 +2153,7 @@ window.filterCategory = function(cat, btn) {
 
         showAuxPanel('.routine-panel');
         loadRoutineDailyDua();
-        const closeBtn = rp.querySelector('.etiquette-close');
+        const closeBtn = rp.querySelector('.panel-back-btn');
         if (closeBtn) closeBtn.focus();
         recordInAppRoute(true);
     };
@@ -3047,7 +3047,7 @@ window.filterCategory = function(cat, btn) {
             pp.className = 'progress-panel';
             pp.setAttribute('onclick', 'if(event.target===this) closeProgress()');
             pp.innerHTML = `
-                <button class="etiquette-close" onclick="closeProgress()">×</button>
+                <button class="panel-back-btn" onclick="closeProgress()">← Back / ← بیرته</button>
                 <div class="progress-panel-content" id="progressPanelContent"></div>`;
             document.body.appendChild(pp);
         }
@@ -6216,15 +6216,15 @@ window.filterCategory = function(cat, btn) {
         const label = document.querySelector('.prayer-countdown-label');
         if (label) label.textContent = uiText.nextPrayer;
 
-        const title = document.querySelector('.prayer-panel-content h2');
-        if (title) title.textContent = isPashtoMode() ? ((typeof PS_UI !== 'undefined' && PS_UI.prayerTimesTitle) ? PS_UI.prayerTimesTitle : 'د لمونځ وختونه') : 'Prayer Times';
-
         const tabTimes = document.getElementById('prayerSubtabTimes');
         const tabQibla = document.getElementById('prayerSubtabQibla');
         const tabReminders = document.getElementById('prayerSubtabReminders');
-        if (tabTimes) tabTimes.textContent = uiText.tabTimes;
-        if (tabQibla) tabQibla.textContent = uiText.tabQibla;
-        if (tabReminders) tabReminders.textContent = uiText.tabReminders;
+        const tabIconClock = '<span class="prayer-subtab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span>';
+        const tabIconCompass = '<span class="prayer-subtab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M14.8 9.2l-4.6 1.8 1.8 4.6 2.8-6.4z"/></svg></span>';
+        const tabIconBell = '<span class="prayer-subtab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .53-.21 1.04-.59 1.41L4 17h5"/><path d="M9 17a3 3 0 006 0"/></svg></span>';
+        if (tabTimes) tabTimes.innerHTML = `${tabIconClock}<span class="prayer-subtab-label">${uiText.tabTimes}</span>`;
+        if (tabQibla) tabQibla.innerHTML = `${tabIconCompass}<span class="prayer-subtab-label">${uiText.tabQibla}</span>`;
+        if (tabReminders) tabReminders.innerHTML = `${tabIconBell}<span class="prayer-subtab-label">${uiText.tabReminders}</span>`;
 
         renderPrayerGrid();
         updateCountdown();
@@ -6280,7 +6280,7 @@ window.filterCategory = function(cat, btn) {
     window.openPrayer = function() {
         const pp = document.querySelector('.prayer-panel');
         if (pp) showAuxPanel('.prayer-panel');
-        const closeBtn = pp?.querySelector('.prayer-close');
+        const closeBtn = pp?.querySelector('.panel-back-btn');
         if (closeBtn) closeBtn.focus();
         initReminderControls();
         initCitySelector();

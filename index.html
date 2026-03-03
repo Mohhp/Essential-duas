@@ -32,7 +32,7 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
     <!-- Production assets (default) -->
-    <link rel="stylesheet" href="styles.min.css?v=20260303f">
+    <link rel="stylesheet" href="styles.min.css?v=20260303g">
     <!-- Development assets (uncomment for local debugging) -->
     <!-- <link rel="stylesheet" href="styles.css?v=20260301f"> -->
 </head>
@@ -90,7 +90,7 @@
 
         <button class="dashboard-suggestion-card continue-card" id="dashboardSuggestionCard" aria-label="Continue Quran">
             <div class="dashboard-suggestion-row">
-                <div class="dashboard-suggestion-sub continue-text" id="dashboardSuggestionSub">Continue Quran · Al-Baqarah Ayah 2</div>
+                <div class="dashboard-suggestion-sub continue-info" id="dashboardSuggestionSub">Continue Quran · Al-Baqarah Ayah 2</div>
                 <span class="dashboard-suggestion-cta continue-btn" id="dashboardSuggestionCta">Continue</span>
             </div>
         </button>
@@ -2868,7 +2868,7 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (default) -->
-<script src="app.min.js?v=20260303f"></script>
+<script src="app.min.js?v=20260303g"></script>
 <!-- Development assets (uncomment for local debugging) -->
 <!-- <script src="app.js?v=20260301f"></script> -->
 
@@ -2877,7 +2877,7 @@
 
 <!-- ===== TASBEEH PANEL ===== -->
 <div class="tasbeeh-panel panel" onclick="if(event.target === this) closeTasbeeh()">
-    <button class="tasbeeh-close" onclick="closeTasbeeh()" aria-label="Close Tasbeeh panel">×</button>
+    <button class="panel-back-btn" onclick="closeTasbeeh()" aria-label="Back">← Back / ← بیرته</button>
     <div class="tasbeeh-title">Digital Tasbeeh</div>
     <div class="dhikr-selector" id="dhikrSelector"></div>
     <div class="tasbeeh-arabic" id="tasbeehArabic">سُبْحَانَ ٱللَّهِ</div>
@@ -2899,20 +2899,22 @@
 
 <!-- ===== ETIQUETTE PANEL ===== -->
 <div class="etiquette-panel panel" onclick="if(event.target === this) closeEtiquette()">
-    <button class="etiquette-close" onclick="closeEtiquette()" aria-label="Close etiquette panel">×</button>
-    <div class="etiquette-content"></div>
+    <div class="etiquette-content">
+        <button class="panel-back-btn" onclick="closeEtiquette()" aria-label="Back">← Back / ← بیرته</button>
+    </div>
 </div>
 
 <!-- ===== ROUTINE PANEL ===== -->
 <div class="routine-panel panel" onclick="if(event.target === this) closeRoutine()">
-    <button class="etiquette-close" onclick="closeRoutine()" aria-label="Close routine panel">×</button>
-    <div class="routine-content"></div>
+    <div class="routine-content">
+        <button class="panel-back-btn" onclick="closeRoutine()" aria-label="Back">← Back / ← بیرته</button>
+    </div>
 </div>
 
 <!-- ===== QURAN PANEL ===== -->
 <div class="quran-panel panel" onclick="if(event.target === this) closeQuran()">
-    <button class="etiquette-close" onclick="closeQuran()" aria-label="Close Quran panel">×</button>
     <div class="quran-panel-content" id="quranPanelContent">
+        <button class="panel-back-btn" onclick="closeQuran()" aria-label="Back">← Back / ← بیرته</button>
         <div class="panel-loading-overlay" id="quranPanelLoading" aria-hidden="true">Loading…</div>
         <div class="quran-top-progress" id="quranTopProgress"><span id="quranTopProgressFill"></span></div>
         <div class="quran-header-row">
@@ -2982,14 +2984,13 @@
 
 <!-- ===== PRAYER PANEL ===== -->
 <div class="prayer-panel panel" onclick="if(event.target === this) closePrayer()">
-    <button class="prayer-close" onclick="closePrayer()" aria-label="Back">←</button>
     <div class="prayer-panel-content" id="prayerPanelContent">
+        <button class="panel-back-btn" onclick="closePrayer()" aria-label="Back">← Back / ← بیرته</button>
         <div class="panel-loading-overlay" id="prayerPanelLoading" aria-hidden="true">Loading…</div>
-        <h2>Prayer Times</h2>
         <div class="prayer-subtabs" id="prayerSubtabs" role="tablist" aria-label="Prayer sections">
-            <button type="button" class="prayer-subtab active" id="prayerSubtabTimes" data-prayer-tab="times" role="tab" aria-selected="true">🕌 Times</button>
-            <button type="button" class="prayer-subtab" id="prayerSubtabQibla" data-prayer-tab="qibla" role="tab" aria-selected="false">🧭 Qibla</button>
-            <button type="button" class="prayer-subtab" id="prayerSubtabReminders" data-prayer-tab="reminders" role="tab" aria-selected="false">🔔 Reminders</button>
+            <button type="button" class="prayer-subtab active" id="prayerSubtabTimes" data-prayer-tab="times" role="tab" aria-selected="true"><span class="prayer-subtab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span><span class="prayer-subtab-label">Times</span></button>
+            <button type="button" class="prayer-subtab" id="prayerSubtabQibla" data-prayer-tab="qibla" role="tab" aria-selected="false"><span class="prayer-subtab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M14.8 9.2l-4.6 1.8 1.8 4.6 2.8-6.4z"/></svg></span><span class="prayer-subtab-label">Qibla</span></button>
+            <button type="button" class="prayer-subtab" id="prayerSubtabReminders" data-prayer-tab="reminders" role="tab" aria-selected="false"><span class="prayer-subtab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .53-.21 1.04-.59 1.41L4 17h5"/><path d="M9 17a3 3 0 006 0"/></svg></span><span class="prayer-subtab-label">Reminders</span></button>
         </div>
 
         <div class="prayer-subtab-pane prayer-tab-times active" id="prayerTabTimes" role="tabpanel">
@@ -3103,8 +3104,8 @@
 
 <!-- ===== MORE PANEL ===== -->
 <div class="more-panel panel" onclick="if(event.target === this) closeMorePanel()">
-    <button class="etiquette-close" onclick="closeMorePanel()" aria-label="Close more panel">×</button>
     <div class="more-panel-content" id="morePanelContent">
+        <button class="panel-back-btn" onclick="closeMorePanel()" aria-label="Back">← Back / ← بیرته</button>
         <h2 id="moreTitle">More</h2>
         <div class="more-section-title" id="moreFeaturesHeader">Features</div>
         <div class="more-list" id="moreList">
@@ -3144,8 +3145,8 @@
 </div>
 
 <div class="about-panel panel" onclick="if(event.target===this) closeAboutPanel()">
-    <button class="etiquette-close" onclick="closeAboutPanel()" aria-label="Back">‹</button>
     <div class="about-panel-content" id="aboutPanelContent">
+        <button class="panel-back-btn" onclick="closeAboutPanel()" aria-label="Back">← Back / ← بیرته</button>
         <div class="about-logo-mark">
             <div class="fallah-mark">
                 <div class="fallah-crescent"></div>
@@ -3220,7 +3221,6 @@
 <button class="back-to-top" onclick="scrollToTop()" aria-label="Back to top" title="Back to top">↑</button>
 
 <!-- ===== IN-APP BACK & SCROLL FABS ===== -->
-<button class="in-app-back-fab" id="inAppBackBtn" type="button" aria-label="Back" title="Back">‹</button>
 <div class="in-app-swipe-indicator" id="inAppSwipeIndicator" aria-hidden="true">←</div>
 
 <!-- ===== BOTTOM NAV (Always last before </body>) ===== -->
