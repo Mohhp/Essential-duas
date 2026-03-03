@@ -1880,6 +1880,27 @@ window.filterCategory = function(cat, btn) {
         setBottomNavActive(navName);
     }
 
+    function ensureTasbeehTapBinding() {
+        const tapBtn = document.getElementById('tasbeehTapBtn') || document.querySelector('.tasbeeh-tap-btn');
+        if (!tapBtn || tapBtn.dataset.inputBound === '1') return;
+
+        const triggerTap = (event) => {
+            if (event) {
+                if (event.type === 'pointerdown' && event.pointerType === 'mouse') return;
+                event.preventDefault();
+            }
+            window.tapTasbeeh(event);
+        };
+
+        tapBtn.addEventListener('pointerdown', triggerTap, { passive: false });
+        tapBtn.addEventListener('touchstart', triggerTap, { passive: false });
+        tapBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            window.tapTasbeeh(event);
+        }, { passive: false });
+        tapBtn.dataset.inputBound = '1';
+    }
+
     window.selectDhikr = function(index) {
         // Save current session count before switching
         if (tasbeehCount > 0) {
@@ -1914,15 +1935,7 @@ window.filterCategory = function(cat, btn) {
         const tt = document.getElementById('tasbeehTargetLabel');
         if (tt) tt.textContent = formatTasbeehTargetLabel(tasbeehTarget);
         updateTasbeehSoundToggle();
-        const tapBtn = document.querySelector('.tasbeeh-tap-btn');
-        if (tapBtn && !tapBtn.dataset.inputBound) {
-            tapBtn.addEventListener('pointerdown', (event) => {
-                if (event.pointerType === 'mouse') return;
-                event.preventDefault();
-                window.tapTasbeeh(event);
-            }, { passive: false });
-            tapBtn.dataset.inputBound = '1';
-        }
+        ensureTasbeehTapBinding();
         const closeBtn = document.querySelector('.tasbeeh-panel .panel-back-btn');
         if (closeBtn) closeBtn.focus();
         recordInAppRoute(true);
@@ -1947,9 +1960,26 @@ window.filterCategory = function(cat, btn) {
 
     let lastTasbeehTapAt = 0;
 
+    function getEventClientPoint(event, fallbackRect) {
+        if (event && typeof event.clientX === 'number' && typeof event.clientY === 'number') {
+            return { x: event.clientX, y: event.clientY };
+        }
+        const touch = event?.touches?.[0] || event?.changedTouches?.[0];
+        if (touch && typeof touch.clientX === 'number' && typeof touch.clientY === 'number') {
+            return { x: touch.clientX, y: touch.clientY };
+        }
+        if (fallbackRect) {
+            return {
+                x: fallbackRect.left + (fallbackRect.width / 2),
+                y: fallbackRect.top + (fallbackRect.height / 2)
+            };
+        }
+        return null;
+    }
+
     window.tapTasbeeh = function(event) {
         const nowTap = Date.now();
-        if (nowTap - lastTasbeehTapAt < 220) return;
+        if (nowTap - lastTasbeehTapAt < 140) return;
         lastTasbeehTapAt = nowTap;
 
         tasbeehCount++;
@@ -1966,10 +1996,11 @@ window.filterCategory = function(cat, btn) {
 
             if (event) {
                 const rect = btn.getBoundingClientRect();
+                const point = getEventClientPoint(event, rect);
                 const ripple = document.createElement('span');
                 ripple.className = 'tasbeeh-ripple';
-                ripple.style.left = `${event.clientX - rect.left}px`;
-                ripple.style.top = `${event.clientY - rect.top}px`;
+                ripple.style.left = `${(point ? point.x : rect.left + (rect.width / 2)) - rect.left}px`;
+                ripple.style.top = `${(point ? point.y : rect.top + (rect.height / 2)) - rect.top}px`;
                 btn.appendChild(ripple);
                 setTimeout(() => ripple.remove(), 700);
             }

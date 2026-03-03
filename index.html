@@ -32,7 +32,7 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
     <!-- Production assets (default) -->
-    <link rel="stylesheet" href="styles.min.css?v=20260303r">
+    <link rel="stylesheet" href="styles.min.css?v=20260303t">
     <!-- Development assets (uncomment for local debugging) -->
     <!-- <link rel="stylesheet" href="styles.css?v=20260301f"> -->
 </head>
@@ -2868,7 +2868,7 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (default) -->
-<script src="app.min.js?v=20260303r"></script>
+<script src="app.min.js?v=20260303t"></script>
 <!-- Development assets (uncomment for local debugging) -->
 <!-- <script src="app.js?v=20260301f"></script> -->
 
@@ -2884,7 +2884,10 @@
     <div class="tasbeeh-virtue" id="tasbeehVirtue">33× after every salah</div>
     <div class="tasbeeh-count-display" id="tasbeehDisplay">0</div>
     <div class="tasbeeh-target" id="tasbeehTargetLabel">Target: 33</div>
-    <button class="tasbeeh-tap-btn" onclick="tapTasbeeh(event)">Tap</button>
+    <button class="tasbeeh-tap-btn" id="tasbeehTapBtn" type="button" aria-label="Tap to count dhikr">
+        <span class="tap-ring" aria-hidden="true"></span>
+        <span class="tap-text">Tap</span>
+    </button>
     <div class="tasbeeh-controls">
         <button class="tasbeeh-ctrl-btn" id="tasbeehSoundToggle" onclick="toggleTasbeehSound()">🔇 Click Sound</button>
         <button class="tasbeeh-ctrl-btn" id="tasbeehResetBtn" onclick="resetTasbeeh()">Reset</button>
@@ -3028,7 +3031,10 @@
                     <div class="qibla-direction-label compass-e"><span>E</span><small>خت</small></div>
                     <div class="qibla-direction-label compass-w"><span>W</span><small>لو</small></div>
                     <div class="qibla-marker" id="qiblaMarker" aria-hidden="true"><span>🕋</span></div>
-                    <div class="qibla-arrow" id="qiblaArrow"></div>
+                    <div class="qibla-arrow" id="qiblaArrow">
+                        <span class="qibla-arrow-shaft" aria-hidden="true"></span>
+                        <span class="qibla-arrow-head" aria-hidden="true"></span>
+                    </div>
                     <div class="qibla-center-dot" aria-hidden="true"></div>
                 </div>
                 <div class="qibla-location" id="qiblaLocation">--</div>

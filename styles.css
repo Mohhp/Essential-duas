@@ -2277,39 +2277,43 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 10px;
-            height: calc(min(46vw, 160px) - 54px);
-            margin-left: -5px;
-            margin-top: calc((min(46vw, 160px) - 54px) * -1);
-            transform-origin: center calc(min(46vw, 160px) - 54px);
+            width: 16px;
+            height: calc(min(46vw, 160px) - 70px);
+            margin-left: -8px;
+            margin-top: calc((min(46vw, 160px) - 70px) * -1);
+            transform-origin: center calc(min(46vw, 160px) - 70px);
             transition: transform 500ms ease-out;
             will-change: transform;
             z-index: 7;
-            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.32));
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
         }
-        .qibla-arrow::before {
-            content: '';
+        .qibla-arrow-head {
             position: absolute;
-            top: -13px;
+            top: -12px;
             left: 50%;
             width: 0;
             height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-bottom: 15px solid #e5be67;
+            border-left: 9px solid transparent;
+            border-right: 9px solid transparent;
+            border-bottom: 18px solid #e6c270;
             transform: translateX(-50%);
-            filter: drop-shadow(0 0 6px rgba(201, 168, 76, 0.38));
+            filter: drop-shadow(0 0 7px rgba(201, 168, 76, 0.46));
         }
-
-        .qibla-arrow::after {
-            content: '';
+        .qibla-arrow-shaft {
             position: absolute;
-            inset: 0;
+            top: 6px;
+            bottom: 0;
+            left: 50%;
+            width: 8px;
+            transform: translateX(-50%);
             border-radius: 999px;
             background:
                 linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 35%),
-                linear-gradient(to top, rgba(108, 125, 143, 0.94) 0 54%, rgba(225, 193, 113, 0.98) 54% 100%);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), 0 0 8px rgba(0, 0, 0, 0.2);
+                linear-gradient(to top, rgba(98, 116, 136, 0.95) 0 52%, rgba(229, 196, 116, 0.98) 52% 100%);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2), 0 0 10px rgba(0, 0, 0, 0.24);
         }
 
         .qibla-center-dot {
@@ -3474,17 +3478,20 @@
         }
         .tasbeeh-tap-btn {
             width: 168px; height: 168px; border-radius: 50%;
-            background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.08), rgba(46, 196, 122, 0.08) 46%, rgba(46, 196, 122, 0.03));
-            border: 2px solid transparent;
+            background: radial-gradient(circle at 32% 30%, rgba(255, 255, 255, 0.22), rgba(46, 196, 122, 0.24) 52%, rgba(46, 196, 122, 0.1));
+            border: 2px solid rgba(46, 196, 122, 0.5);
             background-clip: padding-box;
             color: var(--emerald-light); font-family: var(--font-title);
-            font-size: 0.7rem; letter-spacing: 2px; text-transform: none;
+            font-size: 0.74rem; letter-spacing: 2.5px; text-transform: uppercase;
             cursor: pointer; transition: all 0.15s var(--transition-smooth);
             display: flex; align-items: center; justify-content: center;
-            box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.05), 0 0 34px rgba(46, 196, 122, 0.08);
+            box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.18), 0 0 34px rgba(46, 196, 122, 0.24), 0 10px 28px rgba(0, 0, 0, 0.28);
             -webkit-user-select: none; user-select: none;
             position: relative;
             overflow: hidden;
+            margin-top: 8px;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
         .tasbeeh-tap-btn::before {
             content: '';
@@ -3493,6 +3500,19 @@
             border-radius: 50%;
             background: linear-gradient(135deg, rgba(201, 168, 76, 0.55), rgba(46, 196, 122, 0.42), rgba(201, 168, 76, 0.55));
             z-index: -1;
+        }
+        .tasbeeh-tap-btn .tap-ring {
+            position: absolute;
+            inset: 18px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+        .tasbeeh-tap-btn .tap-text {
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 14px rgba(46, 196, 122, 0.5);
         }
         .tasbeeh-tap-btn:active {
             transform: scale(0.92);
