@@ -3098,7 +3098,7 @@ window.filterCategory = function(cat, btn) {
             aboutVersion: 'Version: 2.0.0',
             aboutDeveloper: isPS ? 'پراختیاکوونکی: Falah' : 'Developer: Falah',
             aboutCopyright: '© 2026 Falah. All rights reserved.',
-            aboutEmail: isPS ? 'اړیکه: support@essentialduas.app' : 'Contact: support@essentialduas.app',
+            aboutContactLabel: isPS ? 'اړیکه ونیسئ' : 'Contact Us',
             aboutPrivacyLink: isPS ? 'د محرمیت تګلاره' : 'Privacy Policy',
             aboutLicenses: isPS ? 'اوپن سورس لایسنسونه: Adhan.js او د وېب پلاتفورم API ګانې' : 'Open-source libraries: Adhan.js and web platform APIs'
         };
@@ -3128,6 +3128,10 @@ window.filterCategory = function(cat, btn) {
             panel: 'more',
             ts: Date.now()
         });
+    };
+
+    window.openContactEmail = function() {
+        window.location.href = 'mailto:fallahapp16@gmail.com?subject=Falah App Feedback&body=Assalamu Alaikum,%0A%0A';
     };
 
     window.rateApp = function() {
