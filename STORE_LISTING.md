@@ -1,4 +1,4 @@
-# Google Play Store Listing — Essential Duas by فلاح
+# Google Play Store Listing — Falah — فلاح
 
 ## Short Description (80 chars max)
 ```
@@ -7,7 +7,7 @@
 
 ## Full Description (4000 chars max)
 ```
-Essential Duas by فلاح — The Crown Collection
+Falah — فلاح
 
 Discover 63 carefully curated duas (supplications) from the Quran and authentic Sunnah, presented with full scholarly authentication and beautiful Arabic calligraphy.
 

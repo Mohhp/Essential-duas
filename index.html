@@ -8,18 +8,18 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="The Crown Collection — 63 essential Islamic duas from the Quran and Sunnah, with tasbeeh counter, bookmarks, daily routines, and scholarly authentication.">
-    <meta property="og:title" content="Essential Duas by فلاح — The Crown Collection">
+    <meta property="og:title" content="Falah — فلاح">
     <meta property="og:description" content="63 essential Islamic duas from Quran & Sunnah — curated with full scholarly authentication, tasbeeh counter, prayer times, and memorization tools.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mohhp.github.io/Essential-duas/">
     <meta property="og:image" content="https://mohhp.github.io/Essential-duas/icon-512.png">
     <meta property="og:locale" content="en_US">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Essential Duas by فلاح — The Crown Collection">
+    <meta name="twitter:title" content="Falah — فلاح">
     <meta name="twitter:description" content="63 essential Islamic duas from Quran & Sunnah with full scholarly authentication.">
     <meta name="twitter:image" content="https://mohhp.github.io/Essential-duas/icon-512.png">
     <link rel="canonical" href="https://mohhp.github.io/Essential-duas/">
-    <title>Essential Duas by فلاح — The Crown Collection</title>
+    <title>Falah — فلاح</title>
 
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -32,7 +32,7 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
     <!-- Production assets (default) -->
-    <link rel="stylesheet" href="styles.min.css?v=20260303ab">
+    <link rel="stylesheet" href="styles.min.css?v=20260304a">
     <!-- Development assets (uncomment for local debugging) -->
     <!-- <link rel="stylesheet" href="styles.css?v=20260301f"> -->
 </head>
@@ -44,7 +44,7 @@
         <div class="splash-crescent-lg"></div>
         <span class="splash-fa-lg">ف</span>
     </div>
-    <div class="splash-title">Essential Duas</div>
+    <div class="splash-title">Falah</div>
     <div class="splash-subtitle">The Crown Collection</div>
     <div class="splash-credit">المهندس محمد فلاح</div>
 </div>
@@ -60,7 +60,7 @@
             <span class="fallah-fa">ف</span>
         </div>
         <div class="fallah-text">
-            <span class="fallah-brand" id="topBrandText">Essential Duas</span>
+            <span class="fallah-brand" id="topBrandText">Falah</span>
             <span class="fallah-sub">فلاح</span>
         </div>
     </div>
@@ -73,11 +73,11 @@
 
 <!-- ===== MAIN CONTENT ===== -->
 <div class="app-content" id="appContent">
-<div class="container home-panel panel active" id="mainContainer" data-main-mode="home" role="main" aria-label="Essential Duas content">
+<div class="container home-panel panel active" id="mainContainer" data-main-mode="home" role="main" aria-label="Falah content">
     <div class="pull-refresh-indicator" id="pullRefreshIndicator" aria-hidden="true">↻ Pull to refresh</div>
 
     <section class="home-dashboard" id="homeDashboard">
-        <div class="dashboard-greeting" id="dashboardGreeting">Essential Duas</div>
+        <div class="dashboard-greeting" id="dashboardGreeting">Falah</div>
         <div class="dashboard-date date-display" id="dashboardDate">Rabi al-Awwal 14, 1447</div>
 
         <button class="dashboard-prayer-card" id="dashboardNextPrayerCard" onclick="openPrayerFromDashboard()" aria-label="Open prayer times">
@@ -2831,7 +2831,7 @@
         <span class="line"></span>
     </div>
     <div class="footer-text">
-        Essential Duas — لازمي دعاګانې<br>
+        Falah — فلاح<br>
         63 Authentic Duas from Quran & Sunnah
     </div>
     <div class="footer-brand-row">
@@ -2868,7 +2868,7 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (default) -->
-<script src="app.min.js?v=20260303ab"></script>
+<script src="app.min.js?v=20260304a"></script>
 <!-- Development assets (uncomment for local debugging) -->
 <!-- <script src="app.js?v=20260301f"></script> -->
 
@@ -2929,14 +2929,13 @@
         <div class="quran-top-progress" id="quranTopProgress"><span id="quranTopProgressFill"></span></div>
         <div class="quran-header-row">
             <h2 id="quranPanelTitle">Quran</h2>
-            <button type="button" class="quran-reading-mode-btn" id="quranReadingModeBtn">Reading Mode</button>
         </div>
 
         <div class="quran-view-tabs" id="quranViewTabs" role="tablist" aria-label="Quran sections">
-            <button type="button" class="quran-view-tab active" data-qview="surah" id="quranTabSurah" role="tab" aria-selected="true">📖 Surahs</button>
-            <button type="button" class="quran-view-tab" data-qview="juz" id="quranTabJuz" role="tab" aria-selected="false">📚 Juz</button>
-            <button type="button" class="quran-view-tab" data-qview="bookmarks" id="quranTabBookmarks" role="tab" aria-selected="false">🔖 Bookmarks</button>
-            <button type="button" class="quran-view-tab" data-qview="settings" id="quranTabSettings" role="tab" aria-selected="false">⚙️ Settings</button>
+            <button type="button" class="quran-view-tab active" data-qview="surah" id="quranTabSurah" role="tab" aria-selected="true"><span class="quran-tab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 4h7a2 2 0 012 2v14a1.5 1.5 0 00-1.5-1.5H2V4z"/><path d="M22 4h-7a2 2 0 00-2 2v14a1.5 1.5 0 011.5-1.5H22V4z"/></svg></span><span class="quran-tab-text">Surahs</span></button>
+            <button type="button" class="quran-view-tab" data-qview="juz" id="quranTabJuz" role="tab" aria-selected="false"><span class="quran-tab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><path d="M7 5v14"/><path d="M17 5v14"/></svg></span><span class="quran-tab-text">Juz</span></button>
+            <button type="button" class="quran-view-tab" data-qview="bookmarks" id="quranTabBookmarks" role="tab" aria-selected="false"><span class="quran-tab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg></span><span class="quran-tab-text">Bookmarks</span></button>
+            <button type="button" class="quran-view-tab" data-qview="settings" id="quranTabSettings" role="tab" aria-selected="false"><span class="quran-tab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9A1.65 1.65 0 0010 3.09V3a2 2 0 014 0v.09A1.65 1.65 0 0015 4a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c0 .66.39 1.26 1 1.51.26.1.54.16.82.16H21a2 2 0 010 4h-.09c-.28 0-.56.05-.82.16-.61.25-1 .85-1 1.51z"/></svg></span><span class="quran-tab-text">Settings</span></button>
         </div>
 
         <div class="quran-list-screen" id="quranListScreen">
@@ -3118,7 +3117,6 @@
 <!-- ===== MORE PANEL ===== -->
 <div class="more-panel panel" onclick="if(event.target === this) closeMorePanel()">
     <div class="more-panel-content" id="morePanelContent">
-        <h2 id="moreTitle">More</h2>
         <div class="more-section-title" id="moreFeaturesHeader">Features</div>
         <div class="more-list" id="moreList">
             <button class="more-row" onclick="openPrayerFromMore()"><span class="more-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span><span class="more-label" id="morePrayerLabel">Prayer Times</span><span class="more-arrow">›</span></button>
@@ -3165,11 +3163,14 @@
                 <span class="fallah-fa">ف</span>
             </div>
         </div>
-        <h2 id="aboutAppName">Essential Duas v2.0.0</h2>
-        <p id="aboutDescription">A focused collection of authentic duas from Quran and Sunnah.</p>
+        <h2 id="aboutAppName">Falah — فلاح</h2>
+        <p id="aboutDescription">Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.</p>
+        <p id="aboutDescriptionPs">ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.</p>
+        <p id="aboutTagline">حي على الفلاح — Come to Success</p>
+        <p id="aboutVersion">Version: 2.0.0</p>
         <div class="about-meta">
-            <div id="aboutDeveloper">Developer: Engineer Mohammad Falah</div>
-            <div id="aboutCopyright">Copyright © 2026</div>
+            <div id="aboutDeveloper">Developer: Falah</div>
+            <div id="aboutCopyright">© 2026 Falah. All rights reserved.</div>
             <div id="aboutEmail">Contact: support@essentialduas.app</div>
             <a href="privacy.html" target="_blank" rel="noopener" id="aboutPrivacyLink">Privacy Policy</a>
             <div id="aboutLicenses">Open-source libraries: Adhan.js and web platform APIs</div>
@@ -3191,8 +3192,8 @@
             <div class="share-translation" id="shareTranslationText">O Allah, guide me.</div>
             <div class="share-reference" id="shareReferenceText">Sahih Bukhari</div>
             <div class="share-branding">
-                <img src="icon-192.png" width="24" height="24" loading="lazy" alt="Essential Duas icon" class="share-brand-icon" id="shareBrandIcon">
-                <span id="shareBrandName">Essential Duas</span>
+                <img src="icon-192.png" width="24" height="24" loading="lazy" alt="Falah icon" class="share-brand-icon" id="shareBrandIcon">
+                <span id="shareBrandName">Falah</span>
             </div>
         </div>
     </div>

@@ -2635,11 +2635,12 @@
             margin-bottom: 14px;
         }
         .quran-header-row h2 {
-            font-family: var(--font-title);
+            font-family: inherit;
             font-size: 1rem;
-            letter-spacing: 2.4px;
+            font-weight: 600;
+            letter-spacing: 0.2px;
             text-transform: none;
-            color: var(--emerald-light);
+            color: var(--text-primary);
         }
 
         .quran-reading-mode-btn {
@@ -2677,6 +2678,10 @@
         }
 
         .quran-view-tab {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             min-height: 34px;
             border-radius: 999px;
             border: 1px solid rgba(46, 196, 122, 0.2);
@@ -2688,6 +2693,17 @@
             text-transform: none;
             cursor: pointer;
             transition: all 0.25s var(--transition-smooth);
+        }
+        .quran-tab-icon {
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .quran-tab-text {
+            line-height: 1;
         }
         .quran-view-tab.active {
             color: var(--gold-light);
@@ -5918,16 +5934,18 @@
         .more-panel-content {
             max-width: 620px;
             margin: 0 auto;
-            padding: calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 56px);
+            padding: calc(var(--safe-top) + 16px) 16px calc(var(--safe-bottom) + 56px);
             min-height: 100%;
         }
-        .more-panel-content h2 { font-size: 1rem; letter-spacing: 0.2px; margin-bottom: 12px; color: var(--text-primary); }
         .more-section-title {
             margin: 14px 2px 8px;
             font-size: 0.62rem;
             letter-spacing: 0.5px;
             text-transform: none;
             color: var(--text-subtle);
+        }
+        .more-panel-content > .more-section-title:first-child {
+            margin-top: 0;
         }
         .more-list { display: grid; gap: 0; border-radius: 14px; overflow: hidden; border: 1px solid rgba(46,196,122,0.1); }
         .more-row {

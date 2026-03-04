@@ -1,4 +1,4 @@
-# Essential Duas by فلاح — The Crown Collection
+# Falah — فلاح
 
 > 63 essential Islamic duas from the Quran and Sunnah, with tasbeeh counter, prayer times, Qibla compass, bookmarks, daily routines, memorization tools, audio recitation, and full scholarly authentication.
 

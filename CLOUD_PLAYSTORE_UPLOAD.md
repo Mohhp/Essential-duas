@@ -14,7 +14,7 @@ Create these secrets:
 ### How to generate `KEYSTORE_BASE64` on Mac
 
 ```bash
-base64 -i "/Users/mohammadpela/Downloads/Essential Duas - Google Play package/signing.keystore" | pbcopy
+base64 -i "/Users/mohammadpela/Downloads/Falah - Google Play package/signing.keystore" | pbcopy
 ```
 
 Then paste clipboard into `KEYSTORE_BASE64` secret.

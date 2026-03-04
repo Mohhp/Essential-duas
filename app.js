@@ -411,7 +411,7 @@
                 { title: 'پیل وکړئ', body: 'نن یوازې له یوې دعا پیل وکړئ. لږ دوام لوی برکت راولي.' }
             ]
             : [
-                { title: 'Welcome', body: 'Welcome to Essential Duas — your curated collection of verified duas from Quran and Sunnah.' },
+                { title: 'Welcome', body: 'Welcome to Falah — your curated collection of verified duas from Quran and Sunnah.' },
                 { title: 'Key Features', body: 'Browse by category, save favorites, track progress, use Tasbeeh, and view prayer times with Qibla.' },
                 { title: 'How to Use', body: 'Tap a category to explore, expand a card to read details, and use Mark Read to build your streak.' },
                 { title: 'Get Started', body: 'Begin with one dua today. Small consistency brings lasting barakah over time.' }
@@ -2241,7 +2241,7 @@ window.filterCategory = function(cat, btn) {
     window.sharePage = function() {
         if (navigator.share) {
             navigator.share({
-                title: 'Essential Duas by فلاح',
+                title: 'Falah — فلاح',
                 text: '63 Essential Islamic Duas from Quran & Sunnah — by Engineer Mohammad Falah',
                 url: window.location.href
             });
@@ -2257,7 +2257,7 @@ window.filterCategory = function(cat, btn) {
         if (!card) return;
         const title = card.querySelector('.dua-title').textContent;
         const arabic = card.querySelector('.arabic-text').textContent;
-        const text = `${title}\n\n${arabic}\n\nFrom: Essential Duas by فلاح\n${window.location.href}`;
+        const text = `${title}\n\n${arabic}\n\nFrom: Falah — فلاح\n${window.location.href}`;
         if (navigator.share) {
             navigator.share({ title: title, text: text });
         } else {
@@ -2320,7 +2320,7 @@ window.filterCategory = function(cat, btn) {
     function getDashboardText() {
         if (isPashtoMode()) {
             return {
-                appTitle: 'لازمي دعاګانې',
+                appTitle: 'فلاح',
                 goodMorning: 'السلام علیکم — صبح بخیر',
                 goodAfternoon: 'السلام علیکم — غرمه مو پخ خير',
                 goodEvening: 'السلام علیکم — ماښام مو پخ خير',
@@ -2365,7 +2365,7 @@ window.filterCategory = function(cat, btn) {
         }
 
         return {
-            appTitle: 'Essential Duas',
+            appTitle: 'Falah',
             goodMorning: 'Assalamu Alaikum — Good Morning',
             goodAfternoon: 'Assalamu Alaikum — Good Afternoon',
             goodEvening: 'Assalamu Alaikum — Good Evening',
@@ -2738,7 +2738,6 @@ window.filterCategory = function(cat, btn) {
             ['tabQuranLabel', ui.tabQuran],
             ['tabDuasLabel', ui.tabDuas],
             ['tabMoreLabel', ui.tabMore],
-            ['moreTitle', ui.more],
             ['moreFeaturesHeader', ui.features],
             ['morePreferencesHeader', ui.preferences],
             ['moreAppHeader', ui.appSection],
@@ -3092,12 +3091,13 @@ window.filterCategory = function(cat, btn) {
     function renderAboutPanelContent() {
         const isPS = isPashtoMode();
         const map = {
-            aboutAppName: isPS ? 'لازمي دعاګانې v2.0.0' : 'Essential Duas v2.0.0',
-            aboutDescription: isPS
-                ? 'د قرآن او سنتو مستندې دعاګانې په یو منظم او ساده بڼه کې.'
-                : 'A focused collection of authentic duas from Quran and Sunnah.',
-            aboutDeveloper: isPS ? 'پراختیاکوونکی: انجینر محمد فلاح' : 'Developer: Engineer Mohammad Falah',
-            aboutCopyright: isPS ? 'کاپي رایټ © 2026' : 'Copyright © 2026',
+            aboutAppName: 'Falah — فلاح',
+            aboutDescription: 'Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.',
+            aboutDescriptionPs: 'ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.',
+            aboutTagline: 'حي على الفلاح — Come to Success',
+            aboutVersion: 'Version: 2.0.0',
+            aboutDeveloper: isPS ? 'پراختیاکوونکی: Falah' : 'Developer: Falah',
+            aboutCopyright: '© 2026 Falah. All rights reserved.',
             aboutEmail: isPS ? 'اړیکه: support@essentialduas.app' : 'Contact: support@essentialduas.app',
             aboutPrivacyLink: isPS ? 'د محرمیت تګلاره' : 'Privacy Policy',
             aboutLicenses: isPS ? 'اوپن سورس لایسنسونه: Adhan.js او د وېب پلاتفورم API ګانې' : 'Open-source libraries: Adhan.js and web platform APIs'
@@ -3384,7 +3384,7 @@ window.filterCategory = function(cat, btn) {
         wrap.innerHTML = `
             <div style="text-align:center;margin-bottom:20px;">
                 <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:16px;color:#2ec47a;margin-bottom:4px;">ف</div>
-                <div style="font-family:'Playfair Display',serif;font-size:11px;letter-spacing:1px;text-transform:none;color:#2ec47a;margin-bottom:6px;">Essential Duas by فلاح</div>
+                <div style="font-family:'Playfair Display',serif;font-size:11px;letter-spacing:1px;text-transform:none;color:#2ec47a;margin-bottom:6px;">Falah — فلاح</div>
                 <div style="font-family:'Playfair Display',serif;font-size:16px;letter-spacing:0.5px;text-transform:none;color:#e0eccc;font-weight:600;">My Journey</div>
             </div>
             <div style="display:flex;gap:12px;margin-bottom:16px;">
@@ -3431,7 +3431,7 @@ window.filterCategory = function(cat, btn) {
                         await navigator.share({
                             files: [new File([blob], 'progress.png', { type: 'image/png' })],
                             title: 'My Dua Journey',
-                            text: 'From Essential Duas by فلاح'
+                            text: 'From Falah — فلاح'
                         });
                         showToast('Shared!');
                         return;
@@ -4260,7 +4260,7 @@ window.filterCategory = function(cat, btn) {
         if (arabicText) arabicText.textContent = arabic;
         if (translationText) translationText.textContent = translation;
         if (referenceText) referenceText.textContent = ref || title;
-        if (brandName) brandName.textContent = isPS ? 'لازمي دعاګانې' : 'Essential Duas';
+        if (brandName) brandName.textContent = isPS ? 'فلاح' : 'Falah';
 
         try {
             if (typeof html2canvas === 'undefined') {
@@ -4288,7 +4288,7 @@ window.filterCategory = function(cat, btn) {
                         await navigator.share({
                             files: [new File([blob], 'dua.png', { type: 'image/png' })],
                             title: title,
-                            text: isPS ? 'له لازمي دعاګانو څخه' : 'From Essential Duas'
+                            text: isPS ? 'له فلاح څخه' : 'From Falah'
                         });
                         showToast('Shared!');
                         return;
@@ -7599,10 +7599,10 @@ window.filterCategory = function(cat, btn) {
             readingMode: isPS ? 'د مطالعې حالت' : 'Reading Mode',
             readingModeOn: isPS ? 'د مطالعې حالت فعال شو' : 'Reading mode enabled',
             readingModeOff: isPS ? 'د مطالعې حالت بند شو' : 'Reading mode disabled',
-            tabSurah: isPS ? '📖 سورتونه' : '📖 Surahs',
-            tabJuz: isPS ? '📚 جزء' : '📚 Juz',
-            tabBookmarks: isPS ? '🔖 خوښونه' : '🔖 Bookmarks',
-            tabSettings: isPS ? '⚙️ ترتیبات' : '⚙️ Settings',
+            tabSurah: isPS ? 'سورتونه' : 'Surahs',
+            tabJuz: isPS ? 'جزء' : 'Juz',
+            tabBookmarks: isPS ? 'خوښونه' : 'Bookmarks',
+            tabSettings: isPS ? 'ترتیبات' : 'Settings',
             searchPlaceholder: isPS ? 'سورت ولټوئ (شمېره، عربي، انګلیسي)...' : 'Search Surah (number, Arabic, English)...',
             continueReading: isPS ? 'مطالعه دوام ورکړئ' : 'Continue Reading',
             continue: isPS ? 'دوام' : 'Continue',
@@ -9255,17 +9255,6 @@ window.filterCategory = function(cat, btn) {
             panel.dataset.boundScroll = '1';
         }
 
-        const readingModeBtn = document.getElementById('quranReadingModeBtn');
-        if (readingModeBtn && readingModeBtn.dataset.bound !== '1') {
-            readingModeBtn.addEventListener('click', () => {
-                document.body.classList.toggle('quran-reading-mode');
-                showToast(document.body.classList.contains('quran-reading-mode') ? getQuranUiText().readingModeOn : getQuranUiText().readingModeOff);
-                updateQuranMiniPlayerVisibility();
-                requestAnimationFrame(() => syncQuranReaderStickyOffsets());
-            });
-            readingModeBtn.dataset.bound = '1';
-        }
-
         if (!window.__quranStickyOffsetResizeBound) {
             window.addEventListener('resize', () => syncQuranReaderStickyOffsets(), { passive: true });
             window.__quranStickyOffsetResizeBound = true;
@@ -9363,10 +9352,14 @@ window.filterCategory = function(cat, btn) {
         updateQuranFloatingAudioUi();
     }
 
+    function setQuranTabLabel(el, label, iconPath) {
+        if (!el) return;
+        el.innerHTML = `<span class="quran-tab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${iconPath}</svg></span><span class="quran-tab-text">${label}</span>`;
+    }
+
     function renderQuranTexts() {
         const ui = getQuranUiText();
         const title = document.getElementById('quranPanelTitle');
-        const readingBtn = document.getElementById('quranReadingModeBtn');
         const searchInput = document.getElementById('quranSearchInput');
         const tabSurah = document.getElementById('quranTabSurah');
         const tabJuz = document.getElementById('quranTabJuz');
@@ -9374,12 +9367,11 @@ window.filterCategory = function(cat, btn) {
         const tabSettings = document.getElementById('quranTabSettings');
         const popularTitle = document.getElementById('quranPopularTitle');
         if (title) title.textContent = ui.panelTitle;
-        if (readingBtn) readingBtn.textContent = ui.readingMode;
         if (searchInput) searchInput.placeholder = ui.searchPlaceholder;
-        if (tabSurah) tabSurah.textContent = ui.tabSurah;
-        if (tabJuz) tabJuz.textContent = ui.tabJuz;
-        if (tabBookmarks) tabBookmarks.textContent = ui.tabBookmarks;
-        if (tabSettings) tabSettings.textContent = ui.tabSettings;
+        setQuranTabLabel(tabSurah, ui.tabSurah, '<path d="M2 4h7a2 2 0 012 2v14a1.5 1.5 0 00-1.5-1.5H2V4z"/><path d="M22 4h-7a2 2 0 00-2 2v14a1.5 1.5 0 011.5-1.5H22V4z"/>');
+        setQuranTabLabel(tabJuz, ui.tabJuz, '<path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><path d="M7 5v14"/><path d="M17 5v14"/>');
+        setQuranTabLabel(tabBookmarks, ui.tabBookmarks, '<path d="M6 3h12v18l-6-4-6 4V3z"/>');
+        setQuranTabLabel(tabSettings, ui.tabSettings, '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9A1.65 1.65 0 0010 3.09V3a2 2 0 014 0v.09A1.65 1.65 0 0015 4a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c0 .66.39 1.26 1 1.51.26.1.54.16.82.16H21a2 2 0 010 4h-.09c-.28 0-.56.05-.82.16-.61.25-1 .85-1 1.51z"/>');
         if (popularTitle) popularTitle.textContent = isPashtoMode() ? 'مشهور سورتونه' : 'Popular Surahs';
         updateQuranSurahSelectLabel();
 

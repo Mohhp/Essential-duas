@@ -230,7 +230,7 @@ const PS_UI = {
     // Footer
     footerText: 'تاج ټولګه',
     footerSub: 'د قرآن او سنت څخه ۶۳ اساسي دعاګانې',
-    footerBrand: 'لازمي دعاګانې',
+    footerBrand: 'فلاح',
     footerInfo: 'د قرآن او سنت څخه ۶۳ مستندې دعاګانې',
     footerCopyright: '© ۲۰۲۶ ټول حقونه خوندي دي',
     // Prayer panel
