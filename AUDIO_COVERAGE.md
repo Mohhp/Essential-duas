@@ -1,5 +1,30 @@
 # Audio Coverage
 
+## Pashto Quran Audio Status (2026-03-05)
+
+- Local surah coverage: **114/114**
+- Primary mapping file: `audio/pashto_audit/pashto_soundcloud_mapping_114.json`
+- SoundCloud playlist raw files: **102** (`audio/quran-pashto-soundcloud-raw`)
+- Supplemental direct-track files used for gaps: **12** (`audio/quran-pashto-soundcloud-normalized`)
+- Per-track failure log: `audio/pashto_audit/soundcloud_per_track_failures_20260305.tsv` (0 failures in latest run)
+
+### Size Snapshot
+
+- Normalized Pashto Quran audio: `2,255,501,240` bytes (about `2.2G`)
+- Raw playlist Pashto Quran audio: `2,217,145,868` bytes (about `2.2G`)
+- Combined raw + normalized on disk: `4,472,647,108` bytes (about `4.47G`)
+- Note: combined size includes duplication because normalized files are copied/renamed deliverables.
+
+### Recommended Sync Command
+
+Use the resilient per-track mode to avoid playlist-level stalls on single tracks:
+
+```bash
+npm run sync:pashto-soundcloud:per-track
+```
+
+This mode is designed to continue per surah even if one track has transient SoundCloud fragment errors.
+
 ## Summary
 
 - Total coverage: **50/63 duas (79%)**

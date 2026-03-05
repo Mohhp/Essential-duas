@@ -7515,6 +7515,7 @@ window.filterCategory = function(cat, btn) {
 
     // ===== QURAN READING FEATURE =====
     const QURAN_API_BASE = 'https://api.alquran.cloud/v1';
+    const QURAN_PASHTO_ZAKARIA_DATA_URL = '/audio/pashto_audit/quranenc_pashto_zakaria_114.json';
     const QURAN_CACHE_PREFIX = 'crown_quran_surah_';
     const QURAN_META_KEY = 'crown_quran_meta';
     const QURAN_LAST_READ_KEY = 'crown_quran_last_read';
@@ -7579,6 +7580,8 @@ window.filterCategory = function(cat, btn) {
         lastPashtoUnavailableAyahKey: null,
         isPashtoTranslationActive: false,
         pashtoTranslationSurah: null,
+        pashtoZakariaMap: null,
+        pashtoZakariaPromise: null,
         loadingReader: false,
         loadingList: false,
         dropdownOpen: false
@@ -7665,7 +7668,7 @@ window.filterCategory = function(cat, btn) {
             arabicFontSize: isPS ? 'د عربي لیک کچه' : 'Arabic font size',
             autoScroll: isPS ? 'د غږ پر مهال اتومات سکرول' : 'Auto-scroll during audio',
             mushafMode: isPS ? 'مصحف حالت (یوازې عربي)' : 'Mushaf mode (Arabic only)',
-            autoPashtoAfterArabic: isPS ? 'د عربي له بشپړېدو وروسته پښتو ژباړه (جز ۳۰)' : 'Auto-play Pashto after Arabic (Juz 30)',
+            autoPashtoAfterArabic: isPS ? 'د عربي له بشپړېدو وروسته پښتو ژباړه' : 'Auto-play Pashto after Arabic',
             flowArabic: isPS ? 'عربي (پرله پسې تلاوت)' : 'Arabic (Continuous)',
             flowArabicPashto: isPS ? 'عربي + پښتو (پرله پسې)' : 'Arabic + Pashto (Sequential)',
             flowArabicEnglish: isPS ? 'عربي + انګلیسي (پرله پسې)' : 'Arabic + English (Sequential)',
@@ -7690,7 +7693,7 @@ window.filterCategory = function(cat, btn) {
     function hasPashtoSurahAudio(surahNumber) {
         const surah = Number(surahNumber);
         return Number.isFinite(surah)
-            && surah >= 78
+            && surah >= 1
             && surah <= 114
             && typeof window.getPashtoTranslationUrl === 'function';
     }
@@ -7701,7 +7704,7 @@ window.filterCategory = function(cat, btn) {
         const ui = getQuranUiText();
         const isPashtoPanel = normalizeQuranPanelMode(quranState.panelMode) === 'pashto';
         const surahNo = Number(quranState.currentSurah || 0);
-        const shouldShow = isPashtoPanel && surahNo >= 1 && surahNo <= 77;
+        const shouldShow = isPashtoPanel && surahNo > 0 && !hasPashtoSurahAudio(surahNo);
         banner.textContent = ui.pashtoComingSoonBanner;
         banner.classList.toggle('visible', shouldShow);
     }
@@ -7955,6 +7958,52 @@ window.filterCategory = function(cat, btn) {
             } catch (error) {}
         }
         return refs.find(ref => Number(ref.number) === Number(surahNumber)) || null;
+    }
+
+    async function loadPashtoZakariaMap() {
+        if (quranState.pashtoZakariaMap) return quranState.pashtoZakariaMap;
+        if (quranState.pashtoZakariaPromise) return quranState.pashtoZakariaPromise;
+
+        quranState.pashtoZakariaPromise = fetch(QURAN_PASHTO_ZAKARIA_DATA_URL, { cache: 'no-cache' })
+            .then((response) => {
+                if (!response.ok) throw new Error('Failed to load Pashto Zakaria dataset');
+                return response.json();
+            })
+            .then((payload) => {
+                const map = new Map();
+                const rows = Array.isArray(payload?.surahs) ? payload.surahs : [];
+                rows.forEach((surahRow) => {
+                    const surahNo = Number(surahRow?.surah);
+                    if (!surahNo) return;
+                    const ayahRows = Array.isArray(surahRow?.ayahs) ? surahRow.ayahs : [];
+                    const texts = ayahRows
+                        .sort((a, b) => Number(a.ayah) - Number(b.ayah))
+                        .map((ayahRow) => String(ayahRow?.text || '').trim());
+                    map.set(surahNo, texts);
+                });
+                quranState.pashtoZakariaMap = map;
+                return map;
+            })
+            .catch((error) => {
+                quranState.pashtoZakariaMap = new Map();
+                return quranState.pashtoZakariaMap;
+            })
+            .finally(() => {
+                quranState.pashtoZakariaPromise = null;
+            });
+
+        return quranState.pashtoZakariaPromise;
+    }
+
+    function getPashtoZakariaAyahTexts(surahNumber, expectedAyahCount) {
+        const surahNo = Number(surahNumber);
+        const rows = quranState.pashtoZakariaMap?.get(surahNo) || [];
+        if (!Number(expectedAyahCount) || rows.length >= Number(expectedAyahCount)) return rows;
+
+        // Keep shape stable for rendering even if upstream translation is partially missing.
+        const out = rows.slice();
+        while (out.length < Number(expectedAyahCount)) out.push('');
+        return out;
     }
 
     async function ensurePashtoEdition() {
@@ -8439,14 +8488,11 @@ window.filterCategory = function(cat, btn) {
             if (cached?.data?.ayahs?.length) return cached.data;
         }
 
-        const settings = getQuranSettings();
-        const pashtoEdition = await ensurePashtoEdition();
-        if (pashtoEdition && settings.pashtoEdition !== pashtoEdition) {
-            settings.pashtoEdition = pashtoEdition;
-            saveQuranSettings(settings);
+        if (!quranState.pashtoZakariaMap) {
+            await loadPashtoZakariaMap();
         }
 
-        const editionList = ['quran-uthmani', 'en.sahih', settings.pashtoEdition || 'ps.abdulwali'];
+        const editionList = ['quran-uthmani', 'en.sahih'];
         const response = await fetch(`${QURAN_API_BASE}/surah/${surahNumber}/editions/${editionList.join(',')}`);
         const json = await response.json();
         const blocks = json?.data || [];
@@ -8454,7 +8500,7 @@ window.filterCategory = function(cat, btn) {
 
         const arabic = blocks.find(b => b.edition?.identifier === 'quran-uthmani') || blocks[0];
         const english = blocks.find(b => b.edition?.identifier === 'en.sahih') || null;
-        const pashto = blocks.find(b => b.edition?.language === 'ps') || null;
+        const pashtoAyahs = getPashtoZakariaAyahTexts(Number(surahNumber), arabic?.ayahs?.length || 0);
 
         const ayahs = (arabic.ayahs || []).map((ayah, index) => ({
             numberInSurah: ayah.numberInSurah,
@@ -8462,7 +8508,7 @@ window.filterCategory = function(cat, btn) {
             juz: ayah.juz,
             arabic: ayah.text,
             english: english?.ayahs?.[index]?.text || '',
-            pashto: pashto?.ayahs?.[index]?.text || ''
+            pashto: pashtoAyahs[index] || ''
         }));
 
         const data = {

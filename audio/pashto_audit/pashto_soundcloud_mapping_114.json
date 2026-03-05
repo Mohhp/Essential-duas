@@ -1,0 +1,940 @@
+{
+  "source": {
+    "primary": "soundcloud",
+    "playlist": "https://soundcloud.com/mirwais-rahimi-737968388/sets/quran-with-pashto-translation",
+    "generated_at": "2026-03-05T22:33:33.801Z",
+    "note": "If a SoundCloud surah is missing or not downloaded, archive fallback is used."
+  },
+  "coverage": {
+    "total": 114,
+    "downloaded_count": 114,
+    "missing_from_soundcloud": [
+      62,
+      71,
+      85,
+      88,
+      89,
+      101,
+      105,
+      106,
+      109,
+      111,
+      113,
+      114
+    ]
+  },
+  "rows": [
+    {
+      "surah": 1,
+      "source": "soundcloud",
+      "title": "01 Al Fatiha",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/01-al-fatiha",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/001.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 2,
+      "source": "soundcloud",
+      "title": "02 Al Baqara",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/02-al-baqara",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/002.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 3,
+      "source": "soundcloud",
+      "title": "03 Ale Imran",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/03-ale-imran",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/003.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 4,
+      "source": "soundcloud",
+      "title": "04 An Nisa",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/04-an-nisa",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/004.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 5,
+      "source": "soundcloud",
+      "title": "05 Al Maeda",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/05-al-maeda",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/005.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 6,
+      "source": "soundcloud",
+      "title": "06 Al Anaam",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/06-al-anaam",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/006.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 7,
+      "source": "soundcloud",
+      "title": "07 Al Aaraf",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/07-al-aaraf",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/007.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 8,
+      "source": "soundcloud",
+      "title": "08 Al Anfaal",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/08-al-anfaal-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/008.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 9,
+      "source": "soundcloud",
+      "title": "09 Al Tauba",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/09-al-tauba",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/009.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 10,
+      "source": "soundcloud",
+      "title": "10 Younus",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/10-younus-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/010.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 11,
+      "source": "soundcloud",
+      "title": "11 Hood",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/11-hood-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/011.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 12,
+      "source": "soundcloud",
+      "title": "12 Yousuf",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/12-yousuf-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/012.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 13,
+      "source": "soundcloud",
+      "title": "13 Al Raad",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/13-al-raad-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/013.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 14,
+      "source": "soundcloud",
+      "title": "14 Ibrahim",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/14-ibrahim-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/014.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 15,
+      "source": "soundcloud",
+      "title": "15 Al Hijr",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/15-al-hijr",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/015.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 16,
+      "source": "soundcloud",
+      "title": "16 Al Nahal",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/16-al-nahal-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/016.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 17,
+      "source": "soundcloud",
+      "title": "17 Al-Isra",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/17-al-isra",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/017.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 18,
+      "source": "soundcloud",
+      "title": "18 Al Kahf",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/18-al-kahf",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/018.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 19,
+      "source": "soundcloud",
+      "title": "19 Mariyam",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/19-mariyam-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/019.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 20,
+      "source": "soundcloud",
+      "title": "20 Taha",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/20-taha-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/020.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 21,
+      "source": "soundcloud",
+      "title": "21 Al Ambia",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/21-al-ambia-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/021.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 22,
+      "source": "soundcloud",
+      "title": "22 Al Hajj",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/22-al-hajj-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/022.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 23,
+      "source": "soundcloud",
+      "title": "23 Al Mouminoon",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/23-al-mouminoon-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/023.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 24,
+      "source": "soundcloud",
+      "title": "24 Al Noor",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/24-al-noor-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/024.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 25,
+      "source": "soundcloud",
+      "title": "25 Al Furqaan",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/25-al-furqaan-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/025.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 26,
+      "source": "soundcloud",
+      "title": "26 Al Shuara",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/26-al-shuara-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/026.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 27,
+      "source": "soundcloud",
+      "title": "27 Al Naml",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/27-al-naml",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/027.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 28,
+      "source": "soundcloud",
+      "title": "28 Al Qasas",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/28-al-qasas-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/028.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 29,
+      "source": "soundcloud",
+      "title": "29 Al Ankaboot",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/29-al-ankaboot-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/029.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 30,
+      "source": "soundcloud",
+      "title": "30 Al Room",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/30-al-room",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/030.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 31,
+      "source": "soundcloud",
+      "title": "31 Luqman",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/31-luqman-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/031.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 32,
+      "source": "soundcloud",
+      "title": "32 Al Sajdah",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/32-al-sajdah-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/032.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 33,
+      "source": "soundcloud",
+      "title": "33 Al Ahzab",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/33-al-ahzab-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/033.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 34,
+      "source": "soundcloud",
+      "title": "34 Saba",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/34-saba-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/034.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 35,
+      "source": "soundcloud",
+      "title": "35 Faatir",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/35-faatir-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/035.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 36,
+      "source": "soundcloud",
+      "title": "36 Yaseen",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/36-yaseen-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/036.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 37,
+      "source": "soundcloud",
+      "title": "37 Al Safaat",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/37-al-safaat",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/037.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 38,
+      "source": "soundcloud",
+      "title": "38 Suaad",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/38-suaad-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/038.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 39,
+      "source": "soundcloud",
+      "title": "39 Al Zumr",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/39-al-zumr",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/039.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 40,
+      "source": "soundcloud",
+      "title": "40 Al-Ghafir",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/40-al-ghafir",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/040.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 41,
+      "source": "soundcloud",
+      "title": "41 Fussilat",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/41-fussilat",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/041.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 42,
+      "source": "soundcloud",
+      "title": "42 Al Shoorah",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/42-al-shoorah-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/042.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 43,
+      "source": "soundcloud",
+      "title": "43 Al Zukhraf",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/43-al-zukhraf",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/043.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 44,
+      "source": "soundcloud",
+      "title": "44 Al Dukhan",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/44-al-dukhan",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/044.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 45,
+      "source": "soundcloud",
+      "title": "45 Al Jasiya",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/45-al-jasiya-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/045.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 46,
+      "source": "soundcloud",
+      "title": "46 Al Ahqaaf",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/46-al-ahqaaf-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/046.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 47,
+      "source": "soundcloud",
+      "title": "47 Muhammad",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/47-muhammad-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/047.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 48,
+      "source": "soundcloud",
+      "title": "48 Al Fatha",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/48-al-fatha-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/048.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 49,
+      "source": "soundcloud",
+      "title": "49 Al Hujraat",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/49-al-hujraat-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/049.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 50,
+      "source": "soundcloud",
+      "title": "50 Qaaf",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/50-qaaf-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/050.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 51,
+      "source": "soundcloud",
+      "title": "51 Al Zarriyaat",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/51-al-zarriyaat",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/051.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 52,
+      "source": "soundcloud",
+      "title": "52 Al Toor",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/52-al-toor-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/052.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 53,
+      "source": "soundcloud",
+      "title": "53 Al Najam",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/53-al-najam-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/053.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 54,
+      "source": "soundcloud",
+      "title": "54 Al Qamar",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/54-al-qamar-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/054.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 55,
+      "source": "soundcloud",
+      "title": "55 Al Rehman",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/55-al-rehman",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/055.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 56,
+      "source": "soundcloud",
+      "title": "56 Al Waqiya",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/56-al-waqiya-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/056.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 57,
+      "source": "soundcloud",
+      "title": "57 Al Hadeed",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/57-al-hadeed-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/057.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 58,
+      "source": "soundcloud",
+      "title": "58 Al Mujadlah",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/58-al-mujadlah",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/058.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 59,
+      "source": "soundcloud",
+      "title": "59 Al Hashar",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/59-al-hashar-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/059.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 60,
+      "source": "soundcloud",
+      "title": "60 Al Mumtinah",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/60-al-mumtinah",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/060.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 61,
+      "source": "soundcloud",
+      "title": "61 Al Saff",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/61-al-saff-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/061.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 62,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 62",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/062.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 63,
+      "source": "soundcloud",
+      "title": "63 Al Munafiqoon",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/63-al-munafiqoon-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/063.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 64,
+      "source": "soundcloud",
+      "title": "64 Al Taghabun",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/64-al-taghabun",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/064.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 65,
+      "source": "soundcloud",
+      "title": "65 Al Talaaq",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/65-al-talaaq",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/065.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 66,
+      "source": "soundcloud",
+      "title": "66 Al Tahreem",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/66-al-tahreem-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/066.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 67,
+      "source": "soundcloud",
+      "title": "67 Al Mulk",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/67-al-mulk-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/067.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 68,
+      "source": "soundcloud",
+      "title": "68 Al Qalam",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/68-al-qalam-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/068.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 69,
+      "source": "soundcloud",
+      "title": "69 Al Haqqah",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/69-al-haqqah-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/069.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 70,
+      "source": "soundcloud",
+      "title": "70 Al Muarij",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/70-al-muarij-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/070.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 71,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 71",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/071.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 72,
+      "source": "soundcloud",
+      "title": "72 Al Jinn",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/72-al-jinn",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/072.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 73,
+      "source": "soundcloud",
+      "title": "73 Al Muzzamil",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/73-al-muzzamil",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/073.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 74,
+      "source": "soundcloud",
+      "title": "74 Al Muddasir",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/74-al-muddasir-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/074.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 75,
+      "source": "soundcloud",
+      "title": "75 Al Qiyyamah",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/75-al-qiyyamah",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/075.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 76,
+      "source": "soundcloud",
+      "title": "76 Al-Insan",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/76-al-insan",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/076.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 77,
+      "source": "soundcloud",
+      "title": "77 Al Mursalat",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/77-al-mursalat-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/077.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 78,
+      "source": "soundcloud",
+      "title": "78 Al Naba",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/78-al-naba",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/078.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 79,
+      "source": "soundcloud",
+      "title": "79 Al Naziaat",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/79-al-naziaat",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/079.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 80,
+      "source": "soundcloud",
+      "title": "80 Al Abas",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/80-al-abas",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/080.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 81,
+      "source": "soundcloud",
+      "title": "81 Al Takwir",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/81-al-takwir",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/081.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 82,
+      "source": "soundcloud",
+      "title": "82 Al Infitar",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/82-al-infitar",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/082.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 83,
+      "source": "soundcloud",
+      "title": "83 Al Mutafafin",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/83-al-mutafafin",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/083.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 84,
+      "source": "soundcloud",
+      "title": "84 Al Inshiqaq",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/84-al-inshiqaq",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/084.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 85,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 85",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/085.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 86,
+      "source": "soundcloud",
+      "title": "86 Al Tariq",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/86-al-tariq",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/086.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 87,
+      "source": "soundcloud",
+      "title": "87 Al Aala",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/87-al-aala",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/087.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 88,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 88",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/088.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 89,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 89",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/089.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 90,
+      "source": "soundcloud",
+      "title": "90 Al Balad",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/90-al-balad",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/090.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 91,
+      "source": "soundcloud",
+      "title": "91 Al Shams",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/91-al-shams",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/091.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 92,
+      "source": "soundcloud",
+      "title": "92 Al Lail",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/92-al-lail",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/092.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 93,
+      "source": "soundcloud",
+      "title": "93 Al Duha",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/93-al-duha",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/093.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 94,
+      "source": "soundcloud",
+      "title": "94 Ash-Sharh",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/94-ash-sharh",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/094.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 95,
+      "source": "soundcloud",
+      "title": "95 Al Teen",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/95-al-teen",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/095.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 96,
+      "source": "soundcloud",
+      "title": "96 Al Alaq",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/96-al-alaq",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/096.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 97,
+      "source": "soundcloud",
+      "title": "97 Al Qadar",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/97-al-qadar",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/097.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 98,
+      "source": "soundcloud",
+      "title": "98 Al Bayyinah",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/98-al-bayyinah",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/098.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 99,
+      "source": "soundcloud",
+      "title": "99 Al Zilzal",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/99-al-zilzal",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/099.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 100,
+      "source": "soundcloud",
+      "title": "100 Al Aadiat",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/100-al-aadiat-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/100.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 101,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 101",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/101.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 102,
+      "source": "soundcloud",
+      "title": "102 Al Takasur",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/102-al-takasur-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/102.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 103,
+      "source": "soundcloud",
+      "title": "103 Al Aasar",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/103-al-aasar-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/103.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 104,
+      "source": "soundcloud",
+      "title": "104 Al Humzah",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/104-al-humzah",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/104.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 105,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 105",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/105.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 106,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 106",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/106.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 107,
+      "source": "soundcloud",
+      "title": "107 Al Maoon",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/107-al-maoon-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/107.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 108,
+      "source": "soundcloud",
+      "title": "108 Al Kausar",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/108-al-kausar-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/108.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 109,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 109",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/109.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 110,
+      "source": "soundcloud",
+      "title": "110 Al Nasar",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/110-al-nasar-2",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/110.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 111,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 111",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/111.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 112,
+      "source": "soundcloud",
+      "title": "112 Al Ikhlas",
+      "track_url": "https://soundcloud.com/mirwais-rahimi-737968388/112-al-ikhlas-1",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/112.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 113,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 113",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/113.mp3",
+      "downloaded": true
+    },
+    {
+      "surah": 114,
+      "source": "soundcloud-extra-local",
+      "title": "Surah 114",
+      "track_url": "",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/114.mp3",
+      "downloaded": true
+    }
+  ]
+}

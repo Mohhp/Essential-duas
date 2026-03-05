@@ -1,8 +1,12 @@
 (function () {
-  const DEFAULT_MAPPING_URL = "/audio/pashto_audit/pashto_archive_mapping_juz30.json";
+  const DEFAULT_MAPPING_URLS = [
+    "/audio/pashto_audit/pashto_soundcloud_mapping_114.json",
+    "/audio/pashto_audit/pashto_archive_mapping_114.json",
+    "/audio/pashto_audit/pashto_archive_mapping_juz30.json",
+  ];
   const LOAD_TIMEOUT_MS = 20000;
 
-  let mappingUrl = DEFAULT_MAPPING_URL;
+  let mappingUrl = DEFAULT_MAPPING_URLS[0];
   let mappingPromise = null;
   let playerAudio = null;
   let preloadAudio = null;
@@ -18,18 +22,38 @@
 
   async function loadMapping() {
     if (mappingPromise) return mappingPromise;
-    mappingPromise = fetch(mappingUrl, { cache: "no-cache" })
-      .then(function (res) {
-        if (!res.ok) throw new Error("Failed to load Pashto mapping JSON");
-        return res.json();
+    const normalizeRows = function (payload) {
+      if (Array.isArray(payload)) return payload;
+      if (payload && Array.isArray(payload.rows)) return payload.rows;
+      return [];
+    };
+
+    const candidates = [mappingUrl].concat(
+      DEFAULT_MAPPING_URLS.filter(function (url) {
+        return url !== mappingUrl;
       })
-      .then(function (rows) {
-        const bySurah = new Map();
-        rows.forEach(function (row) {
-          bySurah.set(Number(row.surah), row);
-        });
-        return bySurah;
-      });
+    );
+
+    mappingPromise = (async function () {
+      for (const candidate of candidates) {
+        try {
+          const res = await fetch(candidate, { cache: "no-cache" });
+          if (!res.ok) continue;
+          const payload = await res.json();
+          const rows = normalizeRows(payload);
+          if (!rows.length) continue;
+          const bySurah = new Map();
+          rows.forEach(function (row) {
+            bySurah.set(Number(row.surah), row);
+          });
+          mappingUrl = candidate;
+          return bySurah;
+        } catch (error) {
+          // try next candidate
+        }
+      }
+      throw new Error("Failed to load Pashto mapping JSON");
+    })();
     return mappingPromise;
   }
 
@@ -202,7 +226,7 @@
   }
 
   window.setPashtoMappingUrl = function (url) {
-    mappingUrl = String(url || DEFAULT_MAPPING_URL);
+    mappingUrl = String(url || DEFAULT_MAPPING_URLS[0]);
     mappingPromise = null;
   };
 

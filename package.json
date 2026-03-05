@@ -101,7 +101,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:min": "npx -y terser app.js -c -m -o app.min.js && npx -y clean-css-cli -o styles.min.css styles.css"
+    "build:min": "npx -y terser app.js -c -m -o app.min.js && npx -y clean-css-cli -o styles.min.css styles.css",
+    "sync:pashto-zakaria": "node scripts/fetch-quranenc-zakaria-pashto.js",
+    "sync:pashto-soundcloud": "bash scripts/prepare-soundcloud-pashto-audio.sh",
+    "sync:pashto-soundcloud:per-track": "bash scripts/sync-soundcloud-pashto-per-track.sh"
   },
   "repository": {
     "type": "git",

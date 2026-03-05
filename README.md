@@ -43,6 +43,49 @@
 
 ---
 
+## Pashto Quran Audio (Production Workflow)
+
+### Current Status
+
+- Local surah coverage: **114/114**
+- Canonical mapping: `audio/pashto_audit/pashto_soundcloud_mapping_114.json`
+- Resilient sync mode: per-track download loop (prevents playlist-wide stalls)
+
+### One-Command Sync
+
+```bash
+npm run sync:pashto-soundcloud:per-track
+```
+
+### What The Sync Produces
+
+- Raw playlist downloads: `audio/quran-pashto-soundcloud-raw/`
+- Normalized deliverables (`001.mp3` ... `114.mp3`): `audio/quran-pashto-soundcloud-normalized/`
+- Playlist metadata snapshot: `audio/pashto_audit/soundcloud_playlist_full.json`
+- Final mapping used by app logic: `audio/pashto_audit/pashto_soundcloud_mapping_114.json`
+- Per-track failures (if any): `audio/pashto_audit/soundcloud_per_track_failures_20260305.tsv`
+
+### Why Per-Track Mode
+
+The SoundCloud set can occasionally stall on a single HLS fragment. Per-track mode isolates failures so one broken item does not block all remaining surahs.
+
+### Hosting Recommendation
+
+- Do **not** commit generated audio binaries to git.
+- Publish only normalized files from `audio/quran-pashto-soundcloud-normalized/` to object storage + CDN.
+- Keep raw files only for local recovery/audit.
+- Suggested setup: Cloudflare R2 + CDN fronting for low-cost global delivery.
+
+### Pre-Release Checklist
+
+1. Run per-track sync and ensure `Failures logged: 0`.
+2. Confirm mapping reports `Downloaded: 114`.
+3. Upload normalized files to CDN bucket.
+4. Verify URL accessibility for a sample set (`001`, `050`, `114`).
+5. Ship mapping update and app release together.
+
+---
+
 ### 🔮 Potential Next Steps
 
 - [ ] Push to Google Play Store (TWA / Bubblewrap packaging)
@@ -74,13 +117,25 @@
 ```
 Essential-duas/
 ├── index.html          # Main app (HTML + CSS + JS, self-contained)
+├── app.js              # Unminified JS engine
+├── app.min.js          # Production JS bundle
+├── styles.css          # Unminified styles
+├── styles.min.css      # Production styles bundle
 ├── pashto.js           # Pashto translation data and language-toggle logic
+├── pashto-translation-player.js # Quran panel translation/audio bridge
 ├── sw.js               # Service worker (offline caching)
 ├── manifest.json       # Web App Manifest (PWA install metadata)
 ├── offline.html        # Offline fallback page
 ├── privacy.html        # Privacy policy page
+├── AUDIO_COVERAGE.md   # Dua + Pashto Quran audio coverage report
+├── audio/
+│   ├── duas/           # Dua audio assets
+│   ├── quran-pashto-soundcloud-raw/        # Generated raw SoundCloud tracks (gitignored)
+│   ├── quran-pashto-soundcloud-normalized/ # Generated normalized surah mp3s (gitignored)
+│   └── pashto_audit/   # Mapping, source metadata, and verification artifacts
+├── scripts/            # Sync and audit utilities
 ├── favicon.svg         # SVG favicon
-├── icon-*.png          # PWA icons (48 → 512 px)
+├── icon-*.png          # PWA icons (48 -> 512 px)
 ├── *.png               # Store screenshots
 ├── feature-graphic.html # Play Store feature graphic source
 ├── STORE_LISTING.md    # Google Play Store copy
