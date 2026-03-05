@@ -3062,6 +3062,36 @@
             padding: 2px 0 4px;
         }
 
+        .quran-flow-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid rgba(201, 168, 76, 0.18);
+            border-radius: 12px;
+            background: var(--bg-card);
+            padding: 3px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            max-width: 100%;
+        }
+        .quran-flow-actions::-webkit-scrollbar { display: none; }
+
+        .quran-flow-btn {
+            border: 0;
+            background: transparent;
+            border-radius: 10px;
+            min-height: 30px;
+            padding: 0 10px;
+            white-space: nowrap;
+            color: var(--text-subtle);
+        }
+
+        .quran-flow-btn.active {
+            color: var(--gold-light);
+            background: rgba(201, 168, 76, 0.12);
+            box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.2) inset;
+        }
+
         .quran-surah-frame {
             border: 1px solid rgba(201, 168, 76, 0.2);
             border-radius: 12px;
@@ -3382,6 +3412,7 @@
         }
         [data-theme="light"] .quran-view-tab,
         [data-theme="light"] .quran-row-btn,
+        [data-theme="light"] .quran-flow-actions,
         [data-theme="light"] .quran-tt-btn,
         [data-theme="light"] .quran-ayah-btn,
         [data-theme="light"] .dot-popup-btn,
