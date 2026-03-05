@@ -3019,7 +3019,7 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (default) -->
-<script src="app.min.js?v=20260305c"></script>
+<script src="app.min.js?v=20260305d"></script>
 <!-- Development assets (uncomment for local debugging) -->
 <!-- <script src="app.js?v=20260301f"></script> -->
 
@@ -3125,6 +3125,10 @@
             <div class="quran-reader-sticky" id="quranReaderSticky">
                 <div class="quran-reader-header" id="quranReaderHeader"></div>
                 <div class="quran-reader-tools">
+                    <div class="quran-flow-actions" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                        <button type="button" class="quran-row-btn" id="quranFlowArabicBtn">Flow Arabic</button>
+                        <button type="button" class="quran-row-btn" id="quranFlowArabicPashtoBtn">Flow Arabic + Pashto</button>
+                    </div>
                     <div class="quran-translation-toggle" id="quranTranslationToggle">
                         <button type="button" class="quran-tt-btn active" data-mode="all">AR + PS + EN</button>
                         <button type="button" class="quran-tt-btn" data-mode="ar-ps">AR + PS</button>
