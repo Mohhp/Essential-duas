@@ -35,6 +35,72 @@
     <link rel="stylesheet" href="styles.min.css?v=20260304b">
     <!-- Development assets (uncomment for local debugging) -->
     <!-- <link rel="stylesheet" href="styles.css?v=20260301f"> -->
+    <style>
+        .update-prompt-card {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 0 0 14px;
+            padding: 14px 16px;
+            border: 1px solid rgba(201, 168, 76, 0.28);
+            border-radius: 16px;
+            background: linear-gradient(140deg, rgba(201, 168, 76, 0.16), rgba(46, 196, 122, 0.12));
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+        }
+
+        .update-prompt-title {
+            font-family: var(--font-title);
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .update-prompt-title-ps {
+            font-family: var(--font-text);
+            color: var(--text-muted);
+        }
+
+        .update-prompt-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .update-prompt-btn {
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            font-family: var(--font-text);
+        }
+
+        .update-prompt-btn.primary {
+            background: linear-gradient(135deg, #1f8a5b, #0f6e47);
+            color: #f6fdf8;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .update-prompt-btn.secondary {
+            background: rgba(255, 255, 255, 0.14);
+            color: var(--text-primary);
+            border-color: rgba(255, 255, 255, 0.22);
+        }
+
+        [data-theme="light"] .update-prompt-card {
+            background: linear-gradient(140deg, rgba(154, 122, 47, 0.18), rgba(13, 123, 80, 0.12));
+            border-color: rgba(13, 123, 80, 0.2);
+            box-shadow: 0 8px 20px rgba(72, 52, 27, 0.12);
+        }
+
+        [data-theme="light"] .update-prompt-btn.secondary {
+            background: rgba(255, 255, 255, 0.72);
+            border-color: rgba(13, 123, 80, 0.2);
+        }
+    </style>
 </head>
 
     <body>
@@ -2864,6 +2930,90 @@
 <!-- ===== PASHTO LANGUAGE SUPPORT ===== -->
 <script src="pashto.js"></script>
 
+<script>
+    const APP_VERSION = '2.0.1';
+
+    (function() {
+        const VERSION_INFO_URL = 'https://mohhp.github.io/Essential-duas/version.json';
+        const DEFAULT_UPDATE_URL = 'https://play.google.com/store/apps/details?id=io.github.mohhp.essentialduas';
+        const UPDATE_DISMISS_KEY = 'falah_update_prompt_dismissed_at';
+        const DAY_MS = 24 * 60 * 60 * 1000;
+
+        function isDismissedRecently() {
+            const raw = localStorage.getItem(UPDATE_DISMISS_KEY);
+            if (!raw) return false;
+            const dismissedAt = Number(raw);
+            if (!Number.isFinite(dismissedAt)) return false;
+            return Date.now() - dismissedAt < DAY_MS;
+        }
+
+        function markDismissedNow() {
+            localStorage.setItem(UPDATE_DISMISS_KEY, String(Date.now()));
+        }
+
+        function removeUpdatePromptCard() {
+            const existing = document.getElementById('updatePromptCard');
+            if (existing) existing.remove();
+        }
+
+        function showUpdatePrompt(updateUrl) {
+            if (isDismissedRecently()) return;
+
+            const host = document.getElementById('homeDashboard');
+            if (!host || document.getElementById('updatePromptCard')) return;
+
+            const safeUrl = typeof updateUrl === 'string' && /^https?:\/\//i.test(updateUrl)
+                ? updateUrl
+                : DEFAULT_UPDATE_URL;
+
+            const card = document.createElement('div');
+            card.id = 'updatePromptCard';
+            card.className = 'update-prompt-card';
+            card.innerHTML = [
+                '<div class="update-prompt-title">A new version of Falah is available! Update now for new features.</div>',
+                '<div class="update-prompt-title update-prompt-title-ps">د فلاح نوې نسخه شتون لري! د نویو ځانګړتیاوو لپاره اوس تازه کړئ.</div>',
+                '<div class="update-prompt-actions">',
+                '  <a class="update-prompt-btn primary" id="updateNowBtn" href="' + safeUrl + '" target="_blank" rel="noopener noreferrer">Update</a>',
+                '  <button type="button" class="update-prompt-btn secondary" id="updateLaterBtn">Later</button>',
+                '</div>'
+            ].join('');
+
+            host.insertBefore(card, host.firstChild);
+
+            const laterBtn = card.querySelector('#updateLaterBtn');
+            const updateBtn = card.querySelector('#updateNowBtn');
+
+            if (laterBtn) {
+                laterBtn.addEventListener('click', function() {
+                    markDismissedNow();
+                    removeUpdatePromptCard();
+                });
+            }
+
+            if (updateBtn) {
+                updateBtn.addEventListener('click', function() {
+                    markDismissedNow();
+                });
+            }
+        }
+
+        window.showUpdatePrompt = showUpdatePrompt;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch(VERSION_INFO_URL)
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    if (data && data.latest !== APP_VERSION) {
+                        showUpdatePrompt(data.updateUrl || DEFAULT_UPDATE_URL);
+                    }
+                })
+                .catch(function() {
+                    // Silent fail if offline or unreachable.
+                });
+        });
+    })();
+</script>
+
 <!-- ══════════════════════════════════════════ -->
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
@@ -3167,7 +3317,7 @@
         <p id="aboutDescription">Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.</p>
         <p id="aboutDescriptionPs">ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.</p>
         <p id="aboutTagline">حي على الفلاح — Come to Success</p>
-        <p id="aboutVersion">Version: 2.0.0</p>
+        <p id="aboutVersion">Version: 2.0.1</p>
         <div class="about-meta">
             <div id="aboutDeveloper">Developer: Falah</div>
             <div id="aboutCopyright">© 2026 Falah. All rights reserved.</div>
