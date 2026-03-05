@@ -1,0 +1,32 @@
+=== 001 :: 001 - Al-Fatihah ( The Opening ) - سورة الفاتحة.mp3 ===
+codec_name=mp3
+sample_rate=24000
+channels=1
+codec_name=mjpeg
+duration=93.240000
+bit_rate=35778
+
+=== 002 :: 002 - Al-Baqarah ( The Cow ) - سورة البقرة.mp3 ===
+codec_name=mp3
+sample_rate=24000
+channels=1
+codec_name=mjpeg
+duration=14205.120000
+bit_rate=29513
+
+=== 036 :: 036 - Ya-seen - سورة يس.mp3 ===
+codec_name=mp3
+sample_rate=24000
+channels=1
+codec_name=mjpeg
+duration=1802.256000
+bit_rate=29344
+
+=== 114 :: 114 - An-Nas ( Mankind ) - سورة الناس.mp3 ===
+codec_name=mp3
+sample_rate=24000
+channels=1
+codec_name=mjpeg
+duration=77.880000
+bit_rate=36962
+

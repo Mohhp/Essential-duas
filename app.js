@@ -7567,6 +7567,9 @@ window.filterCategory = function(cat, btn) {
         audioPausedManually: false,
         audioFallbackAttempted: false,
         audioSwitchingSource: false,
+        audioSessionStartAyah: 1,
+        isPashtoTranslationActive: false,
+        pashtoTranslationSurah: null,
         loadingReader: false,
         loadingList: false,
         dropdownOpen: false
@@ -7592,6 +7595,7 @@ window.filterCategory = function(cat, btn) {
             arabicSize: 2,
             autoScrollAudio: true,
             mushafMode: false,
+            autoPashtoAfterArabic: false,
             pashtoEdition: 'ps.abdulwali'
         };
     }
@@ -7631,6 +7635,7 @@ window.filterCategory = function(cat, btn) {
             arabicFontSize: isPS ? 'د عربي لیک کچه' : 'Arabic font size',
             autoScroll: isPS ? 'د غږ پر مهال اتومات سکرول' : 'Auto-scroll during audio',
             mushafMode: isPS ? 'مصحف حالت (یوازې عربي)' : 'Mushaf mode (Arabic only)',
+            autoPashtoAfterArabic: isPS ? 'د عربي له بشپړېدو وروسته پښتو ژباړه (جز ۳۰)' : 'Auto-play Pashto after Arabic (Juz 30)',
             saveSettings: isPS ? 'تنظیمات خوندي شول' : 'Settings saved',
             notPlaying: isPS ? 'اوس غږ نه شته' : 'Not playing',
             playAll: isPS ? 'ټول پلی' : 'Play All',
@@ -7667,6 +7672,7 @@ window.filterCategory = function(cat, btn) {
             settings.arabicSize = Math.max(1.4, Math.min(2.8, Number(settings.arabicSize) || defaults.arabicSize));
             settings.autoScrollAudio = !!settings.autoScrollAudio;
             settings.mushafMode = !!settings.mushafMode;
+            settings.autoPashtoAfterArabic = !!settings.autoPashtoAfterArabic;
             settings.pashtoEdition = settings.pashtoEdition || defaults.pashtoEdition;
             return settings;
         } catch (error) {
@@ -8261,6 +8267,10 @@ window.filterCategory = function(cat, btn) {
                         <span>${ui.mushafMode}</span>
                         <input id="quranMushafToggle" type="checkbox" ${settings.mushafMode ? 'checked' : ''}>
                     </label>
+                    <label style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                        <span>${ui.autoPashtoAfterArabic}</span>
+                        <input id="quranAutoPashtoToggle" type="checkbox" ${settings.autoPashtoAfterArabic ? 'checked' : ''}>
+                    </label>
                 </div>
             </div>
         `;
@@ -8271,6 +8281,7 @@ window.filterCategory = function(cat, btn) {
         const fontValue = document.getElementById('quranArabicFontValue');
         const autoScrollToggle = document.getElementById('quranAutoScrollToggle');
         const mushafToggle = document.getElementById('quranMushafToggle');
+        const autoPashtoToggle = document.getElementById('quranAutoPashtoToggle');
 
         const persist = () => {
             const current = getQuranSettings();
@@ -8279,6 +8290,7 @@ window.filterCategory = function(cat, btn) {
             if (fontRange) current.arabicSize = Number(fontRange.value);
             if (autoScrollToggle) current.autoScrollAudio = autoScrollToggle.checked;
             if (mushafToggle) current.mushafMode = mushafToggle.checked;
+            if (autoPashtoToggle) current.autoPashtoAfterArabic = autoPashtoToggle.checked;
             saveQuranSettings(current);
             applyQuranArabicFontSize();
             refreshQuranTranslationModeButtons();
@@ -8292,6 +8304,7 @@ window.filterCategory = function(cat, btn) {
         if (fontRange) fontRange.addEventListener('input', persist);
         if (autoScrollToggle) autoScrollToggle.addEventListener('change', persist);
         if (mushafToggle) mushafToggle.addEventListener('change', persist);
+        if (autoPashtoToggle) autoPashtoToggle.addEventListener('change', persist);
     }
 
     function showQuranSkeleton(show) {
@@ -8385,6 +8398,12 @@ window.filterCategory = function(cat, btn) {
     }
 
     function getQuranCurrentAyahLabel() {
+        if (quranState.isPashtoTranslationActive && quranState.pashtoTranslationSurah) {
+            return isPashtoMode()
+                ? `پښتو ژباړه · سورت ${localizeQuranNumber(quranState.pashtoTranslationSurah)}`
+                : `Pashto Translation · Surah ${localizeQuranNumber(quranState.pashtoTranslationSurah)}`;
+        }
+
         const key = quranState.audioAyah
             || (quranState.lastPlayedSurah && quranState.lastPlayedAyah ? `${quranState.lastPlayedSurah}:${quranState.lastPlayedAyah}` : null);
         if (!key) return isPashtoMode() ? 'آیت ۰/۰' : 'Ayah 0/0';
@@ -8444,6 +8463,52 @@ window.filterCategory = function(cat, btn) {
 
     function markQuranControlsInteraction() {
         updateQuranFloatingAudioUi();
+    }
+
+    function stopPashtoTranslationSafe() {
+        if (typeof window.stopPashtoTranslation !== 'function') return;
+        try {
+            window.stopPashtoTranslation();
+        } catch (error) {}
+    }
+
+    function canAutoPlayPashtoTranslationForSurah(surahNumber, startedFromFirstAyah) {
+        const surah = Number(surahNumber);
+        if (!startedFromFirstAyah) return false;
+        if (!Number.isFinite(surah) || surah < 78 || surah > 114) return false;
+        if (typeof window.playPashtoTranslation !== 'function') return false;
+        return !!getQuranSettings().autoPashtoAfterArabic;
+    }
+
+    async function playPashtoTranslationForCompletedSurah(surahNumber, startedFromFirstAyah) {
+        if (!canAutoPlayPashtoTranslationForSurah(surahNumber, startedFromFirstAyah)) return false;
+
+        quranState.isPashtoTranslationActive = true;
+        quranState.pashtoTranslationSurah = Number(surahNumber);
+        setQuranPlayerState('loading');
+        setQuranPlayButtonLoading(true);
+
+        try {
+            if (typeof window.preloadPashtoTranslation === 'function') {
+                try {
+                    await window.preloadPashtoTranslation(Number(surahNumber));
+                } catch (error) {}
+            }
+
+            setQuranPlayerState('playing');
+            setQuranPlayButtonLoading(false);
+            await window.playPashtoTranslation(Number(surahNumber));
+            return true;
+        } catch (error) {
+            console.warn('[QuranAudio] Pashto translation playback failed', { surahNumber, error: error?.message || error });
+            showToast(isPashtoMode() ? 'د پښتو ژباړې غږول ناکام شول' : 'Pashto translation playback failed');
+            return false;
+        } finally {
+            quranState.isPashtoTranslationActive = false;
+            quranState.pashtoTranslationSurah = null;
+            setQuranPlayButtonLoading(false);
+            updateQuranFloatingAudioUi();
+        }
     }
 
     function shouldShowTranslationBlock(mode, type) {
@@ -8674,6 +8739,8 @@ window.filterCategory = function(cat, btn) {
     }
 
     function stopQuranAudio({ resetTime = true, explicitStop = false, fullyReset = false, surahCompleted = false, navigatedAway = false } = {}) {
+        stopPashtoTranslationSafe();
+
         if (quranState.audio) {
             quranState.audio.pause();
             if (resetTime) quranState.audio.currentTime = 0;
@@ -8695,6 +8762,8 @@ window.filterCategory = function(cat, btn) {
         quranState.audioPausedManually = false;
         quranState.audioFallbackAttempted = false;
         quranState.audioSwitchingSource = false;
+        quranState.isPashtoTranslationActive = false;
+        quranState.pashtoTranslationSurah = null;
 
         const shouldHide = explicitStop || fullyReset || surahCompleted || navigatedAway;
         if (shouldHide) {
@@ -8886,6 +8955,13 @@ window.filterCategory = function(cat, btn) {
 
     async function playQuranAyahInternal(surahNumber, ayahNumber, startTime = 0, forceReload = false) {
         console.log('[QuranAudio] play request', { surahNumber, ayahNumber, startTime, forceReload });
+
+        if (quranState.isPashtoTranslationActive) {
+            stopPashtoTranslationSafe();
+            quranState.isPashtoTranslationActive = false;
+            quranState.pashtoTranslationSurah = null;
+        }
+
         if (!quranState.currentSurahData || Number(quranState.currentSurah) !== Number(surahNumber)) {
             await openQuranSurah(surahNumber, ayahNumber);
         }
@@ -8918,6 +8994,7 @@ window.filterCategory = function(cat, btn) {
         const settings = getQuranSettings();
         quranState.lastPlayedSurah = Number(surahNumber);
         quranState.lastPlayedAyah = Number(ayahNumber);
+        if (!quranState.isChainedPlayback) quranState.audioSessionStartAyah = Number(ayahNumber) || 1;
         setQuranPlayerState('loading');
         setQuranPlayButtonLoading(true);
 
@@ -8944,7 +9021,7 @@ window.filterCategory = function(cat, btn) {
                 setQuranPlayerState('playing');
                 setQuranPlayButtonLoading(false);
             });
-            quranState.audio.addEventListener('ended', () => {
+            quranState.audio.addEventListener('ended', async () => {
                 if (!quranState.audioAyah) return;
                 const [sNo, aNo] = quranState.audioAyah.split(':').map(Number);
                 if (quranState.currentSurahData && aNo < quranState.currentSurahData.ayahs.length) {
@@ -8953,6 +9030,8 @@ window.filterCategory = function(cat, btn) {
                     setQuranPlayButtonLoading(true);
                     playQuranAyahInternal(sNo, aNo + 1);
                 } else {
+                    const startedFromFirstAyah = Number(quranState.audioSessionStartAyah || 1) === 1;
+                    await playPashtoTranslationForCompletedSurah(sNo, startedFromFirstAyah);
                     stopQuranAudio({ resetTime: true, surahCompleted: true });
                 }
             });
@@ -9065,6 +9144,26 @@ window.filterCategory = function(cat, btn) {
     function toggleQuranPlayPause() {
         if (quranState.playerState === 'loading') {
             return;
+        }
+
+        if (quranState.isPashtoTranslationActive) {
+            if (quranState.playerState === 'playing' && typeof window.pausePashtoTranslation === 'function') {
+                window.pausePashtoTranslation();
+                setQuranPlayerState('paused');
+                return;
+            }
+
+            if (quranState.playerState === 'paused' && typeof window.resumePashtoTranslation === 'function') {
+                setQuranPlayButtonLoading(true);
+                window.resumePashtoTranslation().then(() => {
+                    setQuranPlayButtonLoading(false);
+                    setQuranPlayerState('playing');
+                }).catch(() => {
+                    setQuranPlayButtonLoading(false);
+                    setQuranPlayerState('paused');
+                });
+                return;
+            }
         }
 
         if (quranState.playerState === 'playing' && quranState.audio) {
