@@ -962,18 +962,43 @@
         }
 
         .cat-card-icon {
-            font-size: 2.2rem;
-            margin-bottom: 6px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
-            position: relative; z-index: 1;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 2.6rem;
-            height: 2.6rem;
-            line-height: 1;
+            width: 2.85rem;
+            height: 2.85rem;
+            border-radius: 14px;
+            background: linear-gradient(150deg, rgba(255,255,255,0.26), rgba(255,255,255,0.08));
+            border: 1px solid rgba(255,255,255,0.34);
+            box-shadow: 0 10px 18px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.28);
         }
-        .cat-card.featured .cat-card-icon { font-size: 2.6rem; }
+
+        .cat-card-icon svg {
+            width: 1.58rem;
+            height: 1.58rem;
+            display: block;
+            stroke: rgba(255,255,255,0.96);
+            stroke-width: 1.85;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            vector-effect: non-scaling-stroke;
+            filter: drop-shadow(0 1px 3px rgba(0,0,0,0.25));
+        }
+
+        .cat-card.featured .cat-card-icon {
+            width: 3.15rem;
+            height: 3.15rem;
+            border-radius: 16px;
+        }
+
+        .cat-card.featured .cat-card-icon svg {
+            width: 1.76rem;
+            height: 1.76rem;
+        }
 
         .cat-card-name {
             font-family: var(--font-title);
@@ -1505,7 +1530,20 @@
             background: linear-gradient(to left, transparent, rgba(46, 196, 122, 0.25));
         }
         .section-header .orn-center {
-            font-size: 1.1rem; color: var(--emerald-light); opacity: 0.5;
+            font-size: 1.1rem; color: var(--emerald-light); opacity: 0.62;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .section-header .orn-center svg {
+            width: 1rem;
+            height: 1rem;
+            stroke: currentColor;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            vector-effect: non-scaling-stroke;
         }
         .section-title {
             font-family: var(--font-title); font-size: 0.92rem;
@@ -6915,5 +6953,882 @@
             .quran-recent-item {
                 transition: none !important;
                 transform: none !important;
+            }
+        }
+
+        /* ============================================ */
+        /* ===== FINAL PREMIUM HOME + QURAN ===== */
+        /* ============================================ */
+
+        .dashboard-greeting {
+            display: block !important;
+            margin-top: 4px;
+            font-size: clamp(1.24rem, 2.7vw, 1.38rem);
+            font-weight: 300;
+            letter-spacing: 0.3px;
+            color: rgba(255, 255, 255, 0.72);
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .dashboard-date {
+            margin-top: 2px;
+            margin-bottom: 6px;
+        }
+
+        .dashboard-prayer-card {
+            background: linear-gradient(135deg, #1a3a5c 0%, #0f2a45 40%, #0a1e35 100%) !important;
+        }
+
+        body[data-day-phase='predawn'] .dashboard-prayer-card {
+            background: linear-gradient(135deg, #2a1a5c 0%, #1a0f45 40%, #0e0a35 100%) !important;
+        }
+
+        body[data-day-phase='daytime'] .dashboard-prayer-card {
+            background: linear-gradient(135deg, #1a3a5c 0%, #0f2a45 40%, #0a1e35 100%) !important;
+        }
+
+        body[data-day-phase='evening'] .dashboard-prayer-card {
+            background: linear-gradient(135deg, #3a1a5c 0%, #250f45 40%, #180a35 100%) !important;
+        }
+
+        body[data-day-phase='night'] .dashboard-prayer-card {
+            background: linear-gradient(135deg, #0f1a3a 0%, #0a1228 40%, #060e20 100%) !important;
+        }
+
+        #dashboardSuggestionCard {
+            min-height: 72px;
+            padding: 16px 20px !important;
+            border-radius: 16px !important;
+            background: linear-gradient(135deg, rgba(28, 60, 94, 0.92), rgba(15, 35, 56, 0.95)) !important;
+        }
+
+        #dashboardSuggestionCard .dashboard-suggestion-row {
+            align-items: center;
+            gap: 16px;
+        }
+
+        .dashboard-continue-left {
+            min-width: 0;
+            flex: 1;
+            display: grid;
+            gap: 3px;
+        }
+
+        .dashboard-continue-kicker {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.58);
+        }
+
+        .dashboard-continue-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 100%;
+        }
+
+        .dashboard-continue-icon {
+            font-size: 20px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .dashboard-continue-surah {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .dashboard-continue-ayah {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.62);
+        }
+
+        #dashboardSuggestionCard .continue-btn,
+        #dashboardSuggestionCard .dashboard-suggestion-cta {
+            background: linear-gradient(135deg, #c9a84c, #a8873a) !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 20px !important;
+            padding: 8px 20px !important;
+            min-height: 36px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .dashboard-quick-grid {
+            margin-top: 14px;
+            gap: 12px;
+        }
+
+        .dashboard-quick-tile {
+            position: relative;
+            isolation: isolate;
+            min-height: 110px !important;
+            border-radius: 18px !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+
+        .dashboard-quick-tile:hover {
+            transform: translateY(-2px);
+        }
+
+        .dashboard-quick-tile:active {
+            transform: scale(0.97);
+        }
+
+        .dashboard-quick-wave {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .dashboard-quick-wave::before {
+            content: '';
+            position: absolute;
+            top: -52%;
+            right: -30%;
+            width: 210%;
+            height: 210%;
+            background: radial-gradient(ellipse at 70% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
+        }
+
+        .dashboard-quick-icon,
+        .dashboard-quick-label {
+            position: relative;
+            z-index: 1;
+        }
+
+        .dashboard-quick-icon {
+            width: auto;
+            height: auto;
+            font-size: 38px;
+            line-height: 1;
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.24));
+        }
+
+        .dashboard-quick-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff !important;
+            letter-spacing: 0.2px;
+        }
+
+        .dashboard-quick-tile.quick-quran {
+            background: linear-gradient(135deg, #2c5f8a 0%, #1a3a6b 100%) !important;
+            box-shadow: 0 8px 20px rgba(20, 54, 102, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .dashboard-quick-tile.quick-duas {
+            background: linear-gradient(135deg, #1a6b4a 0%, #0f4a32 100%) !important;
+            box-shadow: 0 8px 20px rgba(18, 92, 62, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .dashboard-quick-tile.quick-tasbeeh {
+            background: linear-gradient(135deg, #8a6a2a 0%, #5c4a1a 100%) !important;
+            box-shadow: 0 8px 20px rgba(118, 90, 28, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .dashboard-quick-tile.quick-qibla {
+            background: linear-gradient(135deg, #1a5c6b 0%, #0f3a45 100%) !important;
+            box-shadow: 0 8px 20px rgba(21, 84, 98, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+        }
+
+        .dashboard-quick-tile.quick-quran:hover {
+            box-shadow: 0 10px 26px rgba(20, 54, 102, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .dashboard-quick-tile.quick-duas:hover {
+            box-shadow: 0 10px 26px rgba(18, 92, 62, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .dashboard-quick-tile.quick-tasbeeh:hover {
+            box-shadow: 0 10px 26px rgba(118, 90, 28, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .dashboard-quick-tile.quick-qibla:hover {
+            box-shadow: 0 10px 26px rgba(21, 84, 98, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+        }
+
+        #dashboardTipCard {
+            margin-top: 14px;
+            border-radius: 12px !important;
+            padding: 14px 18px !important;
+            background: rgba(201, 168, 76, 0.06) !important;
+            border: 1px solid rgba(201, 168, 76, 0.16) !important;
+            border-left: 3px solid rgba(201, 168, 76, 0.3) !important;
+        }
+
+        .dashboard-tip-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #c9a84c;
+            margin-bottom: 5px;
+        }
+
+        .dashboard-tip-text {
+            font-size: 14px;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.82);
+            font-style: italic;
+        }
+
+        .dashboard-tip-card.tip-fade-out {
+            opacity: 0.4;
+            transform: translateY(3px);
+            transition: opacity 0.16s ease, transform 0.16s ease;
+        }
+
+        .dashboard-tip-card.tip-fade-in {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.24s ease, transform 0.24s ease;
+        }
+
+        .dashboard-hadith-card,
+        .dashboard-progress-summary {
+            margin-top: 12px;
+            border-radius: 16px;
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 1px solid rgba(255, 255, 255, 0.07);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .dashboard-hadith-card {
+            background: linear-gradient(135deg, rgba(29, 53, 76, 0.92), rgba(15, 29, 45, 0.95));
+        }
+
+        .dashboard-hadith-label {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #c9a84c;
+            margin-bottom: 7px;
+        }
+
+        .dashboard-hadith-text {
+            font-size: 14px;
+            line-height: 1.55;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.86);
+        }
+
+        .dashboard-hadith-source {
+            margin-top: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.58);
+        }
+
+        .dashboard-progress-summary {
+            background: linear-gradient(135deg, rgba(21, 44, 64, 0.9), rgba(10, 24, 37, 0.95));
+            display: grid;
+            gap: 8px;
+        }
+
+        .dashboard-progress-heading {
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.72);
+        }
+
+        .dashboard-progress-row {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        .dashboard-progress-bar {
+            width: 100%;
+            height: 5px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            overflow: hidden;
+        }
+
+        .dashboard-progress-bar > span {
+            display: block;
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #c9a84c, #2ec47a);
+            transition: width 0.35s ease;
+        }
+
+        .quran-surah-row {
+            border-left: 3px solid transparent !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.06)) !important;
+            padding: 14px !important;
+            align-items: center;
+        }
+
+        .quran-surah-row.is-makki {
+            border-left-color: rgba(201, 168, 76, 0.5) !important;
+        }
+
+        .quran-surah-row.is-madani {
+            border-left-color: rgba(46, 204, 113, 0.5) !important;
+        }
+
+        .quran-surah-row:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.09)) !important;
+        }
+
+        .quran-surah-num {
+            width: 28px !important;
+            height: 28px !important;
+            font-size: 11px !important;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            background: rgba(255, 255, 255, 0.06) !important;
+            color: rgba(255, 255, 255, 0.86) !important;
+        }
+
+        .quran-surah-main {
+            display: grid;
+            gap: 3px;
+        }
+
+        .quran-surah-name-secondary {
+            font-size: 14px !important;
+            font-weight: 500;
+            color: #fff !important;
+            line-height: 1.35;
+        }
+
+        .quran-surah-ayahs {
+            font-size: 12px !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        .quran-surah-meta {
+            gap: 6px;
+            min-width: 124px;
+        }
+
+        .quran-surah-name-primary {
+            font-family: var(--font-arabic) !important;
+            font-size: clamp(1.35rem, 2.6vw, 1.5rem) !important;
+            line-height: 1.2;
+            color: rgba(255, 255, 255, 0.96) !important;
+            text-align: right;
+        }
+
+        .quran-revelation-text,
+        .quran-popular-revelation {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            padding: 3px 8px;
+            font-size: 10px !important;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            font-weight: 600;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .quran-revelation-text.is-makki,
+        .quran-popular-revelation.is-makki {
+            background: rgba(201, 168, 76, 0.15) !important;
+            color: #c9a84c !important;
+        }
+
+        .quran-revelation-text.is-madani,
+        .quran-popular-revelation.is-madani {
+            background: rgba(46, 204, 113, 0.15) !important;
+            color: #2ecc71 !important;
+        }
+
+        .tasbeeh-tap-btn {
+            width: 140px !important;
+            height: 140px !important;
+            min-width: 140px !important;
+            min-height: 140px !important;
+            border-radius: 50% !important;
+            background: linear-gradient(145deg, #1a6b4a 0%, #0f4a32 100%) !important;
+            border: 2px solid rgba(201, 168, 76, 0.25) !important;
+            box-shadow:
+                0 4px 15px rgba(26, 107, 74, 0.4),
+                0 10px 30px rgba(0, 0, 0, 0.3),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.2) !important;
+            cursor: pointer;
+            transition: all 0.15s ease !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tasbeeh-tap-btn:hover {
+            box-shadow:
+                0 6px 20px rgba(26, 107, 74, 0.5),
+                0 15px 40px rgba(0, 0, 0, 0.35),
+                inset 0 2px 4px rgba(255, 255, 255, 0.12),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.2) !important;
+            transform: scale(1.03);
+        }
+
+        .tasbeeh-tap-btn:active {
+            transform: scale(0.95) !important;
+            box-shadow:
+                0 2px 8px rgba(26, 107, 74, 0.3),
+                0 5px 15px rgba(0, 0, 0, 0.25),
+                inset 0 3px 6px rgba(0, 0, 0, 0.3),
+                inset 0 -1px 2px rgba(255, 255, 255, 0.05) !important;
+            transition-duration: 0.08s !important;
+        }
+
+        .tasbeeh-tap-btn .tap-text {
+            color: #fff !important;
+            font-size: 20px !important;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        #bottomNav,
+        .bottom-nav {
+            position: fixed !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            z-index: 12000 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            display: grid !important;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            overflow: visible !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .bottom-nav-item {
+            min-width: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 6px 2px 10px !important;
+            gap: 4px !important;
+            overflow: visible;
+        }
+
+        .bottom-nav-item.active {
+            margin: 4px 4px 6px !important;
+            padding: 6px 6px 10px !important;
+            border-radius: 14px !important;
+        }
+
+        .bottom-nav-item > span:last-child {
+            display: block !important;
+            white-space: nowrap;
+            font-size: 0.63rem;
+        }
+
+        body.quran-reading-mode .bottom-nav {
+            display: grid !important;
+        }
+
+        @media (max-width: 700px) {
+            .dashboard-quick-tile {
+                min-height: 110px !important;
+            }
+
+            .dashboard-quick-icon {
+                font-size: 36px;
+            }
+
+            .bottom-nav-item > span:last-child {
+                font-size: 0.6rem;
+            }
+
+            .tasbeeh-tap-btn {
+                width: 130px !important;
+                height: 130px !important;
+                min-width: 130px !important;
+                min-height: 130px !important;
+            }
+        }
+
+        /* ============================================ */
+        /* ===== CRITICAL BUGFIX OVERRIDES ===== */
+        /* ============================================ */
+
+        /* FIX 1 + FIX 6: stable premium prayer gradient (no phase switching) */
+        .dashboard-prayer-card,
+        body[data-day-phase='morning'] .dashboard-prayer-card,
+        body[data-day-phase='afternoon'] .dashboard-prayer-card,
+        body[data-day-phase='evening'] .dashboard-prayer-card,
+        body[data-day-phase='night'] .dashboard-prayer-card,
+        body[data-day-phase='predawn'] .dashboard-prayer-card,
+        body[data-day-phase='daytime'] .dashboard-prayer-card {
+            background: linear-gradient(135deg, #1a3a5c 0%, #0f2a45 40%, #0a1e35 100%) !important;
+        }
+
+        /* FIX 5: standardized professional category icon treatment */
+        .cat-card-icon {
+            display: inline-flex !important;
+        }
+
+        .cat-card-icon svg {
+            display: block;
+        }
+
+        /* FIX 5: ensure inline svg home icons size consistently */
+        .dashboard-quick-icon svg {
+            width: 36px;
+            height: 36px;
+            display: block;
+        }
+
+        /* FIX 2: remove broken numeric rail and harden dropdown layout */
+        .quran-jump-rail {
+            display: none !important;
+        }
+
+        .quran-dropdown-body .quran-list {
+            max-height: min(60vh, 400px) !important;
+            padding-right: 0 !important;
+        }
+
+        .quran-surah-row {
+            min-height: 58px !important;
+            padding: 10px 12px !important;
+            align-items: center !important;
+            overflow: hidden;
+        }
+
+        .quran-surah-main,
+        .quran-surah-name-secondary,
+        .quran-surah-name-primary,
+        .quran-surah-meta {
+            min-width: 0;
+        }
+
+        .quran-surah-name-secondary {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .quran-surah-meta {
+            width: auto !important;
+            max-width: 40%;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        /* FIX 3: mobile dua detail scale and controls */
+        @media (max-width: 480px) {
+            .dua-swipe-card {
+                padding: 16px !important;
+            }
+
+            .dua-swipe-content .arabic-text {
+                font-size: 24px !important;
+                line-height: 1.8 !important;
+            }
+
+            .dua-swipe-actions {
+                gap: 8px !important;
+                flex-wrap: nowrap !important;
+                justify-content: space-around !important;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .dua-swipe-actions .action-btn,
+            .dua-swipe-actions .audio-btn {
+                min-height: 44px !important;
+                padding: 6px 10px !important;
+                font-size: 10px !important;
+                border-radius: 12px !important;
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            .dua-swipe-actions .action-btn-icon,
+            .dua-swipe-actions .audio-btn .action-btn-icon {
+                font-size: 18px !important;
+                width: 18px !important;
+                height: 18px !important;
+            }
+
+            .dua-swipe-actions .action-btn-label {
+                font-size: 10px !important;
+                letter-spacing: 0 !important;
+                white-space: nowrap;
+            }
+        }
+
+        /* FIX 1: full light theme readability and surface audit */
+        [data-theme="light"] {
+            --bg-dark: #F5F1EB;
+            --bg-light: #F5F1EB;
+            --bg-card: #FFFFFF;
+            --bg-surface: #FFFFFF;
+            --bg-glass: #FFFFFF;
+            --text-primary: #1a1a2e;
+            --text-muted: #5a5a7a;
+            --text-subtle: #5a5a7a;
+            --text-faint: #8a8aa0;
+            --gold-mid: #C9A84C;
+            --emerald-light: #2ECC71;
+        }
+
+        [data-theme="light"] body,
+        [data-theme="light"] body::before {
+            background: #F5F1EB !important;
+            color: #1a1a2e !important;
+        }
+
+        [data-theme="light"] .dashboard-greeting,
+        [data-theme="light"] .dashboard-date {
+            color: #1a1a2e !important;
+        }
+
+        [data-theme="light"] .dashboard-prayer-card,
+        [data-theme="light"] .dashboard-prayer-card .dashboard-prayer-label,
+        [data-theme="light"] .dashboard-prayer-card .dashboard-prayer-name,
+        [data-theme="light"] .dashboard-prayer-card .dashboard-prayer-time,
+        [data-theme="light"] .dashboard-prayer-card .dashboard-prayer-countdown,
+        [data-theme="light"] .dashboard-prayer-card .dashboard-prayer-location {
+            color: #fff !important;
+        }
+
+        [data-theme="light"] #dashboardSuggestionCard {
+            background: #FFFFFF !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            box-shadow: 0 8px 20px rgba(26, 26, 46, 0.08) !important;
+        }
+
+        [data-theme="light"] #dashboardSuggestionCard .dashboard-continue-kicker,
+        [data-theme="light"] #dashboardSuggestionCard .dashboard-continue-surah,
+        [data-theme="light"] #dashboardSuggestionCard .dashboard-continue-ayah {
+            color: #1a1a2e !important;
+        }
+
+        [data-theme="light"] #dashboardTipCard,
+        [data-theme="light"] .dashboard-hadith-card,
+        [data-theme="light"] .dashboard-progress-summary {
+            background: #FFFFFF !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            box-shadow: 0 8px 20px rgba(26, 26, 46, 0.08) !important;
+        }
+
+        [data-theme="light"] #dashboardTipCard {
+            border-left: 3px solid #C9A84C !important;
+        }
+
+        [data-theme="light"] .dashboard-tip-text,
+        [data-theme="light"] .dashboard-hadith-text,
+        [data-theme="light"] .dashboard-hadith-source,
+        [data-theme="light"] .dashboard-progress-heading,
+        [data-theme="light"] .dashboard-progress-row {
+            color: #1a1a2e !important;
+        }
+
+        [data-theme="light"] .more-section-title {
+            color: #C9A84C !important;
+        }
+
+        [data-theme="light"] .more-row,
+        [data-theme="light"] .settings-row,
+        [data-theme="light"] .quran-surah-select-btn,
+        [data-theme="light"] .quran-search-shell,
+        [data-theme="light"] .quran-surah-dropdown,
+        [data-theme="light"] .quran-surah-row,
+        [data-theme="light"] .dua-card,
+        [data-theme="light"] .prayer-row,
+        [data-theme="light"] .prayer-time-row,
+        [data-theme="light"] .quran-bookmark-item,
+        [data-theme="light"] .quran-juz-item,
+        [data-theme="light"] .quran-recent-item {
+            background: #FFFFFF !important;
+            color: #1a1a2e !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            box-shadow: 0 6px 16px rgba(26, 26, 46, 0.06) !important;
+        }
+
+        [data-theme="light"] .more-label,
+        [data-theme="light"] .more-arrow,
+        [data-theme="light"] .quran-surah-name-secondary,
+        [data-theme="light"] .quran-surah-ayahs,
+        [data-theme="light"] .quran-surah-name-primary,
+        [data-theme="light"] .quran-popular-name,
+        [data-theme="light"] .quran-popular-meta,
+        [data-theme="light"] .quran-search-input,
+        [data-theme="light"] .prayer-name,
+        [data-theme="light"] .prayer-time-name,
+        [data-theme="light"] .prayer-time-val,
+        [data-theme="light"] .prayer-time-value {
+            color: #1a1a2e !important;
+        }
+
+        [data-theme="light"] .quran-revelation-text.is-makki,
+        [data-theme="light"] .quran-popular-revelation.is-makki {
+            background: rgba(201, 168, 76, 0.08) !important;
+            border: 1px solid rgba(201, 168, 76, 0.55) !important;
+            color: #9f7f2d !important;
+        }
+
+        [data-theme="light"] .quran-revelation-text.is-madani,
+        [data-theme="light"] .quran-popular-revelation.is-madani {
+            background: rgba(46, 204, 113, 0.08) !important;
+            border: 1px solid rgba(46, 204, 113, 0.55) !important;
+            color: #228f4f !important;
+        }
+
+        [data-theme="light"] .quran-view-tab {
+            background: #F5F1EB !important;
+            color: #5a5a7a !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .quran-view-tab.active {
+            background: rgba(201, 168, 76, 0.16) !important;
+            color: #1a1a2e !important;
+            border-color: rgba(201, 168, 76, 0.45) !important;
+        }
+
+        [data-theme="light"] .quran-continue-card,
+        [data-theme="light"] #quranContinueCard .quran-continue-inner {
+            background: linear-gradient(135deg, #1a3a5c 0%, #0f2a45 40%, #0a1e35 100%) !important;
+            color: #fff !important;
+        }
+
+        [data-theme="light"] #quranContinueCard .quran-continue-title,
+        [data-theme="light"] #quranContinueCard .quran-continue-meta,
+        [data-theme="light"] #quranContinueCard .quran-continue-sub {
+            color: #fff !important;
+        }
+
+        [data-theme="light"] .search-input,
+        [data-theme="light"] #duasSearchInput {
+            background: #FFFFFF !important;
+            color: #1a1a2e !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .search-input::placeholder,
+        [data-theme="light"] #duasSearchInput::placeholder {
+            color: #8a8aa0 !important;
+        }
+
+        [data-theme="light"] .duas-bookmark-chip {
+            background: #FFFFFF !important;
+            color: #1a1a2e !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+        }
+
+        [data-theme="light"] .dua-swipe-content .arabic-container {
+            background: linear-gradient(135deg, rgba(215, 227, 241, 0.42), rgba(255, 249, 238, 0.94)) !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .dua-swipe-content .arabic-text,
+        [data-theme="light"] .dua-swipe-content .translation,
+        [data-theme="light"] .dua-swipe-content .translation-ps,
+        [data-theme="light"] .dua-swipe-content .transliteration,
+        [data-theme="light"] .dua-swipe-content .reference,
+        [data-theme="light"] .dua-swipe-content .how-to-box,
+        [data-theme="light"] .dua-swipe-content .virtue-tag {
+            color: #1a1a2e !important;
+        }
+
+        [data-theme="light"] .dua-swipe-actions .action-btn,
+        [data-theme="light"] .dua-swipe-actions .audio-btn {
+            background: rgba(26, 26, 46, 0.04) !important;
+            color: #1a1a2e !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .prayer-countdown-card {
+            background: linear-gradient(135deg, #1a3a5c 0%, #0f2a45 40%, #0a1e35 100%) !important;
+            color: #fff !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        [data-theme="light"] .prayer-countdown-card .prayer-countdown-label,
+        [data-theme="light"] .prayer-countdown-card .prayer-countdown-name,
+        [data-theme="light"] .prayer-countdown-card .prayer-countdown-time {
+            color: #fff !important;
+        }
+
+        [data-theme="light"] .more-switch {
+            background: #d1d1d6 !important;
+        }
+
+        [data-theme="light"] .more-switch-input:checked + .more-switch {
+            background: #2ECC71 !important;
+        }
+
+        [data-theme="light"] .bottom-nav {
+            background: rgba(255, 255, 255, 0.96) !important;
+            border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .bottom-nav-item {
+            color: #5a5a7a !important;
+        }
+
+        [data-theme="light"] .bottom-nav-item.active {
+            color: #1a1a2e !important;
+            background: rgba(201, 168, 76, 0.16) !important;
+        }
+
+        /* FIX 2 mobile hardening at 375px */
+        @media (max-width: 375px) {
+            .quran-surah-row {
+                min-height: 56px !important;
+                padding: 8px 10px !important;
+                gap: 8px !important;
+            }
+
+            .quran-surah-num {
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 10px !important;
+            }
+
+            .quran-surah-name-primary {
+                font-size: 1.1rem !important;
+            }
+
+            .quran-surah-name-secondary {
+                font-size: 12px !important;
+            }
+
+            .quran-surah-ayahs {
+                font-size: 11px !important;
+            }
+
+            .quran-surah-meta {
+                max-width: 44%;
+            }
+
+            .quran-revelation-text {
+                font-size: 9px !important;
+                padding: 2px 6px !important;
             }
         }

@@ -32,9 +32,9 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
     <!-- Production assets (active) -->
-    <link rel="stylesheet" href="styles.min.css?v=20260306f">
+    <link rel="stylesheet" href="styles.min.css?v=20260306g">
     <!-- Source assets (fallback for local debugging) -->
-    <!-- <link rel="stylesheet" href="styles.css?v=20260306f"> -->
+    <!-- <link rel="stylesheet" href="styles.css?v=20260306g"> -->
     <style>
         .update-prompt-card {
             display: flex;
@@ -143,7 +143,7 @@
     <div class="pull-refresh-indicator" id="pullRefreshIndicator" aria-hidden="true">↻ Pull to refresh</div>
 
     <section class="home-dashboard" id="homeDashboard">
-        <div class="dashboard-greeting" id="dashboardGreeting">Falah</div>
+        <div class="dashboard-greeting" id="dashboardGreeting">Assalamu Alaikum</div>
         <div class="dashboard-date date-display" id="dashboardDate">Rabi al-Awwal 14, 1447</div>
 
         <button class="dashboard-prayer-card" id="dashboardNextPrayerCard" onclick="openPrayerFromDashboard()" aria-label="Open prayer times">
@@ -156,27 +156,55 @@
 
         <button class="dashboard-suggestion-card continue-card" id="dashboardSuggestionCard" aria-label="Continue Quran">
             <div class="dashboard-suggestion-row">
-                <div class="dashboard-suggestion-sub continue-info" id="dashboardSuggestionSub">Continue Quran · Al-Baqarah Ayah 2</div>
+                <div class="dashboard-continue-left">
+                    <div class="dashboard-continue-kicker" id="dashboardSuggestionKicker">CONTINUE READING</div>
+                    <div class="dashboard-continue-main">
+                        <span class="dashboard-continue-icon" aria-hidden="true">📖</span>
+                        <span class="dashboard-continue-surah" id="dashboardSuggestionSub">Al-Fatiha</span>
+                    </div>
+                    <div class="dashboard-continue-ayah" id="dashboardSuggestionAyah">Ayah 6</div>
+                </div>
                 <span class="dashboard-suggestion-cta continue-btn" id="dashboardSuggestionCta">Continue</span>
             </div>
         </button>
 
         <div class="dashboard-quick-grid" id="dashboardQuickGrid">
-            <button class="dashboard-quick-tile" onclick="handleBottomNav('quran')" aria-label="Open Quran">
-                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 4h7a2 2 0 012 2v14a1.5 1.5 0 00-1.5-1.5H2V4z"/><path d="M22 4h-7a2 2 0 00-2 2v14a1.5 1.5 0 011.5-1.5H22V4z"/></svg></span><span class="dashboard-quick-label" id="quickQuranLabel">Quran</span>
+            <button class="dashboard-quick-tile quick-quran" onclick="handleBottomNav('quran')" aria-label="Open Quran">
+                <span class="dashboard-quick-wave" aria-hidden="true"></span>
+                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><span class="dashboard-quick-label" id="quickQuranLabel">Quran</span>
             </button>
-            <button class="dashboard-quick-tile" onclick="handleBottomNav('duas')" aria-label="Open Duas">
-                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 20V10l-3 4v6h3z"/><path d="M17 20V10l3 4v6h-3z"/><path d="M7 10l5-7 5 7"/></svg></span><span class="dashboard-quick-label" id="quickDuasLabel">Duas</span>
+            <button class="dashboard-quick-tile quick-duas" onclick="handleBottomNav('duas')" aria-label="Open Duas">
+                <span class="dashboard-quick-wave" aria-hidden="true"></span>
+                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V8a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v12"/><path d="M7 12H5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2"/><path d="M17 12h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/></svg></span><span class="dashboard-quick-label" id="quickDuasLabel">Duas</span>
             </button>
-            <button class="dashboard-quick-tile" onclick="openTasbeeh()" aria-label="Open Tasbeeh">
-                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="2"/><circle cx="12" cy="6" r="2"/><circle cx="16" cy="8" r="2"/><circle cx="18" cy="12" r="2"/><circle cx="16" cy="16" r="2"/><circle cx="12" cy="18" r="2"/><circle cx="8" cy="16" r="2"/><path d="M12 20v2"/></svg></span><span class="dashboard-quick-label" id="quickTasbeehLabel">Tasbeeh</span>
+            <button class="dashboard-quick-tile quick-tasbeeh" onclick="openTasbeeh()" aria-label="Open Tasbeeh">
+                <span class="dashboard-quick-wave" aria-hidden="true"></span>
+                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="3" r="1.5" fill="white"/><circle cx="19" cy="8" r="1.5" fill="white"/><circle cx="19" cy="16" r="1.5" fill="white"/><circle cx="12" cy="21" r="1.5" fill="white"/><circle cx="5" cy="16" r="1.5" fill="white"/><circle cx="5" cy="8" r="1.5" fill="white"/></svg></span><span class="dashboard-quick-label" id="quickTasbeehLabel">Tasbeeh</span>
             </button>
-            <button class="dashboard-quick-tile" onclick="openPrayerQiblaFromDashboard()" aria-label="Open Qibla">
-                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4v2"/><path d="M12 18v2"/><path d="M4 12h2"/><path d="M18 12h2"/><path d="M14.8 9.2l-4.6 1.8 1.8 4.6 2.8-6.4z"/></svg></span><span class="dashboard-quick-label" id="quickQiblaLabel">Qibla</span>
+            <button class="dashboard-quick-tile quick-qibla" onclick="openPrayerQiblaFromDashboard()" aria-label="Open Qibla">
+                <span class="dashboard-quick-wave" aria-hidden="true"></span>
+                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polygon points="12,2 14,10 12,8 10,10" fill="white" stroke="none"/><rect x="9" y="10" width="6" height="5" rx="0.5" fill="none" stroke="white" stroke-width="1.5"/></svg></span><span class="dashboard-quick-label" id="quickQiblaLabel">Qibla</span>
             </button>
         </div>
 
-        <div class="dashboard-tip-card" id="dashboardTipCard">Tip: Begin with praising Allah before asking</div>
+        <div class="dashboard-tip-card" id="dashboardTipCard">
+            <div class="dashboard-tip-label" id="dashboardTipLabel">Tip ✨</div>
+            <div class="dashboard-tip-text" id="dashboardTipText">Begin with praising Allah before asking.</div>
+        </div>
+
+        <div class="dashboard-hadith-card" id="dashboardHadithCard" aria-live="polite">
+            <div class="dashboard-hadith-label" id="dashboardHadithLabel">Hadith of the Day ✨</div>
+            <div class="dashboard-hadith-text" id="dashboardHadithText">The most beloved deeds to Allah are those done consistently, even if small.</div>
+            <div class="dashboard-hadith-source" id="dashboardHadithSource">Sahih al-Bukhari</div>
+        </div>
+
+        <div class="dashboard-progress-summary" id="dashboardProgressCard" aria-live="polite">
+            <div class="dashboard-progress-heading" id="dashboardProgressHeading">My Progress</div>
+            <div class="dashboard-progress-row"><span id="dashboardProgressQuran">Quran: Surah Al-Fatiha, Ayah 6</span></div>
+            <div class="dashboard-progress-bar"><span id="dashboardProgressBarFill"></span></div>
+            <div class="dashboard-progress-row"><span id="dashboardProgressDuas">Duas read today: 0 of 63</span></div>
+            <div class="dashboard-progress-row"><span id="dashboardProgressTasbeeh">Tasbeeh today: 0 total</span></div>
+        </div>
 
     </section>
 
@@ -192,91 +220,91 @@
         <div class="category-grid" id="categoryGrid">
         <div class="cat-card featured" data-cat="all" onclick="openCategory('all')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">📿</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></div>
             <div class="cat-card-name">All Duas</div>
             <div class="cat-card-count">63 Duas</div>
         </div>
         <div class="cat-card featured" data-cat="quran" onclick="openCategory('quran')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">📖</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6.5c0-1.1.9-2 2-2h4.5c1.2 0 2.3.5 3 1.4.7-.9 1.8-1.4 3-1.4H18c1.1 0 2 .9 2 2V18a1 1 0 0 1-1 1h-2.5c-1.1 0-2.2.4-3 1.1-.8-.7-1.9-1.1-3-1.1H5a1 1 0 0 1-1-1V6.5Z"></path><path d="M12.5 6v14"></path></svg></div>
             <div class="cat-card-name">The Quranic Foundation</div>
             <div class="cat-card-count">10 Duas</div>
         </div>
         <div class="cat-card" data-cat="morning-evening" onclick="openCategory('morning-evening')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">🌅</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 14h16"></path><path d="M7 14a5 5 0 0 1 10 0"></path><path d="M12 4v3"></path><path d="m6.8 7.3 1.7 1.7"></path><path d="m17.2 7.3-1.7 1.7"></path></svg></div>
             <div class="cat-card-name">Morning & Evening</div>
             <div class="cat-card-count">5 Duas</div>
         </div>
         <div class="cat-card" data-cat="protection" onclick="openCategory('protection')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">🛡️</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 19 6v5c0 5-3.4 8.8-7 10-3.6-1.2-7-5-7-10V6l7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
             <div class="cat-card-name">Protection & Refuge</div>
             <div class="cat-card-count">7 Duas</div>
         </div>
         <div class="cat-card" data-cat="forgiveness" onclick="openCategory('forgiveness')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">🤲</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 20v-4.2c0-1.1.9-2 2-2h2.6c1.1 0 2 .9 2 2V20"></path><path d="M12.6 20v-3c0-1 .8-1.8 1.8-1.8H16c1 0 1.8.8 1.8 1.8V20"></path><path d="M9.3 13.8V7.3"></path><path d="m7.9 8.8 1.4-1.5 1.4 1.5"></path></svg></div>
             <div class="cat-card-name">Forgiveness</div>
             <div class="cat-card-count">6 Duas</div>
         </div>
         <div class="cat-card" data-cat="guidance" onclick="openCategory('guidance')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">🌟</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8"></circle><path d="M12 8.5 15.5 12 12 15.5 8.5 12 12 8.5Z"></path><path d="M12 8.5 14.2 9.8"></path></svg></div>
             <div class="cat-card-name">Guidance & Faith</div>
             <div class="cat-card-count">5 Duas</div>
         </div>
         <div class="cat-card" data-cat="wellbeing" onclick="openCategory('wellbeing')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">💚</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-6.5-4-8.5-7.5C1.8 9.3 3.7 6 7 6c2 0 3.1 1 5 3 1.9-2 3-3 5-3 3.3 0 5.2 3.3 3.5 6.5C18.5 16 12 20 12 20Z"></path><path d="M7.5 13h2l1-2 2 4 1.2-2H16"></path></svg></div>
             <div class="cat-card-name">Wellbeing & Relief</div>
             <div class="cat-card-count">6 Duas</div>
         </div>
         <div class="cat-card" data-cat="prophets" onclick="openCategory('prophets')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">🕌</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20h16"></path><path d="M5.8 20v-6.1h12.4V20"></path><path d="M9 13.9v-2.7c0-1.8 1.3-3.2 3-3.2s3 1.4 3 3.2v2.7"></path><path d="M12 7.2V4.6"></path><path d="M10.9 5.7 12 4.6l1.1 1.1"></path></svg></div>
             <div class="cat-card-name">Prophets' Duas</div>
             <div class="cat-card-count">5 Duas</div>
         </div>
         <div class="cat-card" data-cat="prayer" onclick="openCategory('prayer')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">🕋</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12v13H6z"></path><path d="M6 10h12"></path><path d="M9 7V5h6v2"></path><path d="M10 14h4"></path></svg></div>
             <div class="cat-card-name">Prayer</div>
             <div class="cat-card-count">4 Duas</div>
         </div>
         <div class="cat-card" data-cat="provision" onclick="openCategory('provision')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">🌾</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 10.6h12"></path><path d="M6.8 10.6c.5 5 2.6 7.4 5.2 7.4s4.7-2.4 5.2-7.4"></path><path d="M10 14.2h4"></path><path d="M12 10.6V7.4"></path><path d="M8.6 7.4c1-.8 2.1-1.2 3.4-1.2s2.4.4 3.4 1.2"></path></svg></div>
             <div class="cat-card-name">Provision</div>
             <div class="cat-card-count">4 Duas</div>
         </div>
         <div class="cat-card" data-cat="family" onclick="openCategory('family')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">👨‍👩‍👧</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="9" r="2.2"></circle><circle cx="15.5" cy="9.5" r="1.8"></circle><path d="M4.5 18c.5-2.4 2.5-4 4.8-4h.4c2.3 0 4.3 1.6 4.8 4"></path><path d="M13 18c.3-1.6 1.5-2.8 3.1-2.8H17c1.6 0 2.9 1.2 3.2 2.8"></path></svg></div>
             <div class="cat-card-name">Family</div>
             <div class="cat-card-count">3 Duas</div>
         </div>
         <div class="cat-card" data-cat="travel" onclick="openCategory('travel')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">✈️</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 16.5c2.6-3.2 5.5-4.8 8.6-4.8 2.4 0 4.8 1 7.4 3.1"></path><circle cx="5" cy="16.8" r="1.2"></circle><circle cx="19" cy="14.8" r="1.2"></circle><path d="M12.2 10.2 9.6 7.6"></path><path d="m12.2 10.2 4.8-1.2"></path><path d="m12.2 10.2-1.2 4.8"></path></svg></div>
             <div class="cat-card-name">Travel & Knowledge</div>
             <div class="cat-card-count">3 Duas</div>
         </div>
         <div class="cat-card featured" data-cat="scholars" onclick="openCategory('scholars')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">📚</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6h11a2 2 0 0 1 2 2v10H7a2 2 0 0 0-2 2V6Z"></path><path d="M7 8h8"></path><path d="M7 11h8"></path><path d="M7 14h6"></path></svg></div>
             <div class="cat-card-name">Treasures of the Scholars</div>
             <div class="cat-card-count">3 Duas</div>
         </div>
         <div class="cat-card" data-cat="ramadan" onclick="openCategory('ramadan')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">🌙</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M15.5 4.5a7.5 7.5 0 1 0 0 15 6.2 6.2 0 1 1 0-15Z"></path><path d="m8 8 1 2 2 .3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2L5 10.3l2-.3 1-2Z"></path></svg></div>
             <div class="cat-card-name">Ramadan & Fasting</div>
             <div class="cat-card-count">5 Duas</div>
         </div>
         <div class="cat-card" data-cat="evil-eye" onclick="openCategory('evil-eye')">
             <div class="cat-card-wave"></div>
-            <div class="cat-card-icon">🧿</div>
+            <div class="cat-card-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg></div>
             <div class="cat-card-name">Evil Eye & Envy</div>
             <div class="cat-card-count">4 Duas</div>
         </div>
@@ -337,7 +365,7 @@
          <div class="section-header" data-section="quran" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">📖</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6.5c0-1.1.9-2 2-2h4.5c1.2 0 2.3.5 3 1.4.7-.9 1.8-1.4 3-1.4H18c1.1 0 2 .9 2 2V18a1 1 0 0 1-1 1h-2.5c-1.1 0-2.2.4-3 1.1-.8-.7-1.9-1.1-3-1.1H5a1 1 0 0 1-1-1V6.5Z"></path><path d="M12.5 6v14"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">The Quranic Foundation</div>
@@ -734,7 +762,7 @@
           <div class="section-header" data-section="protection" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">🛡</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 19 6v5c0 5-3.4 8.8-7 10-3.6-1.2-7-5-7-10V6l7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Protection & Refuge</div>
@@ -936,7 +964,7 @@
       <div class="section-header" data-section="forgiveness" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">🤲</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 20v-4.2c0-1.1.9-2 2-2h2.6c1.1 0 2 .9 2 2V20"></path><path d="M12.6 20v-3c0-1 .8-1.8 1.8-1.8H16c1 0 1.8.8 1.8 1.8V20"></path><path d="M9.3 13.8V7.3"></path><path d="m7.9 8.8 1.4-1.5 1.4 1.5"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Forgiveness & Repentance</div>
@@ -1059,7 +1087,7 @@
        <div class="section-header" data-section="guidance" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">✨</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m12 5 1.5 3.5L17 10l-3.5 1.5L12 15l-1.5-3.5L7 10l3.5-1.5L12 5Z"></path><path d="m18.5 4.5.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6.6-1.4Z"></path><path d="m5.5 14.5.8 1.8 1.8.8-1.8.8-.8 1.8-.8-1.8-1.8-.8 1.8-.8.8-1.8Z"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Guidance & Steadfastness</div>
@@ -1225,7 +1253,7 @@
        <div class="section-header" data-section="wellbeing" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">🌿</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M12 20V8"></path><path d="M12 10c-3.8 0-6.1-1.8-7.4-4.4 3.8 0 6.6.9 7.4 4.4Z"></path><path d="M12 13c3.8 0 6.1-1.8 7.4-4.4-3.8 0-6.6.9-7.4 4.4Z"></path><path d="M12 16c-2.9 0-4.7-1.3-5.7-3.3 2.9 0 5.1.7 5.7 3.3Z"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Wellbeing, Health & Relief</div>
@@ -1462,7 +1490,7 @@
       <div class="section-header" data-section="prophets" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">🌙</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M15.5 4.5a7.5 7.5 0 1 0 0 15 6.2 6.2 0 1 1 0-15Z"></path><path d="m8 8 1 2 2 .3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2L5 10.3l2-.3 1-2Z"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Duas of the Prophets</div>
@@ -1659,7 +1687,7 @@
        <div class="section-header" data-section="morning-evening" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">🌅</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 14h16"></path><path d="M7 14a5 5 0 0 1 10 0"></path><path d="M12 4v3"></path><path d="m6.8 7.3 1.7 1.7"></path><path d="m17.2 7.3-1.7 1.7"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Morning & Evening Adhkar</div>
@@ -1789,7 +1817,7 @@
        <div class="section-header" data-section="provision" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">🌾</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 10.6h12"></path><path d="M6.8 10.6c.5 5 2.6 7.4 5.2 7.4s4.7-2.4 5.2-7.4"></path><path d="M10 14.2h4"></path><path d="M12 10.6V7.4"></path><path d="M8.6 7.4c1-.8 2.1-1.2 3.4-1.2s2.4.4 3.4 1.2"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Provision & Sustenance</div>
@@ -1950,7 +1978,7 @@
        <div class="section-header" data-section="prayer" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">🕌</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20h16"></path><path d="M5.8 20v-6.1h12.4V20"></path><path d="M9 13.9v-2.7c0-1.8 1.3-3.2 3-3.2s3 1.4 3 3.2v2.7"></path><path d="M12 7.2V4.6"></path><path d="M10.9 5.7 12 4.6l1.1 1.1"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Prayer, Worship & The Greatest Names</div>
@@ -2261,7 +2289,7 @@
      <div class="section-header" data-section="travel" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">✈</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3.5 16.5c2.6-3.2 5.5-4.8 8.6-4.8 2.4 0 4.8 1 7.4 3.1"></path><circle cx="5" cy="16.8" r="1.2"></circle><circle cx="19" cy="14.8" r="1.2"></circle><path d="M12.2 10.2 9.6 7.6"></path><path d="m12.2 10.2 4.8-1.2"></path><path d="m12.2 10.2-1.2 4.8"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Travel, Mosque & Special Occasions</div>
@@ -2421,7 +2449,7 @@
     <div class="section-header" data-section="scholars" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">📜</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M8 5.5h7.5a2.5 2.5 0 0 1 0 5H8a2.5 2.5 0 0 0 0 5h8"></path><path d="M8 5.5a2.5 2.5 0 0 0 0 5"></path><path d="M16 20h-8a2.5 2.5 0 0 1 0-5"></path><path d="M9 8h5"></path><path d="M9 17h5"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Treasures of the Scholars</div>
@@ -2555,7 +2583,7 @@
     <div class="section-header" data-section="ramadan" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">🌙</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M15.5 4.5a7.5 7.5 0 1 0 0 15 6.2 6.2 0 1 1 0-15Z"></path><path d="m8 8 1 2 2 .3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2L5 10.3l2-.3 1-2Z"></path></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Ramadan & Fasting</div>
@@ -2721,7 +2749,7 @@
     <div class="section-header" data-section="evil-eye" onclick="toggleSection(this)">
         <div class="section-ornament">
             <span class="orn-line"></span>
-            <span class="orn-center">🧿</span>
+            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M2.5 12s3.5-5 9.5-5 9.5 5 9.5 5-3.5 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg></span>
             <span class="orn-line"></span>
         </div>
         <div class="section-title">Evil Eye & Envy</div>
@@ -2929,10 +2957,10 @@
 
 <!-- ===== PASHTO LANGUAGE SUPPORT ===== -->
 <script src="pashto.js"></script>
-<script src="pashto-translation-player.js?v=20260306f"></script>
+<script src="pashto-translation-player.js?v=20260306g"></script>
 
 <script>
-    const APP_VERSION = '2.0.5';
+    const APP_VERSION = '2.0.6';
 
     (function() {
         const VERSION_INFO_URL = 'https://mohhp.github.io/Essential-duas/version.json';
@@ -3019,9 +3047,9 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (active) -->
-<script src="app.min.js?v=20260306f"></script>
+<script src="app.min.js?v=20260306g"></script>
 <!-- Source assets (fallback for local debugging) -->
-<!-- <script src="app.js?v=20260306f"></script> -->
+<!-- <script src="app.js?v=20260306g"></script> -->
 
 <!-- ===== OVERLAY ===== -->
 <div class="overlay" onclick="toggleBookmarksPanel()"></div>
@@ -3337,7 +3365,7 @@
         <p id="aboutDescription">Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.</p>
         <p id="aboutDescriptionPs">ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.</p>
         <p id="aboutTagline">حي على الفلاح — Come to Success</p>
-        <p id="aboutVersion">Version: 2.0.5</p>
+        <p id="aboutVersion">Version: 2.0.6</p>
         <div class="about-meta">
             <div id="aboutDeveloper">Developer: Falah</div>
             <div id="aboutCopyright">© 2026 Falah. All rights reserved.</div>

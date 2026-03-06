@@ -1365,6 +1365,9 @@ window.filterCategory = function(cat, btn) {
     }
 
     function getViewerTexts() {
+        const isSmallPhone = typeof window !== 'undefined'
+            && typeof window.matchMedia === 'function'
+            && window.matchMedia('(max-width: 480px)').matches;
         return isPashtoMode()
             ? {
                 of: 'له',
@@ -1375,9 +1378,9 @@ window.filterCategory = function(cat, btn) {
                 listen: 'اورېدل',
                 copy: 'کاپي',
                 share: 'شريک',
-                shareImage: 'انځور',
-                bookmarkAdd: 'نښه',
-                bookmarkOn: 'په نښه شوی',
+                shareImage: isSmallPhone ? 'شریک' : 'انځور',
+                bookmarkAdd: isSmallPhone ? 'ساتل' : 'نښه',
+                bookmarkOn: isSmallPhone ? 'ساتل شوی' : 'په نښه شوی',
                 backHint: 'کټګوریو ته ستنیدل'
             }
             : {
@@ -1389,9 +1392,9 @@ window.filterCategory = function(cat, btn) {
                 listen: 'Listen',
                 copy: 'Copy',
                 share: 'Share',
-                shareImage: 'Share Image',
-                bookmarkAdd: 'Bookmark',
-                bookmarkOn: 'Bookmarked',
+                shareImage: isSmallPhone ? 'Share' : 'Share Image',
+                bookmarkAdd: isSmallPhone ? 'Save' : 'Bookmark',
+                bookmarkOn: isSmallPhone ? 'Saved' : 'Bookmarked',
                 backHint: 'Back to categories'
             };
     }
@@ -2173,6 +2176,12 @@ window.filterCategory = function(cat, btn) {
         lastTasbeehTapAt = nowTap;
 
         tasbeehCount++;
+        try {
+            const key = new Date().toISOString().slice(0, 10);
+            const counts = JSON.parse(localStorage.getItem('crown_tasbeeh_daily_counts') || '{}') || {};
+            counts[key] = Number(counts[key] || 0) + 1;
+            localStorage.setItem('crown_tasbeeh_daily_counts', JSON.stringify(counts));
+        } catch (_) {}
         const display = document.getElementById('tasbeehDisplay');
         const btn = document.querySelector('.tasbeeh-tap-btn');
         if (display) {
@@ -2197,6 +2206,7 @@ window.filterCategory = function(cat, btn) {
         }
         if (navigator.vibrate) navigator.vibrate(50);
         playTasbeehClick();
+        refreshDashboardProgressSummaryCard();
 
         if (tasbeehCount === tasbeehTarget && tasbeehTarget !== 0) {
             if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
@@ -2511,13 +2521,12 @@ window.filterCategory = function(cat, btn) {
         if (isPashtoMode()) {
             return {
                 appTitle: 'فلاح',
-                goodMorning: 'السلام علیکم — صبح بخیر',
-                goodAfternoon: 'السلام علیکم — غرمه مو پخ خير',
-                goodEvening: 'السلام علیکم — ماښام مو پخ خير',
+                warmGreeting: 'السلام عليكم',
                 nextPrayer: 'راتلونکی لمونځ',
                 nowPrefix: 'اوس',
                 inPrefix: 'په',
                 continue: 'دوام',
+                continueKicker: 'لوستل دوام کړئ',
                 duasToday: 'نن دعاګانې',
                 streak: 'لړۍ',
                 days: 'ورځې',
@@ -2546,23 +2555,30 @@ window.filterCategory = function(cat, btn) {
                 about: 'په اړه',
                 share: 'اپ شریکه کړئ',
                 rate: 'اپ درجه بندي کړئ',
+                tipLabel: 'لارښوونه ✨',
+                hadithOfDay: 'د ورځې حدیث ✨',
                 morningDuas: 'د سهار دعاګانې — خپله ورځ پیل کړئ',
                 eveningDuas: 'د ماښام دعاګانې',
                 fridayKahf: 'سورة الکهف ولولئ',
                 continueQuran: 'د قرآن دوام',
-                duaOfDay: 'د ورځې دعا'
+                duaOfDay: 'د ورځې دعا',
+                progressHeading: 'زما پرمختګ',
+                quranProgress: 'قرآن',
+                ayahLabel: 'آیت',
+                duasReadToday: 'نن لوستل شوې دعاګانې',
+                tasbeehToday: 'د نن تسبیح',
+                of: 'له'
             };
         }
 
         return {
             appTitle: 'Falah',
-            goodMorning: 'Assalamu Alaikum — Good Morning',
-            goodAfternoon: 'Assalamu Alaikum — Good Afternoon',
-            goodEvening: 'Assalamu Alaikum — Good Evening',
+            warmGreeting: 'Assalamu Alaikum',
             nextPrayer: 'Next Prayer',
             nowPrefix: 'NOW',
             inPrefix: 'in',
             continue: 'Continue',
+            continueKicker: 'CONTINUE READING',
             duasToday: 'Duas today',
             streak: 'Streak',
             days: 'days',
@@ -2591,11 +2607,19 @@ window.filterCategory = function(cat, btn) {
             about: 'About',
             share: 'Share App',
             rate: 'Rate App',
+            tipLabel: 'Tip ✨',
+            hadithOfDay: 'Hadith of the Day ✨',
             morningDuas: 'Morning Duas — Start your day',
             eveningDuas: 'Evening Duas',
             fridayKahf: 'Read Surah Al-Kahf',
             continueQuran: 'Continue Quran',
-            duaOfDay: 'Dua of the Day'
+            duaOfDay: 'Dua of the Day',
+            progressHeading: 'My Progress',
+            quranProgress: 'Quran',
+            ayahLabel: 'Ayah',
+            duasReadToday: 'Duas read today',
+            tasbeehToday: 'Tasbeeh today',
+            of: 'of'
         };
     }
 
@@ -2761,16 +2785,14 @@ window.filterCategory = function(cat, btn) {
         if (!greeting || !dateEl) return;
 
         const hour = new Date().getHours();
-        const phase = hour < 11 ? 'morning' : (hour < 16 ? 'afternoon' : 'evening');
+        const phase = hour < 5
+            ? 'predawn'
+            : (hour < 17 ? 'daytime' : (hour < 20 ? 'evening' : 'night'));
         if (document.body) {
             document.body.setAttribute('data-day-phase', phase);
         }
         const ui = getDashboardText();
-        const greetingText = hour < 12
-            ? ui.goodMorning
-            : (hour < 18 ? ui.goodAfternoon : ui.goodEvening);
-
-        greeting.textContent = greetingText;
+        greeting.textContent = ui.warmGreeting;
         greeting.setAttribute('aria-hidden', 'false');
         greeting.classList.remove('dashboard-greeting-enter');
         // Reflow to restart animation when language/time segment changes.
@@ -2791,18 +2813,23 @@ window.filterCategory = function(cat, btn) {
 
         if (lastRead?.surahNumber) {
             const surah = lastRead.surahName || `Surah ${lastRead.surahNumber}`;
+            const ayah = Number(lastRead.ayahNumber || 1);
             return {
-                title: ui.continueQuran,
-                sub: `${ui.continueQuran} · ${surah} Ayah ${localizeDigits(lastRead.ayahNumber || 1)}`,
+                kicker: ui.continueKicker,
+                surah,
+                ayah,
+                sub: `${surah} ${ui.ayahLabel} ${localizeDigits(ayah)}`,
                 action: () => {
                     switchTab('quran');
-                    openQuranSurah(lastRead.surahNumber, lastRead.ayahNumber || 1);
+                    openQuranSurah(lastRead.surahNumber, ayah);
                 }
             };
         }
         return {
-            title: ui.continueQuran,
-            sub: isPashtoMode() ? 'د قرآن دوام · د سورتونو لېست پرانیزئ' : 'Continue Quran · Open surah list',
+            kicker: ui.continueKicker,
+            surah: isPashtoMode() ? 'سورت غوره کړئ' : 'Pick a Surah',
+            ayah: 1,
+            sub: isPashtoMode() ? 'د سورتونو لېست پرانیزئ' : 'Open the surah list',
             action: () => switchTab('quran')
         };
     }
@@ -2901,17 +2928,22 @@ window.filterCategory = function(cat, btn) {
 
     function refreshHomeSmartSuggestion() {
         const sub = document.getElementById('dashboardSuggestionSub');
+        const ayah = document.getElementById('dashboardSuggestionAyah');
         const cta = document.getElementById('dashboardSuggestionCta');
+        const kicker = document.getElementById('dashboardSuggestionKicker');
         if (!sub || !cta) return;
         const ui = getDashboardText();
         const suggestion = getSmartSuggestion();
-        sub.textContent = suggestion.sub || '';
+        if (kicker) kicker.textContent = suggestion.kicker || ui.continueKicker;
+        sub.textContent = suggestion.surah || suggestion.sub || '';
+        if (ayah) ayah.textContent = `${ui.ayahLabel} ${localizeDigits(suggestion.ayah || 1)}`;
         cta.textContent = ui.continue;
         window.__dashboardSuggestionAction = suggestion.action;
     }
 
     function refreshHomeDailyTip() {
         const tipEl = document.getElementById('dashboardTipCard');
+        const tipText = document.getElementById('dashboardTipText');
         if (!tipEl) return;
         const tips = getDailyTips();
         if (!tips.length) return;
@@ -2923,7 +2955,8 @@ window.filterCategory = function(cat, btn) {
 
         tipEl.classList.add('tip-fade-out');
         setTimeout(() => {
-            tipEl.textContent = tips[dashboardTipIndex];
+            if (tipText) tipText.textContent = tips[dashboardTipIndex].replace(/^✨\s*/u, '');
+            else tipEl.textContent = tips[dashboardTipIndex];
             tipEl.classList.remove('tip-fade-out');
             tipEl.classList.add('tip-fade-in');
             setTimeout(() => tipEl.classList.remove('tip-fade-in'), 280);
@@ -2935,6 +2968,124 @@ window.filterCategory = function(cat, btn) {
         if (!tips.length) return;
         dashboardTipIndex = (dashboardTipIndex + 1) % tips.length;
         refreshHomeDailyTip();
+    }
+
+    function getDashboardHadiths() {
+        return isPashtoMode()
+            ? [
+                { text: 'الله ته تر ټولو محبوب عمل هغه دی چې دوام ولري که لږ هم وي.', source: 'صحیح بخاري 6465' },
+                { text: 'د خلکو له منځه غوره هغه څوک دی چې خلکو ته ډېر ګټور وي.', source: 'المعجم الاوسط 5787' },
+                { text: 'پاکي د ایمان نیمایي برخه ده.', source: 'صحیح مسلم 223' },
+                { text: 'نرمښت په هر څه کې ښکلا راولي.', source: 'صحیح مسلم 2594' },
+                { text: 'تبسم دې د ورور په مخ کې صدقه ده.', source: 'جامع ترمذي 1956' },
+                { text: 'رحم کوونکو باندې رحمن رحم کوي.', source: 'جامع ترمذي 1924' },
+                { text: 'مؤمن مؤمن ته د ودانۍ په څېر دی؛ یو بل پیاوړی کوي.', source: 'صحیح بخاري 481' },
+                { text: 'الله د بندګانو لپاره اساني غواړي، سختي نه غواړي.', source: 'صحیح بخاري 39' },
+                { text: 'قوي مؤمن د الله په نزد محبوب او غوره دی.', source: 'صحیح مسلم 2664' },
+                { text: 'دعا عبادت دی.', source: 'جامع ترمذي 2969' },
+                { text: 'د الله په یاد سره زړونه ډاډمنېږي.', source: 'صحیح تفسیر معنا' },
+                { text: 'چا چې پر ما یو ځل درود ووايه، الله پرې لس رحمتونه نازلوي.', source: 'صحیح مسلم 408' },
+                { text: 'بهتره صدقه هغه ده چې خپلوانو ته وشي.', source: 'سنن نسائي 2582' },
+                { text: 'له تاسو هېڅوک مؤمن نه شي کېدای تر څو خپل ورور ته هماغه خوښ نه کړي چې ځان ته یې خوښوي.', source: 'صحیح بخاري 13' },
+                { text: 'حیا د ایمان څانګه ده.', source: 'صحیح مسلم 35' },
+                { text: 'غوسه مه کوه.', source: 'صحیح بخاري 6116' },
+                { text: 'الله ښکلی دی او ښکلا خوښوي.', source: 'صحیح مسلم 91' },
+                { text: 'سحرۍ وکړئ؛ په سحرۍ کې برکت دی.', source: 'صحیح بخاري 1923' },
+                { text: 'په جنت کې یوه دروازه د روژتیانو لپاره ده: الريان.', source: 'صحیح بخاري 1896' },
+                { text: 'ښه خبره هم صدقه ده.', source: 'صحیح بخاري 2989' },
+                { text: 'سلام خپور کړئ، یو بل سره مینه پیدا کېږي.', source: 'صحیح مسلم 54' },
+                { text: 'نیتونه په عملونو کې بنسټ دي.', source: 'صحیح بخاري 1' },
+                { text: 'د مور پلار رضایت کې د الله رضایت دی.', source: 'جامع ترمذي 1899' },
+                { text: 'ریښتینولي نېکۍ ته بیایي.', source: 'صحیح بخاري 6094' },
+                { text: 'امانت ادا کوه د هغه چا امانت چې تا ته یې سپارلی.', source: 'جامع ترمذي 1264' },
+                { text: 'تر ټولو ښه خلک هغه دي چې قرآن زده کوي او ور زده کوي.', source: 'صحیح بخاري 5027' },
+                { text: 'په دنیا کې زاهد اوسئ، الله به مو خوښ کړي.', source: 'سنن ابن ماجه 4102' },
+                { text: 'دوه نعمتونه دي چې ډېری خلک پکې تاواني دي: روغتیا او فرصت.', source: 'صحیح بخاري 6412' },
+                { text: 'د سهار او ماښام اذکار د زړه ساتنه کوي.', source: 'نبوي لارښوونې' },
+                { text: 'د مسلمان ورور عیب مه لټوئ.', source: 'جامع ترمذي 2032' }
+            ]
+            : [
+                { text: 'The most beloved deeds to Allah are those done consistently, even if they are small.', source: 'Sahih al-Bukhari 6465' },
+                { text: 'The best of people are those most beneficial to others.', source: 'Al-Mu\'jam al-Awsat 5787' },
+                { text: 'Purity is half of faith.', source: 'Sahih Muslim 223' },
+                { text: 'Gentleness beautifies whatever it enters.', source: 'Sahih Muslim 2594' },
+                { text: 'Your smile for your brother is charity.', source: 'Jami\' at-Tirmidhi 1956' },
+                { text: 'The Merciful shows mercy to those who are merciful.', source: 'Jami\' at-Tirmidhi 1924' },
+                { text: 'A believer to another believer is like a building, one part strengthening another.', source: 'Sahih al-Bukhari 481' },
+                { text: 'Allah loves ease for this Ummah, not hardship.', source: 'Sahih al-Bukhari 39' },
+                { text: 'The strong believer is more beloved to Allah than the weak believer.', source: 'Sahih Muslim 2664' },
+                { text: 'Supplication is worship.', source: 'Jami\' at-Tirmidhi 2969' },
+                { text: 'Whoever sends one prayer upon me, Allah sends ten upon him.', source: 'Sahih Muslim 408' },
+                { text: 'The best charity is that given to relatives in need.', source: 'Sunan an-Nasa\'i 2582' },
+                { text: 'None of you truly believes until he loves for his brother what he loves for himself.', source: 'Sahih al-Bukhari 13' },
+                { text: 'Modesty is a branch of faith.', source: 'Sahih Muslim 35' },
+                { text: 'Do not get angry.', source: 'Sahih al-Bukhari 6116' },
+                { text: 'Allah is beautiful and loves beauty.', source: 'Sahih Muslim 91' },
+                { text: 'Take suhoor, for in suhoor there is blessing.', source: 'Sahih al-Bukhari 1923' },
+                { text: 'In Paradise there is a gate called Ar-Rayyan for those who fast.', source: 'Sahih al-Bukhari 1896' },
+                { text: 'A good word is charity.', source: 'Sahih al-Bukhari 2989' },
+                { text: 'Spread salam among yourselves.', source: 'Sahih Muslim 54' },
+                { text: 'Actions are judged by intentions.', source: 'Sahih al-Bukhari 1' },
+                { text: 'The pleasure of Allah lies in the pleasure of the parents.', source: 'Jami\' at-Tirmidhi 1899' },
+                { text: 'Truthfulness leads to righteousness.', source: 'Sahih al-Bukhari 6094' },
+                { text: 'Return the trust to the one who entrusted you.', source: 'Jami\' at-Tirmidhi 1264' },
+                { text: 'The best among you are those who learn the Quran and teach it.', source: 'Sahih al-Bukhari 5027' },
+                { text: 'Be detached from worldly excess, and Allah will love you.', source: 'Sunan Ibn Majah 4102' },
+                { text: 'Two blessings many people lose: health and free time.', source: 'Sahih al-Bukhari 6412' },
+                { text: 'Morning and evening remembrance protects the heart.', source: 'Prophetic guidance' },
+                { text: 'Do not search for your Muslim brother\'s faults.', source: 'Jami\' at-Tirmidhi 2032' },
+                { text: 'The believer is the mirror of his brother.', source: 'Abu Dawud 4918' }
+            ];
+    }
+
+    function refreshDashboardHadithCard() {
+        const textEl = document.getElementById('dashboardHadithText');
+        const sourceEl = document.getElementById('dashboardHadithSource');
+        if (!textEl || !sourceEl) return;
+        const rows = getDashboardHadiths();
+        if (!rows.length) return;
+        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+        const current = rows[dayOfYear % rows.length];
+        textEl.textContent = current.text;
+        sourceEl.textContent = current.source;
+    }
+
+    function getTasbeehTodayCount() {
+        const key = new Date().toISOString().slice(0, 10);
+        let counts = {};
+        try {
+            counts = JSON.parse(localStorage.getItem('crown_tasbeeh_daily_counts') || '{}') || {};
+        } catch (_) {
+            counts = {};
+        }
+        return Number(counts[key] || 0);
+    }
+
+    function refreshDashboardProgressSummaryCard() {
+        const ui = getDashboardText();
+        const heading = document.getElementById('dashboardProgressHeading');
+        const quranRow = document.getElementById('dashboardProgressQuran');
+        const duasRow = document.getElementById('dashboardProgressDuas');
+        const tasbeehRow = document.getElementById('dashboardProgressTasbeeh');
+        const bar = document.getElementById('dashboardProgressBarFill');
+        if (!heading || !quranRow || !duasRow || !tasbeehRow || !bar) return;
+
+        heading.textContent = ui.progressHeading;
+
+        const lastRead = (() => {
+            try { return JSON.parse(localStorage.getItem('crown_quran_last_read') || 'null'); }
+            catch (_) { return null; }
+        })();
+        const surah = lastRead?.surahName || (isPashtoMode() ? 'الفاتحه' : 'Al-Fatiha');
+        const ayahNo = localizeDigits(lastRead?.ayahNumber || 1);
+        quranRow.textContent = `${ui.quranProgress}: ${surah}, ${ui.ayahLabel} ${ayahNo}`;
+
+        const readCount = Math.min(STATE.read.length, 63);
+        duasRow.textContent = `${ui.duasReadToday}: ${localizeDigits(readCount)} ${ui.of} ${localizeDigits(63)}`;
+        tasbeehRow.textContent = `${ui.tasbeehToday}: ${localizeDigits(getTasbeehTodayCount())} total`;
+
+        const quranProgress = Math.max(0, Math.min(1, Number(lastRead?.ayahNumber || 1) / 286));
+        bar.style.width = `${Math.round(quranProgress * 100)}%`;
     }
 
     window.openDashboardSuggestion = function() {
@@ -2997,7 +3148,11 @@ window.filterCategory = function(cat, btn) {
             ['moreFontLabel', ui.font],
             ['moreAboutLabel', ui.about],
             ['moreShareLabel', ui.share],
-            ['moreRateLabel', ui.rate]
+            ['moreRateLabel', ui.rate],
+            ['dashboardTipLabel', ui.tipLabel],
+            ['dashboardHadithLabel', ui.hadithOfDay],
+            ['dashboardProgressHeading', ui.progressHeading],
+            ['dashboardSuggestionKicker', ui.continueKicker]
         ];
         ids.forEach(([id, text]) => {
             const el = document.getElementById(id);
@@ -3015,6 +3170,8 @@ window.filterCategory = function(cat, btn) {
         refreshHomeNextPrayerCard();
         refreshHomeSmartSuggestion();
         refreshHomeDailyTip();
+        refreshDashboardHadithCard();
+        refreshDashboardProgressSummaryCard();
         refreshHomeDashboardProgress();
     }
     window.refreshHomeDashboard = refreshHomeDashboard;
@@ -3344,7 +3501,7 @@ window.filterCategory = function(cat, btn) {
             aboutDescription: 'Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.',
             aboutDescriptionPs: 'ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.',
             aboutTagline: 'حي على الفلاح — Come to Success',
-            aboutVersion: 'Version: 2.0.5',
+            aboutVersion: 'Version: 2.0.6',
             aboutDeveloper: isPS ? 'پراختیاکوونکی: Falah' : 'Developer: Falah',
             aboutCopyright: '© 2026 Falah. All rights reserved.',
             aboutContactLabel: isPS ? 'اړیکه ونیسئ' : 'Contact Us',
@@ -6096,6 +6253,20 @@ window.filterCategory = function(cat, btn) {
             const pane = document.getElementById(id);
             if (pane) pane.classList.toggle('active', id === paneMap[active]);
         });
+
+        if (active === 'qibla') {
+            const cached = (() => {
+                try { return JSON.parse(localStorage.getItem('crown_location') || 'null'); }
+                catch (_) { return null; }
+            })();
+            const lat = Number(cached?.lat);
+            const lng = Number(cached?.lng);
+            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                calculateQibla(lat, lng);
+                initCompass();
+            }
+        }
+
         syncPrayerSegmentedThumb();
         if (persist) localStorage.setItem(PRAYER_SUBTAB_STORAGE_KEY, active);
     }
@@ -7156,12 +7327,19 @@ window.filterCategory = function(cat, btn) {
         const qiblaRounded = Math.round(qibla);
         const uiText = getPrayerUiText();
         if (degEl) {
-            degEl.textContent = isPashtoMode()
-                ? `${localizeDigits(qiblaRounded)}° له شماله د قبلې لوری`
-                : `Qibla bearing: ${qiblaRounded}° from North`;
+            degEl.textContent = `${localizeDigits(qiblaRounded)}°`;
         }
+
+        const hasOrientationSupport = ('ondeviceorientationabsolute' in window)
+            || ('ondeviceorientation' in window)
+            || (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function');
+
         if (statusEl) {
-            statusEl.textContent = uiText.qiblaRotateHint;
+            statusEl.textContent = hasOrientationSupport
+                ? uiText.qiblaRotateHint
+                : (isPashtoMode()
+                    ? `${localizeDigits(qiblaRounded)}° له شماله د قبلې لوری`
+                    : `Qibla is ${qiblaRounded}° from North`);
         }
 
         const marker = document.getElementById('qiblaMarker');
@@ -7180,7 +7358,7 @@ window.filterCategory = function(cat, btn) {
             // iOS 13+ — needs explicit permission
             const statusEl = document.getElementById('qiblaStatus');
             if (statusEl && !sessionStorage.getItem('compass_requested')) {
-                statusEl.innerHTML = '<button class="selected-city-change" onclick="requestCompassPermission()">Enable Compass</button>';
+                statusEl.innerHTML = `<button class="selected-city-change" onclick="requestCompassPermission()">${isPashtoMode() ? 'د کمپاس اجازه' : 'Allow Compass'}</button>`;
             }
         } else if ('ondeviceorientationabsolute' in window) {
             window.addEventListener('deviceorientationabsolute', handleCompass, true);
@@ -8293,8 +8471,8 @@ window.filterCategory = function(cat, btn) {
         const type = String(typeRaw || '').toLowerCase();
         const meccan = type.includes('meccan') || type.includes('makki') || type.includes('makkah');
         return meccan
-            ? { label: ui.makki, icon: '🕋' }
-            : { label: ui.madani, icon: '🕌' };
+            ? { label: ui.makki, tone: 'makki' }
+            : { label: ui.madani, tone: 'madani' };
     }
 
     function getCurrentSurahMetaByNumber(surahNumber) {
@@ -8534,7 +8712,7 @@ window.filterCategory = function(cat, btn) {
                 titleEn,
                 ayahCount,
                 revelationLabel: revelation.label,
-                revelationIcon: revelation.icon
+                revelationTone: revelation.tone
             };
         });
     }
@@ -8556,7 +8734,7 @@ window.filterCategory = function(cat, btn) {
                 <div class="quran-popular-card" onclick="${action}">
                     <div class="quran-popular-topline">
                         <span class="quran-popular-badge">${localizeQuranNumber(item.number || 0)}</span>
-                        ${item.type === 'surah' ? `<span class="quran-popular-revelation"><span aria-hidden="true">${item.revelationIcon || '🕌'}</span>${escapeHtml(item.revelationLabel || '')}</span>` : ''}
+                        ${item.type === 'surah' ? `<span class="quran-popular-revelation ${item.revelationTone === 'makki' ? 'is-makki' : 'is-madani'}">${escapeHtml(item.revelationLabel || '')}</span>` : ''}
                     </div>
                     <div class="quran-popular-ar" dir="rtl">${escapeHtml(item.titleAr || '')}</div>
                     <div class="quran-popular-name">${escapeHtml(item.titleEn || '')}</div>
@@ -8584,24 +8762,9 @@ window.filterCategory = function(cat, btn) {
 
     function renderQuranJumpRail(rows) {
         const rail = document.getElementById('quranJumpRail');
-        const listEl = document.getElementById('quranSurahList');
-        if (!rail || !listEl) return;
-
-        const numbers = (rows || []).map(item => Number(item.number)).filter(Boolean);
-        const targets = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110];
-        rail.innerHTML = targets
-            .filter(target => numbers.some(n => n >= target))
-            .map((target) => `<button type="button" class="quran-jump-btn" data-jump="${target}">${target}</button>`)
-            .join('');
-
-        rail.querySelectorAll('.quran-jump-btn').forEach((btn) => {
-            btn.onclick = () => {
-                const target = Number(btn.getAttribute('data-jump'));
-                const row = listEl.querySelector(`.quran-surah-row[data-surah-no=\"${target}\"]`)
-                    || listEl.querySelector(`.quran-surah-row[data-surah-no]:nth-child(${Math.max(1, target)})`);
-                if (row) row.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            };
-        });
+        if (!rail) return;
+        // Disabled to prevent broken numeric rail overlap on narrow screens.
+        rail.innerHTML = '';
     }
 
     function closeQuranSurahDropdown() {
@@ -8707,12 +8870,12 @@ window.filterCategory = function(cat, btn) {
                 <div class="quran-surah-row ${revelationClass} ${isRecentlyRead ? 'is-recently-read' : ''}" data-surah-no="${surah.number}" onclick="openQuranSurah(${surah.number})">
                     <div class="quran-surah-num">${localizeQuranNumber(surah.number)}</div>
                     <div class="quran-surah-main">
-                        <div class="quran-surah-name-primary">${escapeHtml(arabicName)}</div>
                         <div class="quran-surah-name-secondary">${escapeHtml(primary)}${secondary ? ` • ${escapeHtml(secondary)}` : ''}</div>
+                        <span class="quran-surah-ayahs">${localizeQuranNumber(surah.numberOfAyahs)} ${ui.ayahs}</span>
                     </div>
                     <div class="quran-surah-meta">
-                        <span class="quran-surah-ayahs">${localizeQuranNumber(surah.numberOfAyahs)} ${ui.ayahs}</span>
-                        <span class="quran-revelation-text"><span class="quran-revelation-icon" aria-hidden="true">${revelation.icon}</span>${revelation.label}</span>
+                        <div class="quran-surah-name-primary" dir="rtl">${escapeHtml(arabicName)}</div>
+                        <span class="quran-revelation-text ${revelation.tone === 'makki' ? 'is-makki' : 'is-madani'}">${revelation.label}</span>
                         ${isRecentlyRead ? `<span class="quran-recent-dot" title="${ui.recentlyRead}" aria-hidden="true"></span>` : ''}
                         ${cached
                             ? `<span class="quran-cached-icon" title="${ui.cached}">✓</span>`
@@ -8947,7 +9110,9 @@ window.filterCategory = function(cat, btn) {
             <div class="quran-surah-frame mushaf-surah-head">
                 <div class="mushaf-surah-ar">${escapeHtml(cleanSurahArabicName(data.name))}</div>
                 <div class="mushaf-surah-meta">${escapeHtml(data.englishName)} • ${localizeQuranNumber(data.numberOfAyahs)} ${ui.ayahs}</div>
-                <div class="mushaf-surah-meta mushaf-surah-meta-rev">${rev.icon} ${rev.label}</div>
+                <div class="mushaf-surah-meta mushaf-surah-meta-rev">
+                    <span class="quran-revelation-text ${rev.tone === 'makki' ? 'is-makki' : 'is-madani'}">${rev.label}</span>
+                </div>
             </div>
             <button class="quran-row-btn quran-reader-download-btn" type="button" onclick="downloadQuranSurahOffline(${Number(data.surahNumber)})" title="${ui.downloadOffline}" aria-label="${ui.downloadOffline}">${isOffline ? '✓' : '↓'}</button>
             ${showBismillah ? `
