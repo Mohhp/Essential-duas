@@ -107,7 +107,9 @@
 <!-- ===== SPLASH SCREEN ===== -->
 <div class="splash-screen" id="splashScreen">
     <div class="splash-logo-large">
-        <div class="splash-crescent-lg"></div>
+        <svg class="splash-crescent-lg" width="78" height="78" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
+        </svg>
         <span class="splash-fa-lg">ف</span>
     </div>
     <div class="splash-title">Falah</div>
@@ -160,6 +162,34 @@
             <div class="dashboard-prayer-location" id="dashboardPrayerLocation">London</div>
         </button>
 
+        <button class="dashboard-prayer-strip-card" id="dashboardPrayerStripCard" onclick="openPrayerFromDashboard()" aria-label="Open prayer times overview">
+            <div class="dashboard-prayer-strip-head" id="dashboardPrayerStripTitle">Today Prayer Times</div>
+            <div class="dashboard-prayer-strip" id="dashboardPrayerStrip" role="list">
+                <div class="dashboard-prayer-strip-item" id="dashboardPrayerStrip-fajr" role="listitem" aria-label="Fajr prayer time">
+                    <span class="dashboard-prayer-strip-name" id="dashboardPrayerStripName-fajr">Fajr</span>
+                    <span class="dashboard-prayer-strip-time" id="dashboardPrayerStripTime-fajr">--:--</span>
+                </div>
+                <div class="dashboard-prayer-strip-item" id="dashboardPrayerStrip-dhuhr" role="listitem" aria-label="Dhuhr prayer time">
+                    <span class="dashboard-prayer-strip-name" id="dashboardPrayerStripName-dhuhr">Dhuhr</span>
+                    <span class="dashboard-prayer-strip-time" id="dashboardPrayerStripTime-dhuhr">--:--</span>
+                </div>
+                <div class="dashboard-prayer-strip-item" id="dashboardPrayerStrip-asr" role="listitem" aria-label="Asr prayer time">
+                    <span class="dashboard-prayer-strip-name" id="dashboardPrayerStripName-asr">Asr</span>
+                    <span class="dashboard-prayer-strip-time" id="dashboardPrayerStripTime-asr">--:--</span>
+                </div>
+                <div class="dashboard-prayer-strip-item" id="dashboardPrayerStrip-maghrib" role="listitem" aria-label="Maghrib prayer time">
+                    <span class="dashboard-prayer-strip-name" id="dashboardPrayerStripName-maghrib">Maghrib</span>
+                    <span class="dashboard-prayer-strip-time" id="dashboardPrayerStripTime-maghrib">--:--</span>
+                </div>
+                <div class="dashboard-prayer-strip-item" id="dashboardPrayerStrip-isha" role="listitem" aria-label="Isha prayer time">
+                    <span class="dashboard-prayer-strip-name" id="dashboardPrayerStripName-isha">Isha</span>
+                    <span class="dashboard-prayer-strip-time" id="dashboardPrayerStripTime-isha">--:--</span>
+                </div>
+            </div>
+        </button>
+
+        <div class="ornamental-line" aria-hidden="true">◆</div>
+
         <button class="dashboard-suggestion-card continue-card" id="dashboardSuggestionCard" aria-label="Continue Quran">
             <div class="dashboard-suggestion-row">
                 <div class="dashboard-continue-left">
@@ -179,6 +209,30 @@
             </div>
         </button>
 
+        <button class="dashboard-quran-streak-card" id="dashboardQuranStreakCard" onclick="handleBottomNav('quran')" aria-label="Open Quran streak">
+            <div class="dashboard-streak-icon" aria-hidden="true">🔥</div>
+            <div class="dashboard-streak-copy">
+                <div class="dashboard-streak-title" id="dashboardQuranStreakText">Quran Streak: 0 days</div>
+                <div class="dashboard-streak-sub" id="dashboardQuranStreakSub">Read one ayah today to start.</div>
+            </div>
+        </button>
+
+        <button class="dashboard-suggestion-card dashboard-dua-suggestion-card" id="dashboardDuaSuggestionCard" aria-label="Open suggested dua">
+            <div class="dashboard-suggestion-row">
+                <div class="dashboard-continue-left">
+                    <div class="dashboard-continue-kicker" id="dashboardDuaSuggestionKicker">FOR THIS MOMENT</div>
+                    <div class="dashboard-continue-main">
+                        <span class="dashboard-continue-icon" aria-hidden="true">🤲</span>
+                        <span class="dashboard-continue-surah" id="dashboardDuaSuggestionTitle">Suggested Dua</span>
+                    </div>
+                    <div class="dashboard-continue-ayah" id="dashboardDuaSuggestionSub">Tap to open a relevant dua</div>
+                </div>
+                <span class="dashboard-suggestion-cta" id="dashboardDuaSuggestionCta">Open</span>
+            </div>
+        </button>
+
+        <div class="ornamental-line" aria-hidden="true">◆</div>
+
         <div class="dashboard-quick-grid" id="dashboardQuickGrid">
             <button class="dashboard-quick-tile quick-quran" onclick="handleBottomNav('quran')" aria-label="Open Quran">
                 <span class="dashboard-quick-wave" aria-hidden="true"></span>
@@ -197,6 +251,8 @@
                 <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10" fill="rgba(255,255,255,0.12)"/><polygon points="12,2 14,10 12,8 10,10" fill="white" stroke="none"/><rect x="9" y="10" width="6" height="5" rx="0.5" fill="none" stroke="white" stroke-width="2"/></svg></span><span class="dashboard-quick-label" id="quickQiblaLabel">Qibla</span>
             </button>
         </div>
+
+        <div class="ornamental-line" aria-hidden="true">◆</div>
 
         <div class="dashboard-tip-card" id="dashboardTipCard">
             <div class="dashboard-tip-label" id="dashboardTipLabel">Tip ✨</div>
@@ -2971,7 +3027,7 @@
 <script src="pashto-translation-player.js?v=20260306j"></script>
 
 <script>
-    const APP_VERSION = '2.0.10';
+    const APP_VERSION = '2.0.11';
 
     (function() {
         const VERSION_INFO_URL = 'https://mohhp.github.io/Essential-duas/version.json';
@@ -3377,7 +3433,7 @@
         <p id="aboutDescription">Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.</p>
         <p id="aboutDescriptionPs">ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.</p>
         <p id="aboutTagline">حي على الفلاح — Come to Success</p>
-        <p id="aboutVersion">Version: 2.0.10</p>
+        <p id="aboutVersion">Version: 2.0.11</p>
         <div class="about-meta">
             <div id="aboutDeveloper">Developer: Falah</div>
             <div id="aboutCopyright">© 2026 Falah. All rights reserved.</div>

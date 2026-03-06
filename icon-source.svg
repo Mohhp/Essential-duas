@@ -1,30 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <!-- Background gradient — rich dark green with warm center -->
-    <radialGradient id="bgGrad" cx="50%" cy="45%" r="65%">
-      <stop offset="0%" stop-color="#163d28"/>
-      <stop offset="100%" stop-color="#0c1a13"/>
+    <!-- Deep blue premium backdrop -->
+    <radialGradient id="bgGrad" cx="48%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#13243d"/>
+      <stop offset="100%" stop-color="#060d19"/>
     </radialGradient>
-    <!-- Emerald gradient for the main letter -->
-    <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#5eeaa0"/>
-      <stop offset="40%" stop-color="#2ec47a"/>
-      <stop offset="100%" stop-color="#1a9a6a"/>
+    <!-- Gold crescent gradient -->
+    <linearGradient id="goldCrescent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f4dfa0"/>
+      <stop offset="55%" stop-color="#d7b356"/>
+      <stop offset="100%" stop-color="#b98e33"/>
     </linearGradient>
-    <!-- Gold ring gradient -->
-    <linearGradient id="goldRing" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#e0c060"/>
-      <stop offset="50%" stop-color="#c9a84c"/>
-      <stop offset="100%" stop-color="#a08838"/>
-    </linearGradient>
-    <!-- Soft glow behind letter -->
-    <radialGradient id="glowGrad" cx="50%" cy="48%" r="30%">
-      <stop offset="0%" stop-color="#2ec47a" stop-opacity="0.25"/>
-      <stop offset="100%" stop-color="#2ec47a" stop-opacity="0"/>
+    <!-- Soft gold glow -->
+    <radialGradient id="glowGrad" cx="46%" cy="44%" r="40%">
+      <stop offset="0%" stop-color="#d9b860" stop-opacity="0.36"/>
+      <stop offset="100%" stop-color="#d9b860" stop-opacity="0"/>
     </radialGradient>
-    <!-- Drop shadow for letter -->
-    <filter id="letterShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#0a1510" flood-opacity="0.7"/>
+    <filter id="shapeShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#03070f" flood-opacity="0.7"/>
     </filter>
   </defs>
 
@@ -32,20 +25,18 @@
   <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
 
   <!-- Subtle inner border -->
-  <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#2ec47a" stroke-width="1.5" opacity="0.1"/>
+  <rect x="16" y="16" width="480" height="480" rx="98" fill="none" stroke="#d6b25a" stroke-width="1.5" opacity="0.2"/>
 
-  <!-- Radial glow behind letter -->
+  <!-- Radial glow behind crescent -->
   <circle cx="256" cy="256" r="160" fill="url(#glowGrad)"/>
 
-  <!-- Gold accent ring — visible and elegant -->
-  <circle cx="256" cy="256" r="172" fill="none" stroke="url(#goldRing)" stroke-width="3" opacity="0.6"/>
+  <!-- Primary crescent -->
+  <circle cx="248" cy="250" r="130" fill="url(#goldCrescent)" filter="url(#shapeShadow)"/>
+  <circle cx="292" cy="230" r="112" fill="#0a1322"/>
 
-  <!-- Thin emerald inner ring -->
-  <circle cx="256" cy="256" r="162" fill="none" stroke="#2ec47a" stroke-width="1" opacity="0.2"/>
+  <!-- Small accent star -->
+  <path d="M337 175l8 18 19 2-14 12 4 18-17-9-17 9 4-18-14-12 19-2 8-18z" fill="url(#goldCrescent)" opacity="0.92"/>
 
-  <!-- Main Arabic letter ف — large, bold, centered -->
-  <text x="256" y="310" text-anchor="middle"
-        font-family="'Noto Naskh Arabic', 'Amiri', serif"
-        font-size="260" font-weight="700"
-        fill="url(#emeraldGrad)" filter="url(#letterShadow)">ف</text>
+  <!-- Outer ring for definition at small sizes -->
+  <circle cx="256" cy="256" r="174" fill="none" stroke="#e7c979" stroke-width="2" opacity="0.46"/>
 </svg>
