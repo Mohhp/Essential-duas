@@ -1,6 +1,8 @@
 const CACHE_NAME = 'falah-v87';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
+const PRAYER_REMINDER_STATE_CACHE = 'falah-prayer-reminder-state-v1';
+const PRAYER_REMINDER_STATE_URL = '/__prayer-reminder-state__';
 const PRAYER_REMINDER_DUE_WINDOW_MS = 2 * 60 * 1000;
 const PRAYER_REMINDER_GRACE_MS = 3 * 60 * 60 * 1000;
 
@@ -10,6 +12,31 @@ let prayerReminderState = {
   reminders: []
 };
 const firedReminderMap = new Map();
+
+async function persistPrayerReminderState() {
+  const cache = await caches.open(PRAYER_REMINDER_STATE_CACHE);
+  const response = new Response(JSON.stringify(prayerReminderState), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+  await cache.put(PRAYER_REMINDER_STATE_URL, response);
+}
+
+async function restorePrayerReminderState() {
+  const cache = await caches.open(PRAYER_REMINDER_STATE_CACHE);
+  const response = await cache.match(PRAYER_REMINDER_STATE_URL);
+  if (!response) return prayerReminderState;
+
+  try {
+    const data = await response.json();
+    prayerReminderState = {
+      generatedAt: Number(data?.generatedAt) || 0,
+      timezoneOffsetMinutes: typeof data?.timezoneOffsetMinutes === 'number' ? data.timezoneOffsetMinutes : null,
+      reminders: Array.isArray(data?.reminders) ? data.reminders : []
+    };
+  } catch (_) {}
+
+  return prayerReminderState;
+}
 
 function cleanupFiredReminderMap(nowTs) {
   for (const [key, firedAt] of firedReminderMap.entries()) {
@@ -23,6 +50,10 @@ async function broadcastReminderDue(payload) {
 }
 
 async function checkDuePrayerReminders(reason = 'manual') {
+  if (!Array.isArray(prayerReminderState.reminders) || !prayerReminderState.reminders.length) {
+    await restorePrayerReminderState();
+  }
+
   const nowTs = Date.now();
   cleanupFiredReminderMap(nowTs);
 
@@ -145,9 +176,10 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME && k !== PRAYER_REMINDER_STATE_CACHE).map(k => caches.delete(k))
       );
-    }).then(() => {
+    }).then(async () => {
+      await restorePrayerReminderState();
       // Notify all open clients that a new version is active
       return self.clients.matchAll({ type: 'window' }).then(clients => {
         clients.forEach(client => client.postMessage({ type: 'SW_UPDATED' }));
@@ -165,7 +197,10 @@ self.addEventListener('message', (event) => {
       timezoneOffsetMinutes: data.timezoneOffsetMinutes,
       reminders: Array.isArray(data.reminders) ? data.reminders : []
     };
-    event.waitUntil(checkDuePrayerReminders(data.reason || 'sync-message'));
+    event.waitUntil((async () => {
+      await persistPrayerReminderState();
+      await checkDuePrayerReminders(data.reason || 'sync-message');
+    })());
   }
   if (data.type === 'FORCE_PRAYER_REMINDER_CHECK') {
     event.waitUntil(checkDuePrayerReminders('forced-message'));

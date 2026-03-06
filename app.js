@@ -162,6 +162,9 @@
         trackDailyActivity();
         renderBookmarksPanel();
         wrapArabicWords();
+        injectDuaBismillahHeaders();
+        syncCategoryWatermarks();
+        syncHomeTileWatermarks();
         initDailyReminderPrompt();
         initHomeDashboard();
         initDuasTabSearch();
@@ -1355,6 +1358,64 @@ window.filterCategory = function(cat, btn) {
         'evil-eye':        { icon: '🧿', title: 'Evil Eye & Envy',             subtitle: 'Prophetic shields against hasad and al-\'ayn' }
     };
 
+    const CATEGORY_WATERMARKS = {
+        all: 'ادعوني أستجب لكم',
+        quran: 'كتاب أنزلناه إليك مبارك',
+        quranic: 'كتاب أنزلناه إليك مبارك',
+        'morning-evening': 'أذكار الصباح والمساء',
+        morning: 'أذكار الصباح والمساء',
+        protection: 'أعوذ بالله من الشيطان الرجيم',
+        forgiveness: 'أستغفر الله العظيم',
+        guidance: 'اهدنا الصراط المستقيم',
+        wellbeing: 'اللهم عافني في بدني',
+        prophets: 'ربنا آتنا في الدنيا حسنة',
+        prayer: 'أقم الصلاة لذكري',
+        provision: 'إن الله هو الرزاق',
+        family: 'ربنا هب لنا من أزواجنا',
+        travel: 'سبحان الذي سخر لنا هذا',
+        knowledge: 'رب زدني علما',
+        scholars: 'لا حول ولا قوة إلا بالله',
+        ramadan: 'شهر رمضان الذي أنزل فيه القرآن',
+        'evil-eye': 'أعوذ بكلمات الله التامات'
+    };
+
+    const QUICK_TILE_WATERMARKS = {
+        'quick-quran': 'بسم الله',
+        'quick-duas': 'ادعوني',
+        'quick-tasbeeh': 'سبحان الله',
+        'quick-qibla': 'الله أكبر'
+    };
+
+    function syncCategoryWatermarks(root = document) {
+        root.querySelectorAll('#categoryGrid .cat-card[data-cat], .dua-category-card[data-cat]').forEach((card) => {
+            const categoryKey = card.getAttribute('data-cat') || '';
+            const watermarkText = CATEGORY_WATERMARKS[categoryKey] || 'سبحان الله وبحمده';
+            let watermark = card.querySelector('.category-watermark');
+            if (!watermark) {
+                watermark = document.createElement('span');
+                watermark.className = 'category-watermark';
+                watermark.setAttribute('aria-hidden', 'true');
+                card.insertBefore(watermark, card.firstChild);
+            }
+            watermark.textContent = watermarkText;
+        });
+    }
+
+    function syncHomeTileWatermarks(root = document) {
+        Object.entries(QUICK_TILE_WATERMARKS).forEach(([tileClass, watermarkText]) => {
+            const tile = root.querySelector(`.dashboard-quick-tile.${tileClass}`);
+            if (!tile) return;
+            let watermark = tile.querySelector('.tile-watermark');
+            if (!watermark) {
+                watermark = document.createElement('span');
+                watermark.className = 'tile-watermark';
+                watermark.setAttribute('aria-hidden', 'true');
+                tile.insertBefore(watermark, tile.firstChild);
+            }
+            watermark.textContent = watermarkText;
+        });
+    }
+
     function getDuaIdsForCategory(cat) {
         const cards = Array.from(document.querySelectorAll('#duaListSection .dua-card'));
         return cards
@@ -1402,6 +1463,23 @@ window.filterCategory = function(cat, btn) {
             };
     }
 
+    function ensureDuaBismillah(bodyInner) {
+        if (!bodyInner || bodyInner.querySelector('.dua-bismillah')) return;
+
+        const firstChild = bodyInner.firstElementChild;
+        if (firstChild?.classList.contains('dua-title-arabic')) return;
+
+        const bismillah = document.createElement('div');
+        bismillah.className = 'dua-bismillah';
+        bismillah.setAttribute('dir', 'rtl');
+        bismillah.textContent = 'بسم الله الرحمن الرحيم';
+        bodyInner.insertBefore(bismillah, bodyInner.firstChild);
+    }
+
+    function injectDuaBismillahHeaders(root = document) {
+        root.querySelectorAll('#duaListSection .card-body-inner').forEach(ensureDuaBismillah);
+    }
+
     function buildSwipeSlide(duaId, slotClass) {
         const card = document.querySelector(`#duaListSection .dua-card[data-id="${duaId}"]`);
         if (!card) {
@@ -1419,6 +1497,7 @@ window.filterCategory = function(cat, btn) {
 
         const bodyClone = card.querySelector('.card-body-inner')?.cloneNode(true);
         if (bodyClone) bodyClone.querySelectorAll('.copy-row').forEach(row => row.remove());
+        ensureDuaBismillah(bodyClone);
 
         const texts = getViewerTexts();
         const isBookmarked = STATE.bookmarks.includes(duaId);
@@ -3937,7 +4016,7 @@ window.filterCategory = function(cat, btn) {
             aboutDescription: 'Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.',
             aboutDescriptionPs: 'ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.',
             aboutTagline: 'حي على الفلاح — Come to Success',
-            aboutVersion: 'Version: 2.0.11',
+            aboutVersion: 'Version: 2.0.16',
             aboutDeveloper: isPS ? 'پراختیاکوونکی: Falah' : 'Developer: Falah',
             aboutCopyright: '© 2026 Falah. All rights reserved.',
             aboutContactLabel: isPS ? 'اړیکه ونیسئ' : 'Contact Us',
@@ -6255,6 +6334,7 @@ window.filterCategory = function(cat, btn) {
     let compassEventTimer = null;
     let latestCompassHeading = null;
     let currentNeedleRotation = 0;
+    let lastQiblaDistanceKm = null;
     let prayerPanelHydrated = false;
     const PRAYER_SUBTAB_STORAGE_KEY = 'crown_prayer_active_tab';
 
@@ -6633,8 +6713,8 @@ window.filterCategory = function(cat, btn) {
             remindersInactive: isPS ? 'یادونې غیرفعاله دي' : 'Reminders inactive',
             qiblaFacing: isPS ? 'ماشاءالله! تاسو قبلې ته برابر یاست.' : 'MashaAllah! You are facing Qibla.',
             qiblaAlmost: isPS ? 'نږدې یاست — {delta}° توپیر' : 'Almost there — {delta}° off',
-            qiblaRotateHint: isPS ? 'موبایل وڅرخوئ — ستنه د قبلې نښې ته برابره کړئ' : 'Rotate phone until needle aligns with Qibla marker',
-            qiblaNeedleHint: isPS ? 'موبایل مو هوار ونیسئ او ورو یې وڅرخوئ' : 'Hold your phone flat and rotate gently',
+            qiblaRotateHint: isPS ? 'موبایل وڅرخوئ — ستنه د قبلې نښې ته برابره کړئ' : 'Rotate phone until the needle aligns with the highlighted direction',
+            qiblaNeedleHint: isPS ? 'موبایل د روښانه شوي لوري پر خوا ونیسئ' : 'Point your phone toward the highlighted direction',
             change: isPS ? 'بدل' : 'Change',
             noCitySelected: isPS ? 'ښار نه دی ټاکل شوی' : 'No city selected',
             tabTimes: isPS ? 'وختونه' : 'Times',
@@ -6647,6 +6727,35 @@ window.filterCategory = function(cat, btn) {
         const qiblaLoc = document.getElementById('qiblaLocation');
         if (!qiblaLoc) return;
         qiblaLoc.textContent = text || '--';
+    }
+
+    function formatQiblaDistance(distanceKm) {
+        if (!Number.isFinite(distanceKm)) {
+            return isPashtoMode() ? 'تر کعبې -- کیلومتره' : '-- km to the Kaaba';
+        }
+        const roundedKm = Math.round(distanceKm);
+        const formatted = Intl.NumberFormat('en-US').format(roundedKm);
+        const localized = localizeDigits(formatted);
+        return isPashtoMode() ? `تر کعبې ${localized} کیلومتره` : `${localized} km to the Kaaba`;
+    }
+
+    function setQiblaDistanceText(distanceKm) {
+        lastQiblaDistanceKm = Number.isFinite(distanceKm) ? distanceKm : null;
+        const qiblaDistance = document.getElementById('qiblaDistance');
+        if (!qiblaDistance) return;
+        qiblaDistance.textContent = formatQiblaDistance(lastQiblaDistanceKm);
+    }
+
+    function getDistanceToKaabaKm(lat, lng) {
+        const toRadians = (degrees) => degrees * Math.PI / 180;
+        const earthRadiusKm = 6371;
+        const deltaLat = toRadians(KAABA_LAT - lat);
+        const deltaLng = toRadians(KAABA_LNG - lng);
+        const lat1 = toRadians(lat);
+        const lat2 = toRadians(KAABA_LAT);
+        const a = Math.sin(deltaLat / 2) ** 2
+            + Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) ** 2;
+        return 2 * earthRadiusKm * Math.asin(Math.sqrt(a));
     }
 
     function getSavedPrayerTab() {
@@ -6838,7 +6947,7 @@ window.filterCategory = function(cat, btn) {
         if (sameAllLabel) sameAllLabel.textContent = isPashtoMode() ? 'د ټولو لمونځونو لپاره یو غږ' : 'Same sound for all prayers';
         if (beforeLabel) beforeLabel.textContent = uiText.reminderBefore;
         if (testBtn) testBtn.textContent = uiText.testReminder;
-        if (test10sBtn) test10sBtn.textContent = isPashtoMode() ? 'ازموینه په ۱۰ ثانیو کې' : 'Test in 10 seconds';
+        if (test10sBtn) test10sBtn.textContent = 'Test Reminder (10 seconds)';
 
         const beforeSelect = document.getElementById('reminderBefore');
         if (beforeSelect) {
@@ -6869,6 +6978,7 @@ window.filterCategory = function(cat, btn) {
         if (instruction) {
             instruction.textContent = getPrayerUiText().qiblaNeedleHint;
         }
+        setQiblaDistanceText(lastQiblaDistanceKm);
 
         const labelMap = {
             n: { en: 'N', ps: 'ش' },
@@ -7756,6 +7866,7 @@ window.filterCategory = function(cat, btn) {
         if (qibla < 0) qibla += 360;
 
         userQibla = qibla;
+        setQiblaDistanceText(getDistanceToKaabaKm(lat, lng));
         buildQiblaDegreeRing();
 
         const degEl = document.getElementById('qiblaDegree');
@@ -8031,14 +8142,14 @@ window.filterCategory = function(cat, btn) {
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
         if (!('serviceWorker' in navigator)) return;
 
-        navigator.serviceWorker.ready
+        return navigator.serviceWorker.ready
             .then((registration) => {
                 if (registration && typeof registration.showNotification === 'function') {
                     return registration.showNotification(title, options);
                 }
                 return null;
             })
-            .catch(() => {});
+            .catch(() => null);
     }
 
     function resolveReminderSoundId(prayerName = null) {
@@ -8220,11 +8331,9 @@ window.filterCategory = function(cat, btn) {
 
             setTimeout(() => {
                 const samplePrayer = getNextPrayer(new Date()) || 'dhuhr';
-                const uiText = getPrayerUiText();
-                const localizedPrayer = getPrayerLabel(samplePrayer);
                 playReminderSound(resolveReminderSoundId(samplePrayer));
-                sendSystemNotification(`${PRAYER_ICONS[samplePrayer]} ${uiText.testReminder}`, {
-                    body: `Test reminder - ${localizedPrayer}`,
+                Promise.resolve(sendSystemNotification('Falah — Prayer Reminder', {
+                    body: 'This is a test reminder. Your reminders are working correctly!',
                     icon: 'icon-192.png',
                     badge: 'icon-192.png',
                     tag: 'prayer-test-reminder-10s',
@@ -8236,6 +8345,8 @@ window.filterCategory = function(cat, btn) {
                         prayer: samplePrayer,
                         url: '/'
                     }
+                })).finally(() => {
+                    showToast('✅ Test reminder sent successfully');
                 });
             }, 10000);
         });
@@ -11276,8 +11387,7 @@ window.filterCategory = function(cat, btn) {
         renderQuranContinueCard();
         renderQuranRecentSection();
         setQuranView(quranState.view || 'surah', { skipHistory: true });
-        const pashtoEdition = await ensurePashtoEdition();
-        showToast(pashtoEdition ? getQuranUiText().pashtoEditionFound : getQuranUiText().noPashtoFound);
+        await ensurePashtoEdition();
         quranState.initialized = true;
     }
 

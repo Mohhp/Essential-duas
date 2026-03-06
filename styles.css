@@ -7,20 +7,99 @@
         }
 
         :root {
-            --bg-dark: #0f2533;
-            --bg-light: #f6f0e4;
-            --bg-card: #18374a;
-            --bg-surface: #1d4055;
-            --bg-glass: #1a384d;
-            --gold-lightest: #f4f7ee;
-            --gold-light: #e6f0da;
-            --gold-mid: #c9a84c;
+            --space-2: 2px;
+            --space-4: 4px;
+            --space-6: 6px;
+            --space-8: 8px;
+            --space-12: 12px;
+            --space-16: 16px;
+            --space-20: 20px;
+            --space-24: 24px;
+            --space-32: 32px;
+            --space-40: 40px;
+            --space-48: 48px;
+            --space-64: 64px;
+
+            --text-display: 600 48px/1.1 'Inter', system-ui, sans-serif;
+            --text-h1: 700 24px/1.3 'Inter', system-ui, sans-serif;
+            --text-h2: 600 18px/1.4 'Inter', system-ui, sans-serif;
+            --text-body: 400 15px/1.6 'Inter', system-ui, sans-serif;
+            --text-caption: 500 12px/1.4 'Inter', system-ui, sans-serif;
+            --text-micro: 600 10px/1.2 'Inter', system-ui, sans-serif;
+            --text-arabic-display: 32px;
+            --text-arabic-heading: 22px;
+            --text-arabic-body: 18px;
+            --arabic-line-height: 2;
+            --arabic-font: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+
+            --bg-primary: #0a1628;
+            --bg-secondary: #0f1d30;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --bg-card-hover: rgba(255, 255, 255, 0.07);
+            --bg-card-active: rgba(255, 255, 255, 0.03);
+
+            --accent-gold: #C9A84C;
+            --accent-gold-muted: rgba(201, 168, 76, 0.3);
+            --accent-gold-subtle: rgba(201, 168, 76, 0.1);
+            --accent-green: #2ECC71;
+            --accent-green-muted: rgba(46, 204, 113, 0.3);
+            --accent-green-subtle: rgba(46, 204, 113, 0.1);
+
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.75);
+            --text-muted: rgba(255, 255, 255, 0.5);
+            --text-accent: var(--accent-gold);
+
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-medium: rgba(255, 255, 255, 0.1);
+            --border-accent: rgba(201, 168, 76, 0.2);
+
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+            --shadow-glow-gold: 0 0 20px rgba(201, 168, 76, 0.15);
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+
+            --height-button: 48px;
+            --height-input: 48px;
+            --height-nav-item: 56px;
+            --height-list-row: 64px;
+            --height-touch-min: 44px;
+
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+
+            --nav-height: 56px;
+            --bottom-nav-height: 64px;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --font-scale: 1;
+
+            --surface-card: linear-gradient(180deg, var(--bg-card-hover), var(--bg-card-active));
+            --surface-accent: linear-gradient(180deg, var(--accent-gold-subtle), var(--bg-card-active));
+            --surface-success: linear-gradient(180deg, var(--accent-green-subtle), var(--bg-card-active));
+            --size-quick-tile: 100px;
+            --size-tasbeeh-tap: 140px;
+            --size-qibla-compass: 184px;
+            --size-qibla-compass-mobile: 168px;
+
+            --bg-dark: var(--bg-primary);
+            --bg-light: var(--bg-secondary);
+            --bg-surface: var(--bg-secondary);
+            --bg-glass: rgba(10, 22, 40, 0.88);
+            --gold-lightest: var(--text-primary);
+            --gold-light: rgba(255, 255, 255, 0.92);
+            --gold-mid: var(--accent-gold);
             --gold-dark: #8a6d2b;
             --gold-deep: #4a3a15;
-            --gold-glow: rgba(201, 168, 76, 0.08);
-            --emerald: #0a4d33;
-            --emerald-light: #2ec47a;
-            --emerald-glow: rgba(46, 196, 122, 0.06);
+            --gold-glow: var(--accent-gold-subtle);
+            --emerald: #123525;
+            --emerald-light: var(--accent-green);
+            --emerald-glow: var(--accent-green-subtle);
             --ruby: #7A2E3B;
             --sapphire: #1a3a5c;
             --teal: #1B6B6D;
@@ -30,57 +109,61 @@
             --green-mid: #4cad52;
             --green-dark: #1b5e20;
             --green-deep: #0a3d0a;
-            --text-primary: #f3f9ed;
-            --text-muted: #deebde;
-            --text-subtle: #c5dccd;
-            --text-faint: #acc6b7;
-            --font-arabic: 'Noto Naskh Arabic', 'Amiri', serif;
+            --text-subtle: var(--text-secondary);
+            --text-faint: var(--text-muted);
+            --font-arabic: var(--arabic-font);
             --font-amiri: 'Amiri', serif;
-            --font-title: 'Playfair Display', serif;
-            --font-text: 'Playfair Display', serif;
-            --radius-sm: 8px;
-            --radius-md: 14px;
-            --radius-lg: 20px;
-            --radius-xl: 32px;
-            --shadow-soft: 0 2px 16px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.12);
-            --shadow-card: 0 4px 28px rgba(0,0,0,0.22), 0 1px 6px rgba(0,0,0,0.15);
-            --shadow-elevated: 0 12px 48px rgba(0,0,0,0.35), 0 4px 12px rgba(0,0,0,0.2);
-            --shadow-glow: 0 0 48px rgba(46, 196, 122, 0.05);
-            --nav-height: 56px;
-            --bottom-nav-height: 60px;
-            --safe-top: env(safe-area-inset-top, 0px);
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-            --font-scale: 1;
-            --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --font-title: 'Inter', system-ui, sans-serif;
+            --font-text: 'Inter', system-ui, sans-serif;
+            --shadow-soft: var(--shadow-sm);
+            --shadow-card: var(--shadow-md);
+            --shadow-elevated: var(--shadow-lg);
+            --shadow-glow: var(--shadow-glow-gold);
+            --transition-smooth: var(--transition-normal);
+            --transition-spring: var(--transition-normal);
         }
 
         /* ===== LIGHT MODE ===== */
         [data-theme="light"] {
-            --bg-dark: #f6f0e4;
-            --bg-light: #f6f0e4;
-            --bg-card: #f0e7d7;
-            --bg-surface: #ebe0cf;
-            --bg-glass: #eee3d1;
-            --gold-lightest: #1a1a0e;
-            --gold-light: #2f2a18;
-            --gold-mid: #9a7a2f;
+            --bg-primary: #F5F1EB;
+            --bg-secondary: #EDE8E0;
+            --bg-card: #FFFFFF;
+            --bg-card-hover: #F8F6F2;
+            --bg-card-active: #F2EEE8;
+
+            --text-primary: #1a1a2e;
+            --text-secondary: rgba(26, 26, 46, 0.7);
+            --text-muted: rgba(26, 26, 46, 0.45);
+
+            --border-subtle: rgba(0, 0, 0, 0.06);
+            --border-medium: rgba(0, 0, 0, 0.1);
+            --border-accent: rgba(201, 168, 76, 0.22);
+
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+            --bg-dark: var(--bg-primary);
+            --bg-light: var(--bg-primary);
+            --bg-surface: var(--bg-secondary);
+            --bg-glass: rgba(245, 241, 235, 0.92);
+            --gold-lightest: #1a1a2e;
+            --gold-light: #1a1a2e;
+            --gold-mid: var(--accent-gold);
             --gold-dark: #745921;
-            --gold-glow: rgba(138, 109, 43, 0.08);
-            --emerald: #e8f5e9;
-            --emerald-light: #0f7f56;
-            --emerald-glow: rgba(13, 123, 80, 0.06);
+            --gold-glow: rgba(201, 168, 76, 0.12);
+            --emerald: #E8F5E9;
+            --emerald-light: #16985A;
+            --emerald-glow: rgba(22, 152, 90, 0.08);
             --green-lightest: #0a3d0a;
             --green-light: #2e7d32;
             --green-mid: #1b5e20;
-            --text-primary: #173326;
-            --text-muted: #254536;
-            --text-subtle: #365646;
-            --text-faint: #4b6a5b;
-            --shadow-soft: 0 3px 12px rgba(72,52,27,0.07), 0 1px 3px rgba(72,52,27,0.05);
-            --shadow-card: 0 6px 22px rgba(72,52,27,0.09), 0 2px 6px rgba(72,52,27,0.06);
-            --shadow-elevated: 0 12px 34px rgba(72,52,27,0.12), 0 4px 10px rgba(72,52,27,0.08);
-            --shadow-glow: 0 0 24px rgba(13, 123, 80, 0.04);
+            --text-subtle: var(--text-secondary);
+            --text-faint: var(--text-muted);
+            --shadow-soft: var(--shadow-sm);
+            --shadow-card: var(--shadow-md);
+            --shadow-elevated: var(--shadow-lg);
+            --shadow-glow: var(--shadow-glow-gold);
         }
         [data-theme="light"] body::before {
             background: var(--bg-dark);
@@ -939,7 +1022,8 @@
         }
         .category-grid.hidden-grid { display: none; }
 
-        .cat-card {
+        .cat-card,
+        .dua-category-card {
             position: relative;
             border-radius: 18px;
             overflow: hidden;
@@ -950,7 +1034,12 @@
             justify-content: flex-end;
             padding: 18px 16px;
             transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), box-shadow 0.35s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.25), 0 1px 4px rgba(0,0,0,0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            border-left: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                0 8px 24px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
             -webkit-tap-highlight-color: transparent;
             transform: perspective(800px) rotateX(0) rotateY(0);
             will-change: transform;
@@ -988,7 +1077,8 @@
             pointer-events: none;
         }
 
-        .cat-card-icon {
+        .cat-card-icon,
+        .dua-category-card .category-icon-circle {
             margin-bottom: 8px;
             position: relative;
             z-index: 1;
@@ -998,16 +1088,22 @@
             width: 2.85rem;
             height: 2.85rem;
             border-radius: 14px;
-            background: linear-gradient(150deg, rgba(255,255,255,0.26), rgba(255,255,255,0.08));
-            border: 1px solid rgba(255,255,255,0.34);
-            box-shadow: 0 10px 18px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.28);
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
-        .cat-card-icon svg {
+        .cat-card-icon svg,
+        .dua-category-card .category-icon-circle svg,
+        .dua-category-card .category-icon-circle i {
             width: 1.58rem;
             height: 1.58rem;
             display: block;
-            stroke: rgba(255,255,255,0.96);
+            color: #fff;
+            opacity: 1;
+            stroke: rgba(255, 255, 255, 1);
             stroke-width: 1.85;
             stroke-linecap: round;
             stroke-linejoin: round;
@@ -1065,49 +1161,49 @@
 
         /* Individual card gradients */
         .cat-card[data-cat="all"] {
-            background: linear-gradient(135deg, #2ec47a, #1a9d5c, #0d7b50);
+            background: linear-gradient(135deg, #2a6b4a 0%, #1a5035 50%, #0f3822 100%);
         }
         .cat-card[data-cat="quran"] {
-            background: linear-gradient(135deg, #1b6b4f, #2d9e6e, #3db87d);
-        }
-        .cat-card[data-cat="protection"] {
-            background: linear-gradient(135deg, #2d5aa0, #4478c4, #5a8fd4);
-        }
-        .cat-card[data-cat="forgiveness"] {
-            background: linear-gradient(135deg, #b85a7a, #d4738e, #e89ab0);
-        }
-        .cat-card[data-cat="guidance"] {
-            background: linear-gradient(135deg, #7b4fa0, #9b6cc0, #b088d4);
-        }
-        .cat-card[data-cat="wellbeing"] {
-            background: linear-gradient(135deg, #2a8f6a, #48b88a, #6dd4a8);
-        }
-        .cat-card[data-cat="prophets"] {
-            background: linear-gradient(135deg, #c4883a, #d4a04e, #e4b86a);
+            background: linear-gradient(135deg, #2a4a7a 0%, #1a355d 50%, #0f2240 100%);
         }
         .cat-card[data-cat="morning-evening"] {
-            background: linear-gradient(135deg, #d48a3a, #e8a44e, #f0be6a);
+            background: linear-gradient(135deg, #c47a3a 0%, #8b5225 50%, #6b3d1a 100%);
         }
-        .cat-card[data-cat="provision"] {
-            background: linear-gradient(135deg, #c07040, #d48858, #e4a070);
+        .cat-card[data-cat="protection"] {
+            background: linear-gradient(135deg, #3a7aaa 0%, #2a5a85 50%, #1a3f65 100%);
+        }
+        .cat-card[data-cat="forgiveness"] {
+            background: linear-gradient(135deg, #7a5aaa 0%, #5a3f85 50%, #3f2a65 100%);
+        }
+        .cat-card[data-cat="guidance"] {
+            background: linear-gradient(135deg, #8a7a3a 0%, #6b5d25 50%, #4a401a 100%);
+        }
+        .cat-card[data-cat="wellbeing"] {
+            background: linear-gradient(135deg, #3a8a7a 0%, #2a6b5d 50%, #1a4a40 100%);
+        }
+        .cat-card[data-cat="prophets"] {
+            background: linear-gradient(135deg, #8a6a3a 0%, #6b5025 50%, #4a381a 100%);
         }
         .cat-card[data-cat="prayer"] {
-            background: linear-gradient(135deg, #2a7a8a, #3a98a8, #50b4c4);
+            background: linear-gradient(135deg, #3a7a5a 0%, #2a5d40 50%, #1a402a 100%);
+        }
+        .cat-card[data-cat="provision"] {
+            background: linear-gradient(135deg, #7a6a4a 0%, #5d5035 50%, #403822 100%);
         }
         .cat-card[data-cat="family"] {
-            background: linear-gradient(135deg, #c45a6a, #d47888, #e494a0);
+            background: linear-gradient(135deg, #8a4a6a 0%, #6b3550 50%, #4a2238 100%);
         }
         .cat-card[data-cat="travel"] {
-            background: linear-gradient(135deg, #4a8ab0, #64a4c8, #7ebed8);
+            background: linear-gradient(135deg, #5a7a7a 0%, #3f5d5d 50%, #2a4040 100%);
         }
         .cat-card[data-cat="scholars"] {
-            background: linear-gradient(135deg, #5a4a8a, #7a68a8, #9480c0);
+            background: linear-gradient(135deg, #8a6aaa 0%, #6b4f88 50%, #4f3868 100%);
         }
         .cat-card[data-cat="ramadan"] {
-            background: linear-gradient(135deg, #1a5c6a, #2a8a7a, #3ab89a);
+            background: linear-gradient(135deg, #3aaa8a 0%, #2a856b 50%, #1a654a 100%);
         }
         .cat-card[data-cat="evil-eye"] {
-            background: linear-gradient(135deg, #6a3a8a, #8a50b0, #a870c8);
+            background: linear-gradient(135deg, #7a5a8a 0%, #5d3f6b 50%, #402a4a 100%);
         }
 
         /* Back to grid button */
@@ -1163,19 +1259,28 @@
         }
 
         /* Light mode adjustments for category grid */
-        [data-theme="light"] .cat-card {
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08);
+        [data-theme="light"] .cat-card,
+        [data-theme="light"] .dua-category-card {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 8px 20px rgba(0, 0, 0, 0.08);
         }
         [data-theme="light"] .cat-card:hover {
             box-shadow: 0 12px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.1);
         }
         [data-theme="light"] .cat-card-name {
-            color: #1f2f24;
-            text-shadow: 0 1px 3px rgba(255,255,255,0.25);
+            color: #fff;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
         }
         [data-theme="light"] .cat-card-count {
-            color: rgba(31, 47, 36, 0.82);
-            text-shadow: none;
+            color: rgba(255, 255, 255, 0.82);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+        }
+        [data-theme="light"] .cat-card-icon,
+        [data-theme="light"] .dua-category-card .category-icon-circle,
+        [data-theme="light"] .cat-card-icon svg,
+        [data-theme="light"] .dua-category-card .category-icon-circle svg,
+        [data-theme="light"] .dua-category-card .category-icon-circle i {
+            color: #fff;
+            stroke: rgba(255, 255, 255, 1);
         }
         [data-theme="light"] .back-to-grid {
             background: rgba(255, 255, 255, 0.88);
@@ -6040,14 +6145,16 @@
         }
 
         .dashboard-prayer-strip-item.is-current {
-            border-color: rgba(46, 196, 122, 0.62);
-            background: rgba(46, 196, 122, 0.15);
-            box-shadow: 0 0 0 1px rgba(46, 196, 122, 0.14) inset;
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.25), rgba(201, 168, 76, 0.15));
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            border-radius: 8px;
+            box-shadow: none;
         }
 
         .dashboard-prayer-strip-item.is-next {
-            border-color: rgba(201, 168, 76, 0.7);
-            background: rgba(201, 168, 76, 0.14);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
         }
 
         .dashboard-prayer-strip-item.is-past {
@@ -6232,6 +6339,14 @@
             gap: 8px;
             transition: transform 0.15s ease, opacity 0.15s ease;
             touch-action: manipulation;
+        }
+        .tile-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
         }
         .dashboard-quick-tile:active { transform: scale(0.98); opacity: 0.92; }
         .dashboard-quick-icon {
@@ -6566,26 +6681,37 @@
             align-items: center !important;
             justify-content: center !important;
             gap: 12px !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 8px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
-        .dashboard-quick-grid .dashboard-quick-tile:nth-child(1) {
-            background: linear-gradient(135deg, var(--fx-blue-1), var(--fx-blue-2)) !important;
-            box-shadow: 0 4px 15px rgba(26, 58, 92, 0.4) !important;
+        .dashboard-quick-grid .quick-quran {
+            background: linear-gradient(135deg, #2a5a8a 0%, #1a4068 50%, #102a48 100%) !important;
         }
 
-        .dashboard-quick-grid .dashboard-quick-tile:nth-child(2) {
-            background: linear-gradient(135deg, var(--fx-green-1), var(--fx-green-2)) !important;
-            box-shadow: 0 4px 15px rgba(26, 92, 58, 0.4) !important;
+        .dashboard-quick-grid .quick-duas {
+            background: linear-gradient(135deg, #2a7a5a 0%, #1a5d40 50%, #10402a 100%) !important;
         }
 
-        .dashboard-quick-grid .dashboard-quick-tile:nth-child(3) {
-            background: linear-gradient(135deg, var(--fx-gold-1), var(--fx-gold-2)) !important;
-            box-shadow: 0 4px 15px rgba(106, 83, 32, 0.42) !important;
+        .dashboard-quick-grid .quick-tasbeeh {
+            background: linear-gradient(135deg, #7a6a2a 0%, #5d501a 50%, #403810 100%) !important;
         }
 
-        .dashboard-quick-grid .dashboard-quick-tile:nth-child(4) {
-            background: linear-gradient(135deg, var(--fx-teal-1), var(--fx-teal-2)) !important;
-            box-shadow: 0 4px 15px rgba(26, 92, 92, 0.4) !important;
+        .dashboard-quick-grid .quick-qibla {
+            background: linear-gradient(135deg, #2a6a7a 0%, #1a505d 50%, #103840 100%) !important;
+        }
+
+        .dashboard-quick-label {
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+        }
+
+        .dashboard-quick-icon svg {
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+        }
+
+        .dashboard-quick-icon svg [stroke] {
+            stroke-width: 2.5;
         }
 
         .dashboard-prayer-card {
@@ -6604,6 +6730,29 @@
             background-image: var(--fx-pattern);
             background-size: 120px 120px;
             pointer-events: none;
+        }
+
+        .prayer-watermark {
+            position: absolute;
+            right: 18px;
+            bottom: 14px;
+            font-family: 'Amiri', 'Noto Naskh Arabic', serif;
+            font-size: 1.35rem;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.1);
+            letter-spacing: 0;
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+        }
+
+        .dashboard-prayer-label,
+        .dashboard-prayer-name,
+        .dashboard-prayer-time,
+        .dashboard-prayer-countdown,
+        .dashboard-prayer-location {
+            position: relative;
+            z-index: 1;
         }
 
         body[data-day-phase='morning'] .dashboard-prayer-card {
@@ -6627,26 +6776,73 @@
             min-height: 104px !important;
             border-radius: 16px !important;
             padding: 16px !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            border-left: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .cat-card .category-watermark,
+        .dua-category-card .category-watermark {
+            position: absolute;
+            bottom: 6px;
+            right: 10px;
+            font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+            font-size: 1.25rem;
+            line-height: 1.2;
+            color: rgba(255, 255, 255, 0.22);
+            direction: rtl;
+            pointer-events: none;
+            user-select: none;
+            z-index: 1;
+            max-width: 70%;
+            overflow: hidden;
+            text-overflow: clip;
+            white-space: nowrap;
+            text-align: right;
+            letter-spacing: 0.01em;
+            filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.14));
+            text-shadow: 0 1px 10px rgba(255, 255, 255, 0.05), 0 1px 10px rgba(0, 0, 0, 0.14);
+        }
+
+        .cat-card.featured .category-watermark,
+        .dua-category-card.featured .category-watermark {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.2);
+            bottom: 10px;
+            right: 14px;
+        }
+
+        .cat-card-icon,
+        .cat-card-name,
+        .cat-card-count,
+        .dua-category-card .dua-category-icon,
+        .dua-category-card .dua-category-name,
+        .dua-category-card .dua-category-count {
+            position: relative;
+            z-index: 2;
         }
 
         .cat-card[data-cat='all'] {
-            background: linear-gradient(135deg, #0f5a3a, #0f5a5a) !important;
+            background: linear-gradient(135deg, #2ec47a 0%, #1a9d5c 50%, #0d7b50 100%) !important;
         }
 
         .cat-card[data-cat='quran'] {
-            background: linear-gradient(135deg, #1a3a5c, #2b2f66) !important;
+            background: linear-gradient(135deg, #1b6b4f 0%, #2d9e6e 50%, #3db87d 100%) !important;
         }
 
-        .cat-card[data-cat='morning-evening'] { background: linear-gradient(135deg, #c0713a, #8b4513) !important; }
-        .cat-card[data-cat='protection'] { background: linear-gradient(135deg, #2c5f8a, #1a3a5c) !important; }
-        .cat-card[data-cat='forgiveness'] { background: linear-gradient(135deg, #6b4a8a, #4a2d6b) !important; }
-        .cat-card[data-cat='guidance'] { background: linear-gradient(135deg, #8a7a3a, #5c5020) !important; }
-        .cat-card[data-cat='wellbeing'] { background: linear-gradient(135deg, #2a7a6a, #1a5c4a) !important; }
-        .cat-card[data-cat='prophets'] { background: linear-gradient(135deg, #8a6a3a, #5c4520) !important; }
-        .cat-card[data-cat='prayer'] { background: linear-gradient(135deg, #2a6b3a, #1a4525) !important; }
-        .cat-card[data-cat='provision'] { background: linear-gradient(135deg, #6b5a3a, #453a20) !important; }
-        .cat-card[data-cat='family'] { background: linear-gradient(135deg, #8a3a5a, #5c2040) !important; }
-        .cat-card[data-cat='travel'] { background: linear-gradient(135deg, #3a6a8a, #20455c) !important; }
+        .cat-card[data-cat='morning-evening'] { background: linear-gradient(135deg, #d48a3a 0%, #e8a44e 50%, #f0be6a 100%) !important; }
+        .cat-card[data-cat='protection'] { background: linear-gradient(135deg, #2d5aa0 0%, #4478c4 50%, #5a8fd4 100%) !important; }
+        .cat-card[data-cat='forgiveness'] { background: linear-gradient(135deg, #b85a7a 0%, #d4738e 50%, #e89ab0 100%) !important; }
+        .cat-card[data-cat='guidance'] { background: linear-gradient(135deg, #7b4fa0 0%, #9b6cc0 50%, #b088d4 100%) !important; }
+        .cat-card[data-cat='wellbeing'] { background: linear-gradient(135deg, #2a8f6a 0%, #48b88a 50%, #6dd4a8 100%) !important; }
+        .cat-card[data-cat='prophets'] { background: linear-gradient(135deg, #c4883a 0%, #d4a04e 50%, #e4b86a 100%) !important; }
+        .cat-card[data-cat='prayer'] { background: linear-gradient(135deg, #2a7a8a 0%, #3a98a8 50%, #50b4c4 100%) !important; }
+        .cat-card[data-cat='provision'] { background: linear-gradient(135deg, #c07040 0%, #d48858 50%, #e4a070 100%) !important; }
+        .cat-card[data-cat='family'] { background: linear-gradient(135deg, #c45a6a 0%, #d47888 50%, #e494a0 100%) !important; }
+        .cat-card[data-cat='travel'] { background: linear-gradient(135deg, #4a8ab0 0%, #64a4c8 50%, #7ebed8 100%) !important; }
+        .cat-card[data-cat='scholars'] { background: linear-gradient(135deg, #5a4a8a 0%, #7a68a8 50%, #9480c0 100%) !important; }
+        .cat-card[data-cat='ramadan'] { background: linear-gradient(135deg, #1a5c6a 0%, #2a8a7a 50%, #3ab89a 100%) !important; }
+        .cat-card[data-cat='evil-eye'] { background: linear-gradient(135deg, #6a3a8a 0%, #8a50b0 50%, #a870c8 100%) !important; }
 
         .prayer-countdown-card {
             position: relative;
@@ -7330,6 +7526,11 @@
             letter-spacing: 0.3px;
         }
 
+            #dashboardSuggestionCard .continue-btn:hover,
+            #dashboardSuggestionCard .dashboard-suggestion-cta:hover {
+                box-shadow: 0 0 12px rgba(201, 168, 76, 0.3);
+            }
+
         .dashboard-quick-grid {
             margin-top: 14px;
             gap: 12px;
@@ -7381,6 +7582,39 @@
         .dashboard-quick-label {
             position: relative;
             z-index: 1;
+        }
+
+        .dashboard-quick-tile .tile-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .dashboard-quick-tile .tile-watermark {
+            position: absolute;
+            bottom: 6px;
+            right: 8px;
+            font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+            font-size: 1.375rem;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.15);
+            direction: rtl;
+            pointer-events: none;
+            user-select: none;
+            z-index: 0;
+            white-space: nowrap;
+            letter-spacing: 0.01em;
+            filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.16));
+            text-shadow: 0 1px 10px rgba(255, 255, 255, 0.05), 0 1px 10px rgba(0, 0, 0, 0.16);
+        }
+
+        .tile-arabic-label {
+            position: relative;
+            z-index: 1;
+            font-family: 'Amiri', 'Noto Naskh Arabic', serif;
+            font-size: 0.92rem;
+            line-height: 1;
+            color: rgba(255, 255, 255, 0.84);
+            letter-spacing: 0;
         }
 
         .dashboard-quick-icon {
@@ -8235,6 +8469,7 @@
             color: #ffffff;
             line-height: 1;
             font-family: var(--font-title);
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
         [data-theme="light"] .home-falah-text {
@@ -8342,10 +8577,10 @@
 
         @keyframes gentle-pulse {
             0%, 100% {
-                text-shadow: 0 0 8px rgba(201, 168, 76, 0.18);
+                text-shadow: 0 0 8px rgba(201, 168, 76, 0.3);
             }
             50% {
-                text-shadow: 0 0 14px rgba(201, 168, 76, 0.28);
+                text-shadow: 0 0 16px rgba(201, 168, 76, 0.5);
             }
         }
 
@@ -8425,7 +8660,9 @@
         }
 
         .prayer-countdown-time,
-        .prayer-countdown-value {
+        .prayer-countdown-value,
+        .dashboard-prayer-countdown,
+        .dashboard-prayer-time-left {
             animation: gentle-pulse 3s ease-in-out infinite;
         }
 
@@ -8509,6 +8746,10 @@
             text-align: center;
             padding: 20px;
             position: relative;
+            font-family: 'Amiri', 'Noto Naskh Arabic', serif;
+            font-size: clamp(1.75rem, 4vw, 2.4rem);
+            color: rgba(201, 168, 76, 0.92);
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
         }
 
         .mushaf-bismillah::before,
@@ -8519,6 +8760,26 @@
             height: 1px;
             margin: 12px auto;
             background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.24), transparent);
+        }
+
+        .dua-bismillah {
+            margin: 0 0 18px;
+            text-align: center;
+            font-family: 'Amiri', 'Noto Naskh Arabic', serif;
+            font-size: clamp(1.55rem, 4.2vw, 2.1rem);
+            line-height: 1.35;
+            color: rgba(201, 168, 76, 0.9);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
+        }
+
+        .dua-bismillah::before,
+        .dua-bismillah::after {
+            content: '';
+            display: block;
+            width: min(220px, 62%);
+            height: 1px;
+            margin: 10px auto;
+            background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.2), transparent);
         }
 
         .quran-reader-content,
@@ -8574,6 +8835,8 @@
         @media (prefers-reduced-motion: reduce) {
             .prayer-countdown-time,
             .prayer-countdown-value,
+            .dashboard-prayer-countdown,
+            .dashboard-prayer-time-left,
             .tasbeeh-tap-btn.tapped,
             .tasbeeh-counter.target-reached,
             .tasbeeh-count-display.target-reached,
@@ -8584,7 +8847,912 @@
             }
 
             .prayer-countdown-time,
-            .prayer-countdown-value {
-                text-shadow: 0 0 8px rgba(201, 168, 76, 0.18);
+            .prayer-countdown-value,
+            .dashboard-prayer-countdown,
+            .dashboard-prayer-time-left {
+                text-shadow: 0 0 8px rgba(201, 168, 76, 0.3);
             }
+        }
+
+        /* ============================================ */
+        /* ===== DESIGN SYSTEM ENFORCEMENT ===== */
+        /* ============================================ */
+
+        html,
+        body {
+            background: var(--bg-primary) !important;
+        }
+
+        body,
+        button,
+        input,
+        select,
+        textarea {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            font: var(--text-body);
+            color: var(--text-secondary);
+            padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + var(--space-24));
+        }
+
+        .top-nav,
+        .bottom-nav,
+        .toast,
+        .word-popup,
+        .quran-panel,
+        .prayer-panel,
+        .search-input,
+        .duas-tab-search {
+            backdrop-filter: blur(16px) saturate(160%) !important;
+            -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
+        }
+
+        .dashboard-quick-tile[onclick*="quran"]::after,
+        .dashboard-quick-tile[onclick*="duas"]::after,
+        .dashboard-quick-tile[onclick*="tasbeeh"]::after,
+        .dashboard-quick-tile[onclick*="qibla"]::after {
+            inset: 15% !important;
+            filter: blur(20px) !important;
+            opacity: 0.1 !important;
+        }
+
+        .dashboard-prayer-card,
+        .dashboard-prayer-strip-card,
+        .dashboard-suggestion-card,
+        #dashboardSuggestionCard,
+        .dashboard-quran-streak-card,
+        .dashboard-tip-card,
+        .dashboard-hadith-card,
+        .dashboard-progress-summary,
+        .quran-continue-card,
+        #quranContinueCard .quran-continue-inner,
+        .quran-surah-row,
+        .quran-ayah-card,
+        .cat-card,
+        .dua-card,
+        .duas-bookmarks,
+        .duas-bookmark-chip,
+        .prayer-countdown-card,
+        .prayer-row,
+        .prayer-time-row,
+        .qibla-section,
+        .prayer-reminder-settings,
+        .more-row,
+        .settings-row,
+        .selected-city-chip,
+        .city-search-shell,
+        .city-dropdown,
+        .quran-settings-card,
+        .quran-bookmark-item,
+        .quran-juz-item,
+        .quran-recent-item {
+            background: var(--surface-card) !important;
+            border: 1px solid var(--border-medium) !important;
+            box-shadow: var(--shadow-md) !important;
+        }
+
+        .dashboard-prayer-card,
+        .prayer-countdown-card,
+        .quran-continue-card,
+        #quranContinueCard .quran-continue-inner,
+        .dashboard-suggestion-card,
+        #dashboardSuggestionCard {
+            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.05) !important;
+            box-shadow:
+                0 1px 3px rgba(0, 0, 0, 0.1),
+                0 4px 12px rgba(0, 0, 0, 0.12),
+                0 12px 24px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .cat-card,
+        .dua-category-card,
+        .dashboard-quick-tile,
+        .dashboard-tip-card,
+        .dashboard-hadith-card,
+        .dashboard-quran-streak-card,
+        .dashboard-progress-summary,
+        .duas-bookmarks,
+        .duas-bookmark-chip {
+            border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.04) !important;
+            box-shadow:
+                0 1px 3px rgba(0, 0, 0, 0.08),
+                0 6px 16px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+        }
+
+        .quran-surah-row,
+        .prayer-row,
+        .prayer-time-row,
+        .more-row,
+        .settings-row,
+        .city-option,
+        .prayer-reminder-item {
+            box-shadow: none !important;
+            border-bottom: 1px solid var(--border-subtle) !important;
+        }
+
+        .cat-card,
+        .dua-category-card,
+        .dashboard-quick-tile,
+        .dashboard-suggestion-card,
+        #dashboardSuggestionCard,
+        .dashboard-quran-streak-card,
+        .quran-continue-card,
+        #quranContinueCard .quran-continue-inner,
+        .quran-surah-row,
+        .more-row,
+        .settings-row {
+            cursor: pointer;
+            transition:
+                transform var(--transition-fast),
+                box-shadow var(--transition-fast),
+                border-color var(--transition-fast);
+        }
+
+        .cat-card:hover,
+        .dua-category-card:hover,
+        .dashboard-quick-tile:hover,
+        .dashboard-suggestion-card:hover,
+        #dashboardSuggestionCard:hover,
+        .dashboard-quran-streak-card:hover,
+        .quran-continue-card:hover,
+        #quranContinueCard .quran-continue-inner:hover,
+        .quran-surah-row:hover,
+        .more-row:hover,
+        .settings-row:hover {
+            transform: translateY(-3px) !important;
+            box-shadow:
+                var(--shadow-lg),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .cat-card:active,
+        .dua-category-card:active,
+        .dashboard-quick-tile:active,
+        .dashboard-suggestion-card:active,
+        #dashboardSuggestionCard:active,
+        .dashboard-quran-streak-card:active,
+        .quran-continue-card:active,
+        #quranContinueCard .quran-continue-inner:active,
+        .quran-surah-row:active,
+        .more-row:active,
+        .settings-row:active {
+            transform: translateY(0) scale(0.98) !important;
+            transition-duration: 100ms !important;
+        }
+
+        .bottom-nav {
+            height: var(--space-64) !important;
+            background: rgba(10, 22, 40, 0.88) !important;
+            box-shadow: var(--shadow-lg) !important;
+        }
+
+        .bottom-nav-item {
+            min-height: var(--height-nav-item) !important;
+            color: var(--text-muted) !important;
+            font: var(--text-caption);
+        }
+
+        .bottom-nav-item.active {
+            color: var(--text-primary) !important;
+            background: var(--accent-gold-subtle) !important;
+            border-radius: var(--radius-lg) !important;
+        }
+
+        #mainContainer[data-main-mode="home"] .home-dashboard {
+            gap: var(--space-16) !important;
+            padding-top: var(--space-8);
+        }
+
+        .dashboard-greeting {
+            font: var(--text-h2) !important;
+            color: var(--text-secondary) !important;
+            margin-top: var(--space-4) !important;
+        }
+
+        .dashboard-date {
+            font: var(--text-caption) !important;
+            color: var(--text-muted) !important;
+        }
+
+        .dashboard-prayer-card {
+            padding: var(--space-24) !important;
+            border-radius: var(--radius-xl) !important;
+            background: var(--surface-accent) !important;
+            min-height: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        .dashboard-prayer-label,
+        .dashboard-prayer-strip-head,
+        .dashboard-continue-kicker,
+        .dashboard-tip-label,
+        .dashboard-hadith-label,
+        .dashboard-progress-heading,
+        .dashboard-streak-title {
+            font: var(--text-caption) !important;
+            color: var(--text-accent) !important;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .dashboard-prayer-name {
+            font: var(--text-h1) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .dashboard-prayer-time {
+            font: var(--text-h2) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .dashboard-prayer-countdown {
+            font: var(--text-h2) !important;
+            color: var(--text-accent) !important;
+        }
+
+        .dashboard-prayer-location,
+        .dashboard-streak-sub,
+        .dashboard-hadith-source,
+        .dashboard-progress-row,
+        .dashboard-continue-ayah {
+            font: var(--text-caption) !important;
+            color: var(--text-secondary) !important;
+        }
+
+        .dashboard-prayer-strip-card,
+        .dashboard-suggestion-card,
+        .dashboard-quran-streak-card,
+        .dashboard-tip-card,
+        .dashboard-hadith-card,
+        .dashboard-progress-summary {
+            padding: var(--space-16) !important;
+            border-radius: var(--radius-lg) !important;
+        }
+
+        .dashboard-prayer-strip-head {
+            color: var(--text-accent) !important;
+        }
+
+        .dashboard-prayer-strip-name {
+            color: var(--text-primary) !important;
+        }
+
+        .dashboard-prayer-strip-time {
+            color: var(--text-secondary) !important;
+        }
+
+        .dashboard-continue-surah,
+        .dashboard-tip-text,
+        .dashboard-hadith-text {
+            font: var(--text-body) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .dashboard-suggestion-cta {
+            font: var(--text-micro) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .dashboard-quick-grid {
+            gap: var(--space-16) !important;
+        }
+
+        .dashboard-quick-tile {
+            min-height: var(--size-quick-tile) !important;
+            padding: var(--space-16) !important;
+            border-radius: var(--radius-lg) !important;
+            background: var(--surface-card) !important;
+            gap: var(--space-12) !important;
+        }
+
+        .dashboard-quick-label {
+            font: var(--text-h2) !important;
+            color: var(--text-primary) !important;
+            text-shadow: none !important;
+        }
+
+        .dashboard-quick-icon,
+        .dashboard-quick-icon svg {
+            color: var(--text-accent) !important;
+            stroke: currentColor !important;
+            filter: none !important;
+        }
+
+        .quran-view-tabs,
+        .prayer-subtabs {
+            gap: var(--space-8) !important;
+        }
+
+        .quran-view-tab,
+        .prayer-subtab,
+        .selected-city-change,
+        .prayer-reminder-select,
+        .quran-reading-mode-btn,
+        .quran-player-btn,
+        .quran-ayah-btn,
+        .tasbeeh-ctrl-btn,
+        .tasbeeh-preset,
+        .action-btn,
+        .prayer-reminder-test-btn,
+        .back-to-grid {
+            min-height: var(--height-button) !important;
+            border-radius: var(--radius-md) !important;
+        }
+
+        .quran-view-tab,
+        .prayer-subtab {
+            font: var(--text-body) !important;
+            padding: 0 var(--space-16) !important;
+            background: var(--bg-card) !important;
+            color: var(--text-secondary) !important;
+            border: 1px solid var(--border-medium) !important;
+        }
+
+        .quran-view-tab.active,
+        .prayer-subtab.active {
+            background: var(--accent-gold-subtle) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-accent) !important;
+            box-shadow: none !important;
+        }
+
+        .quran-continue-card,
+        #quranContinueCard .quran-continue-inner {
+            padding: var(--space-16) !important;
+            border-radius: var(--radius-lg) !important;
+        }
+
+        .quran-surah-row {
+            min-height: var(--height-list-row) !important;
+            padding: var(--space-12) !important;
+            border-radius: var(--radius-lg) !important;
+            gap: var(--space-12) !important;
+            border-left-width: 1px !important;
+        }
+
+        .quran-surah-num,
+        .quran-ayah-num,
+        .dua-number {
+            width: var(--space-32) !important;
+            height: var(--space-32) !important;
+            border-radius: 50% !important;
+            font: var(--text-caption) !important;
+        }
+
+        .quran-surah-name-secondary {
+            font: var(--text-body) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .quran-surah-name-primary,
+        .quran-surah-ar {
+            font-family: var(--arabic-font) !important;
+            font-size: var(--text-arabic-heading) !important;
+            line-height: 1.45 !important;
+            color: var(--text-primary) !important;
+        }
+
+        .quran-surah-ayahs,
+        .quran-playback-progress-label,
+        .quran-inline-reciter label,
+        .quran-recent-meta,
+        .quran-bookmark-meta,
+        .quran-juz-meta {
+            font: var(--text-caption) !important;
+            color: var(--text-muted) !important;
+        }
+
+        .quran-revelation-text,
+        .auth-badge,
+        .prayer-now-badge,
+        .prayer-next-badge {
+            font: var(--text-micro) !important;
+            border-radius: var(--radius-sm) !important;
+            padding: var(--space-2) var(--space-6) !important;
+            letter-spacing: 0.08em !important;
+        }
+
+        .quran-ayah-card {
+            padding: var(--space-16) !important;
+            border-radius: var(--radius-lg) !important;
+            gap: var(--space-12) !important;
+        }
+
+        .quran-ayah-ar,
+        .dua-swipe-content .arabic-text,
+        .dua-card .arabic-text {
+            font-family: var(--arabic-font) !important;
+            font-size: var(--text-arabic-display) !important;
+            line-height: var(--arabic-line-height) !important;
+            color: var(--text-primary) !important;
+            word-spacing: normal !important;
+        }
+
+        .quran-ayah-en,
+        .quran-ayah-ps,
+        .translation,
+        .transliteration,
+        .how-to-box,
+        .prayer-reminder-helper,
+        .more-label,
+        .selected-city-text,
+        .city-name,
+        .city-search-input,
+        .qibla-status {
+            font: var(--text-body) !important;
+        }
+
+        .transliteration {
+            color: var(--text-secondary) !important;
+            font-style: italic;
+        }
+
+        .translation,
+        .quran-ayah-en,
+        .quran-ayah-ps,
+        .how-to-box,
+        .city-name,
+        .selected-city-text,
+        .qibla-status,
+        .more-label {
+            color: var(--text-primary) !important;
+        }
+
+        .reference,
+        .ref-text,
+        .dua-category-tag,
+        .category-detail-header .cdh-subtitle,
+        .cat-card-count,
+        .qibla-distance,
+        .qibla-instruction,
+        .prayer-reminder-title,
+        .prayer-reminder-status,
+        .more-arrow,
+        .city-subline,
+        .city-coords {
+            font: var(--text-caption) !important;
+            color: var(--text-muted) !important;
+            opacity: 1 !important;
+        }
+
+        .duas-tab-search-wrap {
+            margin: 0 0 var(--space-16) !important;
+        }
+
+        .duas-tab-search,
+        .search-input {
+            min-height: var(--height-input) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0 var(--space-16) !important;
+            font: var(--text-body) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-medium) !important;
+            background: var(--bg-card) !important;
+        }
+
+        .category-grid {
+            gap: var(--space-16) !important;
+            padding: var(--space-4) 0 var(--space-12) !important;
+        }
+
+        .cat-card,
+        .dua-category-card {
+            min-height: 120px !important;
+            padding: var(--space-16) !important;
+            border-radius: var(--radius-lg) !important;
+            justify-content: flex-end !important;
+            transform: translateY(0) scale(1) !important;
+        }
+
+        .cat-card::before,
+        .cat-card::after {
+            opacity: 0.04 !important;
+        }
+
+        .cat-card-icon,
+        .dua-category-card .category-icon-circle {
+            width: var(--space-40) !important;
+            height: var(--space-40) !important;
+            border-radius: var(--radius-md) !important;
+            margin-bottom: var(--space-8) !important;
+            background: var(--accent-gold-subtle) !important;
+            border: 1px solid var(--border-accent) !important;
+            box-shadow: none !important;
+        }
+
+        .cat-card-name,
+        .dua-title,
+        .cdh-title {
+            font: var(--text-h2) !important;
+            color: var(--text-primary) !important;
+            letter-spacing: normal !important;
+            text-transform: none !important;
+            text-shadow: none !important;
+        }
+
+        .category-detail-header,
+        .duas-bookmarks {
+            padding: var(--space-20) !important;
+            border-radius: var(--radius-lg) !important;
+        }
+
+        .dua-card {
+            margin-bottom: var(--space-16) !important;
+            border-radius: var(--radius-lg) !important;
+            padding: 0 !important;
+        }
+
+        .card-header {
+            min-height: var(--height-list-row) !important;
+            padding: var(--space-16) !important;
+        }
+
+        .card-header-left,
+        .card-actions,
+        .copy-row,
+        .dua-swipe-actions,
+        .tasbeeh-controls,
+        .tasbeeh-presets {
+            gap: var(--space-8) !important;
+        }
+
+        .card-body-inner,
+        .dua-card .card-body-inner {
+            padding: 0 var(--space-16) var(--space-16) !important;
+        }
+
+        .arabic-container,
+        .dua-swipe-content .arabic-container {
+            padding: var(--space-24) !important;
+            border-radius: var(--radius-lg) !important;
+            margin-bottom: var(--space-16) !important;
+        }
+
+        .copy-row .action-btn,
+        .dua-swipe-actions .action-btn,
+        .dua-swipe-actions .audio-btn {
+            min-height: var(--height-button) !important;
+            padding: 0 var(--space-16) !important;
+            border-radius: var(--radius-md) !important;
+            font: var(--text-micro) !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase;
+        }
+
+        .tasbeeh-title,
+        .tasbeeh-target {
+            font: var(--text-caption) !important;
+            color: var(--text-accent) !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase;
+        }
+
+        .tasbeeh-arabic {
+            font-family: var(--arabic-font) !important;
+            font-size: var(--text-arabic-heading) !important;
+            line-height: var(--arabic-line-height) !important;
+            color: var(--text-primary) !important;
+            max-width: 100% !important;
+        }
+
+        .tasbeeh-count-display {
+            font: var(--text-display) !important;
+            color: var(--text-primary) !important;
+            text-shadow: none !important;
+        }
+
+        .tasbeeh-tap-btn {
+            width: var(--size-tasbeeh-tap) !important;
+            height: var(--size-tasbeeh-tap) !important;
+            min-width: var(--size-tasbeeh-tap) !important;
+            min-height: var(--size-tasbeeh-tap) !important;
+            border-radius: 50% !important;
+            border: 1px solid var(--border-accent) !important;
+            background: var(--surface-success) !important;
+            box-shadow: var(--shadow-lg) !important;
+        }
+
+        .tasbeeh-tap-btn .tap-text {
+            font: var(--text-caption) !important;
+            color: var(--text-primary) !important;
+            text-transform: uppercase;
+            letter-spacing: 0.08em !important;
+        }
+
+        .tasbeeh-ctrl-btn,
+        .tasbeeh-preset {
+            padding: 0 var(--space-16) !important;
+            font: var(--text-caption) !important;
+        }
+
+        .prayer-panel {
+            padding: calc(var(--safe-top) + var(--space-8)) var(--space-12) calc(var(--safe-bottom) + var(--space-12)) !important;
+        }
+
+        .prayer-location-bar,
+        .prayer-countdown-card,
+        .prayer-reminder-status,
+        .prayer-notify-row {
+            margin-bottom: var(--space-12) !important;
+        }
+
+        .selected-city-chip,
+        .city-search-shell {
+            min-height: var(--height-input) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0 var(--space-12) !important;
+        }
+
+        .city-option,
+        .prayer-row,
+        .prayer-time-row,
+        .prayer-reminder-item,
+        .more-row,
+        .settings-row {
+            min-height: var(--height-list-row) !important;
+            padding: 0 var(--space-16) !important;
+            border-radius: var(--radius-lg) !important;
+        }
+
+        .prayer-countdown-card {
+            padding: var(--space-24) !important;
+            border-radius: var(--radius-xl) !important;
+        }
+
+        .prayer-countdown-name {
+            font: var(--text-h1) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .prayer-countdown-time {
+            font: var(--text-h2) !important;
+            color: var(--text-accent) !important;
+        }
+
+        .prayer-name,
+        .prayer-time-name,
+        .prayer-time-val,
+        .prayer-time-value,
+        .prayer-notify-label {
+            font: var(--text-body) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .qibla-section {
+            padding: var(--space-24) !important;
+            border-radius: var(--radius-xl) !important;
+            gap: var(--space-12) !important;
+            justify-content: flex-start !important;
+        }
+
+        .qibla-title,
+        .more-section-title {
+            font: var(--text-micro) !important;
+            color: var(--text-accent) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.12em !important;
+        }
+
+        .more-section-title {
+            padding-left: var(--space-16) !important;
+        }
+
+        .qibla-compass {
+            width: var(--size-qibla-compass) !important;
+            height: var(--size-qibla-compass) !important;
+            min-width: var(--size-qibla-compass) !important;
+            min-height: var(--size-qibla-compass) !important;
+            margin: 0 auto var(--space-16) !important;
+        }
+
+        .qibla-location {
+            font: var(--text-body) !important;
+            color: var(--text-primary) !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-8);
+            width: 100%;
+        }
+
+        .qibla-location::before {
+            content: '📍';
+            font-size: 1em;
+        }
+
+        .qibla-degree {
+            font: var(--text-display) !important;
+            color: var(--text-primary) !important;
+            letter-spacing: -0.03em !important;
+        }
+
+        .qibla-distance {
+            margin-top: calc(var(--space-4) * -1);
+        }
+
+        .qibla-status {
+            margin-top: var(--space-8) !important;
+        }
+
+        .qibla-instruction {
+            max-width: 28ch;
+            margin: 0 auto;
+        }
+
+        .prayer-reminder-settings {
+            padding: var(--space-16) !important;
+            border-radius: var(--radius-lg) !important;
+        }
+
+        .prayer-reminder-grid,
+        .prayer-reminder-controls {
+            gap: var(--space-8) !important;
+        }
+
+        .prayer-reminder-helper {
+            color: var(--text-muted) !important;
+            opacity: 1 !important;
+            margin: 0 0 var(--space-12) !important;
+        }
+
+        .prayer-reminder-status,
+        .prayer-reminder-title {
+            color: var(--text-muted) !important;
+        }
+
+        .more-panel-content {
+            gap: var(--space-12);
+        }
+
+        .more-label {
+            color: var(--text-primary) !important;
+        }
+
+        .more-arrow {
+            color: var(--text-muted) !important;
+            font: var(--text-caption) !important;
+        }
+
+        .ornament-divider,
+        .ornamental-divider,
+        .ornamental-line {
+            color: rgba(201, 168, 76, 0.15) !important;
+        }
+
+        [data-theme="light"] .bottom-nav {
+            background: rgba(255, 255, 255, 0.96) !important;
+        }
+
+        [data-theme="light"] .quran-continue-card,
+        [data-theme="light"] #quranContinueCard .quran-continue-inner,
+        [data-theme="light"] .dashboard-prayer-strip-card,
+        [data-theme="light"] .dashboard-prayer-card,
+        [data-theme="light"] .prayer-countdown-card {
+            background: #ffffff !important;
+            color: var(--text-primary) !important;
+        }
+
+        [data-theme="light"] .dashboard-prayer-strip-name,
+        [data-theme="light"] .dashboard-prayer-name,
+        [data-theme="light"] .dashboard-prayer-time,
+        [data-theme="light"] .dashboard-prayer-location,
+        [data-theme="light"] .prayer-countdown-name {
+            color: var(--text-primary) !important;
+        }
+
+        [data-theme="light"] .dashboard-prayer-strip-head,
+        [data-theme="light"] .dashboard-prayer-countdown,
+        [data-theme="light"] .prayer-countdown-time,
+        [data-theme="light"] .dashboard-prayer-label,
+        [data-theme="light"] .dashboard-continue-kicker,
+        [data-theme="light"] .dashboard-tip-label,
+        [data-theme="light"] .dashboard-hadith-label,
+        [data-theme="light"] .dashboard-progress-heading,
+        [data-theme="light"] .qibla-title,
+        [data-theme="light"] .more-section-title {
+            color: var(--text-accent) !important;
+        }
+
+        [data-theme="light"] .dashboard-prayer-strip-time {
+            color: var(--text-secondary) !important;
+        }
+
+        [data-theme="light"] .dashboard-quick-tile .tile-watermark,
+        [data-theme="light"] .cat-card .category-watermark,
+        [data-theme="light"] .dua-category-card .category-watermark {
+            color: rgba(255, 255, 255, 0.16);
+        }
+
+        [data-theme="light"] .prayer-watermark {
+            color: rgba(22, 43, 74, 0.09);
+        }
+
+        [data-theme="light"] .tile-arabic-label {
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        [data-theme="light"] .dua-bismillah,
+        [data-theme="light"] .mushaf-bismillah {
+            color: rgba(160, 122, 28, 0.96);
+            text-shadow: none;
+        }
+
+        @media (max-width: 480px) {
+            .qibla-compass {
+                width: var(--size-qibla-compass-mobile) !important;
+                height: var(--size-qibla-compass-mobile) !important;
+                min-width: var(--size-qibla-compass-mobile) !important;
+                min-height: var(--size-qibla-compass-mobile) !important;
+            }
+
+            .dua-swipe-content .arabic-text,
+            .dua-card .arabic-text,
+            .quran-ayah-ar {
+                font-size: 28px !important;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .cat-card .category-watermark,
+            .dua-category-card .category-watermark {
+                font-size: 1rem;
+                max-width: 60%;
+            }
+
+            .dashboard-quick-tile .tile-watermark {
+                font-size: 1.1rem;
+                max-width: 60%;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .dashboard-prayer-card {
+                padding: var(--space-20) !important;
+            }
+
+            .dashboard-quick-grid,
+            .category-grid {
+                gap: var(--space-12) !important;
+            }
+
+            .quran-surah-row,
+            .prayer-row,
+            .prayer-time-row,
+            .prayer-reminder-item,
+            .more-row,
+            .settings-row {
+                min-height: var(--height-list-row) !important;
+            }
+        }
+
+        .quran-player-btn {
+            width: var(--height-button) !important;
+            height: var(--height-button) !important;
+            min-width: var(--height-button) !important;
+            min-height: var(--height-button) !important;
+            border-radius: var(--radius-md) !important;
+            background: var(--bg-card) !important;
+            color: var(--text-primary) !important;
+        }
+
+        .quran-player-btn-main {
+            width: calc(var(--height-button) + var(--space-8)) !important;
+            height: calc(var(--height-button) + var(--space-8)) !important;
+            min-width: calc(var(--height-button) + var(--space-8)) !important;
+            min-height: calc(var(--height-button) + var(--space-8)) !important;
+            background: var(--accent-gold-subtle) !important;
+            color: var(--text-accent) !important;
+            border-color: var(--border-accent) !important;
+        }
+
+        [data-theme="light"] .dashboard-prayer-card .dashboard-prayer-countdown,
+        [data-theme="light"] .dashboard-prayer-countdown,
+        [data-theme="light"] .prayer-countdown-time {
+            color: var(--text-accent) !important;
         }
