@@ -8147,6 +8147,7 @@ window.filterCategory = function(cat, btn) {
     const QURAN_SETTINGS_KEY = 'crown_quran_settings';
     const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
     const QURAN_FALLBACK_RECITER = 'ar.alafasy';
+    const quranSavedPanelMode = localStorage.getItem(QURAN_PANEL_MODE_KEY);
 
     if (PASHTO_AUDIO_BASE_URL && typeof window.setPashtoAudioBaseUrl === 'function') {
         window.setPashtoAudioBaseUrl(PASHTO_AUDIO_BASE_URL);
@@ -8177,7 +8178,7 @@ window.filterCategory = function(cat, btn) {
         meta: null,
         surahStartOffsets: null,
         view: localStorage.getItem(QURAN_ACTIVE_TAB_KEY) || 'surah',
-        panelMode: localStorage.getItem(QURAN_PANEL_MODE_KEY) || 'arabic',
+        panelMode: quranSavedPanelMode || (isPashtoMode() ? 'pashto' : 'arabic'),
         search: '',
         currentSurah: null,
         currentSurahData: null,
@@ -8227,8 +8228,8 @@ window.filterCategory = function(cat, btn) {
         const panel = normalizeQuranPanelMode(mode);
         if (panel === 'pashto') return 'ar-ps';
         if (panel === 'english') return 'ar-en';
-        // Arabic panel stays pure Arabic in Pashto app mode, and shows AR+EN in English app mode.
-        return isPashtoMode() ? 'ar' : 'ar-en';
+        // Arabic panel is always Arabic-only.
+        return 'ar';
     }
 
     const QURAN_POPULAR_ITEMS = [
@@ -10576,6 +10577,19 @@ window.filterCategory = function(cat, btn) {
                 setQuranPanelMode(tab.getAttribute('data-qview'));
             });
             tab.dataset.bound = '1';
+        });
+
+        // Harden mode switching in case class-based tab binding is skipped in slower init paths.
+        const viewTabsById = [
+            { id: 'quranTabArabic', mode: 'arabic' },
+            { id: 'quranTabPashto', mode: 'pashto' },
+            { id: 'quranTabEnglish', mode: 'english' }
+        ];
+        viewTabsById.forEach(({ id, mode }) => {
+            const tabEl = document.getElementById(id);
+            if (!tabEl || tabEl.dataset.boundViewMode === '1') return;
+            tabEl.addEventListener('click', () => setQuranPanelMode(mode));
+            tabEl.dataset.boundViewMode = '1';
         });
 
         const loadMore = document.getElementById('quranLoadMore');
