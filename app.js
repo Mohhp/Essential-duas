@@ -3421,6 +3421,63 @@ window.filterCategory = function(cat, btn) {
         }
     };
 
+    function bindIntentionalCardTap(card, onActivate, options = {}) {
+        if (!card) return;
+        const movementThreshold = Number(options.movementThreshold || 10);
+        const interceptOnly = options.interceptOnly === true;
+
+        let startX = 0;
+        let startY = 0;
+        let trackingTouch = false;
+        let movedDuringTouch = false;
+
+        card.addEventListener('touchstart', (event) => {
+            const touch = event.touches?.[0];
+            if (!touch) return;
+            trackingTouch = true;
+            movedDuringTouch = false;
+            startX = touch.clientX;
+            startY = touch.clientY;
+        }, { passive: true });
+
+        card.addEventListener('touchmove', (event) => {
+            if (!trackingTouch) return;
+            const touch = event.touches?.[0];
+            if (!touch) return;
+            const movedX = Math.abs(touch.clientX - startX);
+            const movedY = Math.abs(touch.clientY - startY);
+            if (movedX > movementThreshold || movedY > movementThreshold) {
+                movedDuringTouch = true;
+            }
+        }, { passive: true });
+
+        card.addEventListener('touchend', () => {
+            card.dataset.ignoreNextTap = movedDuringTouch ? '1' : '0';
+            trackingTouch = false;
+        }, { passive: true });
+
+        card.addEventListener('touchcancel', () => {
+            trackingTouch = false;
+            movedDuringTouch = false;
+            card.dataset.ignoreNextTap = '0';
+        }, { passive: true });
+
+        card.addEventListener('click', (event) => {
+            if (card.dataset.ignoreNextTap === '1') {
+                card.dataset.ignoreNextTap = '0';
+                event.preventDefault();
+                event.stopPropagation();
+                return;
+            }
+
+            if (interceptOnly) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof onActivate === 'function') onActivate();
+        }, true);
+    }
+
     function bindDashboardSuggestionCard() {
         const card = document.getElementById('dashboardSuggestionCard');
         if (!card || card.dataset.bound === '1') return;
@@ -3432,11 +3489,7 @@ window.filterCategory = function(cat, btn) {
         };
 
         card.style.cursor = 'pointer';
-        card.addEventListener('touchstart', (event) => {
-            event.preventDefault();
-            trigger();
-        }, { passive: false });
-        card.addEventListener('click', trigger);
+        bindIntentionalCardTap(card, trigger);
         card.dataset.bound = '1';
     }
 
@@ -3453,12 +3506,17 @@ window.filterCategory = function(cat, btn) {
         };
 
         card.style.cursor = 'pointer';
-        card.addEventListener('touchstart', (event) => {
-            event.preventDefault();
-            trigger();
-        }, { passive: false });
-        card.addEventListener('click', trigger);
+        bindIntentionalCardTap(card, trigger);
         card.dataset.bound = '1';
+    }
+
+    function bindDashboardQuranStreakCard() {
+        const card = document.getElementById('dashboardQuranStreakCard');
+        if (!card || card.dataset.scrollGuardBound === '1') return;
+
+        // Keep the existing inline onclick navigation, but suppress it during vertical scrolling.
+        bindIntentionalCardTap(card, null, { interceptOnly: true });
+        card.dataset.scrollGuardBound = '1';
     }
 
     window.openPrayerFromDashboard = function() {
@@ -3532,6 +3590,7 @@ window.filterCategory = function(cat, btn) {
         refreshHomeDashboard();
         bindDashboardSuggestionCard();
         bindDashboardDuaSuggestionCard();
+        bindDashboardQuranStreakCard();
         if (!window.__dashboardRefreshTimer) {
             window.__dashboardRefreshTimer = setInterval(() => {
                 refreshHomeNextPrayerCard();

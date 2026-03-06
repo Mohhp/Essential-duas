@@ -229,7 +229,7 @@
         html {
             scroll-behavior: smooth;
             overflow-x: hidden;
-            max-width: 100vw;
+            max-width: 100%;
             font-size: 16px;
             background: #0a1210;
         }
@@ -241,7 +241,7 @@
             line-height: 1.85;
             min-height: 100vh; min-height: 100dvh;
             overflow-x: hidden;
-            max-width: 100vw;
+            max-width: 100%;
             padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -254,8 +254,13 @@
         #mainContainer.container,
         .home-dashboard {
             width: 100%;
-            max-width: 100vw;
-            overflow-x: hidden;
+            max-width: 100%;
+            overflow-x: clip;
+        }
+
+        .home-dashboard > * {
+            min-width: 0;
+            max-width: 100%;
         }
 
         body.panel-open {
@@ -6077,7 +6082,7 @@
             padding: 10px 12px;
             text-align: left;
             cursor: pointer;
-            touch-action: manipulation;
+            touch-action: pan-y;
             transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.2s ease;
         }
         .dashboard-suggestion-row {
@@ -6147,6 +6152,7 @@
             align-items: center;
             gap: 10px;
             text-align: left;
+            touch-action: pan-y;
         }
 
         .dashboard-streak-icon {
@@ -7254,6 +7260,7 @@
         #dashboardSuggestionCard .dashboard-suggestion-row {
             align-items: center;
             gap: 16px;
+            min-width: 0;
         }
 
         .dashboard-continue-left {
@@ -7275,6 +7282,7 @@
             align-items: center;
             gap: 8px;
             max-width: 100%;
+            min-width: 0;
         }
 
         .dashboard-continue-icon {
@@ -7295,6 +7303,7 @@
             font-size: 16px;
             font-weight: 700;
             color: #fff;
+            min-width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -7303,6 +7312,10 @@
         .dashboard-continue-ayah {
             font-size: 13px;
             color: rgba(255, 255, 255, 0.62);
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         #dashboardSuggestionCard .continue-btn,
