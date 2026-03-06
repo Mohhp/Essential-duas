@@ -32,9 +32,9 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
     <!-- Production assets (active) -->
-    <link rel="stylesheet" href="styles.min.css?v=20260306g">
+    <link rel="stylesheet" href="styles.min.css?v=20260306j">
     <!-- Source assets (fallback for local debugging) -->
-    <!-- <link rel="stylesheet" href="styles.css?v=20260306g"> -->
+    <!-- <link rel="stylesheet" href="styles.css?v=20260306j"> -->
     <style>
         .update-prompt-card {
             display: flex;
@@ -122,12 +122,12 @@
 <nav class="top-nav" id="topNav" aria-label="Top navigation">
     <div class="fallah-logo" onclick="handleLogoTap()">
         <div class="fallah-mark">
-            <div class="fallah-crescent"></div>
-            <span class="fallah-fa">ف</span>
+            <svg class="fallah-crescent-svg" width="24" height="24" viewBox="0 0 24 24" fill="#C9A84C" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
         </div>
         <div class="fallah-text">
             <span class="fallah-brand" id="topBrandText">Falah</span>
-            <span class="fallah-sub">فلاح</span>
         </div>
     </div>
 </nav>
@@ -143,6 +143,12 @@
     <div class="pull-refresh-indicator" id="pullRefreshIndicator" aria-hidden="true">↻ Pull to refresh</div>
 
     <section class="home-dashboard" id="homeDashboard">
+        <button class="home-falah-brand" type="button" onclick="handleLogoTap()" aria-label="Go to home">
+            <svg class="home-falah-crescent-svg" width="24" height="24" viewBox="0 0 24 24" fill="#C9A84C" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            <span class="home-falah-text">Falah</span>
+        </button>
         <div class="dashboard-greeting" id="dashboardGreeting">Assalamu Alaikum</div>
         <div class="dashboard-date date-display" id="dashboardDate">Rabi al-Awwal 14, 1447</div>
 
@@ -159,10 +165,15 @@
                 <div class="dashboard-continue-left">
                     <div class="dashboard-continue-kicker" id="dashboardSuggestionKicker">CONTINUE READING</div>
                     <div class="dashboard-continue-main">
-                        <span class="dashboard-continue-icon" aria-hidden="true">📖</span>
+                        <span class="dashboard-continue-icon" aria-hidden="true">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                            </svg>
+                        </span>
                         <span class="dashboard-continue-surah" id="dashboardSuggestionSub">Al-Fatiha</span>
                     </div>
-                    <div class="dashboard-continue-ayah" id="dashboardSuggestionAyah">Ayah 6</div>
+                    <div class="dashboard-continue-ayah" id="dashboardSuggestionAyah">Al-Fatiha · Ayah 6</div>
                 </div>
                 <span class="dashboard-suggestion-cta continue-btn" id="dashboardSuggestionCta">Continue</span>
             </div>
@@ -171,19 +182,19 @@
         <div class="dashboard-quick-grid" id="dashboardQuickGrid">
             <button class="dashboard-quick-tile quick-quran" onclick="handleBottomNav('quran')" aria-label="Open Quran">
                 <span class="dashboard-quick-wave" aria-hidden="true"></span>
-                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span><span class="dashboard-quick-label" id="quickQuranLabel">Quran</span>
+                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" fill="rgba(255,255,255,0.15)"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" fill="rgba(255,255,255,0.15)"/></svg></span><span class="dashboard-quick-label" id="quickQuranLabel">Quran</span>
             </button>
             <button class="dashboard-quick-tile quick-duas" onclick="handleBottomNav('duas')" aria-label="Open Duas">
                 <span class="dashboard-quick-wave" aria-hidden="true"></span>
-                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V8a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v12"/><path d="M7 12H5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2"/><path d="M17 12h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/></svg></span><span class="dashboard-quick-label" id="quickDuasLabel">Duas</span>
+                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V8a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v12"/><path d="M7 12H5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2"/><path d="M17 12h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/></svg></span><span class="dashboard-quick-label" id="quickDuasLabel">Duas</span>
             </button>
             <button class="dashboard-quick-tile quick-tasbeeh" onclick="openTasbeeh()" aria-label="Open Tasbeeh">
                 <span class="dashboard-quick-wave" aria-hidden="true"></span>
-                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="3" r="1.5" fill="white"/><circle cx="19" cy="8" r="1.5" fill="white"/><circle cx="19" cy="16" r="1.5" fill="white"/><circle cx="12" cy="21" r="1.5" fill="white"/><circle cx="5" cy="16" r="1.5" fill="white"/><circle cx="5" cy="8" r="1.5" fill="white"/></svg></span><span class="dashboard-quick-label" id="quickTasbeehLabel">Tasbeeh</span>
+                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9" fill="rgba(255,255,255,0.12)"/><circle cx="12" cy="3" r="1.5" fill="white"/><circle cx="19" cy="8" r="1.5" fill="white"/><circle cx="19" cy="16" r="1.5" fill="white"/><circle cx="12" cy="21" r="1.5" fill="white"/><circle cx="5" cy="16" r="1.5" fill="white"/><circle cx="5" cy="8" r="1.5" fill="white"/></svg></span><span class="dashboard-quick-label" id="quickTasbeehLabel">Tasbeeh</span>
             </button>
             <button class="dashboard-quick-tile quick-qibla" onclick="openPrayerQiblaFromDashboard()" aria-label="Open Qibla">
                 <span class="dashboard-quick-wave" aria-hidden="true"></span>
-                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polygon points="12,2 14,10 12,8 10,10" fill="white" stroke="none"/><rect x="9" y="10" width="6" height="5" rx="0.5" fill="none" stroke="white" stroke-width="1.5"/></svg></span><span class="dashboard-quick-label" id="quickQiblaLabel">Qibla</span>
+                <span class="dashboard-quick-icon" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10" fill="rgba(255,255,255,0.12)"/><polygon points="12,2 14,10 12,8 10,10" fill="white" stroke="none"/><rect x="9" y="10" width="6" height="5" rx="0.5" fill="none" stroke="white" stroke-width="2"/></svg></span><span class="dashboard-quick-label" id="quickQiblaLabel">Qibla</span>
             </button>
         </div>
 
@@ -2957,10 +2968,10 @@
 
 <!-- ===== PASHTO LANGUAGE SUPPORT ===== -->
 <script src="pashto.js"></script>
-<script src="pashto-translation-player.js?v=20260306g"></script>
+<script src="pashto-translation-player.js?v=20260306j"></script>
 
 <script>
-    const APP_VERSION = '2.0.6';
+    const APP_VERSION = '2.0.10';
 
     (function() {
         const VERSION_INFO_URL = 'https://mohhp.github.io/Essential-duas/version.json';
@@ -3047,9 +3058,9 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (active) -->
-<script src="app.min.js?v=20260306g"></script>
+<script src="app.min.js?v=20260306j"></script>
 <!-- Source assets (fallback for local debugging) -->
-<!-- <script src="app.js?v=20260306g"></script> -->
+<!-- <script src="app.js?v=20260306j"></script> -->
 
 <!-- ===== OVERLAY ===== -->
 <div class="overlay" onclick="toggleBookmarksPanel()"></div>
@@ -3125,6 +3136,7 @@
                         <div class="quran-search-shell">
                             <span class="quran-search-icon" aria-hidden="true">🔎</span>
                             <input type="text" id="quranSearchInput" class="quran-search-input" placeholder="Search Surah..." autocomplete="off">
+                            <button type="button" class="quran-dropdown-close" aria-label="Close surah list" onclick="closeQuranSurahDropdown()">✕</button>
                         </div>
                         <div class="quran-dropdown-body">
                             <div class="quran-list" id="quranSurahList"></div>
@@ -3365,7 +3377,7 @@
         <p id="aboutDescription">Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.</p>
         <p id="aboutDescriptionPs">ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.</p>
         <p id="aboutTagline">حي على الفلاح — Come to Success</p>
-        <p id="aboutVersion">Version: 2.0.6</p>
+        <p id="aboutVersion">Version: 2.0.10</p>
         <div class="about-meta">
             <div id="aboutDeveloper">Developer: Falah</div>
             <div id="aboutCopyright">© 2026 Falah. All rights reserved.</div>

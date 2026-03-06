@@ -1,4 +1,4 @@
-const CACHE_NAME = 'falah-v83';
+const CACHE_NAME = 'falah-v86';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
 const PRAYER_REMINDER_DUE_WINDOW_MS = 2 * 60 * 1000;
@@ -83,6 +83,10 @@ const ASSETS = [
   './icon-512.png',
   './favicon.svg',
   './pashto.js',
+  './pashto-translation-player.js',
+  './audio/pashto_audit/pashto_soundcloud_mapping_114.json',
+  './audio/pashto_audit/pashto_archive_mapping_114.json',
+  './audio/pashto_audit/pashto_archive_mapping_juz30.json',
   './audio/reminders/adhan-alafasy.mp3',
   './audio/reminders/adhan-abdulbasit.mp3',
   './audio/reminders/adhan-short.mp3',

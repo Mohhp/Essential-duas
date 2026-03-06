@@ -719,6 +719,7 @@
 
     window.switchTab = function(tabName) {
         const nextTab = TAB_LAYER_SELECTORS[tabName] ? tabName : 'home';
+        document.body.setAttribute('data-active-tab', nextTab);
         setActiveTabLayer(nextTab);
         setBottomNavActive(nextTab);
         const target = document.querySelector(TAB_LAYER_SELECTORS[nextTab]);
@@ -2806,19 +2807,65 @@ window.filterCategory = function(cat, btn) {
 
     function getSmartSuggestion() {
         const ui = getDashboardText();
+        const isPS = isPashtoMode();
         const lastRead = (() => {
             try { return JSON.parse(localStorage.getItem('crown_quran_last_read') || 'null'); }
             catch (_) { return null; }
         })();
 
+        const resolveSurahNameForDashboard = (payload) => {
+            const surahNo = Number(payload?.surahNumber || 0);
+            const savedNameRaw = String(payload?.surahName || '').trim();
+            const genericEnglish = /^surah\s*[\d۰-۹]+$/i.test(savedNameRaw);
+            const genericPashto = /^سورت\s*[\d۰-۹]+$/u.test(savedNameRaw);
+            const genericArabic = /^سورة\s*[\d۰-۹]+$/u.test(savedNameRaw);
+            const hasSpecificSavedName = !!savedNameRaw && !genericEnglish && !genericPashto && !genericArabic;
+
+            const meta = surahNo ? getCurrentSurahMetaByNumber(surahNo) : null;
+            const metaName = meta
+                ? (isPS ? cleanSurahArabicName(meta.name) : String(meta.englishName || '').trim())
+                : '';
+
+            const fallbackNames = {
+                1: { en: 'Al-Faatiha', ar: 'الفاتحة' },
+                2: { en: 'Al-Baqarah', ar: 'البقرة' },
+                3: { en: 'Aal-i-Imraan', ar: 'آل عمران' },
+                4: { en: 'An-Nisaa', ar: 'النساء' },
+                36: { en: 'Ya-Sin', ar: 'يس' },
+                55: { en: 'Ar-Rahman', ar: 'الرحمن' },
+                67: { en: 'Al-Mulk', ar: 'الملك' },
+                112: { en: 'Al-Ikhlaas', ar: 'الإخلاص' },
+                113: { en: 'Al-Falaq', ar: 'الفلق' },
+                114: { en: 'An-Naas', ar: 'الناس' }
+            };
+
+            const fallbackName = surahNo
+                ? (isPS ? fallbackNames[surahNo]?.ar : fallbackNames[surahNo]?.en)
+                : '';
+            const resolvedName = hasSpecificSavedName
+                ? savedNameRaw
+                : (metaName || fallbackName || savedNameRaw);
+
+            const surahPrefix = isPS ? 'سورت' : 'Surah';
+            const genericLabel = surahNo ? `${surahPrefix} ${localizeDigits(surahNo)}` : '';
+            const shouldShowNumberAndName = !hasSpecificSavedName && !!genericLabel && !!resolvedName && resolvedName !== genericLabel;
+
+            return {
+                resolvedName: resolvedName || genericLabel || (isPS ? 'سورت غوره کړئ' : 'Pick a Surah'),
+                detailsPrefix: shouldShowNumberAndName
+                    ? `${genericLabel} · ${resolvedName}`
+                    : (resolvedName || genericLabel)
+            };
+        };
+
         if (lastRead?.surahNumber) {
-            const surah = lastRead.surahName || `Surah ${lastRead.surahNumber}`;
             const ayah = Number(lastRead.ayahNumber || 1);
+            const resolved = resolveSurahNameForDashboard(lastRead);
             return {
                 kicker: ui.continueKicker,
-                surah,
+                surah: resolved.resolvedName,
                 ayah,
-                sub: `${surah} ${ui.ayahLabel} ${localizeDigits(ayah)}`,
+                ayahDisplay: `${resolved.detailsPrefix} · ${ui.ayahLabel} ${localizeDigits(ayah)}`,
                 action: () => {
                     switchTab('quran');
                     openQuranSurah(lastRead.surahNumber, ayah);
@@ -2829,7 +2876,7 @@ window.filterCategory = function(cat, btn) {
             kicker: ui.continueKicker,
             surah: isPashtoMode() ? 'سورت غوره کړئ' : 'Pick a Surah',
             ayah: 1,
-            sub: isPashtoMode() ? 'د سورتونو لېست پرانیزئ' : 'Open the surah list',
+            ayahDisplay: isPashtoMode() ? `د سورتونو لېست پرانیزئ · ${ui.ayahLabel} ${localizeDigits(1)}` : `Open the surah list · ${ui.ayahLabel} ${localizeDigits(1)}`,
             action: () => switchTab('quran')
         };
     }
@@ -2935,8 +2982,8 @@ window.filterCategory = function(cat, btn) {
         const ui = getDashboardText();
         const suggestion = getSmartSuggestion();
         if (kicker) kicker.textContent = suggestion.kicker || ui.continueKicker;
-        sub.textContent = suggestion.surah || suggestion.sub || '';
-        if (ayah) ayah.textContent = `${ui.ayahLabel} ${localizeDigits(suggestion.ayah || 1)}`;
+        sub.textContent = suggestion.surah || '';
+        if (ayah) ayah.textContent = suggestion.ayahDisplay || `${ui.ayahLabel} ${localizeDigits(suggestion.ayah || 1)}`;
         cta.textContent = ui.continue;
         window.__dashboardSuggestionAction = suggestion.action;
     }
@@ -3082,7 +3129,8 @@ window.filterCategory = function(cat, btn) {
 
         const readCount = Math.min(STATE.read.length, 63);
         duasRow.textContent = `${ui.duasReadToday}: ${localizeDigits(readCount)} ${ui.of} ${localizeDigits(63)}`;
-        tasbeehRow.textContent = `${ui.tasbeehToday}: ${localizeDigits(getTasbeehTodayCount())} total`;
+        const totalLabel = isPashtoMode() ? 'ټول' : 'total';
+        tasbeehRow.textContent = `${ui.tasbeehToday}: ${localizeDigits(getTasbeehTodayCount())} ${totalLabel}`;
 
         const quranProgress = Math.max(0, Math.min(1, Number(lastRead?.ayahNumber || 1) / 286));
         bar.style.width = `${Math.round(quranProgress * 100)}%`;
@@ -3192,12 +3240,34 @@ window.filterCategory = function(cat, btn) {
     function initDuasTabSearch() {
         const input = document.getElementById('duasSearchInput');
         if (!input || input.dataset.bound === '1') return;
+
+        const getCategoryMatch = (query, category) => {
+            if (!query) return true;
+            const cards = document.querySelectorAll('#duaListSection .dua-card');
+            const needle = query.toLowerCase();
+            for (const card of cards) {
+                const categories = (card.getAttribute('data-categories') || '').split(',').map(v => v.trim());
+                if (category !== 'all' && !categories.includes(category)) continue;
+                const haystack = `${card.textContent || ''} ${card.getAttribute('data-keywords') || ''}`.toLowerCase();
+                if (haystack.includes(needle)) return true;
+            }
+            return false;
+        };
+
+        const filterCategoryGridByQuery = (query) => {
+            const categoryCards = document.querySelectorAll('#categoryGrid .cat-card');
+            categoryCards.forEach((card) => {
+                const cat = card.getAttribute('data-cat') || 'all';
+                const visible = getCategoryMatch(query, cat);
+                card.style.display = visible ? '' : 'none';
+            });
+        };
+
         input.addEventListener('input', () => {
             const query = (input.value || '').trim();
-            switchTab('duas');
-            openCategory('all', { skipScroll: true });
-            filterDuas(query);
+            filterCategoryGridByQuery(query);
         });
+
         input.dataset.bound = '1';
     }
 
@@ -3501,7 +3571,7 @@ window.filterCategory = function(cat, btn) {
             aboutDescription: 'Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.',
             aboutDescriptionPs: 'ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.',
             aboutTagline: 'حي على الفلاح — Come to Success',
-            aboutVersion: 'Version: 2.0.6',
+            aboutVersion: 'Version: 2.0.10',
             aboutDeveloper: isPS ? 'پراختیاکوونکی: Falah' : 'Developer: Falah',
             aboutCopyright: '© 2026 Falah. All rights reserved.',
             aboutContactLabel: isPS ? 'اړیکه ونیسئ' : 'Contact Us',
@@ -7501,7 +7571,10 @@ window.filterCategory = function(cat, btn) {
 
         due.forEach(({ prayerName, details }) => {
             markReminderFired(prayerName, details.triggerAt);
-            firePrayerReminder(prayerName, details.offsetMinutes > 0, details.offsetMinutes);
+            firePrayerReminder(prayerName, details.offsetMinutes > 0, details.offsetMinutes, {
+                triggerAt: details.triggerAt,
+                source
+            });
             delete activePrayerReminderSchedule[prayerName];
         });
 
@@ -7641,13 +7714,19 @@ window.filterCategory = function(cat, btn) {
     }
 
     function getNextReminderDate(prayerName, offsetMinutes, now) {
-        const todayPrayer = prayerTimesData?.[prayerName] || getPrayerTimeForDate(prayerName, now);
+        const asValidDate = (value) => {
+            if (!value) return null;
+            const d = new Date(value);
+            return Number.isFinite(d.getTime()) ? d : null;
+        };
+
+        const todayPrayer = asValidDate(prayerTimesData?.[prayerName] || getPrayerTimeForDate(prayerName, now));
         if (todayPrayer) {
             const candidate = new Date(todayPrayer);
             candidate.setMinutes(candidate.getMinutes() - offsetMinutes);
             console.log('[PrayerReminder] Candidate reminder (today)', {
                 prayerName,
-                prayerAt: new Date(todayPrayer).toString(),
+                prayerAt: todayPrayer.toString(),
                 reminderAt: candidate.toString(),
                 now: now.toString(),
                 offsetMinutes
@@ -7657,7 +7736,7 @@ window.filterCategory = function(cat, btn) {
 
         const tomorrow = new Date(now);
         tomorrow.setDate(tomorrow.getDate() + 1);
-        const tomorrowPrayer = getPrayerTimeForDate(prayerName, tomorrow);
+        const tomorrowPrayer = asValidDate(getPrayerTimeForDate(prayerName, tomorrow));
         if (!tomorrowPrayer) return null;
         const nextCandidate = new Date(tomorrowPrayer);
         nextCandidate.setMinutes(nextCandidate.getMinutes() - offsetMinutes);
@@ -7693,33 +7772,42 @@ window.filterCategory = function(cat, btn) {
         showReminderSetConfirmation(firstEnabled);
     }
 
-    function firePrayerReminder(prayerName, isPreReminder, minutesBefore) {
+    function firePrayerReminder(prayerName, isPreReminder, minutesBefore, meta = {}) {
         console.log('[PrayerReminder] Timer fired', {
             prayerName,
             isPreReminder,
             minutesBefore,
+            triggerAt: meta.triggerAt || null,
+            source: meta.source || 'timer',
             firedAtLocal: new Date().toString(),
             firedAtISO: new Date().toISOString()
         });
         const uiText = getPrayerUiText();
         const localizedPrayer = getPrayerLabel(prayerName);
+        const triggerAt = Number(meta.triggerAt || 0);
         const body = isPreReminder
             ? uiText.preReminderBody
                 .replace('{prayer}', localizedPrayer)
                 .replace('{minutes}', localizeDigits(minutesBefore))
             : uiText.atTimeBody.replace('{prayer}', localizedPrayer);
 
-        sendSystemNotification(`${PRAYER_ICONS[prayerName]} ${localizedPrayer}`, {
+        const title = isPreReminder
+            ? `${PRAYER_ICONS[prayerName]} ${localizedPrayer} • ${localizeDigits(minutesBefore)}m`
+            : `${PRAYER_ICONS[prayerName]} ${localizedPrayer}`;
+
+        sendSystemNotification(title, {
             body,
             icon: 'icon-192.png',
             badge: 'icon-192.png',
-            tag: `prayer-${prayerName}-${isPreReminder ? 'before' : 'now'}`,
+            tag: `prayer-${prayerName}-${isPreReminder ? 'before' : 'now'}-${triggerAt || Date.now()}`,
             renotify: true,
             requireInteraction: true,
             vibrate: [200, 100, 200],
             silent: false,
             data: {
                 prayer: prayerName,
+                triggerAt: triggerAt || null,
+                source: meta.source || 'timer',
                 url: '/'
             }
         });
@@ -7766,9 +7854,10 @@ window.filterCategory = function(cat, btn) {
 
             setTimeout(() => {
                 const samplePrayer = getNextPrayer(new Date()) || 'dhuhr';
+                const uiText = getPrayerUiText();
                 const localizedPrayer = getPrayerLabel(samplePrayer);
                 playReminderSound(resolveReminderSoundId(samplePrayer));
-                sendSystemNotification(`${PRAYER_ICONS[samplePrayer]} Prayer Time`, {
+                sendSystemNotification(`${PRAYER_ICONS[samplePrayer]} ${uiText.testReminder}`, {
                     body: `Test reminder - ${localizedPrayer}`,
                     icon: 'icon-192.png',
                     badge: 'icon-192.png',
@@ -7879,7 +7968,14 @@ window.filterCategory = function(cat, btn) {
             if (!settings.prayers[name]) return;
             const prayerAt = prayerTimesData?.[name] || getPrayerTimeForDate(name, now);
             const reminderTime = getNextReminderDate(name, settings.offsetMinutes, now);
-            if (!reminderTime) return;
+            if (!reminderTime) {
+                console.log('[PrayerReminder] Skipping reminder (no valid next time)', {
+                    prayer: name,
+                    prayerTimeLocal: prayerAt ? new Date(prayerAt).toString() : null,
+                    offsetMinutes: settings.offsetMinutes
+                });
+                return;
+            }
 
             const delay = reminderTime.getTime() - now.getTime();
             if (delay <= 0 || delay > 172800000) {
@@ -7918,7 +8014,10 @@ window.filterCategory = function(cat, btn) {
             const tid = setTimeout(() => {
                 if (hasReminderFired(name, triggerAt)) return;
                 markReminderFired(name, triggerAt);
-                firePrayerReminder(name, settings.offsetMinutes > 0, settings.offsetMinutes);
+                firePrayerReminder(name, settings.offsetMinutes > 0, settings.offsetMinutes, {
+                    triggerAt,
+                    source: 'timer'
+                });
                 delete activePrayerReminderSchedule[name];
                 syncPrayerReminderStateToServiceWorker('timer-fired');
                 schedulePrayerNotifications();
@@ -8786,9 +8885,9 @@ window.filterCategory = function(cat, btn) {
         dropdown.classList.toggle('open', shouldOpen);
         dropdown.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
         btn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
-        if (shouldOpen) {
+        if (!shouldOpen) {
             const input = document.getElementById('quranSearchInput');
-            if (input) setTimeout(() => input.focus(), 40);
+            if (input) input.blur();
         }
     }
 
@@ -8870,16 +8969,20 @@ window.filterCategory = function(cat, btn) {
                 <div class="quran-surah-row ${revelationClass} ${isRecentlyRead ? 'is-recently-read' : ''}" data-surah-no="${surah.number}" onclick="openQuranSurah(${surah.number})">
                     <div class="quran-surah-num">${localizeQuranNumber(surah.number)}</div>
                     <div class="quran-surah-main">
-                        <div class="quran-surah-name-secondary">${escapeHtml(primary)}${secondary ? ` • ${escapeHtml(secondary)}` : ''}</div>
-                        <span class="quran-surah-ayahs">${localizeQuranNumber(surah.numberOfAyahs)} ${ui.ayahs}</span>
-                    </div>
-                    <div class="quran-surah-meta">
-                        <div class="quran-surah-name-primary" dir="rtl">${escapeHtml(arabicName)}</div>
-                        <span class="quran-revelation-text ${revelation.tone === 'makki' ? 'is-makki' : 'is-madani'}">${revelation.label}</span>
-                        ${isRecentlyRead ? `<span class="quran-recent-dot" title="${ui.recentlyRead}" aria-hidden="true"></span>` : ''}
-                        ${cached
-                            ? `<span class="quran-cached-icon" title="${ui.cached}">✓</span>`
-                            : `<button class="quran-download-icon" type="button" title="${ui.downloadOffline}" onclick="event.stopPropagation(); downloadQuranSurahOffline(${surah.number});">↓</button>`}
+                        <div class="quran-surah-top-line">
+                            <span class="quran-surah-name-secondary">${escapeHtml(primary)}${secondary ? ` • ${escapeHtml(secondary)}` : ''}</span>
+                            <span class="quran-revelation-text ${revelation.tone === 'makki' ? 'is-makki' : 'is-madani'}">${revelation.label}</span>
+                            <span class="quran-surah-name-primary" dir="rtl">${escapeHtml(arabicName)}</span>
+                            <span class="quran-surah-inline-actions">
+                                ${isRecentlyRead ? `<span class="quran-recent-dot" title="${ui.recentlyRead}" aria-hidden="true"></span>` : ''}
+                                ${cached
+                                    ? `<span class="quran-cached-icon" title="${ui.cached}">✓</span>`
+                                    : `<button class="quran-download-icon" type="button" title="${ui.downloadOffline}" onclick="event.stopPropagation(); downloadQuranSurahOffline(${surah.number});">↓</button>`}
+                            </span>
+                        </div>
+                        <div class="quran-surah-bottom-line">
+                            <span class="quran-surah-ayahs">${localizeQuranNumber(surah.numberOfAyahs)} ${ui.ayahs}</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -9511,7 +9614,7 @@ window.filterCategory = function(cat, btn) {
             return `
                 <div class="quran-ayah-card ${playing ? 'playing' : ''}" data-ayah-no="${ayah.numberInSurah}" id="quranAyah-${cardKey}">
                     <div class="quran-ayah-head">
-                        <span class="quran-ayah-num">﴿${localizeQuranNumber(ayah.numberInSurah)}﴾</span>
+                        <span class="quran-ayah-num">﴾${localizeQuranNumber(ayah.numberInSurah)}﴿</span>
                     </div>
                     <div class="quran-ayah-ar">${escapeHtml(ayah.arabic)}</div>
                     ${shouldShowTranslationBlock(mode, 'ps') ? `<div class="quran-ayah-ps">${escapeHtml(ayah.pashto || '')}</div>` : ''}
