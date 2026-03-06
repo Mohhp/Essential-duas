@@ -1,0 +1,280 @@
+{
+  "visual": {
+    "quick": [
+      "linear-gradient(135deg, rgb(26, 58, 92), rgb(13, 33, 55))",
+      "linear-gradient(135deg, rgb(26, 92, 58), rgb(13, 55, 33))",
+      "linear-gradient(135deg, rgb(106, 83, 32), rgb(58, 47, 15))",
+      "linear-gradient(135deg, rgb(26, 92, 92), rgb(13, 55, 55))"
+    ],
+    "prayerCard": {
+      "exists": true,
+      "bg": "linear-gradient(135deg, rgb(92, 63, 26), rgb(47, 32, 13))",
+      "bgc": "rgba(0, 0, 0, 0)",
+      "borderTop": "1px solid rgba(46, 196, 122, 0.12)",
+      "borderLeft": "1px solid rgba(46, 196, 122, 0.12)",
+      "backdrop": "none",
+      "minHeight": "0px",
+      "width": "100%",
+      "overflowX": "hidden",
+      "text": "راتلونکی لمونځ\n            --\n            --:--\n            --\n            نامعل"
+    },
+    "prayerPattern": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.24' stroke-width='1.4'%3E%3Cpath d='M60 16l10 20 22 2-16 14 4 22-20-10-20 10 4-22-16-14 22-2z'/%3E%3Cpath d='M60 30l7 14 15 1-11 10 3 15-14-7-14 7 3-15-11-10 15-1z'/%3E%3C/g%3E%3C/svg%3E\")",
+    "categories": [
+      {
+        "cat": "all",
+        "bg": "linear-gradient(135deg, rgb(15, 90, 58), rgb(15, 90, 90))"
+      },
+      {
+        "cat": "quran",
+        "bg": "linear-gradient(135deg, rgb(26, 58, 92), rgb(43, 47, 102))"
+      },
+      {
+        "cat": "morning-evening",
+        "bg": "linear-gradient(135deg, rgb(192, 113, 58), rgb(139, 69, 19))"
+      },
+      {
+        "cat": "protection",
+        "bg": "linear-gradient(135deg, rgb(44, 95, 138), rgb(26, 58, 92))"
+      },
+      {
+        "cat": "forgiveness",
+        "bg": "linear-gradient(135deg, rgb(107, 74, 138), rgb(74, 45, 107))"
+      },
+      {
+        "cat": "guidance",
+        "bg": "linear-gradient(135deg, rgb(138, 122, 58), rgb(92, 80, 32))"
+      },
+      {
+        "cat": "wellbeing",
+        "bg": "linear-gradient(135deg, rgb(42, 122, 106), rgb(26, 92, 74))"
+      },
+      {
+        "cat": "prophets",
+        "bg": "linear-gradient(135deg, rgb(138, 106, 58), rgb(92, 69, 32))"
+      },
+      {
+        "cat": "prayer",
+        "bg": "linear-gradient(135deg, rgb(42, 107, 58), rgb(26, 69, 37))"
+      },
+      {
+        "cat": "provision",
+        "bg": "linear-gradient(135deg, rgb(107, 90, 58), rgb(69, 58, 32))"
+      },
+      {
+        "cat": "family",
+        "bg": "linear-gradient(135deg, rgb(138, 58, 90), rgb(92, 32, 64))"
+      },
+      {
+        "cat": "travel",
+        "bg": "linear-gradient(135deg, rgb(58, 106, 138), rgb(32, 69, 92))"
+      }
+    ],
+    "allBanner": {
+      "exists": true,
+      "bg": "linear-gradient(135deg, rgb(15, 90, 58), rgb(15, 90, 90))",
+      "bgc": "rgba(0, 0, 0, 0)",
+      "borderTop": "0px none rgb(230, 240, 218)",
+      "borderLeft": "0px none rgb(230, 240, 218)",
+      "backdrop": "none",
+      "minHeight": "104px",
+      "width": "auto",
+      "overflowX": "hidden",
+      "text": "📿\n            ټولې دعاګانې\n            ۶۳ دعاګانې"
+    },
+    "quranBanner": {
+      "exists": true,
+      "bg": "linear-gradient(135deg, rgb(26, 58, 92), rgb(43, 47, 102))",
+      "bgc": "rgba(0, 0, 0, 0)",
+      "borderTop": "0px none rgb(230, 240, 218)",
+      "borderLeft": "0px none rgb(230, 240, 218)",
+      "backdrop": "none",
+      "minHeight": "104px",
+      "width": "auto",
+      "overflowX": "hidden",
+      "text": "📖\n            قرآني بنسټ\n            ۱۰ دعاګانې"
+    },
+    "tasbeehBtn": {
+      "exists": true,
+      "bg": "linear-gradient(145deg, rgb(30, 107, 70), rgb(19, 93, 104))",
+      "bgc": "rgba(0, 0, 0, 0)",
+      "borderTop": "3px solid rgba(201, 168, 76, 0.32)",
+      "borderLeft": "3px solid rgba(201, 168, 76, 0.32)",
+      "backdrop": "none",
+      "minHeight": "120px",
+      "width": "120px",
+      "overflowX": "hidden",
+      "text": "ټک"
+    },
+    "tasbeehRing": "conic-gradient(from -90deg, rgb(201, 168, 76) 0%, rgba(255, 255, 255, 0.08) 0deg)",
+    "bottomNav": {
+      "exists": true,
+      "bg": "none",
+      "bgc": "rgba(12, 20, 35, 0.84)",
+      "borderTop": "0px none rgb(230, 240, 218)",
+      "borderLeft": "0px none rgb(230, 240, 218)",
+      "backdrop": "blur(16px) saturate(1.7)",
+      "minHeight": "60px",
+      "width": "1440px",
+      "overflowX": "hidden",
+      "text": "کور\n    \n    \n        \n        قرآن\n    \n    \n        \n        دعاګانې\n    \n    "
+    },
+    "bottomNavTopLine": "linear-gradient(90deg, rgba(0, 0, 0, 0) 8%, rgb(201, 168, 76) 50%, rgba(0, 0, 0, 0) 92%)",
+    "prayerCountdown": {
+      "exists": true,
+      "bg": "linear-gradient(135deg, rgb(26, 47, 77), rgb(23, 59, 47))",
+      "bgc": "rgba(0, 0, 0, 0)",
+      "borderTop": "1px solid rgba(46, 196, 122, 0.2)",
+      "borderLeft": "1px solid rgba(46, 196, 122, 0.2)",
+      "backdrop": "none",
+      "minHeight": "auto",
+      "width": "500px",
+      "overflowX": "hidden",
+      "text": "راتلونکی لمونځ\n                --\n                --:--:--"
+    },
+    "prayerCountdownPattern": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.24' stroke-width='1.4'%3E%3Cpath d='M60 16l10 20 22 2-16 14 4 22-20-10-20 10 4-22-16-14 22-2z'/%3E%3Cpath d='M60 30l7 14 15 1-11 10 3 15-14-7-14 7 3-15-11-10 15-1z'/%3E%3C/g%3E%3C/svg%3E\")",
+    "duaActions": [
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": ""
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "لړلیک"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "کاپي"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "نښه"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "انځور"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": ""
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "لړلیک"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "کاپي"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "نښه"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "انځور"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": ""
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "لړلیک"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "کاپي"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "نښه"
+      },
+      {
+        "h": "64px",
+        "w": "54px",
+        "label": "انځور"
+      }
+    ],
+    "overflowCheck": {
+      "content": "hidden",
+      "slide": "hidden"
+    },
+    "surahMakki": {
+      "exists": true,
+      "bg": "none",
+      "bgc": "rgb(29, 64, 85)",
+      "borderTop": "1px solid rgba(46, 196, 122, 0.14)",
+      "borderLeft": "3px solid rgb(201, 168, 76)",
+      "backdrop": "none",
+      "minHeight": "0px",
+      "width": "auto",
+      "overflowX": "visible",
+      "text": "١\n                    \n                        ٱلْفَاتِحَةِ\n                    "
+    },
+    "surahMadani": {
+      "exists": false
+    },
+    "reminderCheckbox": {
+      "exists": true,
+      "bg": "linear-gradient(135deg, rgb(201, 168, 76), rgb(46, 204, 113))",
+      "bgc": "rgba(0, 0, 0, 0)",
+      "borderTop": "1px solid rgba(0, 0, 0, 0)",
+      "borderLeft": "1px solid rgba(0, 0, 0, 0)",
+      "backdrop": "none",
+      "minHeight": "0px",
+      "width": "22px",
+      "overflowX": "visible",
+      "text": ""
+    },
+    "settingsIcon": {
+      "exists": true,
+      "bg": "linear-gradient(135deg, rgb(51, 90, 138), rgb(26, 58, 92))",
+      "bgc": "rgba(0, 0, 0, 0)",
+      "borderTop": "0px none rgb(255, 255, 255)",
+      "borderLeft": "0px none rgb(255, 255, 255)",
+      "backdrop": "none",
+      "minHeight": "auto",
+      "width": "32px",
+      "overflowX": "visible",
+      "text": ""
+    }
+  },
+  "numeral": {
+    "homePrayerTime": "",
+    "homeCountdown": "",
+    "surahNum": "١",
+    "ayahCount": "٧ آیتونه",
+    "ayahMarker": "",
+    "duaProgress": "",
+    "tasbeehCounter": "٠",
+    "tasbeehTarget": "هدف: ٣٣",
+    "prayerTime": "",
+    "prayerCountdown": "--:--:--",
+    "checks": {
+      "homePrayerTime": false,
+      "homeCountdown": false,
+      "surahNum": true,
+      "ayahCount": true,
+      "ayahMarker": false,
+      "duaProgress": false,
+      "tasbeehCounter": true,
+      "tasbeehTarget": true,
+      "prayerTime": false,
+      "prayerCountdown": false
+    }
+  }
+}

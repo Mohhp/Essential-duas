@@ -21,6 +21,105 @@
         return getPreferredLang() === 'ps';
     }
 
+    const ARABIC_INDIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    const WESTERN_DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    let digitLocalizationObserver = null;
+    let digitLocalizationBusy = false;
+    let digitLocalizationTimer = null;
+
+    function getNumeralMode() {
+        const lang = String(getPreferredLang() || '').toLowerCase();
+        return (lang === 'ps' || lang === 'ar') ? 'arabic' : 'western';
+    }
+
+    function toArabicNumerals(str) {
+        return String(str).replace(/[0-9]/g, (d) => ARABIC_INDIC_DIGITS[Number(d)]);
+    }
+
+    function toWesternNumerals(str) {
+        return String(str).replace(/[٠-٩]/g, (d) => {
+            const idx = ARABIC_INDIC_DIGITS.indexOf(d);
+            return idx >= 0 ? WESTERN_DIGITS[idx] : d;
+        });
+    }
+
+    function normalizeDigitsForCurrentLanguage(value) {
+        const raw = String(value ?? '');
+        return getNumeralMode() === 'arabic' ? toArabicNumerals(raw) : toWesternNumerals(raw);
+    }
+
+    function localizeDigitsInTextNode(node) {
+        if (!node || !node.nodeValue) return;
+        const parent = node.parentElement;
+        if (!parent) return;
+        if (parent.closest('script, style, noscript, textarea')) return;
+        const normalized = normalizeDigitsForCurrentLanguage(node.nodeValue);
+        if (normalized !== node.nodeValue) node.nodeValue = normalized;
+    }
+
+    function relocalizeAllVisibleNumbers(root = document.body) {
+        if (!root || digitLocalizationBusy) return;
+        digitLocalizationBusy = true;
+        try {
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+            let node = walker.nextNode();
+            while (node) {
+                localizeDigitsInTextNode(node);
+                node = walker.nextNode();
+            }
+        } finally {
+            digitLocalizationBusy = false;
+        }
+    }
+
+    function scheduleNumberRelocalization() {
+        if (digitLocalizationTimer) clearTimeout(digitLocalizationTimer);
+        digitLocalizationTimer = setTimeout(() => {
+            digitLocalizationTimer = null;
+            relocalizeAllVisibleNumbers(document.body);
+        }, 0);
+    }
+
+    function initGlobalDigitLocalization() {
+        if (digitLocalizationObserver || typeof MutationObserver === 'undefined') return;
+        digitLocalizationObserver = new MutationObserver((mutations) => {
+            if (digitLocalizationBusy) return;
+            let shouldRelocalize = false;
+            for (const mutation of mutations) {
+                if (mutation.type === 'characterData') {
+                    localizeDigitsInTextNode(mutation.target);
+                    continue;
+                }
+                if (mutation.addedNodes && mutation.addedNodes.length) {
+                    shouldRelocalize = true;
+                }
+            }
+            if (shouldRelocalize) scheduleNumberRelocalization();
+        });
+        digitLocalizationObserver.observe(document.body, {
+            subtree: true,
+            childList: true,
+            characterData: true
+        });
+        scheduleNumberRelocalization();
+    }
+
+    function refreshLanguageModeConsistency() {
+        refreshHomeDashboard();
+        renderDuasBookmarksSection();
+        if (typeof refreshEtiquetteLanguage === 'function') refreshEtiquetteLanguage();
+        if (typeof refreshRoutineLanguage === 'function') refreshRoutineLanguage();
+        if (typeof refreshProgressLanguage === 'function') refreshProgressLanguage();
+        if (typeof renderQuranContinueCard === 'function') renderQuranContinueCard();
+        if (typeof updateQuranUiLanguage === 'function') updateQuranUiLanguage();
+        if (typeof updateTasbeehUI === 'function') updateTasbeehUI();
+        if (typeof resetTasbeeh === 'function') {
+            const targetLabel = document.getElementById('tasbeehTargetLabel');
+            if (targetLabel) targetLabel.textContent = formatTasbeehTargetLabel(tasbeehTarget);
+        }
+        scheduleNumberRelocalization();
+    }
+
     // ===== DOM ELEMENTS =====
     const els = {
         cards: document.querySelectorAll('.dua-card'),
@@ -74,13 +173,15 @@
             window.toggleLanguage = function(...args) {
                 const result = originalToggleLanguage.apply(this, args);
                 setTimeout(() => {
-                    refreshHomeDashboard();
-                    renderDuasBookmarksSection();
+                    refreshLanguageModeConsistency();
                 }, 0);
                 return result;
             };
             window.__wrappedToggleLanguageForDashboard = true;
         }
+
+        initGlobalDigitLocalization();
+        scheduleNumberRelocalization();
 
         showOnboardingIfFirstTime();
         enhanceAccessibility();
@@ -304,7 +405,7 @@
             if (!el.hasAttribute('role')) el.setAttribute('role', 'button');
             if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
             if (!el.hasAttribute('aria-label')) {
-                const label = 'Scroll to top';
+                const label = 'Go to Home';
                 el.setAttribute('aria-label', label);
             }
             if (!el.dataset.a11yBound) {
@@ -352,7 +453,7 @@
         if (!target) return;
         target.classList.add('tab-fade-target');
         target.classList.add('is-fading');
-        setTimeout(() => target.classList.remove('is-fading'), 120);
+        setTimeout(() => target.classList.remove('is-fading'), 180);
     }
 
     function initBottomNavTouchHandlers() {
@@ -656,6 +757,7 @@
     };
     let swipeHintTimer = null;
     let duaViewerCloseTimer = null;
+    let duaSwipeWheelLockUntil = 0;
 
     function showDuaSwipeHints(direction = 'both', durationMs = 3000) {
         const viewer = document.getElementById('duaSwipeViewer');
@@ -1269,12 +1371,13 @@ window.filterCategory = function(cat, btn) {
                 from: 'څخه',
                 read: 'لوستل شوی ✓',
                 markRead: '✓ ولولئ',
-                listen: '🔊 اورېدل',
-                copy: '📋 کاپي',
-                share: '↗ شريک',
-                shareImage: '🖼 انځور',
-                bookmarkAdd: '☆ نښه',
-                bookmarkOn: '★ نښه',
+                list: 'لړلیک',
+                listen: 'اورېدل',
+                copy: 'کاپي',
+                share: 'شريک',
+                shareImage: 'انځور',
+                bookmarkAdd: 'نښه',
+                bookmarkOn: 'په نښه شوی',
                 backHint: 'کټګوریو ته ستنیدل'
             }
             : {
@@ -1282,12 +1385,13 @@ window.filterCategory = function(cat, btn) {
                 from: '',
                 read: 'Read ✓',
                 markRead: '✓ Mark Read',
-                listen: '🔊 Listen',
-                copy: '📋 Copy',
-                share: '↗ Share',
-                shareImage: '🖼 Share Image',
-                bookmarkAdd: '☆ Bookmark',
-                bookmarkOn: '★ Bookmarked',
+                list: 'List',
+                listen: 'Listen',
+                copy: 'Copy',
+                share: 'Share',
+                shareImage: 'Share Image',
+                bookmarkAdd: 'Bookmark',
+                bookmarkOn: 'Bookmarked',
                 backHint: 'Back to categories'
             };
     }
@@ -1316,7 +1420,7 @@ window.filterCategory = function(cat, btn) {
         const indexDisplay = DUA_SWIPE_STATE.index + 1;
         const total = DUA_SWIPE_STATE.ids.length;
         const progressLabel = isPashtoMode()
-            ? `${localizeDigits(indexDisplay)} ${texts.of} ${localizeDigits(total)} ${texts.from}`
+            ? `${localizeDigits(indexDisplay)} از ${localizeDigits(total)}`
             : `${indexDisplay} ${texts.of} ${total}`;
 
         const slide = document.createElement('div');
@@ -1348,17 +1452,18 @@ window.filterCategory = function(cat, btn) {
         const hasMappedAudio = !!mappedAudioId;
         const actions = document.createElement('div');
         actions.className = 'dua-swipe-actions';
+        const bookmarkAria = isBookmarked ? texts.bookmarkOn : texts.bookmarkAdd;
         actions.innerHTML = `
             ${hasMappedAudio ? `
             <div class="audio-player dua-swipe-audio" data-state="idle">
-                <button class="action-btn audio-btn" type="button">${texts.listen}</button>
+                <button class="action-btn action-btn-listen audio-btn" type="button" aria-label="${texts.listen}" title="${texts.listen}"><span class="action-btn-icon">▶</span><span class="action-btn-label">${texts.listen}</span></button>
                 <div class="audio-progress"><span class="audio-progress-fill"></span></div>
             </div>
             ` : ''}
-            <button class="action-btn" data-role="copy">${texts.copy}</button>
-            <button class="action-btn" data-role="share">${texts.share}</button>
-            <button class="action-btn ${isBookmarked ? 'bookmarked-inline' : ''}" data-role="bookmark">${isBookmarked ? texts.bookmarkOn : texts.bookmarkAdd}</button>
-            <button class="action-btn" data-role="image">${texts.shareImage}</button>
+            <button class="action-btn action-btn-list" data-role="list" aria-label="${texts.list}" title="${texts.list}"><span class="action-btn-icon">☰</span><span class="action-btn-label">${texts.list}</span></button>
+            <button class="action-btn action-btn-copy" data-role="copy" aria-label="${texts.copy}" title="${texts.copy}"><span class="action-btn-icon">⧉</span><span class="action-btn-label">${texts.copy}</span></button>
+            <button class="action-btn action-btn-bookmark ${isBookmarked ? 'bookmarked-inline' : ''}" data-role="bookmark" aria-label="${bookmarkAria}" title="${bookmarkAria}"><span class="action-btn-icon">${isBookmarked ? '★' : '☆'}</span><span class="action-btn-label">${isBookmarked ? texts.bookmarkOn : texts.bookmarkAdd}</span></button>
+            <button class="action-btn action-btn-image" data-role="image" aria-label="${texts.shareImage}" title="${texts.shareImage}"><span class="action-btn-icon">🖼</span><span class="action-btn-label">${texts.shareImage}</span></button>
         `;
 
         const listenBtn = actions.querySelector('.audio-btn');
@@ -1374,7 +1479,7 @@ window.filterCategory = function(cat, btn) {
         actions.querySelector('[data-role="copy"]')?.addEventListener('click', function() {
             copyText(this, firstArabic);
         });
-        actions.querySelector('[data-role="share"]')?.addEventListener('click', () => shareDua(duaId));
+        actions.querySelector('[data-role="list"]')?.addEventListener('click', () => backToCategories());
         actions.querySelector('[data-role="image"]')?.addEventListener('click', () => shareAsImage(duaId));
         actions.querySelector('[data-role="bookmark"]')?.addEventListener('click', () => {
             toggleBookmark(duaId);
@@ -1426,11 +1531,12 @@ window.filterCategory = function(cat, btn) {
 
     function setSwipeTrackPosition(baseIndex, extraX, animated) {
         const track = document.getElementById('duaSwipeTrack');
-        if (!track) return;
+        if (!track) return false;
         const step = getSwipeStep();
-        if (!step) return;
+        if (!step) return false;
         track.style.transition = animated ? 'transform 300ms ease-out' : 'none';
         track.style.transform = `translate3d(${(-step * baseIndex) + extraX}px, 0, 0)`;
+        return true;
     }
 
     function renderDuaSwipeViewer() {
@@ -1467,10 +1573,15 @@ window.filterCategory = function(cat, btn) {
         safeVibrate(5);
         DUA_SWIPE_STATE.transitionLock = true;
         showDuaSwipeHints(delta > 0 ? 'right' : 'left', 900);
-        setSwipeTrackPosition(delta > 0 ? 2 : 0, 0, true);
+        const moved = setSwipeTrackPosition(delta > 0 ? 2 : 0, 0, true);
 
         const track = document.getElementById('duaSwipeTrack');
+        let completeTimer = null;
         const onDone = () => {
+            if (completeTimer) {
+                clearTimeout(completeTimer);
+                completeTimer = null;
+            }
             track?.removeEventListener('transitionend', onDone);
             DUA_SWIPE_STATE.index = targetIndex;
             DUA_SWIPE_STATE.transitionLock = false;
@@ -1483,7 +1594,15 @@ window.filterCategory = function(cat, btn) {
                 ts: Date.now()
             });
         };
-        track?.addEventListener('transitionend', onDone);
+
+        if (!moved || !track) {
+            onDone();
+            return;
+        }
+
+        track.addEventListener('transitionend', onDone);
+        // Guard against missed transitionend on mobile browsers.
+        completeTimer = setTimeout(onDone, 380);
     }
 
     function openDuaSwipeViewer(category, ids, startIndex, opts) {
@@ -1609,23 +1728,20 @@ window.filterCategory = function(cat, btn) {
         }
 
         if (shell && !shell.dataset.boundSwipe) {
-            shell.addEventListener('touchstart', (e) => {
-                const touch = e.touches?.[0];
-                if (!touch || !DUA_SWIPE_STATE.active) return;
-                DUA_SWIPE_STATE.touchStartX = touch.clientX;
-                DUA_SWIPE_STATE.touchStartY = touch.clientY;
+            const startSwipeGesture = (x, y) => {
+                if (!DUA_SWIPE_STATE.active) return;
+                DUA_SWIPE_STATE.touchStartX = x;
+                DUA_SWIPE_STATE.touchStartY = y;
                 DUA_SWIPE_STATE.axisLock = null;
                 DUA_SWIPE_STATE.dragX = 0;
                 DUA_SWIPE_STATE.isDragging = true;
-            }, { passive: true });
+            };
 
-            shell.addEventListener('touchmove', (e) => {
+            const moveSwipeGesture = (x, y, preventDefaultCb = null) => {
                 if (!DUA_SWIPE_STATE.isDragging || !DUA_SWIPE_STATE.active) return;
-                const touch = e.touches?.[0];
-                if (!touch) return;
 
-                const dx = touch.clientX - DUA_SWIPE_STATE.touchStartX;
-                const dy = touch.clientY - DUA_SWIPE_STATE.touchStartY;
+                const dx = x - DUA_SWIPE_STATE.touchStartX;
+                const dy = y - DUA_SWIPE_STATE.touchStartY;
 
                 if (!DUA_SWIPE_STATE.axisLock) {
                     if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
@@ -1633,12 +1749,12 @@ window.filterCategory = function(cat, btn) {
                 }
 
                 if (DUA_SWIPE_STATE.axisLock !== 'x') return;
-                e.preventDefault();
+                if (typeof preventDefaultCb === 'function') preventDefaultCb();
                 DUA_SWIPE_STATE.dragX = Math.max(-180, Math.min(180, dx));
                 setSwipeTrackPosition(1, DUA_SWIPE_STATE.dragX, false);
-            }, { passive: false });
+            };
 
-            shell.addEventListener('touchend', () => {
+            const endSwipeGesture = () => {
                 if (!DUA_SWIPE_STATE.isDragging || !DUA_SWIPE_STATE.active) return;
                 const dx = DUA_SWIPE_STATE.dragX;
                 const axis = DUA_SWIPE_STATE.axisLock;
@@ -1649,7 +1765,77 @@ window.filterCategory = function(cat, btn) {
                 if (axis !== 'x') return;
                 if (Math.abs(dx) >= 50) navigateSwipe(dx < 0 ? 1 : -1);
                 else setSwipeTrackPosition(1, 0, true);
+            };
+
+            const cancelSwipeGesture = () => {
+                DUA_SWIPE_STATE.isDragging = false;
+                DUA_SWIPE_STATE.axisLock = null;
+                DUA_SWIPE_STATE.dragX = 0;
+                setSwipeTrackPosition(1, 0, true);
+            };
+
+            shell.addEventListener('touchstart', (e) => {
+                const touch = e.touches?.[0];
+                if (!touch) return;
+                startSwipeGesture(touch.clientX, touch.clientY);
             }, { passive: true });
+
+            shell.addEventListener('touchmove', (e) => {
+                const touch = e.touches?.[0];
+                if (!touch) return;
+                moveSwipeGesture(touch.clientX, touch.clientY, () => e.preventDefault());
+            }, { passive: false });
+
+            shell.addEventListener('touchend', () => {
+                endSwipeGesture();
+            }, { passive: true });
+
+            shell.addEventListener('touchcancel', () => {
+                cancelSwipeGesture();
+            }, { passive: true });
+
+            // Support desktop/laptop drag gestures (mouse, trackpad, stylus).
+            shell.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                startSwipeGesture(e.clientX, e.clientY);
+            });
+
+            shell.addEventListener('pointermove', (e) => {
+                moveSwipeGesture(e.clientX, e.clientY, () => e.preventDefault());
+            }, { passive: false });
+
+            shell.addEventListener('pointerup', () => {
+                endSwipeGesture();
+            });
+
+            shell.addEventListener('pointercancel', () => {
+                cancelSwipeGesture();
+            });
+
+            shell.addEventListener('mouseleave', () => {
+                if (DUA_SWIPE_STATE.isDragging) endSwipeGesture();
+            });
+
+            // Trackpads often emit wheel deltas instead of pointer drags on laptops.
+            shell.addEventListener('wheel', (e) => {
+                if (!DUA_SWIPE_STATE.active || DUA_SWIPE_STATE.transitionLock) return;
+
+                const now = Date.now();
+                if (now < duaSwipeWheelLockUntil) {
+                    e.preventDefault();
+                    return;
+                }
+
+                const absX = Math.abs(e.deltaX || 0);
+                const absY = Math.abs(e.deltaY || 0);
+                const horizontal = absX > absY * 1.1;
+                if (!horizontal) return;
+
+                if (absX < 24) return;
+                e.preventDefault();
+                duaSwipeWheelLockUntil = now + 420;
+                navigateSwipe(e.deltaX > 0 ? 1 : -1);
+            }, { passive: false });
 
             shell.dataset.boundSwipe = '1';
         }
@@ -1814,9 +2000,13 @@ window.filterCategory = function(cat, btn) {
         const arEl = document.getElementById('tasbeehArabic');
         const virtueEl = document.getElementById('tasbeehVirtue');
         const lifetimeEl = document.getElementById('tasbeehLifetime');
+        const display = document.getElementById('tasbeehDisplay');
         if (arEl) arEl.textContent = d.ar;
         if (virtueEl) virtueEl.textContent = d.virtue;
-        if (lifetimeEl) lifetimeEl.innerHTML = `Total: <span>${getOverallTotal().toLocaleString()}</span>`;
+        if (lifetimeEl) lifetimeEl.innerHTML = `${isPashtoMode() ? 'ټولټال' : 'Total'}: <span>${localizeDigits(getOverallTotal().toLocaleString())}</span>`;
+        if (display) display.textContent = localizeDigits(tasbeehCount);
+        const ringRatio = tasbeehTarget > 0 ? Math.max(0, Math.min(1, tasbeehCount / tasbeehTarget)) : 0;
+        document.documentElement.style.setProperty('--tasbeeh-progress', `${Math.round(ringRatio * 100)}%`);
     }
 
     function formatTasbeehTargetLabel(target) {
@@ -1829,7 +2019,7 @@ window.filterCategory = function(cat, btn) {
         const label = isPashtoMode() && typeof PS_UI !== 'undefined'
             ? (PS_UI.target || 'هدف')
             : 'Target';
-        return `${label}: ${value}`;
+        return `${label}: ${localizeDigits(value)}`;
     }
 
     function updateTasbeehSoundToggle() {
@@ -1911,7 +2101,7 @@ window.filterCategory = function(cat, btn) {
         tasbeehTarget = d.defaultTarget;
         tasbeehCount = 0;
         const display = document.getElementById('tasbeehDisplay');
-        if (display) display.textContent = '0';
+        if (display) display.textContent = localizeDigits('0');
         const tt = document.getElementById('tasbeehTargetLabel');
         if (tt) tt.textContent = formatTasbeehTargetLabel(tasbeehTarget);
         // Update preset active states
@@ -1986,7 +2176,7 @@ window.filterCategory = function(cat, btn) {
         const display = document.getElementById('tasbeehDisplay');
         const btn = document.querySelector('.tasbeeh-tap-btn');
         if (display) {
-            display.textContent = tasbeehCount;
+            display.textContent = localizeDigits(tasbeehCount);
             display.classList.remove('bump');
             requestAnimationFrame(() => display.classList.add('bump'));
         }
@@ -2017,7 +2207,7 @@ window.filterCategory = function(cat, btn) {
             // Auto-advance to next dhikr if user reached target
             setTimeout(() => {
                 const display2 = document.getElementById('tasbeehDisplay');
-                if (display2) display2.textContent = '0';
+                if (display2) display2.textContent = localizeDigits('0');
                 updateTasbeehUI();
             }, 300);
         }
@@ -2030,7 +2220,7 @@ window.filterCategory = function(cat, btn) {
         }
         tasbeehCount = 0;
         const display = document.getElementById('tasbeehDisplay');
-        if (display) display.textContent = '0';
+        if (display) display.textContent = localizeDigits('0');
         updateTasbeehUI();
     };
 
@@ -2428,20 +2618,29 @@ window.filterCategory = function(cat, btn) {
         progressSub.textContent = `${ui.streak}: ${localizeDigits(STATE.streak)} ${ui.days}`;
     }
 
-    function getDailyTip() {
-        const tips = isPashtoMode()
+    let dashboardTipInterval = null;
+    let dashboardTipIndex = -1;
+
+    function getDailyTips() {
+        return isPashtoMode()
             ? [
-                'لارښوونه: د دعا پر مهال خپل لاسونه پورته کړئ',
-                'لارښوونه: لومړی د الله ستاینه وکړئ بیا غوښتنه وکړئ',
-                'لارښوونه: پر نبي ﷺ درود ووایئ'
+                '✨ لارښوونه: د دعا پر مهال خپل لاسونه پورته کړئ',
+                '✨ لارښوونه: لومړی د الله ستاینه وکړئ بیا غوښتنه وکړئ',
+                '✨ لارښوونه: پر نبي ﷺ درود ووایئ',
+                '✨ لارښوونه: د سحر او ماښام اذکار مه هېروئ',
+                '✨ لارښوونه: د اړتیا تر څنګ د امت لپاره هم دعا وکړئ',
+                '✨ لارښوونه: د قبلې خوا ته په سکون ناست دعا وکړئ',
+                '✨ لارښوونه: دعا په یقین او عاجزۍ سره وکړئ'
             ]
             : [
-                'Tip: Raise your hands when making dua',
-                'Tip: Begin with praising Allah before asking',
-                'Tip: Send salawat upon the Prophet ﷺ'
+                '✨ Tip: Raise your hands when making dua',
+                '✨ Tip: Begin with praising Allah before asking',
+                '✨ Tip: Send salawat upon the Prophet ﷺ',
+                '✨ Tip: Keep your morning and evening adhkar consistent',
+                '✨ Tip: Make dua for the Ummah along with your needs',
+                '✨ Tip: Face the Qibla and ask with calmness',
+                '✨ Tip: Ask with certainty that Allah responds'
             ];
-        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-        return tips[dayOfYear % tips.length];
     }
 
     function formatDashboardDate() {
@@ -2560,8 +2759,24 @@ window.filterCategory = function(cat, btn) {
         const greeting = document.getElementById('dashboardGreeting');
         const dateEl = document.getElementById('dashboardDate');
         if (!greeting || !dateEl) return;
-        greeting.textContent = '';
-        greeting.setAttribute('aria-hidden', 'true');
+
+        const hour = new Date().getHours();
+        const phase = hour < 11 ? 'morning' : (hour < 16 ? 'afternoon' : 'evening');
+        if (document.body) {
+            document.body.setAttribute('data-day-phase', phase);
+        }
+        const ui = getDashboardText();
+        const greetingText = hour < 12
+            ? ui.goodMorning
+            : (hour < 18 ? ui.goodAfternoon : ui.goodEvening);
+
+        greeting.textContent = greetingText;
+        greeting.setAttribute('aria-hidden', 'false');
+        greeting.classList.remove('dashboard-greeting-enter');
+        // Reflow to restart animation when language/time segment changes.
+        void greeting.offsetWidth;
+        greeting.classList.add('dashboard-greeting-enter');
+
         const formattedDate = formatDashboardDate();
         if (isPashtoMode()) dateEl.innerHTML = formattedDate;
         else dateEl.textContent = formattedDate;
@@ -2615,6 +2830,7 @@ window.filterCategory = function(cat, btn) {
             time.textContent = '--:--';
             countdown.textContent = '--';
             card.classList.remove('is-now');
+            card.style.setProperty('--prayer-progress', '0%');
             return;
         }
 
@@ -2630,6 +2846,7 @@ window.filterCategory = function(cat, btn) {
             time.textContent = formatDisplayTime(currentStart, 'dashboard-now');
             countdown.textContent = `${ui.nowPrefix} — ${getPrayerLabel(current)}`;
             card.classList.add('is-now');
+            card.style.setProperty('--prayer-progress', '100%');
             return;
         }
 
@@ -2663,6 +2880,7 @@ window.filterCategory = function(cat, btn) {
         if (!nextTarget) {
             time.textContent = '--:--';
             countdown.textContent = '--';
+            card.style.setProperty('--prayer-progress', '0%');
             return;
         }
         time.textContent = formatDisplayTime(nextTarget, 'dashboard-next');
@@ -2672,6 +2890,13 @@ window.filterCategory = function(cat, btn) {
         countdown.textContent = isPashtoMode()
             ? `په ${localizeDigits(h)} ساعته ${localizeDigits(m)} دقیقو کې`
             : `${ui.inPrefix} ${h}h ${m}m`;
+
+        if (currentStart && nextTarget > currentStart) {
+            const ratio = Math.max(0, Math.min(1, (now - currentStart) / (nextTarget - currentStart)));
+            card.style.setProperty('--prayer-progress', `${Math.round(ratio * 100)}%`);
+        } else {
+            card.style.setProperty('--prayer-progress', '0%');
+        }
     }
 
     function refreshHomeSmartSuggestion() {
@@ -2688,7 +2913,28 @@ window.filterCategory = function(cat, btn) {
     function refreshHomeDailyTip() {
         const tipEl = document.getElementById('dashboardTipCard');
         if (!tipEl) return;
-        tipEl.textContent = getDailyTip();
+        const tips = getDailyTips();
+        if (!tips.length) return;
+
+        if (dashboardTipIndex < 0 || dashboardTipIndex >= tips.length) {
+            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+            dashboardTipIndex = dayOfYear % tips.length;
+        }
+
+        tipEl.classList.add('tip-fade-out');
+        setTimeout(() => {
+            tipEl.textContent = tips[dashboardTipIndex];
+            tipEl.classList.remove('tip-fade-out');
+            tipEl.classList.add('tip-fade-in');
+            setTimeout(() => tipEl.classList.remove('tip-fade-in'), 280);
+        }, 170);
+    }
+
+    function rotateHomeDailyTip() {
+        const tips = getDailyTips();
+        if (!tips.length) return;
+        dashboardTipIndex = (dashboardTipIndex + 1) % tips.length;
+        refreshHomeDailyTip();
     }
 
     window.openDashboardSuggestion = function() {
@@ -2779,7 +3025,10 @@ window.filterCategory = function(cat, btn) {
         if (!window.__dashboardRefreshTimer) {
             window.__dashboardRefreshTimer = setInterval(() => {
                 refreshHomeNextPrayerCard();
-            }, 30000);
+            }, 10000);
+        }
+        if (!dashboardTipInterval) {
+            dashboardTipInterval = setInterval(rotateHomeDailyTip, 12000);
         }
     }
 
@@ -3095,7 +3344,7 @@ window.filterCategory = function(cat, btn) {
             aboutDescription: 'Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.',
             aboutDescriptionPs: 'ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.',
             aboutTagline: 'حي على الفلاح — Come to Success',
-            aboutVersion: 'Version: 2.0.1',
+            aboutVersion: 'Version: 2.0.5',
             aboutDeveloper: isPS ? 'پراختیاکوونکی: Falah' : 'Developer: Falah',
             aboutCopyright: '© 2026 Falah. All rights reserved.',
             aboutContactLabel: isPS ? 'اړیکه ونیسئ' : 'Contact Us',
@@ -3861,6 +4110,32 @@ window.filterCategory = function(cat, btn) {
     // ===== SCROLL TO TOP =====
     window.scrollToTop = function() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.handleLogoTap = function() {
+        const homePanel = document.getElementById('mainContainer');
+        const isHomeRoute = getInAppRoute() === IN_APP_VIEWS.HOME;
+
+        closeAllPanelsForStateApply();
+        switchTab('home');
+        backToCategories();
+        if (homePanel) {
+            try {
+                homePanel.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (_) {
+                homePanel.scrollTop = 0;
+            }
+        }
+
+        if (isHomeRoute) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        recordInAppRoute(false, {
+            [IN_APP_HISTORY_FLAG]: true,
+            view: IN_APP_VIEWS.HOME,
+            ts: Date.now()
+        });
     };
 
     // ===== SCROLL TO DAILY DUA =====
@@ -5006,7 +5281,7 @@ window.filterCategory = function(cat, btn) {
 
     // ===== PRAYER TIMES & QIBLA =====
     const PRAYER_NAMES = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'];
-    const REMINDER_PRAYERS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+    const REMINDER_PRAYERS = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'];
     const REMINDER_SOUND_OPTIONS = [
         {
             id: 'adhan-alafasy',
@@ -5786,6 +6061,25 @@ window.filterCategory = function(cat, btn) {
         return ['times', 'qibla', 'reminders'].includes(raw) ? raw : 'times';
     }
 
+    function syncSegmentedTabThumb(containerSelector, tabSelector) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+        const tabs = Array.from(container.querySelectorAll(tabSelector));
+        if (!tabs.length) return;
+
+        const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.classList.contains('active') || tab.getAttribute('aria-selected') === 'true'));
+        container.style.setProperty('--seg-count', String(tabs.length));
+        container.style.setProperty('--seg-index', String(activeIndex));
+    }
+
+    function syncPrayerSegmentedThumb() {
+        syncSegmentedTabThumb('#prayerSubtabs', '.prayer-subtab');
+    }
+
+    function syncQuranSegmentedThumb() {
+        syncSegmentedTabThumb('#quranViewTabs', '.quran-view-tab[data-qview]');
+    }
+
     function setPrayerSubtab(tabName, persist = true) {
         const active = ['times', 'qibla', 'reminders'].includes(tabName) ? tabName : 'times';
         document.querySelectorAll('.prayer-subtab').forEach((btn) => {
@@ -5802,6 +6096,7 @@ window.filterCategory = function(cat, btn) {
             const pane = document.getElementById(id);
             if (pane) pane.classList.toggle('active', id === paneMap[active]);
         });
+        syncPrayerSegmentedThumb();
         if (persist) localStorage.setItem(PRAYER_SUBTAB_STORAGE_KEY, active);
     }
 
@@ -5827,10 +6122,7 @@ window.filterCategory = function(cat, btn) {
     }
 
     function localizeDigits(value) {
-        const raw = String(value);
-        if (!isPashtoMode()) return raw;
-        if (typeof toPashtoDigits === 'function') return toPashtoDigits(raw);
-        return raw;
+        return normalizeDigitsForCurrentLanguage(value);
     }
 
     function getReminderDefaults() {
@@ -5841,6 +6133,7 @@ window.filterCategory = function(cat, btn) {
             sameSoundForAll: true,
             prayerSounds: {
                 fajr: 'adhan-alafasy',
+                sunrise: 'adhan-short',
                 dhuhr: 'adhan-short',
                 asr: 'adhan-short',
                 maghrib: 'takbeer',
@@ -5849,6 +6142,7 @@ window.filterCategory = function(cat, btn) {
             offsetMinutes: 0,
             prayers: {
                 fajr: true,
+                sunrise: true,
                 dhuhr: true,
                 asr: true,
                 maghrib: true,
@@ -5953,7 +6247,12 @@ window.filterCategory = function(cat, btn) {
 
         REMINDER_PRAYERS.forEach(name => {
             const label = document.getElementById(`remPrayerLabel-${name}`);
-            if (label) label.textContent = getPrayerLabel(name);
+            if (label) {
+                const prayerLabel = getPrayerLabel(name);
+                const prayerTime = prayerTimesData?.[name];
+                const timeText = prayerTime ? formatDisplayTime(prayerTime, 'reminder-label') : '';
+                label.textContent = timeText ? `${prayerLabel} · ${timeText}` : prayerLabel;
+            }
         });
 
         renderReminderSoundSelector();
@@ -6688,6 +6987,7 @@ window.filterCategory = function(cat, btn) {
         const next = getNextPrayer(now);
         const nameEl = document.getElementById('nextPrayerName');
         const timeEl = document.getElementById('nextPrayerCountdown');
+        const countdownCard = document.getElementById('prayerCountdown');
         if (!nameEl || !timeEl) return;
 
         nameEl.textContent = getPrayerLabel(next) || '--';
@@ -6720,6 +7020,17 @@ window.filterCategory = function(cat, btn) {
                 calculateAndRenderPrayers(loc.lat, loc.lng);
             }
             return;
+        }
+
+        const current = getCurrentPrayer(now);
+        const currentStart = current ? prayerTimesData[current] : null;
+        if (countdownCard) {
+            if (currentStart && target > currentStart) {
+                const ratio = Math.max(0, Math.min(1, (now - currentStart) / (target - currentStart)));
+                countdownCard.style.setProperty('--countdown-ring-progress', `${Math.round(ratio * 100)}%`);
+            } else {
+                countdownCard.style.setProperty('--countdown-ring-progress', '0%');
+            }
         }
 
         const h = Math.floor(diff / 3600000);
@@ -7101,22 +7412,16 @@ window.filterCategory = function(cat, btn) {
 
     function sendSystemNotification(title, options) {
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
+        if (!('serviceWorker' in navigator)) return;
 
-        if (navigator.serviceWorker?.controller) {
-            navigator.serviceWorker.ready
-                .then((registration) => {
-                    if (registration && typeof registration.showNotification === 'function') {
-                        return registration.showNotification(title, options);
-                    }
-                    return new Notification(title, options);
-                })
-                .catch(() => {
-                    new Notification(title, options);
-                });
-            return;
-        }
-
-        new Notification(title, options);
+        navigator.serviceWorker.ready
+            .then((registration) => {
+                if (registration && typeof registration.showNotification === 'function') {
+                    return registration.showNotification(title, options);
+                }
+                return null;
+            })
+            .catch(() => {});
     }
 
     function resolveReminderSoundId(prayerName = null) {
@@ -7232,7 +7537,13 @@ window.filterCategory = function(cat, btn) {
             badge: 'icon-192.png',
             tag: `prayer-${prayerName}-${isPreReminder ? 'before' : 'now'}`,
             renotify: true,
-            requireInteraction: false
+            requireInteraction: true,
+            vibrate: [200, 100, 200],
+            silent: false,
+            data: {
+                prayer: prayerName,
+                url: '/'
+            }
         });
 
         playReminderSound(resolveReminderSoundId(prayerName));
@@ -7257,31 +7568,44 @@ window.filterCategory = function(cat, btn) {
                 icon: 'icon-192.png',
                 badge: 'icon-192.png',
                 tag: 'prayer-test-reminder',
-                renotify: true
+                renotify: true,
+                requireInteraction: true,
+                vibrate: [200, 100, 200],
+                silent: false,
+                data: {
+                    prayer: samplePrayer,
+                    url: '/'
+                }
             });
         });
     }
 
     function runReminderTestInTenSeconds() {
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission().catch(() => {});
-        }
+        requestNotificationPermissionIfNeeded().then((granted) => {
+            if (!granted) return;
 
-        alert('Test reminder set — will fire in 10 seconds');
+            showToast(isPashtoMode() ? 'ازموینې خبرتیا په ۱۰ ثانیو کې رارسېږي' : 'Test reminder will fire in 10 seconds');
 
-        setTimeout(() => {
-            const audio = new Audio('audio/reminders/adhan-alafasy.mp3');
-            audio.play().catch(() => {});
-
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('Prayer Time', {
-                    body: 'Test reminder - Dhuhr',
-                    icon: 'icon-192.png'
+            setTimeout(() => {
+                const samplePrayer = getNextPrayer(new Date()) || 'dhuhr';
+                const localizedPrayer = getPrayerLabel(samplePrayer);
+                playReminderSound(resolveReminderSoundId(samplePrayer));
+                sendSystemNotification(`${PRAYER_ICONS[samplePrayer]} Prayer Time`, {
+                    body: `Test reminder - ${localizedPrayer}`,
+                    icon: 'icon-192.png',
+                    badge: 'icon-192.png',
+                    tag: 'prayer-test-reminder-10s',
+                    renotify: true,
+                    requireInteraction: true,
+                    vibrate: [200, 100, 200],
+                    silent: false,
+                    data: {
+                        prayer: samplePrayer,
+                        url: '/'
+                    }
                 });
-            }
-
-            alert('REMINDER FIRED!');
-        }, 10000);
+            }, 10000);
+        });
     }
 
     window.togglePrayerNotifications = function(enabled) {
@@ -7375,6 +7699,7 @@ window.filterCategory = function(cat, btn) {
 
         REMINDER_PRAYERS.forEach(name => {
             if (!settings.prayers[name]) return;
+            const prayerAt = prayerTimesData?.[name] || getPrayerTimeForDate(name, now);
             const reminderTime = getNextReminderDate(name, settings.offsetMinutes, now);
             if (!reminderTime) return;
 
@@ -7386,11 +7711,20 @@ window.filterCategory = function(cat, btn) {
 
             console.log('[PrayerReminder] Scheduled', {
                 prayer: name,
+                prayerTimeLocal: prayerAt ? new Date(prayerAt).toString() : null,
+                reminderOffsetMinutes: settings.offsetMinutes,
                 reminderAtLocal: reminderTime.toString(),
                 reminderAtISO: reminderTime.toISOString(),
                 currentTimeLocal: now.toString(),
                 delayMs: delay
             });
+
+            console.log('[PrayerReminder Debug] prayer=%s prayerTime=%s offset=%s scheduled=%s',
+                name,
+                prayerAt ? new Date(prayerAt).toString() : 'N/A',
+                settings.offsetMinutes,
+                reminderTime.toString()
+            );
 
             const triggerAt = reminderTime.getTime();
             activePrayerReminderSchedule[name] = {
@@ -7471,11 +7805,19 @@ window.filterCategory = function(cat, btn) {
 
         dailyDuaReminderTimer = setTimeout(() => {
             const { title } = getTodayDuaSummary();
-            new Notification('📖 Daily Dua Reminder', {
+            sendSystemNotification('📖 Daily Dua Reminder', {
                 body: `Today’s focus: ${title}`,
                 icon: 'icon-192.png',
+                badge: 'icon-192.png',
                 tag: 'daily-dua-reminder',
-                renotify: false
+                renotify: false,
+                requireInteraction: true,
+                vibrate: [200, 100, 200],
+                silent: false,
+                data: {
+                    prayer: 'daily-dua',
+                    url: '/'
+                }
             });
             scheduleDailyDuaReminder();
         }, delay);
@@ -7515,6 +7857,7 @@ window.filterCategory = function(cat, btn) {
 
     // ===== QURAN READING FEATURE =====
     const QURAN_API_BASE = 'https://api.alquran.cloud/v1';
+    const PASHTO_AUDIO_BASE_URL = String(window.PASHTO_AUDIO_BASE_URL || '').trim();
     const QURAN_PASHTO_ZAKARIA_DATA_URL = '/audio/pashto_audit/quranenc_pashto_zakaria_114.json';
     const QURAN_CACHE_PREFIX = 'crown_quran_surah_';
     const QURAN_META_KEY = 'crown_quran_meta';
@@ -7527,6 +7870,10 @@ window.filterCategory = function(cat, btn) {
     const QURAN_SETTINGS_KEY = 'crown_quran_settings';
     const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
     const QURAN_FALLBACK_RECITER = 'ar.alafasy';
+
+    if (PASHTO_AUDIO_BASE_URL && typeof window.setPashtoAudioBaseUrl === 'function') {
+        window.setPashtoAudioBaseUrl(PASHTO_AUDIO_BASE_URL);
+    }
 
     const QURAN_RECITERS = [
         { id: 'ar.alafasy', name: 'Mishary Rashid Alafasy' },
@@ -7619,6 +7966,7 @@ window.filterCategory = function(cat, btn) {
     ];
     let quranDotLongPressTimer = null;
     let quranDotLongPressFired = false;
+    let quranReaderControlsTimer = null;
     const ENGLISH_AUDIO_CACHE = new Map();
 
     function getQuranDefaults() {
@@ -7880,7 +8228,8 @@ window.filterCategory = function(cat, btn) {
     }
 
     function localizeQuranNumber(value) {
-        return isPashtoMode() ? localizeDigits(value) : String(value);
+        const lang = String(getPreferredLang() || '').toLowerCase();
+        return (lang === 'ps' || lang === 'ar') ? localizeDigits(value) : String(value);
     }
 
     function cleanSurahArabicName(name) {
@@ -8039,6 +8388,8 @@ window.filterCategory = function(cat, btn) {
             btn.classList.toggle('active', isActive);
             btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
         });
+
+        syncQuranSegmentedThumb();
     }
 
     function setQuranPanelMode(mode, { restartAudio = true } = {}) {
@@ -8089,6 +8440,34 @@ window.filterCategory = function(cat, btn) {
         });
     }
 
+    function getRelativeLastReadText(timestamp) {
+        const ts = Number(timestamp || 0);
+        if (!Number.isFinite(ts) || ts <= 0) {
+            return isPashtoMode() ? 'وروستی لوستل: همدا اوس' : 'Last read just now';
+        }
+        const diffMs = Math.max(0, Date.now() - ts);
+        const minutes = Math.floor(diffMs / 60000);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+
+        if (days > 0) {
+            return isPashtoMode()
+                ? `وروستی لوستل: ${localizeQuranNumber(days)} ورځې مخکې`
+                : `Last read ${days} day${days === 1 ? '' : 's'} ago`;
+        }
+        if (hours > 0) {
+            return isPashtoMode()
+                ? `وروستی لوستل: ${localizeQuranNumber(hours)} ساعت مخکې`
+                : `Last read ${hours} hour${hours === 1 ? '' : 's'} ago`;
+        }
+        if (minutes > 0) {
+            return isPashtoMode()
+                ? `وروستی لوستل: ${localizeQuranNumber(minutes)} دقیقې مخکې`
+                : `Last read ${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+        }
+        return isPashtoMode() ? 'وروستی لوستل: همدا اوس' : 'Last read just now';
+    }
+
     function renderQuranContinueCard() {
         const card = document.getElementById('quranContinueCard');
         if (!card) return;
@@ -8105,15 +8484,21 @@ window.filterCategory = function(cat, btn) {
         }
 
         const surahName = isPashtoMode() ? cleanSurahArabicName(meta.name) : meta.englishName;
+        const ayahLabel = isPashtoMode() ? 'آیت' : 'Ayah';
+        const lastReadLabel = getRelativeLastReadText(last.timestamp);
         card.innerHTML = `
             <div class="quran-continue-inner">
-                <div style="font-family:var(--font-title);font-size:0.68rem;letter-spacing:0.35px;color:var(--emerald-light);text-transform:none;margin-bottom:6px;">${ui.continueReading}</div>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-                    <div>
-                        <div style="font-size:0.88rem;color:var(--text-primary);">${surahName}</div>
-                        <div style="font-size:0.68rem;color:var(--text-subtle);">${ui.juzLabel ? '' : ''}${isPashtoMode() ? 'آیت' : 'Ayah'} ${localizeQuranNumber(last.ayahNumber || 1)}</div>
+                <div class="quran-continue-head">
+                    <span class="quran-continue-icon" aria-hidden="true">📖</span>
+                    <span class="quran-continue-kicker">${ui.continueReading}</span>
+                </div>
+                <div class="quran-continue-main">
+                    <div class="quran-continue-copy">
+                        <div class="quran-continue-surah">${surahName}</div>
+                        <div class="quran-continue-ayah">${ayahLabel} ${localizeQuranNumber(last.ayahNumber || 1)}</div>
+                        <div class="quran-continue-lastread">${lastReadLabel}</div>
                     </div>
-                    <button class="quran-row-btn" type="button" onclick="resumeQuranReading()">${ui.continue}</button>
+                    <button class="quran-row-btn quran-continue-btn" type="button" onclick="resumeQuranReading()">${ui.continue}</button>
                 </div>
             </div>`;
     }
@@ -8142,11 +8527,14 @@ window.filterCategory = function(cat, btn) {
                 ? String(meta?.englishNameTranslation || meta?.englishName || item.fallbackEn)
                 : String(meta?.englishName || item.fallbackEn);
             const ayahCount = Number(meta?.numberOfAyahs || 0);
+            const revelation = getRevelationMeta(meta?.revelationType);
             return {
                 ...item,
                 titleAr,
                 titleEn,
-                ayahCount
+                ayahCount,
+                revelationLabel: revelation.label,
+                revelationIcon: revelation.icon
             };
         });
     }
@@ -8166,6 +8554,10 @@ window.filterCategory = function(cat, btn) {
 
             return `
                 <div class="quran-popular-card" onclick="${action}">
+                    <div class="quran-popular-topline">
+                        <span class="quran-popular-badge">${localizeQuranNumber(item.number || 0)}</span>
+                        ${item.type === 'surah' ? `<span class="quran-popular-revelation"><span aria-hidden="true">${item.revelationIcon || '🕌'}</span>${escapeHtml(item.revelationLabel || '')}</span>` : ''}
+                    </div>
                     <div class="quran-popular-ar" dir="rtl">${escapeHtml(item.titleAr || '')}</div>
                     <div class="quran-popular-name">${escapeHtml(item.titleEn || '')}</div>
                     <div class="quran-popular-meta">${localizeQuranNumber(item.ayahCount || 0)} ${ui.ayahs}</div>
@@ -8294,6 +8686,8 @@ window.filterCategory = function(cat, btn) {
         const ui = getQuranUiText();
         const rows = buildQuranSurahList(quranState.search);
         const offlineSet = new Set(getOfflineSurahs().map(Number));
+        const lastRead = getQuranLastRead();
+        const recentlyReadSurah = Number(lastRead?.surahNumber || 0);
 
         list.innerHTML = rows.map((surah) => {
             const revelation = getRevelationMeta(surah.revelationType);
@@ -8305,9 +8699,12 @@ window.filterCategory = function(cat, btn) {
                 : (surah.englishNameTranslation || surah.englishName);
             const arabicName = cleanSurahArabicName(surah.name);
             const cached = offlineSet.has(Number(surah.number));
+            const isRecentlyRead = recentlyReadSurah === Number(surah.number);
+            const revRaw = String(surah.revelationType || '').toLowerCase();
+            const revelationClass = revRaw.includes('mad') ? 'is-madani' : 'is-makki';
 
             return `
-                <div class="quran-surah-row" data-surah-no="${surah.number}" onclick="openQuranSurah(${surah.number})">
+                <div class="quran-surah-row ${revelationClass} ${isRecentlyRead ? 'is-recently-read' : ''}" data-surah-no="${surah.number}" onclick="openQuranSurah(${surah.number})">
                     <div class="quran-surah-num">${localizeQuranNumber(surah.number)}</div>
                     <div class="quran-surah-main">
                         <div class="quran-surah-name-primary">${escapeHtml(arabicName)}</div>
@@ -8315,14 +8712,21 @@ window.filterCategory = function(cat, btn) {
                     </div>
                     <div class="quran-surah-meta">
                         <span class="quran-surah-ayahs">${localizeQuranNumber(surah.numberOfAyahs)} ${ui.ayahs}</span>
-                        <span class="quran-revelation-text">${revelation.label}</span>
+                        <span class="quran-revelation-text"><span class="quran-revelation-icon" aria-hidden="true">${revelation.icon}</span>${revelation.label}</span>
+                        ${isRecentlyRead ? `<span class="quran-recent-dot" title="${ui.recentlyRead}" aria-hidden="true"></span>` : ''}
                         ${cached
                             ? `<span class="quran-cached-icon" title="${ui.cached}">✓</span>`
                             : `<button class="quran-download-icon" type="button" title="${ui.downloadOffline}" onclick="event.stopPropagation(); downloadQuranSurahOffline(${surah.number});">↓</button>`}
                     </div>
                 </div>
             `;
-        }).join('') || `<div class="quran-settings-card">${ui.noData}</div>`;
+        }).join('') || `
+            <div class="quran-empty-state">
+                <div class="quran-empty-icon" aria-hidden="true">📚</div>
+                <div class="quran-empty-title">${ui.noData}</div>
+                <div class="quran-empty-sub">${isPashtoMode() ? 'د لټون متن بدل کړئ یا ټول سورتونه وښایئ.' : 'Try a different search term or clear the filter.'}</div>
+            </div>
+        `;
 
         renderQuranJumpRail(rows);
         updateQuranSurahSelectLabel();
@@ -8369,7 +8773,13 @@ window.filterCategory = function(cat, btn) {
         const bookmarks = getQuranBookmarks();
 
         if (!bookmarks.length) {
-            list.innerHTML = `<div class="quran-settings-card">${ui.noBookmarks}</div>`;
+            list.innerHTML = `
+                <div class="quran-empty-state">
+                    <div class="quran-empty-icon" aria-hidden="true">🔖</div>
+                    <div class="quran-empty-title">${ui.noBookmarks}</div>
+                    <div class="quran-empty-sub">${isPashtoMode() ? 'د آیت تر څنګ نښه کېکاږئ تر څو وروسته ورته ژر وګرځئ.' : 'Tap bookmark on any ayah to quickly return later.'}</div>
+                    <button class="quran-row-btn quran-empty-cta" type="button" onclick="setQuranView('surah')">${isPashtoMode() ? 'سورتونه وګورئ' : 'Browse Surahs'}</button>
+                </div>`;
             return;
         }
 
@@ -8530,15 +8940,23 @@ window.filterCategory = function(cat, btn) {
         if (!header || !data) return;
         const ui = getQuranUiText();
         const rev = getRevelationMeta(data.revelationType);
+        const showBismillah = Number(data.surahNumber) !== 9;
+        const isOffline = getOfflineSurahs().map(Number).includes(Number(data.surahNumber));
 
         header.innerHTML = `
-            <div class="quran-surah-frame">
-                <div style="font-family:var(--font-arabic);font-size:1.3rem;color:var(--gold-light);direction:rtl;">${escapeHtml(cleanSurahArabicName(data.name))}</div>
-                <div style="font-family:var(--font-title);font-size:0.7rem;color:var(--text-subtle);margin-top:2px;">${escapeHtml(data.englishName)} &bull; ${localizeQuranNumber(data.numberOfAyahs)} ${ui.ayahs}</div>
-                <div style="margin-top:4px;font-size:0.62rem;color:var(--text-subtle);">${rev.icon} ${rev.label}</div>
+            <div class="quran-surah-frame mushaf-surah-head">
+                <div class="mushaf-surah-ar">${escapeHtml(cleanSurahArabicName(data.name))}</div>
+                <div class="mushaf-surah-meta">${escapeHtml(data.englishName)} • ${localizeQuranNumber(data.numberOfAyahs)} ${ui.ayahs}</div>
+                <div class="mushaf-surah-meta mushaf-surah-meta-rev">${rev.icon} ${rev.label}</div>
             </div>
-            <button class="quran-row-btn quran-reader-download-btn" type="button" onclick="downloadQuranSurahOffline(${Number(data.surahNumber)})" title="${ui.downloadOffline}">${getOfflineSurahs().map(Number).includes(Number(data.surahNumber)) ? '✓' : '↓'}</button>
-            ${Number(data.surahNumber) === 9 ? '' : `<div style="font-family:var(--font-arabic);font-size:1.2rem;line-height:2;color:var(--gold-light);margin-top:12px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,0.12);">${ui.bismillah}</div>`}
+            <button class="quran-row-btn quran-reader-download-btn" type="button" onclick="downloadQuranSurahOffline(${Number(data.surahNumber)})" title="${ui.downloadOffline}" aria-label="${ui.downloadOffline}">${isOffline ? '✓' : '↓'}</button>
+            ${showBismillah ? `
+                <div class="mushaf-bismillah-wrap">
+                    <div class="mushaf-ornament" aria-hidden="true"></div>
+                    <div class="mushaf-bismillah">${ui.bismillah}</div>
+                    <div class="mushaf-ornament" aria-hidden="true"></div>
+                </div>
+            ` : ''}
         `;
 
         requestAnimationFrame(() => syncQuranReaderStickyOffsets());
@@ -8549,6 +8967,38 @@ window.filterCategory = function(cat, btn) {
         const list = document.getElementById('quranAyahList');
         if (!reader || !list) return;
         reader.style.setProperty('--quran-reader-offset', '28px');
+    }
+
+    function scheduleQuranReaderControlsHide(delayMs = 3000) {
+        const reader = document.getElementById('quranReaderScreen');
+        if (!reader || !reader.classList.contains('active')) return;
+
+        if (quranReaderControlsTimer) {
+            clearTimeout(quranReaderControlsTimer);
+            quranReaderControlsTimer = null;
+        }
+
+        quranReaderControlsTimer = setTimeout(() => {
+            const activeReader = document.getElementById('quranReaderScreen');
+            if (!activeReader || !activeReader.classList.contains('active')) return;
+            activeReader.classList.add('controls-hidden');
+        }, Math.max(600, Number(delayMs) || 3000));
+    }
+
+    function showQuranReaderControls() {
+        const reader = document.getElementById('quranReaderScreen');
+        if (!reader || !reader.classList.contains('active')) return;
+        reader.classList.remove('controls-hidden');
+        scheduleQuranReaderControlsHide(3000);
+    }
+
+    function clearQuranReaderControlsHide() {
+        if (quranReaderControlsTimer) {
+            clearTimeout(quranReaderControlsTimer);
+            quranReaderControlsTimer = null;
+        }
+        const reader = document.getElementById('quranReaderScreen');
+        if (reader) reader.classList.remove('controls-hidden');
     }
 
     function isQuranAudioSessionActive() {
@@ -8644,6 +9094,7 @@ window.filterCategory = function(cat, btn) {
     }
 
     function markQuranControlsInteraction() {
+        showQuranReaderControls();
         updateQuranFloatingAudioUi();
     }
 
@@ -8895,7 +9346,7 @@ window.filterCategory = function(cat, btn) {
             return `
                 <div class="quran-ayah-card ${playing ? 'playing' : ''}" data-ayah-no="${ayah.numberInSurah}" id="quranAyah-${cardKey}">
                     <div class="quran-ayah-head">
-                        <span class="quran-ayah-num">${localizeQuranNumber(ayah.numberInSurah)}</span>
+                        <span class="quran-ayah-num">﴿${localizeQuranNumber(ayah.numberInSurah)}﴾</span>
                     </div>
                     <div class="quran-ayah-ar">${escapeHtml(ayah.arabic)}</div>
                     ${shouldShowTranslationBlock(mode, 'ps') ? `<div class="quran-ayah-ps">${escapeHtml(ayah.pashto || '')}</div>` : ''}
@@ -8992,6 +9443,7 @@ window.filterCategory = function(cat, btn) {
             updateQuranReaderProgress();
             updateQuranPashtoAudioBanner();
             updateQuranFloatingAudioUi();
+            showQuranReaderControls();
             recordInAppRoute(true, {
                 view: IN_APP_VIEWS.SURAH_READER,
                 surah: Number(quranState.currentSurah),
@@ -9088,6 +9540,48 @@ window.filterCategory = function(cat, btn) {
         if (!isLoading) updateQuranPlayPauseIcon();
     }
 
+    function getCurrentReciterName() {
+        const settings = getQuranSettings();
+        const id = getCanonicalReciterId(settings.reciter);
+        const match = QURAN_RECITERS.find((reciter) => getCanonicalReciterId(reciter.id) === id);
+        return match?.name || 'Quran Recitation';
+    }
+
+    function updateQuranMediaSession() {
+        if (!('mediaSession' in navigator)) return;
+
+        const playbackState = quranState.playerState === 'playing'
+            ? 'playing'
+            : (quranState.playerState === 'paused' ? 'paused' : 'none');
+        navigator.mediaSession.playbackState = playbackState;
+
+        const surah = Number(quranState.currentSurah || quranState.lastPlayedSurah || 0);
+        const ayah = Number(quranState.lastPlayedAyah || (quranState.audioAyah ? quranState.audioAyah.split(':')[1] : 0) || 0);
+        const data = quranState.currentSurahData;
+        const surahLabel = data
+            ? (isPashtoMode() ? cleanSurahArabicName(data.name) : data.englishName)
+            : (surah ? `Surah ${surah}` : 'Quran');
+        const reciterLabel = getCurrentReciterName();
+
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: ayah ? `${surahLabel} - Ayah ${ayah}` : surahLabel,
+            artist: reciterLabel,
+            album: 'Falah Quran',
+            artwork: [{ src: '/icon-512.png', sizes: '512x512', type: 'image/png' }]
+        });
+
+        const safeSet = (action, handler) => {
+            try {
+                navigator.mediaSession.setActionHandler(action, handler);
+            } catch (_) {}
+        };
+
+        safeSet('play', () => toggleQuranPlayPause());
+        safeSet('pause', () => toggleQuranPlayPause());
+        safeSet('previoustrack', () => playRelativeAyah(-1));
+        safeSet('nexttrack', () => playRelativeAyah(1));
+    }
+
     function stopQuranAudio({ resetTime = true, explicitStop = false, fullyReset = false, surahCompleted = false, navigatedAway = false } = {}) {
         stopPashtoTranslationSafe();
         stopTranslationOverlayAudio();
@@ -9135,6 +9629,7 @@ window.filterCategory = function(cat, btn) {
         updateQuranMiniTime();
         updateFlowModeButtons();
         setQuranPlayButtonLoading(false);
+        updateQuranMediaSession();
     }
 
     async function getAyahGlobalNumber(surahNumber, ayahNumber) {
@@ -9396,6 +9891,8 @@ window.filterCategory = function(cat, btn) {
         if (!quranState.audio) {
             quranState.audio = new Audio();
             quranState.audio.preload = 'auto';
+            quranState.audio.setAttribute('playsinline', '');
+            quranState.audio.setAttribute('webkit-playsinline', '');
             quranState.audio.addEventListener('timeupdate', () => {
                 if (quranState.isContinuousSurahPlayback && quranState.currentSurahData?.ayahs?.length && quranState.audio?.duration) {
                     const totalAyahs = quranState.currentSurahData.ayahs.length;
@@ -9427,6 +9924,7 @@ window.filterCategory = function(cat, btn) {
                 quranState.isChainedPlayback = false;
                 setQuranPlayerState('playing');
                 setQuranPlayButtonLoading(false);
+                updateQuranMediaSession();
             });
             quranState.audio.addEventListener('ended', async () => {
                 if (!quranState.audioAyah) return;
@@ -9480,6 +9978,7 @@ window.filterCategory = function(cat, btn) {
                 showToast('Audio playback failed');
                 stopQuranAudio({ resetTime: true, explicitStop: true });
             });
+            quranState.audio.addEventListener('pause', updateQuranMediaSession);
         }
 
         quranState.audioAyah = `${surahNumber}:${ayahNumber}`;
@@ -9587,6 +10086,7 @@ window.filterCategory = function(cat, btn) {
         setQuranPlayerState('playing');
         updateQuranMiniTime();
         setQuranPlayButtonLoading(false);
+        updateQuranMediaSession();
     }
 
     window.playQuranAyah = function(surahNumber, ayahNumber, playAll = false, startTime = 0, forceReload = false) {
@@ -9818,7 +10318,10 @@ window.filterCategory = function(cat, btn) {
 
         const panel = document.querySelector('.quran-panel');
         if (panel && panel.dataset.boundScroll !== '1') {
-            panel.addEventListener('scroll', updateQuranReaderProgress, { passive: true });
+            panel.addEventListener('scroll', () => {
+                updateQuranReaderProgress();
+                scheduleQuranReaderControlsHide(900);
+            }, { passive: true });
             panel.dataset.boundScroll = '1';
         }
 
@@ -9841,6 +10344,10 @@ window.filterCategory = function(cat, btn) {
         const prevSurahBtn = document.getElementById('quranPrevSurahBtn');
         const playPauseBtn = document.getElementById('quranPlayPauseBtn');
         const nextSurahBtn = document.getElementById('quranNextSurahBtn');
+        const fontDownBtn = document.getElementById('quranFontDownBtn');
+        const fontUpBtn = document.getElementById('quranFontUpBtn');
+        const bookmarkCurrentBtn = document.getElementById('quranBookmarkCurrentBtn');
+        const scrollContent = document.getElementById('quranScrollContent');
         if (ayahList && ayahList.dataset.boundActions !== '1') {
             ayahList.addEventListener('touchstart', (event) => handleQuranAyahActionEvent(event, true), { passive: false });
             ayahList.addEventListener('click', (event) => handleQuranAyahActionEvent(event, false));
@@ -9879,6 +10386,48 @@ window.filterCategory = function(cat, btn) {
                 toggleQuranPlayPause();
             });
             playPauseBtn.dataset.bound = '1';
+        }
+
+        if (fontDownBtn && fontDownBtn.dataset.bound !== '1') {
+            fontDownBtn.addEventListener('click', () => {
+                const settings = getQuranSettings();
+                settings.arabicSize = Math.max(1, Number(settings.arabicSize || 2) - 1);
+                setQuranSettings(settings);
+                applyQuranArabicFontSize();
+            });
+            fontDownBtn.dataset.bound = '1';
+        }
+
+        if (fontUpBtn && fontUpBtn.dataset.bound !== '1') {
+            fontUpBtn.addEventListener('click', () => {
+                const settings = getQuranSettings();
+                settings.arabicSize = Math.min(4, Number(settings.arabicSize || 2) + 1);
+                setQuranSettings(settings);
+                applyQuranArabicFontSize();
+            });
+            fontUpBtn.dataset.bound = '1';
+        }
+
+        if (bookmarkCurrentBtn && bookmarkCurrentBtn.dataset.bound !== '1') {
+            bookmarkCurrentBtn.addEventListener('click', () => {
+                if (!quranState.currentSurahData || !quranState.currentSurah) return;
+                const cards = Array.from(document.querySelectorAll('#quranAyahList .quran-ayah-card'));
+                if (!cards.length) return;
+
+                const anchorY = 150;
+                let activeCard = cards[cards.length - 1];
+                for (const card of cards) {
+                    const rect = card.getBoundingClientRect();
+                    if (rect.top >= anchorY) {
+                        activeCard = card;
+                        break;
+                    }
+                }
+
+                const ayahNo = Number(activeCard.getAttribute('data-ayah-no') || 1);
+                toggleQuranAyahBookmark(Number(quranState.currentSurah), ayahNo);
+            });
+            bookmarkCurrentBtn.dataset.bound = '1';
         }
 
         if (prevSurahBtn && prevSurahBtn.dataset.bound !== '1') {
@@ -9974,6 +10523,25 @@ window.filterCategory = function(cat, btn) {
             reader.dataset.popupDismissBound = '1';
         }
 
+        if (reader && reader.dataset.readerControlsBound !== '1') {
+            reader.addEventListener('click', (event) => {
+                const tools = document.querySelector('#quranReaderScreen .quran-reader-tools');
+                if (tools && tools.contains(event.target)) return;
+                showQuranReaderControls();
+            });
+            reader.addEventListener('touchstart', (event) => {
+                const tools = document.querySelector('#quranReaderScreen .quran-reader-tools');
+                if (tools && tools.contains(event.target)) return;
+                showQuranReaderControls();
+            }, { passive: true });
+            reader.dataset.readerControlsBound = '1';
+        }
+
+        if (scrollContent && scrollContent.dataset.readerControlsBound !== '1') {
+            scrollContent.addEventListener('scroll', () => scheduleQuranReaderControlsHide(700), { passive: true });
+            scrollContent.dataset.readerControlsBound = '1';
+        }
+
         updateQuranFloatingAudioUi();
     }
 
@@ -10008,6 +10576,9 @@ window.filterCategory = function(cat, btn) {
         const modeArabicBtn = document.getElementById('quranModeArabicBtn');
         const modePashtoBtn = document.getElementById('quranModePashtoBtn');
         const modeEnglishBtn = document.getElementById('quranModeEnglishBtn');
+        const fontDownBtn = document.getElementById('quranFontDownBtn');
+        const fontUpBtn = document.getElementById('quranFontUpBtn');
+        const bookmarkCurrentBtn = document.getElementById('quranBookmarkCurrentBtn');
         if (dotPrev) dotPrev.setAttribute('aria-label', isPashtoMode() ? 'مخکینی آیت' : 'Previous ayah');
         if (dotNext) dotNext.setAttribute('aria-label', isPashtoMode() ? 'راتلونکی آیت' : 'Next ayah');
         if (dotStop) {
@@ -10021,6 +10592,18 @@ window.filterCategory = function(cat, btn) {
         if (modeArabicBtn) modeArabicBtn.textContent = isPashtoMode() ? 'عربي' : 'Arabic';
         if (modePashtoBtn) modePashtoBtn.textContent = isPashtoMode() ? 'پښتو' : 'Pashto';
         if (modeEnglishBtn) modeEnglishBtn.textContent = isPashtoMode() ? 'انګلیسي' : 'English';
+        if (fontDownBtn) {
+            fontDownBtn.setAttribute('aria-label', isPashtoMode() ? 'د عربي لیکنې اندازه کمه کړئ' : 'Decrease Arabic text size');
+            fontDownBtn.setAttribute('title', isPashtoMode() ? 'اندازه کمه کړئ' : 'Smaller text');
+        }
+        if (fontUpBtn) {
+            fontUpBtn.setAttribute('aria-label', isPashtoMode() ? 'د عربي لیکنې اندازه زیاته کړئ' : 'Increase Arabic text size');
+            fontUpBtn.setAttribute('title', isPashtoMode() ? 'اندازه زیاته کړئ' : 'Larger text');
+        }
+        if (bookmarkCurrentBtn) {
+            bookmarkCurrentBtn.setAttribute('aria-label', isPashtoMode() ? 'اوسنی آیت په نښه کړئ' : 'Bookmark current ayah');
+            bookmarkCurrentBtn.setAttribute('title', isPashtoMode() ? 'اوسنی آیت په نښه کړئ' : 'Bookmark current ayah');
+        }
 
         renderQuranInlineReciterSelect();
         updateQuranPashtoAudioBanner();
@@ -10084,6 +10667,7 @@ window.filterCategory = function(cat, btn) {
         const listScreen = document.getElementById('quranListScreen');
         const activeList = getQuranListContainerByView(quranState.view) || document.getElementById('quranSurahList');
         if (reader) reader.classList.remove('active');
+        clearQuranReaderControlsHide();
         if (listScreen) listScreen.style.display = '';
         if (activeList) activeList.style.display = '';
         stopQuranAudio({ resetTime: true, navigatedAway: true });

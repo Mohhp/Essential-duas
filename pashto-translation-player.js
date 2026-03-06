@@ -8,9 +8,21 @@
 
   let mappingUrl = DEFAULT_MAPPING_URLS[0];
   const mappingPromiseByUrl = new Map();
+  let pashtoAudioBaseUrl = "";
   let playerAudio = null;
   let preloadAudio = null;
   let activePlay = null;
+
+  function normalizeAudioUrl(url) {
+    const raw = String(url || "").trim();
+    if (!raw) return "";
+    if (/^(https?:|blob:|data:)/i.test(raw)) return raw;
+    if (!pashtoAudioBaseUrl) return raw;
+
+    const base = pashtoAudioBaseUrl.replace(/\/+$/, "");
+    const rel = raw.replace(/^\/+/, "");
+    return base + "/" + rel;
+  }
 
   function emitState(state, detail) {
     window.dispatchEvent(
@@ -65,7 +77,7 @@
       try {
         const map = await loadMappingByUrl(candidate);
         const row = map.get(surah);
-        const url = row && row.pashto_audio_url ? String(row.pashto_audio_url) : "";
+        const url = row && row.pashto_audio_url ? normalizeAudioUrl(row.pashto_audio_url) : "";
         if (url && !seen.has(url)) {
           seen.add(url);
           urls.push(url);
@@ -271,6 +283,11 @@
 
   window.setPashtoMappingUrl = function (url) {
     mappingUrl = String(url || DEFAULT_MAPPING_URLS[0]);
+    mappingPromiseByUrl.clear();
+  };
+
+  window.setPashtoAudioBaseUrl = function (url) {
+    pashtoAudioBaseUrl = String(url || "").trim();
     mappingPromiseByUrl.clear();
   };
 

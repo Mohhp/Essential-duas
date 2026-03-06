@@ -49,10 +49,14 @@ async function checkDuePrayerReminders(reason = 'manual') {
       badge: './icon-192.png',
       tag: `prayer-reminder-${entry.prayerName}-${entry.triggerAt}`,
       renotify: false,
+      requireInteraction: true,
+      vibrate: [200, 100, 200],
+      silent: false,
       data: {
-        prayerName: entry.prayerName,
+        prayer: entry.prayerName,
         triggerAt: entry.triggerAt,
-        reason
+        reason,
+        url: '/'
       }
     });
 
@@ -253,12 +257,20 @@ self.addEventListener('fetch', (event) => {
 // Notification click — open app
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+  const targetUrl = event.notification?.data?.url || '/';
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
       if (clientList.length > 0) {
-        return clientList[0].focus();
+        const matched = clientList.find((client) => {
+            try {
+              return new URL(client.url).pathname === new URL(targetUrl, self.location.origin).pathname;
+            } catch (_) {
+              return false;
+            }
+        }) || clientList[0];
+        return matched.focus();
       }
-      return clients.openWindow('./');
+      return clients.openWindow(targetUrl);
     })
   );
 });

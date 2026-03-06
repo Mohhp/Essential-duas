@@ -27,14 +27,14 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
-    <!-- Production assets (default) -->
-    <link rel="stylesheet" href="styles.min.css?v=20260305i">
-    <!-- Development assets (uncomment for local debugging) -->
-    <!-- <link rel="stylesheet" href="styles.css?v=20260301f"> -->
+    <!-- Production assets (active) -->
+    <link rel="stylesheet" href="styles.min.css?v=20260306f">
+    <!-- Source assets (fallback for local debugging) -->
+    <!-- <link rel="stylesheet" href="styles.css?v=20260306f"> -->
     <style>
         .update-prompt-card {
             display: flex;
@@ -120,7 +120,7 @@
 
 <!-- ===== TOP NAVIGATION ===== -->
 <nav class="top-nav" id="topNav" aria-label="Top navigation">
-    <div class="fallah-logo" onclick="scrollToTop()">
+    <div class="fallah-logo" onclick="handleLogoTap()">
         <div class="fallah-mark">
             <div class="fallah-crescent"></div>
             <span class="fallah-fa">ف</span>
@@ -2929,10 +2929,10 @@
 
 <!-- ===== PASHTO LANGUAGE SUPPORT ===== -->
 <script src="pashto.js"></script>
-<script src="pashto-translation-player.js?v=20260305a"></script>
+<script src="pashto-translation-player.js?v=20260306f"></script>
 
 <script>
-    const APP_VERSION = '2.0.1';
+    const APP_VERSION = '2.0.5';
 
     (function() {
         const VERSION_INFO_URL = 'https://mohhp.github.io/Essential-duas/version.json';
@@ -3018,10 +3018,10 @@
 <!-- ══════════════════════════════════════════ -->
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
-<!-- Production assets (default) -->
-<script src="app.min.js?v=20260305i"></script>
-<!-- Development assets (uncomment for local debugging) -->
-<!-- <script src="app.js?v=20260301f"></script> -->
+<!-- Production assets (active) -->
+<script src="app.min.js?v=20260306f"></script>
+<!-- Source assets (fallback for local debugging) -->
+<!-- <script src="app.js?v=20260306f"></script> -->
 
 <!-- ===== OVERLAY ===== -->
 <div class="overlay" onclick="toggleBookmarksPanel()"></div>
@@ -3131,7 +3131,10 @@
                     </div>
                     <div class="quran-player-toolbar" id="quranPlayerToolbar">
                         <button type="button" class="quran-player-btn" id="quranPrevSurahBtn" aria-label="Previous surah">⏮</button>
+                        <button type="button" class="quran-player-btn" id="quranFontDownBtn" aria-label="Decrease Arabic font size" title="Decrease Arabic font size">A−</button>
                         <button type="button" class="quran-player-btn quran-player-btn-main" id="quranPlayPauseBtn" aria-label="Play or pause">▶</button>
+                        <button type="button" class="quran-player-btn" id="quranFontUpBtn" aria-label="Increase Arabic font size" title="Increase Arabic font size">A+</button>
+                        <button type="button" class="quran-player-btn" id="quranBookmarkCurrentBtn" aria-label="Bookmark current ayah" title="Bookmark current ayah">☆</button>
                         <button type="button" class="quran-player-btn" id="quranNextSurahBtn" aria-label="Next surah">⏭</button>
                         <div class="quran-playback-progress" aria-label="Playback progress">
                             <div class="quran-playback-progress-track"><span id="quranPlaybackProgressFill"></span></div>
@@ -3229,6 +3232,10 @@
                     <label class="prayer-reminder-item">
                         <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-fajr">Fajr</span><span class="reminder-bell" id="remBell-fajr" aria-hidden="true">🔔</span></span>
                         <input type="checkbox" id="remPrayer-fajr" checked>
+                    </label>
+                    <label class="prayer-reminder-item">
+                        <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-sunrise">Sunrise</span><span class="reminder-bell" id="remBell-sunrise" aria-hidden="true">🔔</span></span>
+                        <input type="checkbox" id="remPrayer-sunrise" checked>
                     </label>
                     <label class="prayer-reminder-item">
                         <span class="reminder-prayer-label-wrap"><span id="remPrayerLabel-dhuhr">Dhuhr</span><span class="reminder-bell" id="remBell-dhuhr" aria-hidden="true">🔔</span></span>
@@ -3330,7 +3337,7 @@
         <p id="aboutDescription">Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.</p>
         <p id="aboutDescriptionPs">ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.</p>
         <p id="aboutTagline">حي على الفلاح — Come to Success</p>
-        <p id="aboutVersion">Version: 2.0.1</p>
+        <p id="aboutVersion">Version: 2.0.5</p>
         <div class="about-meta">
             <div id="aboutDeveloper">Developer: Falah</div>
             <div id="aboutCopyright">© 2026 Falah. All rights reserved.</div>

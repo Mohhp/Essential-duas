@@ -289,6 +289,11 @@
             display: flex; align-items: center; gap: 10px;
             text-decoration: none; cursor: pointer;
         }
+        .fallah-logo:hover .fallah-mark,
+        .fallah-logo:focus-visible .fallah-mark {
+            transform: translateY(-1px);
+            transition: transform 0.16s ease;
+        }
         .fallah-mark {
             position: relative; width: 36px; height: 36px;
             display: flex; align-items: center; justify-content: center;
@@ -6211,3 +6216,704 @@
         }
 
         .progress-bar { display: none; }
+
+        /* ============================================ */
+        /* ===== FINAL VISUAL OVERRIDES V3 ===== */
+        /* ============================================ */
+
+        :root {
+            --fx-blue-1: #1a3a5c;
+            --fx-blue-2: #0d2137;
+            --fx-green-1: #1a5c3a;
+            --fx-green-2: #0d3721;
+            --fx-gold-1: #6a5320;
+            --fx-gold-2: #3a2f0f;
+            --fx-teal-1: #1a5c5c;
+            --fx-teal-2: #0d3737;
+            --fx-night-1: #1a1a4e;
+            --fx-night-2: #0d1b2e;
+            --fx-sunrise-1: #5c3f1a;
+            --fx-sunrise-2: #2f200d;
+            --fx-afternoon-1: #1a4e3a;
+            --fx-afternoon-2: #0d2e1b;
+            --fx-evening-1: #3a1a4e;
+            --fx-evening-2: #1b0d2e;
+            --fx-gold-line: #c9a84c;
+            --fx-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.24' stroke-width='1.4'%3E%3Cpath d='M60 16l10 20 22 2-16 14 4 22-20-10-20 10 4-22-16-14 22-2z'/%3E%3Cpath d='M60 30l7 14 15 1-11 10 3 15-14-7-14 7 3-15-11-10 15-1z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .tab-fade-target {
+            transition: opacity 200ms ease-out, transform 200ms ease-out;
+        }
+
+        .tab-fade-target.is-fading {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(201, 168, 76, 0.36);
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(201, 168, 76, 0.52);
+        }
+
+        .dashboard-quick-tile {
+            min-height: 100px !important;
+            border-radius: 16px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 12px !important;
+        }
+
+        .dashboard-quick-grid .dashboard-quick-tile:nth-child(1) {
+            background: linear-gradient(135deg, var(--fx-blue-1), var(--fx-blue-2)) !important;
+            box-shadow: 0 4px 15px rgba(26, 58, 92, 0.4) !important;
+        }
+
+        .dashboard-quick-grid .dashboard-quick-tile:nth-child(2) {
+            background: linear-gradient(135deg, var(--fx-green-1), var(--fx-green-2)) !important;
+            box-shadow: 0 4px 15px rgba(26, 92, 58, 0.4) !important;
+        }
+
+        .dashboard-quick-grid .dashboard-quick-tile:nth-child(3) {
+            background: linear-gradient(135deg, var(--fx-gold-1), var(--fx-gold-2)) !important;
+            box-shadow: 0 4px 15px rgba(106, 83, 32, 0.42) !important;
+        }
+
+        .dashboard-quick-grid .dashboard-quick-tile:nth-child(4) {
+            background: linear-gradient(135deg, var(--fx-teal-1), var(--fx-teal-2)) !important;
+            box-shadow: 0 4px 15px rgba(26, 92, 92, 0.4) !important;
+        }
+
+        .dashboard-prayer-card {
+            position: relative;
+            border-radius: 20px !important;
+            overflow: hidden;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28), 0 3px 10px rgba(0, 0, 0, 0.2) !important;
+            background: linear-gradient(135deg, var(--fx-night-1), var(--fx-night-2)) !important;
+        }
+
+        .dashboard-prayer-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.08;
+            background-image: var(--fx-pattern);
+            background-size: 120px 120px;
+            pointer-events: none;
+        }
+
+        body[data-day-phase='morning'] .dashboard-prayer-card {
+            background: linear-gradient(135deg, var(--fx-sunrise-1), var(--fx-sunrise-2)) !important;
+        }
+
+        body[data-day-phase='afternoon'] .dashboard-prayer-card {
+            background: linear-gradient(135deg, var(--fx-afternoon-1), var(--fx-afternoon-2)) !important;
+        }
+
+        body[data-day-phase='evening'] .dashboard-prayer-card {
+            background: linear-gradient(135deg, var(--fx-evening-1), var(--fx-evening-2)) !important;
+        }
+
+        body[data-day-phase='night'] .dashboard-prayer-card {
+            background: linear-gradient(135deg, var(--fx-night-1), var(--fx-night-2)) !important;
+        }
+
+        .cat-card,
+        .dua-category-card {
+            min-height: 104px !important;
+            border-radius: 16px !important;
+            padding: 16px !important;
+        }
+
+        .cat-card[data-cat='all'] {
+            background: linear-gradient(135deg, #0f5a3a, #0f5a5a) !important;
+        }
+
+        .cat-card[data-cat='quran'] {
+            background: linear-gradient(135deg, #1a3a5c, #2b2f66) !important;
+        }
+
+        .cat-card[data-cat='morning-evening'] { background: linear-gradient(135deg, #c0713a, #8b4513) !important; }
+        .cat-card[data-cat='protection'] { background: linear-gradient(135deg, #2c5f8a, #1a3a5c) !important; }
+        .cat-card[data-cat='forgiveness'] { background: linear-gradient(135deg, #6b4a8a, #4a2d6b) !important; }
+        .cat-card[data-cat='guidance'] { background: linear-gradient(135deg, #8a7a3a, #5c5020) !important; }
+        .cat-card[data-cat='wellbeing'] { background: linear-gradient(135deg, #2a7a6a, #1a5c4a) !important; }
+        .cat-card[data-cat='prophets'] { background: linear-gradient(135deg, #8a6a3a, #5c4520) !important; }
+        .cat-card[data-cat='prayer'] { background: linear-gradient(135deg, #2a6b3a, #1a4525) !important; }
+        .cat-card[data-cat='provision'] { background: linear-gradient(135deg, #6b5a3a, #453a20) !important; }
+        .cat-card[data-cat='family'] { background: linear-gradient(135deg, #8a3a5a, #5c2040) !important; }
+        .cat-card[data-cat='travel'] { background: linear-gradient(135deg, #3a6a8a, #20455c) !important; }
+
+        .prayer-countdown-card {
+            position: relative;
+            border-radius: 20px !important;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a2f4d, #173b2f) !important;
+        }
+
+        .prayer-countdown-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.06;
+            background-image: var(--fx-pattern);
+            background-size: 120px 120px;
+            pointer-events: none;
+        }
+
+        #bottomNav,
+        .bottom-nav {
+            height: 64px !important;
+            border-top: none !important;
+            background: rgba(12, 20, 35, 0.84) !important;
+            backdrop-filter: blur(16px) saturate(170%) !important;
+            -webkit-backdrop-filter: blur(16px) saturate(170%) !important;
+            position: fixed;
+            overflow: hidden;
+            box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.32) !important;
+        }
+
+        #bottomNav::before,
+        .bottom-nav::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 8%, var(--fx-gold-line) 50%, transparent 92%);
+        }
+
+        .bottom-nav-item {
+            min-height: 64px !important;
+            color: rgba(255, 255, 255, 0.42) !important;
+        }
+
+        .bottom-nav-item.active {
+            color: #f2dba0 !important;
+            border-radius: 20px !important;
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.22), rgba(201, 168, 76, 0.08)) !important;
+            box-shadow: inset 0 0 0 1px rgba(201, 168, 76, 0.24);
+        }
+
+        .tasbeeh-panel {
+            --tasbeeh-progress: 0%;
+            position: relative;
+        }
+
+        .tasbeeh-count-display {
+            position: relative;
+        }
+
+        .tasbeeh-count-display::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 126px;
+            height: 126px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: conic-gradient(from -90deg, #c9a84c var(--tasbeeh-progress), rgba(255, 255, 255, 0.08) 0);
+            -webkit-mask: radial-gradient(circle, transparent 58px, #000 60px);
+            mask: radial-gradient(circle, transparent 58px, #000 60px);
+            pointer-events: none;
+            opacity: 0.88;
+        }
+
+        .tasbeeh-tap-btn {
+            width: 120px !important;
+            height: 120px !important;
+            min-width: 120px !important;
+            min-height: 120px !important;
+            border: 3px solid rgba(201, 168, 76, 0.32) !important;
+            background: linear-gradient(145deg, #1e6b46, #135d68) !important;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4), 0 0 28px rgba(26, 92, 92, 0.24) !important;
+        }
+
+        .dua-swipe-content,
+        .dua-swipe-slide {
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .dua-swipe-actions {
+            justify-content: center !important;
+            gap: 10px !important;
+            flex-wrap: wrap;
+        }
+
+        .dua-swipe-actions .action-btn {
+            width: 54px !important;
+            min-width: 54px !important;
+            min-height: 64px !important;
+            border-radius: 14px !important;
+            display: inline-flex !important;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dua-swipe-actions .action-btn-label {
+            font-size: 10px;
+            max-width: 52px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .quran-surah-row {
+            border-left: 3px solid transparent !important;
+        }
+
+        .quran-surah-row.is-makki {
+            border-left-color: #c9a84c !important;
+        }
+
+        .quran-surah-row.is-madani {
+            border-left-color: #2ecc71 !important;
+        }
+
+        .prayer-reminder-item input[type='checkbox'] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            background: transparent;
+            position: relative;
+            transition: all 170ms ease;
+        }
+
+        .prayer-reminder-item input[type='checkbox']:checked {
+            background: linear-gradient(135deg, #c9a84c, #2ecc71);
+            border-color: transparent;
+        }
+
+        .prayer-reminder-item input[type='checkbox']:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -56%);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .more-section-title {
+            position: relative;
+            color: var(--fx-gold-line) !important;
+            letter-spacing: 1.5px !important;
+            text-transform: uppercase;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            padding-left: 14px;
+        }
+
+        .more-section-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--fx-gold-line);
+            position: absolute;
+            left: 0;
+            top: 50%;
+            margin-top: -4px;
+        }
+
+        .more-list .more-row .more-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            color: #fff !important;
+            background: linear-gradient(135deg, #335a8a, #1a3a5c) !important;
+        }
+
+        .more-list .more-row:nth-child(2) .more-icon { background: linear-gradient(135deg, #1a7a5d, #1a5c3a) !important; }
+        .more-list .more-row:nth-child(3) .more-icon { background: linear-gradient(135deg, #8a6a28, #5c4a1a) !important; }
+        .more-list .more-row:nth-child(4) .more-icon { background: linear-gradient(135deg, #267a7a, #1a5c5c) !important; }
+        .more-list .more-row:nth-child(5) .more-icon { background: linear-gradient(135deg, #6b4a8a, #4a2d6b) !important; }
+
+        @keyframes nowBadgePulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(46, 204, 113, 0.25); }
+            50% { box-shadow: 0 0 10px rgba(46, 204, 113, 0.4); }
+        }
+
+        .prayer-now-badge {
+            animation: nowBadgePulse 3s ease-in-out infinite;
+        }
+
+        @media (max-width: 700px) {
+            .dashboard-quick-tile {
+                min-height: 86px !important;
+            }
+
+            .cat-card,
+            .dua-category-card {
+                min-height: 88px !important;
+                padding: 12px !important;
+            }
+
+            .tasbeeh-tap-btn {
+                width: 110px !important;
+                height: 110px !important;
+                min-width: 110px !important;
+                min-height: 110px !important;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .tab-fade-target,
+            .tab-fade-target.is-fading {
+                transition: none !important;
+                transform: none !important;
+                opacity: 1 !important;
+            }
+
+            .prayer-now-badge {
+                animation: none !important;
+            }
+        }
+
+        /* ============================================ */
+        /* ===== PHASE 2 PREMIUM DEPTH LAYER ===== */
+        /* ============================================ */
+
+        :root {
+            --premium-surface-border-top: rgba(255, 255, 255, 0.12);
+            --premium-surface-border-left: rgba(255, 255, 255, 0.08);
+            --premium-surface-border-right: rgba(255, 255, 255, 0.05);
+            --premium-surface-border-bottom: rgba(255, 255, 255, 0.03);
+            --premium-contact-shadow: 0 2px 4px rgba(0, 0, 0, 0.14);
+            --premium-mid-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+            --premium-ambient-shadow: 0 18px 36px rgba(0, 0, 0, 0.26);
+            --premium-inner-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .cat-card,
+        .dashboard-quick-tile,
+        .dashboard-prayer-card,
+        #dashboardSuggestionCard,
+        #quranContinueCard .quran-continue-inner,
+        .quran-popular-card,
+        .quran-surah-row,
+        .dua-card,
+        .prayer-countdown-card,
+        .more-row,
+        .quran-bookmark-item,
+        .quran-juz-item,
+        .quran-recent-item {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            cursor: pointer;
+        }
+
+        .cat-card::after,
+        .dashboard-quick-tile::after,
+        .dashboard-prayer-card::after,
+        #dashboardSuggestionCard::after,
+        #quranContinueCard .quran-continue-inner::after,
+        .quran-popular-card::after,
+        .quran-surah-row::after,
+        .dua-card::after,
+        .prayer-countdown-card::after,
+        .more-row::after,
+        .quran-bookmark-item::after,
+        .quran-juz-item::after,
+        .quran-recent-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+            opacity: 0.5;
+        }
+
+        .cat-card:hover,
+        .dashboard-quick-tile:hover,
+        .dashboard-prayer-card:hover,
+        #dashboardSuggestionCard:hover,
+        #quranContinueCard .quran-continue-inner:hover,
+        .quran-popular-card:hover,
+        .quran-surah-row:hover,
+        .dua-card:hover,
+        .prayer-countdown-card:hover,
+        .more-row:hover,
+        .quran-bookmark-item:hover,
+        .quran-juz-item:hover,
+        .quran-recent-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .cat-card:active,
+        .dashboard-quick-tile:active,
+        .dashboard-prayer-card:active,
+        #dashboardSuggestionCard:active,
+        #quranContinueCard .quran-continue-inner:active,
+        .quran-popular-card:active,
+        .quran-surah-row:active,
+        .dua-card:active,
+        .prayer-countdown-card:active,
+        .more-row:active,
+        .quran-bookmark-item:active,
+        .quran-juz-item:active,
+        .quran-recent-item:active {
+            transform: translateY(0) scale(0.98);
+            transition-duration: 0.1s;
+        }
+
+        .dashboard-quick-tile {
+            border-top: 1px solid var(--premium-surface-border-top) !important;
+            border-left: 1px solid var(--premium-surface-border-left) !important;
+            border-right: 1px solid var(--premium-surface-border-right) !important;
+            border-bottom: 1px solid var(--premium-surface-border-bottom) !important;
+            box-shadow:
+                var(--premium-contact-shadow),
+                var(--premium-mid-shadow),
+                var(--premium-ambient-shadow),
+                var(--premium-inner-highlight) !important;
+            padding: 20px 16px !important;
+            gap: 10px !important;
+            border-radius: 18px !important;
+        }
+
+        .dashboard-quick-grid .dashboard-quick-tile:nth-child(1) {
+            background: linear-gradient(135deg, #1a3f6e 0%, #14325a 40%, #0e2444 100%) !important;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.14),
+                0 10px 24px rgba(26, 63, 110, 0.32),
+                0 20px 40px rgba(0, 0, 0, 0.26),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .dashboard-quick-grid .dashboard-quick-tile:nth-child(2) {
+            background: linear-gradient(135deg, #1a6b4a 0%, #14553b 40%, #0e3f2c 100%) !important;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.14),
+                0 10px 24px rgba(26, 107, 74, 0.3),
+                0 20px 40px rgba(0, 0, 0, 0.26),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .dashboard-quick-grid .dashboard-quick-tile:nth-child(3) {
+            background: linear-gradient(135deg, #6b4a1a 0%, #554014 40%, #3f300e 100%) !important;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.14),
+                0 10px 24px rgba(107, 74, 26, 0.3),
+                0 20px 40px rgba(0, 0, 0, 0.26),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .dashboard-quick-grid .dashboard-quick-tile:nth-child(4) {
+            background: linear-gradient(135deg, #1a5c6b 0%, #144a55 40%, #0e363f 100%) !important;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.14),
+                0 10px 24px rgba(26, 92, 107, 0.3),
+                0 20px 40px rgba(0, 0, 0, 0.26),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .dashboard-prayer-card {
+            border-radius: 22px !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.12),
+                0 10px 20px rgba(0, 0, 0, 0.18),
+                0 24px 50px rgba(0, 0, 0, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+            background: linear-gradient(135deg, #1a3a5c 0%, #0f2a45 50%, #0a1e35 100%) !important;
+            padding: 24px !important;
+        }
+
+        .dashboard-prayer-card::before {
+            opacity: 0.045 !important;
+        }
+
+        .dashboard-prayer-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.42), transparent);
+            pointer-events: none;
+        }
+
+        #dashboardSuggestionCard {
+            border-top: 1px solid var(--premium-surface-border-top) !important;
+            border-left: 1px solid var(--premium-surface-border-left) !important;
+            border-right: 1px solid var(--premium-surface-border-right) !important;
+            border-bottom: 1px solid var(--premium-surface-border-bottom) !important;
+            box-shadow:
+                var(--premium-contact-shadow),
+                var(--premium-mid-shadow),
+                0 18px 34px rgba(0, 0, 0, 0.24),
+                var(--premium-inner-highlight) !important;
+            border-radius: 18px !important;
+            padding: 20px !important;
+        }
+
+        .cat-card,
+        .dua-card,
+        .quran-surah-row,
+        .quran-popular-card,
+        .prayer-countdown-card,
+        .more-row,
+        .quran-bookmark-item,
+        .quran-juz-item,
+        .quran-recent-item {
+            border-top: 1px solid var(--premium-surface-border-top) !important;
+            border-left: 1px solid var(--premium-surface-border-left) !important;
+            border-right: 1px solid var(--premium-surface-border-right) !important;
+            border-bottom: 1px solid var(--premium-surface-border-bottom) !important;
+            box-shadow:
+                var(--premium-contact-shadow),
+                var(--premium-mid-shadow),
+                var(--premium-ambient-shadow),
+                var(--premium-inner-highlight) !important;
+            border-radius: 18px !important;
+        }
+
+        .quran-surah-row,
+        .quran-popular-card,
+        .quran-bookmark-item,
+        .quran-juz-item,
+        .quran-recent-item {
+            padding: 16px !important;
+        }
+
+        .more-row {
+            min-height: 58px;
+            padding: 0 14px;
+            margin-bottom: 10px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, rgba(19, 42, 58, 0.92), rgba(12, 29, 43, 0.96));
+        }
+
+        .more-row .more-label {
+            font-weight: 600;
+            letter-spacing: 0.2px;
+        }
+
+        .quran-continue-card,
+        #quranContinueCard .quran-continue-inner {
+            border-radius: 18px !important;
+            background: linear-gradient(135deg, rgba(25, 60, 92, 0.92), rgba(14, 34, 52, 0.96)) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.14) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.14),
+                0 10px 20px rgba(20, 49, 74, 0.3),
+                0 20px 40px rgba(0, 0, 0, 0.26),
+                inset 0 1px 0 rgba(255, 255, 255, 0.09) !important;
+        }
+
+        .dua-swipe-card {
+            border-top: 1px solid rgba(255, 255, 255, 0.11);
+            border-left: 1px solid rgba(255, 255, 255, 0.07);
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.12),
+                0 12px 24px rgba(0, 0, 0, 0.24),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .dua-swipe-content .arabic-container,
+        .dua-card .arabic-container {
+            border: none !important;
+            border-radius: 24px !important;
+            background: radial-gradient(ellipse at center, rgba(26, 58, 92, 0.44) 0%, rgba(26, 58, 92, 0.2) 58%, rgba(26, 58, 92, 0.02) 100%) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            padding: 34px 24px !important;
+        }
+
+        .ornament-divider {
+            color: rgba(201, 168, 76, 0.45) !important;
+            letter-spacing: 6px;
+        }
+
+        .ornament-divider .diamond {
+            width: 6px;
+            height: 6px;
+            background: rgba(201, 168, 76, 0.58);
+            box-shadow: 0 0 10px rgba(201, 168, 76, 0.22);
+        }
+
+        .prayer-countdown-card {
+            padding: 20px 16px !important;
+            border-radius: 18px !important;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.14),
+                0 10px 24px rgba(25, 58, 92, 0.28),
+                0 20px 42px rgba(0, 0, 0, 0.24),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .dua-card {
+            padding: 2px;
+        }
+
+        .dua-card .card-body-inner {
+            padding: 0 20px 22px;
+        }
+
+        @media (max-width: 700px) {
+            .dashboard-quick-tile,
+            #dashboardSuggestionCard,
+            .prayer-countdown-card,
+            .quran-surah-row,
+            .quran-popular-card,
+            .more-row,
+            .dua-card {
+                border-radius: 16px !important;
+            }
+
+            .dashboard-prayer-card {
+                border-radius: 20px !important;
+                padding: 20px !important;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .cat-card,
+            .dashboard-quick-tile,
+            .dashboard-prayer-card,
+            #dashboardSuggestionCard,
+            #quranContinueCard .quran-continue-inner,
+            .quran-popular-card,
+            .quran-surah-row,
+            .dua-card,
+            .prayer-countdown-card,
+            .more-row,
+            .quran-bookmark-item,
+            .quran-juz-item,
+            .quran-recent-item {
+                transition: none !important;
+                transform: none !important;
+            }
+        }
