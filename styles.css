@@ -255,8 +255,6 @@
         [data-theme="light"] .prayer-reminder-settings { background: rgba(15, 80, 50, 0.04); border-color: rgba(15, 80, 50, 0.15); }
         [data-theme="light"] .prayer-reminder-item { background: transparent; border-color: rgba(15, 80, 50, 0.08); }
         [data-theme="light"] .prayer-reminder-select { background: rgba(255, 255, 255, 0.9); border-color: rgba(15, 80, 50, 0.18); color: var(--text-primary); }
-        [data-theme="light"] .prayer-reminder-test-btn { color: var(--text-subtle); border-color: rgba(15, 80, 50, 0.25); background: transparent; }
-        [data-theme="light"] .prayer-reminder-test-btn:hover { background: rgba(15, 80, 50, 0.06); color: var(--text-primary); }
         [data-theme="light"] .prayer-reminder-status { border-color: rgba(15, 80, 50, 0.2); background: rgba(15, 80, 50, 0.06); color: var(--text-muted); }
         [data-theme="light"] .prayer-notify-label { color: var(--text-primary); }
         [data-theme="light"] .toggle-slider { background: rgba(15, 80, 50, 0.15); }
@@ -1289,7 +1287,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
-                /* ============================================ */
+        /* ============================================ */
         /* ===== DUA CARDS ===== */
         /* ============================================ */
         .dua-card {
@@ -2682,33 +2680,6 @@
         .prayer-reminder-select:focus {
             border-color: rgba(46, 196, 122, 0.35);
             box-shadow: 0 0 0 3px rgba(46, 196, 122, 0.12);
-        }
-        .prayer-reminder-test-wrap {
-            margin-top: 4px;
-            display: flex;
-            justify-content: flex-end;
-        }
-        .prayer-reminder-test-btn {
-            border: 1px solid rgba(46, 196, 122, 0.28);
-            background: transparent;
-            color: var(--text-subtle);
-            border-radius: 999px;
-            min-height: 24px;
-            padding: 0 10px;
-            font-family: var(--font-title);
-            font-size: 0.62rem;
-            letter-spacing: 0.4px;
-            cursor: pointer;
-            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-        }
-        .prayer-reminder-test-btn:hover {
-            background: rgba(46, 196, 122, 0.09);
-            color: var(--text-primary);
-            border-color: rgba(46, 196, 122, 0.4);
-        }
-        .prayer-reminder-test-btn:focus-visible {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(46, 196, 122, 0.14);
         }
         .prayer-notify-label {
             font-family: var(--font-title); font-size: 0.85rem;
@@ -6784,32 +6755,32 @@
         .cat-card .category-watermark,
         .dua-category-card .category-watermark {
             position: absolute;
-            bottom: 6px;
-            right: 10px;
+            bottom: -10px;
+            right: -18px;
             font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
-            font-size: 1.25rem;
-            line-height: 1.2;
-            color: rgba(255, 255, 255, 0.22);
+            font-size: 2.45rem;
+            line-height: 0.88;
+            color: rgba(255, 255, 255, 0.1);
             direction: rtl;
             pointer-events: none;
             user-select: none;
-            z-index: 1;
-            max-width: 70%;
-            overflow: hidden;
-            text-overflow: clip;
+            z-index: 0;
+            max-width: none;
             white-space: nowrap;
             text-align: right;
-            letter-spacing: 0.01em;
-            filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.14));
-            text-shadow: 0 1px 10px rgba(255, 255, 255, 0.05), 0 1px 10px rgba(0, 0, 0, 0.14);
+            letter-spacing: 0.02em;
+            transform: rotate(-8deg);
+            filter: none;
+            text-shadow: none;
+            opacity: 0.7;
         }
 
         .cat-card.featured .category-watermark,
         .dua-category-card.featured .category-watermark {
-            font-size: 1.5rem;
-            color: rgba(255, 255, 255, 0.2);
-            bottom: 10px;
-            right: 14px;
+            font-size: 2.9rem;
+            color: rgba(255, 255, 255, 0.11);
+            bottom: -12px;
+            right: -12px;
         }
 
         .cat-card-icon,
@@ -7591,30 +7562,26 @@
 
         .dashboard-quick-tile .tile-watermark {
             position: absolute;
-            bottom: 6px;
-            right: 8px;
+            bottom: -10px;
+            right: -16px;
             font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', serif;
-            font-size: 1.375rem;
-            line-height: 1;
-            color: rgba(255, 255, 255, 0.15);
+            font-size: 2.4rem;
+            line-height: 0.86;
+            color: rgba(255, 255, 255, 0.1);
             direction: rtl;
             pointer-events: none;
             user-select: none;
             z-index: 0;
             white-space: nowrap;
-            letter-spacing: 0.01em;
-            filter: drop-shadow(0 1px 10px rgba(0, 0, 0, 0.16));
-            text-shadow: 0 1px 10px rgba(255, 255, 255, 0.05), 0 1px 10px rgba(0, 0, 0, 0.16);
+            letter-spacing: 0.02em;
+            transform: rotate(-8deg);
+            filter: none;
+            text-shadow: none;
+            opacity: 0.72;
         }
 
         .tile-arabic-label {
-            position: relative;
-            z-index: 1;
-            font-family: 'Amiri', 'Noto Naskh Arabic', serif;
-            font-size: 0.92rem;
-            line-height: 1;
-            color: rgba(255, 255, 255, 0.84);
-            letter-spacing: 0;
+            display: none;
         }
 
         .dashboard-quick-icon {
@@ -8718,7 +8685,7 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            padding: 8px 28px;
+            padding: 6px 28px 4px;
             color: rgba(201, 168, 76, 0.22);
             font-size: 11px;
             letter-spacing: 0;
@@ -9179,7 +9146,6 @@
         .tasbeeh-ctrl-btn,
         .tasbeeh-preset,
         .action-btn,
-        .prayer-reminder-test-btn,
         .back-to-grid {
             min-height: var(--height-button) !important;
             border-radius: var(--radius-md) !important;
@@ -9666,7 +9632,78 @@
         [data-theme="light"] .dashboard-quick-tile .tile-watermark,
         [data-theme="light"] .cat-card .category-watermark,
         [data-theme="light"] .dua-category-card .category-watermark {
-            color: rgba(255, 255, 255, 0.16);
+            color: rgba(255, 255, 255, 0.12);
+        }
+
+        [data-theme="light"] .dua-swipe-content .arabic-container {
+            background: linear-gradient(180deg, rgba(255, 251, 243, 0.96), rgba(247, 240, 228, 0.94)) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.82),
+                0 1px 0 rgba(154, 122, 47, 0.08) !important;
+        }
+
+        [data-theme="light"] .dua-swipe-card {
+            border-top-color: rgba(154, 122, 47, 0.22) !important;
+            border-left-color: rgba(154, 122, 47, 0.16) !important;
+            border-right-color: rgba(154, 122, 47, 0.1) !important;
+            border-bottom-color: rgba(154, 122, 47, 0.08) !important;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.1),
+                0 10px 22px rgba(112, 83, 24, 0.14),
+                inset 0 1px 0 rgba(255, 255, 255, 0.72) !important;
+        }
+
+        [data-theme="light"] .dua-swipe-card::before {
+            border-color: rgba(154, 122, 47, 0.3) !important;
+            opacity: 0.55 !important;
+        }
+
+        [data-theme="light"] .tasbeeh-tap-btn {
+            border-color: rgba(154, 122, 47, 0.36) !important;
+            background: radial-gradient(circle at 30% 24%, rgba(255, 248, 228, 0.98) 0%, rgba(233, 219, 187, 0.96) 24%, rgba(173, 132, 43, 0.92) 58%, rgba(107, 76, 18, 0.98) 100%) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                0 16px 30px rgba(122, 88, 24, 0.2),
+                0 0 0 1px rgba(154, 122, 47, 0.08) !important;
+        }
+
+        [data-theme="light"] .tasbeeh-tap-btn .tap-text {
+            color: rgba(53, 36, 10, 0.96) !important;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.42) !important;
+        }
+
+        [data-theme="light"] .tasbeeh-tap-btn:active {
+            background: radial-gradient(circle at 30% 24%, rgba(255, 246, 216, 0.98) 0%, rgba(228, 208, 164, 0.96) 22%, rgba(161, 119, 31, 0.94) 56%, rgba(96, 66, 14, 0.98) 100%) !important;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.7),
+                0 10px 18px rgba(122, 88, 24, 0.18) !important;
+        }
+
+        [data-theme="light"] .quran-top-progress {
+            height: 1px;
+            background: rgba(154, 122, 47, 0.08);
+        }
+
+        [data-theme="light"] .quran-top-progress span {
+            background: linear-gradient(90deg, rgba(154, 122, 47, 0.22), rgba(154, 122, 47, 0.46));
+        }
+
+        #quranContinueCard .quran-continue-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.1rem;
+            height: 1.1rem;
+            color: currentColor;
+            vertical-align: middle;
+            margin-right: 0.35rem;
+        }
+
+        #quranContinueCard .quran-continue-icon svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            stroke: currentColor;
         }
 
         [data-theme="light"] .prayer-watermark {
@@ -9701,13 +9738,13 @@
         @media (max-width: 375px) {
             .cat-card .category-watermark,
             .dua-category-card .category-watermark {
-                font-size: 1rem;
-                max-width: 60%;
+                font-size: 2.05rem;
+                right: -16px;
             }
 
             .dashboard-quick-tile .tile-watermark {
-                font-size: 1.1rem;
-                max-width: 60%;
+                font-size: 1.95rem;
+                right: -14px;
             }
         }
 

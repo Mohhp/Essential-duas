@@ -20,8 +20,8 @@
   "maskableIconUrl": "https://mohhp.github.io/Essential-duas/icon-512.png",
   "splashScreenFadeOutDuration": 300,
   "fallbackType": "customtabs",
-  "appVersionCode": 8,
-  "appVersion": "2.0.16",
+  "appVersionCode": 9,
+  "appVersion": "2.0.17",
   "fullScopeUrl": "https://mohhp.github.io/Essential-duas/",
   "webManifestUrl": "https://mohhp.github.io/Essential-duas/manifest.json",
   "signingKey": {

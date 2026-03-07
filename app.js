@@ -4016,7 +4016,7 @@ window.filterCategory = function(cat, btn) {
             aboutDescription: 'Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.',
             aboutDescriptionPs: 'ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.',
             aboutTagline: 'حي على الفلاح — Come to Success',
-            aboutVersion: 'Version: 2.0.16',
+            aboutVersion: 'Version: 2.0.17',
             aboutDeveloper: isPS ? 'پراختیاکوونکی: Falah' : 'Developer: Falah',
             aboutCopyright: '© 2026 Falah. All rights reserved.',
             aboutContactLabel: isPS ? 'اړیکه ونیسئ' : 'Contact Us',
@@ -6698,8 +6698,6 @@ window.filterCategory = function(cat, btn) {
             soundAdhan: isPS ? (psUI?.soundAdhan || 'بشپړ اذان') : 'Full Adhan',
             soundTone: isPS ? (psUI?.soundTone || 'لنډ زنګ') : 'Short tone',
             soundSilent: isPS ? (psUI?.soundSilent || 'بې غږه') : 'Silent',
-            testReminder: isPS ? (psUI?.testReminder || 'د یادونې ازمويښت') : 'Test Reminder',
-            testReminderBody: isPS ? (psUI?.testReminderBody || 'دا د {prayer} لپاره ازمویښتي یادونه ده') : 'This is a sample reminder for {prayer}',
             preReminderBody: isPS ? (psUI?.preReminderBody || 'د {prayer} لمونځ به په {minutes} دقیقو کې وي') : '{minutes} min until {prayer} prayer',
             atTimeBody: isPS ? (psUI?.atTimeBody || 'د {prayer} لمانځه وخت شو') : "It's time for {prayer} prayer",
             alertsEnabled: isPS ? (psUI?.alertsEnabled || 'د لمونځ خبرتیاوې فعالې شوې') : 'Prayer alerts enabled',
@@ -6938,16 +6936,12 @@ window.filterCategory = function(cat, btn) {
         const soundLabel = document.getElementById('reminderSoundLabel');
         const sameAllLabel = document.getElementById('sameSoundAllLabel');
         const beforeLabel = document.getElementById('reminderBeforeLabel');
-        const testBtn = document.getElementById('reminderTestBtn');
-        const test10sBtn = document.getElementById('reminderTest10sBtn');
 
         if (sectionTitle) sectionTitle.textContent = uiText.reminderSettingsTitle;
         if (masterLabel) masterLabel.textContent = uiText.reminderMaster;
         if (soundLabel) soundLabel.textContent = 'Reminder Sound / د یادونې غږ';
         if (sameAllLabel) sameAllLabel.textContent = isPashtoMode() ? 'د ټولو لمونځونو لپاره یو غږ' : 'Same sound for all prayers';
         if (beforeLabel) beforeLabel.textContent = uiText.reminderBefore;
-        if (testBtn) testBtn.textContent = uiText.testReminder;
-        if (test10sBtn) test10sBtn.textContent = 'Test Reminder (10 seconds)';
 
         const beforeSelect = document.getElementById('reminderBefore');
         if (beforeSelect) {
@@ -7081,28 +7075,6 @@ window.filterCategory = function(cat, btn) {
                 } else {
                     showToast(getPrayerUiText().reminderSaved);
                 }
-            });
-        }
-
-        const testBtn = document.getElementById('reminderTestBtn');
-        if (testBtn) {
-            testBtn.addEventListener('touchstart', (event) => {
-                event.preventDefault();
-                runReminderTest();
-            }, { passive: false });
-            testBtn.addEventListener('click', () => {
-                runReminderTest();
-            });
-        }
-
-        const test10sBtn = document.getElementById('reminderTest10sBtn');
-        if (test10sBtn) {
-            test10sBtn.addEventListener('touchstart', (event) => {
-                event.preventDefault();
-                runReminderTestInTenSeconds();
-            }, { passive: false });
-            test10sBtn.addEventListener('click', () => {
-                runReminderTestInTenSeconds();
             });
         }
 
@@ -8296,62 +8268,6 @@ window.filterCategory = function(cat, btn) {
         }
     }
 
-    function runReminderTest() {
-        const uiText = getPrayerUiText();
-        const samplePrayer = getNextPrayer(new Date()) || 'fajr';
-        const localizedPrayer = getPrayerLabel(samplePrayer);
-        const body = uiText.testReminderBody.replace('{prayer}', localizedPrayer);
-
-        playReminderSound(resolveReminderSoundId(samplePrayer));
-
-        requestNotificationPermissionIfNeeded().then((granted) => {
-            if (!granted) return;
-            sendSystemNotification(`${PRAYER_ICONS[samplePrayer]} ${uiText.testReminder}`, {
-                body,
-                icon: 'icon-192.png',
-                badge: 'icon-192.png',
-                tag: 'prayer-test-reminder',
-                renotify: true,
-                requireInteraction: true,
-                vibrate: [200, 100, 200],
-                silent: false,
-                data: {
-                    prayer: samplePrayer,
-                    url: '/'
-                }
-            });
-        });
-    }
-
-    function runReminderTestInTenSeconds() {
-        requestNotificationPermissionIfNeeded().then((granted) => {
-            if (!granted) return;
-
-            showToast(isPashtoMode() ? 'ازموینې خبرتیا په ۱۰ ثانیو کې رارسېږي' : 'Test reminder will fire in 10 seconds');
-
-            setTimeout(() => {
-                const samplePrayer = getNextPrayer(new Date()) || 'dhuhr';
-                playReminderSound(resolveReminderSoundId(samplePrayer));
-                Promise.resolve(sendSystemNotification('Falah — Prayer Reminder', {
-                    body: 'This is a test reminder. Your reminders are working correctly!',
-                    icon: 'icon-192.png',
-                    badge: 'icon-192.png',
-                    tag: 'prayer-test-reminder-10s',
-                    renotify: true,
-                    requireInteraction: true,
-                    vibrate: [200, 100, 200],
-                    silent: false,
-                    data: {
-                        prayer: samplePrayer,
-                        url: '/'
-                    }
-                })).finally(() => {
-                    showToast('✅ Test reminder sent successfully');
-                });
-            }, 10000);
-        });
-    }
-
     window.togglePrayerNotifications = function(enabled) {
         const settings = loadReminderSettings();
         settings.enabled = !!enabled;
@@ -9245,10 +9161,11 @@ window.filterCategory = function(cat, btn) {
         const surahName = isPashtoMode() ? cleanSurahArabicName(meta.name) : meta.englishName;
         const ayahLabel = isPashtoMode() ? 'آیت' : 'Ayah';
         const lastReadLabel = getRelativeLastReadText(last.timestamp);
+        const continueIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" fill="currentColor" fill-opacity="0.15"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" fill="currentColor" fill-opacity="0.15"/><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
         card.innerHTML = `
             <div class="quran-continue-inner">
                 <div class="quran-continue-head">
-                    <span class="quran-continue-icon" aria-hidden="true">📖</span>
+                    <span class="quran-continue-icon" aria-hidden="true">${continueIcon}</span>
                     <span class="quran-continue-kicker">${ui.continueReading}</span>
                 </div>
                 <div class="quran-continue-main">
