@@ -10328,6 +10328,62 @@ window.filterCategory = function(cat, btn) {
         return quranState.audio;
     }
 
+    function countAyahTimingTokens(text) {
+        return String(text || '')
+            .replace(/[\u0640]/g, '')
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean)
+            .length;
+    }
+
+    function countAyahTimingChars(text) {
+        return String(text || '')
+            .replace(/\s+/g, '')
+            .replace(/[\u0640\u200c\u200d]/g, '')
+            .length;
+    }
+
+    function estimateAyahTimingWeight(ayah, profileName) {
+        const arabicTokens = countAyahTimingTokens(ayah?.arabic);
+        const arabicChars = countAyahTimingChars(ayah?.arabic);
+        const arabicWeight = 1.2 + arabicTokens + (arabicChars / 18);
+
+        if (profileName === 'pashto') {
+            const pashtoTokens = countAyahTimingTokens(ayah?.pashto);
+            const pashtoChars = countAyahTimingChars(ayah?.pashto);
+            const pashtoWeight = 1.6 + (pashtoTokens * 1.15) + (pashtoChars / 22);
+            return Math.max(1, arabicWeight + pashtoWeight);
+        }
+
+        return Math.max(1, arabicWeight);
+    }
+
+    function getContinuousSurahTimingProfile(profileName = 'arabic') {
+        const data = quranState.currentSurahData;
+        if (!data?.ayahs?.length) return null;
+
+        if (!data.__timingProfiles) data.__timingProfiles = {};
+        if (data.__timingProfiles[profileName]) return data.__timingProfiles[profileName];
+
+        let totalWeight = 0;
+        const cumulativeWeights = data.ayahs.map((ayah, index) => {
+            totalWeight += estimateAyahTimingWeight(ayah, profileName);
+            return {
+                ayahNo: Number(ayah.numberInSurah || index + 1),
+                endWeight: totalWeight
+            };
+        });
+
+        const profile = {
+            totalWeight,
+            cumulativeWeights
+        };
+
+        data.__timingProfiles[profileName] = profile;
+        return profile;
+    }
+
     function getAyahKeyFromContinuousSurahProgress(currentTime, duration, surahNumber) {
         if (!quranState.currentSurahData?.ayahs?.length) return null;
         if (!Number.isFinite(duration) || duration <= 0) return null;
@@ -10336,9 +10392,16 @@ window.filterCategory = function(cat, btn) {
         if (!resolvedSurah) return null;
         if (Number(quranState.currentSurah || 0) !== resolvedSurah) return null;
 
-        const totalAyahs = quranState.currentSurahData.ayahs.length;
+        const profileName = quranState.isPashtoTranslationActive ? 'pashto' : 'arabic';
+        const profile = getContinuousSurahTimingProfile(profileName);
+        if (!profile?.totalWeight || !Array.isArray(profile.cumulativeWeights) || !profile.cumulativeWeights.length) {
+            return null;
+        }
+
         const progress = Math.max(0, Math.min(1, Number(currentTime || 0) / duration));
-        const ayahNo = Math.max(1, Math.min(totalAyahs, Math.floor(progress * totalAyahs) + 1));
+        const targetWeight = progress * profile.totalWeight;
+        const active = profile.cumulativeWeights.find((entry) => targetWeight <= entry.endWeight) || profile.cumulativeWeights[profile.cumulativeWeights.length - 1];
+        const ayahNo = Number(active?.ayahNo || 1);
         return `${resolvedSurah}:${ayahNo}`;
     }
 
