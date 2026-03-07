@@ -1,4 +1,4 @@
-const CACHE_NAME = 'falah-v87';
+const CACHE_NAME = 'falah-v99';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
 const PRAYER_REMINDER_STATE_CACHE = 'falah-prayer-reminder-state-v1';

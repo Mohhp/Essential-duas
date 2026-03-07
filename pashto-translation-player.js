@@ -12,6 +12,14 @@
   let playerAudio = null;
   let preloadAudio = null;
   let activePlay = null;
+  let recoveryTimer = null;
+
+  function clearRecoveryTimer() {
+    if (recoveryTimer) {
+      window.clearTimeout(recoveryTimer);
+      recoveryTimer = null;
+    }
+  }
 
   function normalizeAudioUrl(url) {
     const raw = String(url || "").trim();
@@ -119,8 +127,10 @@
 
   function stopPashtoTranslation() {
     if (!playerAudio) return;
+    clearRecoveryTimer();
     playerAudio.pause();
     playerAudio.currentTime = 0;
+    playerAudio.src = "";
     if (activePlay && typeof activePlay.reject === "function") {
       activePlay.reject(new Error("Playback stopped"));
       activePlay = null;
@@ -130,12 +140,14 @@
 
   function pausePashtoTranslation() {
     if (!playerAudio) return;
+    clearRecoveryTimer();
     playerAudio.pause();
     emitState("paused", {});
   }
 
   async function resumePashtoTranslation() {
     if (!playerAudio) return;
+    clearRecoveryTimer();
     await playerAudio.play();
     emitState("playing", {});
   }
@@ -162,7 +174,7 @@
         if (done) return;
         done = true;
         cleanup();
-        emitState("preloaded", { surahNumber: Number(surahNumber), url: url });
+        emitState("preloaded", { surahNumber: Number(surahNumber), url: url, preload: true });
         resolve(url);
       }
 
@@ -177,7 +189,7 @@
       audio.addEventListener("error", onError, { once: true });
       audio.src = url;
       audio.load();
-      emitState("preloading", { surahNumber: Number(surahNumber), url: url });
+      emitState("preloading", { surahNumber: Number(surahNumber), url: url, preload: true });
     });
   }
 
@@ -194,9 +206,20 @@
       stopPashtoTranslation();
     }
 
+    function onTimeUpdate() {
+      if (
+        typeof window.syncContinuousSurahAyahFromProgress === "function" &&
+        Number.isFinite(audio.duration) &&
+        audio.duration > 0
+      ) {
+        window.syncContinuousSurahAyahFromProgress(audio.currentTime, audio.duration, surah);
+      }
+    }
+
     const playOnce = function (url) {
       return new Promise(function (resolve, reject) {
         let settled = false;
+        let loadTimerId = null;
         const timeoutId = window.setTimeout(function () {
           if (settled) return;
           settled = true;
@@ -206,14 +229,33 @@
         }, LOAD_TIMEOUT_MS);
 
         function cleanup() {
+          clearRecoveryTimer();
           audio.removeEventListener("canplay", onCanPlay);
+          audio.removeEventListener("playing", onPlaying);
           audio.removeEventListener("ended", onEnded);
           audio.removeEventListener("error", onError);
+          audio.removeEventListener("waiting", onWaiting);
+          audio.removeEventListener("stalled", onWaiting);
+          audio.removeEventListener("timeupdate", onTimeUpdate);
+          window.clearTimeout(timeoutId);
+          if (loadTimerId) {
+            window.clearTimeout(loadTimerId);
+            loadTimerId = null;
+          }
+        }
+
+        function clearLoadTimeout() {
           window.clearTimeout(timeoutId);
         }
 
         function onCanPlay() {
+          clearLoadTimeout();
           emitState("ready", { surahNumber: surah, url: url });
+        }
+
+        function onPlaying() {
+          clearLoadTimeout();
+          emitState("playing", { surahNumber: surah, url: url });
         }
 
         function onEnded() {
@@ -234,17 +276,36 @@
           reject(new Error("Audio playback failed for surah " + surah));
         }
 
+        function onWaiting() {
+          emitState("buffering", { surahNumber: surah, url: url });
+          clearRecoveryTimer();
+          recoveryTimer = window.setTimeout(function () {
+            recoveryTimer = null;
+            if (settled || audio.ended) return;
+            audio.play().catch(function () {});
+          }, 4000);
+        }
+
         audio.addEventListener("canplay", onCanPlay);
+        audio.addEventListener("playing", onPlaying);
         audio.addEventListener("ended", onEnded, { once: true });
         audio.addEventListener("error", onError, { once: true });
+        audio.addEventListener("waiting", onWaiting);
+        audio.addEventListener("stalled", onWaiting);
+        audio.addEventListener("timeupdate", onTimeUpdate);
 
-        audio.src = url;
-        audio.load();
-        emitState("buffering", { surahNumber: surah, url: url });
+        if ((audio.currentSrc || audio.src || "") !== url || audio.readyState < 3) {
+          audio.src = url;
+          audio.load();
+          emitState("buffering", { surahNumber: surah, url: url });
+        }
+
+        audio.currentTime = 0;
 
         audio
           .play()
           .then(function () {
+            clearLoadTimeout();
             emitState("playing", { surahNumber: surah, url: url });
           })
           .catch(function (err) {

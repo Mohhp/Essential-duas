@@ -3353,6 +3353,21 @@
             display: block;
         }
 
+        .quran-audio-banner[data-state="ready"] {
+            border-color: rgba(46, 196, 122, 0.34);
+            background: rgba(46, 196, 122, 0.14);
+        }
+
+        .quran-audio-banner[data-state="loading"] {
+            border-color: rgba(201, 168, 76, 0.36);
+            background: rgba(201, 168, 76, 0.12);
+        }
+
+        .quran-audio-banner[data-state="unavailable"] {
+            border-color: rgba(220, 108, 93, 0.36);
+            background: rgba(220, 108, 93, 0.12);
+        }
+
         .quran-player-btn {
             width: 40px;
             height: 40px;
@@ -3431,11 +3446,55 @@
             z-index: 1;
         }
 
+        .quran-ayah-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
         .quran-ayah-card.playing {
-            border-color: rgba(201, 168, 76, 0.32);
-            border-left: 2px solid rgba(201, 168, 76, 0.9);
-            background: var(--bg-card);
-            box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.12), 0 6px 14px rgba(0,0,0,0.18);
+            border-color: rgba(201, 168, 76, 0.5);
+            border-left: 4px solid rgba(201, 168, 76, 0.95);
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.14), rgba(46, 196, 122, 0.08)), var(--bg-card);
+            box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.18), 0 14px 28px rgba(0,0,0,0.24);
+            transform: translateY(-1px);
+            animation: quran-playing-pulse 2.2s ease-in-out infinite;
+        }
+
+        .quran-ayah-card.playing::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top right, rgba(201, 168, 76, 0.18), transparent 48%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .quran-ayah-card.playing .quran-ayah-num {
+            border-color: rgba(201, 168, 76, 0.62);
+            background: rgba(201, 168, 76, 0.22);
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.08);
+        }
+
+        .quran-ayah-card.playing .quran-ayah-ar,
+        .quran-ayah-card.playing .quran-ayah-ps,
+        .quran-ayah-card.playing .quran-ayah-en {
+            color: var(--text-primary);
+        }
+
+        @keyframes quran-playing-pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.18), 0 14px 28px rgba(0,0,0,0.24);
+            }
+            50% {
+                box-shadow: 0 0 0 1px rgba(201, 168, 76, 0.26), 0 18px 34px rgba(0,0,0,0.28);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .quran-ayah-card.playing {
+                animation: none;
+            }
         }
 
         .quran-ayah-head {
@@ -9608,6 +9667,7 @@
         [data-theme="light"] .dashboard-prayer-name,
         [data-theme="light"] .dashboard-prayer-time,
         [data-theme="light"] .dashboard-prayer-location,
+        [data-theme="light"] .prayer-countdown-label,
         [data-theme="light"] .prayer-countdown-name {
             color: var(--text-primary) !important;
         }
