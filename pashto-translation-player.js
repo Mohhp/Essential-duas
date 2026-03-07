@@ -5,6 +5,19 @@
     "/audio/pashto_audit/pashto_archive_mapping_juz30.json",
   ];
   const LOAD_TIMEOUT_MS = 20000;
+  const APP_BASE_PATH = (function () {
+    try {
+      const currentScript = document.currentScript;
+      if (currentScript && currentScript.src) {
+        const scriptUrl = new URL(currentScript.src, window.location.href);
+        return scriptUrl.pathname.replace(/\/[^/]*$/, "");
+      }
+    } catch (error) {}
+
+    const path = String(window.location.pathname || "/");
+    if (path === "/") return "";
+    return path.replace(/\/[^/]*$/, "");
+  })();
 
   let mappingUrl = DEFAULT_MAPPING_URLS[0];
   const mappingPromiseByUrl = new Map();
@@ -21,11 +34,26 @@
     }
   }
 
+  function resolveAppUrl(url) {
+    const raw = String(url || "").trim();
+    if (!raw) return "";
+    if (/^(https?:|blob:|data:)/i.test(raw)) return raw;
+
+    const origin = String(window.location.origin || "").replace(/\/+$/, "");
+    const base = String(APP_BASE_PATH || "").replace(/\/+$/, "");
+
+    if (raw.startsWith("/")) {
+      return origin + base + raw;
+    }
+
+    return origin + base + "/" + raw.replace(/^\/+/, "");
+  }
+
   function normalizeAudioUrl(url) {
     const raw = String(url || "").trim();
     if (!raw) return "";
     if (/^(https?:|blob:|data:)/i.test(raw)) return raw;
-    if (!pashtoAudioBaseUrl) return raw;
+    if (!pashtoAudioBaseUrl) return resolveAppUrl(raw);
 
     const base = pashtoAudioBaseUrl.replace(/\/+$/, "");
     const rel = raw.replace(/^\/+/, "");
@@ -60,7 +88,8 @@
     }
 
     const p = (async function () {
-      const res = await fetch(url, { cache: "no-cache" });
+      const resolvedUrl = resolveAppUrl(url);
+      const res = await fetch(resolvedUrl, { cache: "no-cache" });
       if (!res.ok) throw new Error("HTTP " + res.status + " for " + url);
       const payload = await res.json();
       const rows = normalizeRows(payload);
