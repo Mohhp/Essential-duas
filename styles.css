@@ -5521,6 +5521,98 @@
         .app-update-open {
             overflow: hidden;
         }
+        .language-picker-open {
+            overflow: hidden;
+        }
+        .startup-blocked #appContent {
+            visibility: hidden;
+        }
+        .startup-blocked .first-launch-language-overlay,
+        .startup-blocked .app-update-overlay.active {
+            visibility: visible;
+        }
+        .first-launch-language-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 13000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(5, 12, 23, 0.82);
+            backdrop-filter: blur(7px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 220ms ease;
+        }
+        .first-launch-language-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .first-launch-language-overlay.closing {
+            opacity: 0;
+        }
+        .first-launch-language-card {
+            width: min(92vw, 430px);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+            border: 1px solid rgba(201, 168, 76, 0.28);
+            border-radius: 20px;
+            box-shadow: var(--shadow-elevated), 0 0 36px rgba(201, 168, 76, 0.12);
+            padding: 24px 18px 18px;
+            text-align: center;
+        }
+        .first-launch-language-logo img {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            margin: 0 auto 12px;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+        }
+        .first-launch-language-title {
+            font: var(--text-h1);
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .first-launch-language-subtitle {
+            margin: 6px 0 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .first-launch-language-actions {
+            display: grid;
+            gap: 10px;
+        }
+        .first-launch-language-btn {
+            width: 100%;
+            min-height: 52px;
+            border-radius: 14px;
+            border: 1px solid rgba(201, 168, 76, 0.26);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            font-family: var(--font-title);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+        }
+        .first-launch-language-btn:active {
+            transform: scale(0.98);
+        }
+        .first-launch-language-btn:hover,
+        .first-launch-language-btn:focus-visible {
+            background: rgba(201, 168, 76, 0.18);
+            border-color: rgba(201, 168, 76, 0.5);
+            outline: none;
+        }
+        .first-launch-language-hint {
+            margin: 14px 0 0;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
         .app-update-overlay {
             position: fixed;
             inset: 0;
@@ -5601,6 +5693,16 @@
         }
         [data-theme="light"] .app-update-overlay {
             background: rgba(34, 28, 17, 0.42);
+        }
+        [data-theme="light"] .first-launch-language-overlay {
+            background: rgba(34, 28, 17, 0.46);
+        }
+        [data-theme="light"] .first-launch-language-card {
+            background: linear-gradient(180deg, #ffffff, #f6f2ea);
+            border-color: rgba(116, 89, 33, 0.3);
+        }
+        [data-theme="light"] .first-launch-language-subtitle {
+            color: rgba(26, 26, 46, 0.76);
         }
         [data-theme="light"] .app-update-card {
             background: linear-gradient(180deg, #ffffff, #f6f2ea);

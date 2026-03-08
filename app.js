@@ -17,10 +17,110 @@
     const VERSION_CHECK_CONFIG_URL = 'version.json';
     const DEFAULT_PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=io.github.mohhp.essentialduas';
     const APP_UPDATE_DIALOG_ID = 'appUpdateOverlay';
+    const LANGUAGE_STORAGE_KEY = 'crown_lang';
+    const FIRST_LAUNCH_LANGUAGE_OVERLAY_ID = 'firstLaunchLanguageOverlay';
+    let resolveLanguageSelectionReady;
+    let languageSelectionReadyResolved = false;
+    const languageSelectionReadyPromise = new Promise((resolve) => {
+        resolveLanguageSelectionReady = resolve;
+    });
+
+    function markLanguageSelectionReady() {
+        if (languageSelectionReadyResolved) return;
+        languageSelectionReadyResolved = true;
+        if (typeof resolveLanguageSelectionReady === 'function') resolveLanguageSelectionReady();
+    }
+
+    function getStoredLanguagePreference() {
+        const lang = String(localStorage.getItem(LANGUAGE_STORAGE_KEY) || '').toLowerCase();
+        if (lang === 'en' || lang === 'ps') return lang;
+        return '';
+    }
+
+    function getStartupLanguageDirection(lang) {
+        return lang === 'ps' ? 'rtl' : 'ltr';
+    }
+
+    function applyStartupDirectionFromLanguage(lang) {
+        const dir = getStartupLanguageDirection(lang);
+        document.documentElement.setAttribute('dir', dir);
+        if (document.body) document.body.setAttribute('dir', dir);
+    }
+
+    function hideFirstLaunchLanguageOverlay() {
+        const overlay = document.getElementById(FIRST_LAUNCH_LANGUAGE_OVERLAY_ID);
+        if (!overlay) {
+            document.body.classList.remove('language-picker-open');
+            return;
+        }
+
+        overlay.classList.add('closing');
+        window.setTimeout(() => {
+            overlay.remove();
+            document.body.classList.remove('language-picker-open');
+        }, 240);
+    }
+
+    function createFirstLaunchLanguageOverlay() {
+        let overlay = document.getElementById(FIRST_LAUNCH_LANGUAGE_OVERLAY_ID);
+        if (overlay) return overlay;
+
+        overlay = document.createElement('div');
+        overlay.id = FIRST_LAUNCH_LANGUAGE_OVERLAY_ID;
+        overlay.className = 'first-launch-language-overlay';
+        overlay.innerHTML = `
+            <div class="first-launch-language-card" role="dialog" aria-modal="true" aria-labelledby="firstLaunchLanguageTitle" aria-describedby="firstLaunchLanguageHint">
+                <div class="first-launch-language-logo">
+                    <img src="icon-192.png" alt="Falah" width="72" height="72">
+                </div>
+                <h2 id="firstLaunchLanguageTitle" class="first-launch-language-title">Falah</h2>
+                <p class="first-launch-language-subtitle">Choose your language / خپله ژبه وټاکئ</p>
+                <div class="first-launch-language-actions">
+                    <button type="button" class="first-launch-language-btn" data-lang-choice="en" aria-label="English">🇬🇧 English</button>
+                    <button type="button" class="first-launch-language-btn" data-lang-choice="ps" aria-label="پښتو">🇦🇫 پښتو (Pashto)</button>
+                </div>
+                <p id="firstLaunchLanguageHint" class="first-launch-language-hint">You can change this later in Settings / تاسو وروسته دا په ترتیباتو کې بدلولی شئ</p>
+            </div>`;
+
+        const chooseLanguage = (lang) => {
+            const normalized = lang === 'ps' ? 'ps' : 'en';
+            localStorage.setItem(LANGUAGE_STORAGE_KEY, normalized);
+            applyStartupDirectionFromLanguage(normalized);
+            if (typeof applyLanguage === 'function') applyLanguage(normalized);
+            hideFirstLaunchLanguageOverlay();
+            markLanguageSelectionReady();
+        };
+
+        overlay.querySelectorAll('[data-lang-choice]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                chooseLanguage(btn.getAttribute('data-lang-choice'));
+            });
+        });
+
+        document.body.appendChild(overlay);
+        window.requestAnimationFrame(() => {
+            overlay.classList.add('active');
+        });
+        return overlay;
+    }
+
+    async function ensureLanguageSelectionBeforeStartup() {
+        const savedLang = getStoredLanguagePreference();
+        if (savedLang) {
+            applyStartupDirectionFromLanguage(savedLang);
+            if (typeof applyLanguage === 'function') applyLanguage(savedLang);
+            markLanguageSelectionReady();
+            return;
+        }
+
+        document.body.classList.add('language-picker-open');
+        createFirstLaunchLanguageOverlay();
+        await languageSelectionReadyPromise;
+    }
 
     function getPreferredLang() {
         if (typeof getCurrentLang === 'function') return getCurrentLang();
-        return localStorage.getItem('crown_lang') || 'ps';
+        return localStorage.getItem(LANGUAGE_STORAGE_KEY) || 'ps';
     }
 
     function isPashtoMode() {
@@ -175,10 +275,32 @@
         const laterBtn = document.getElementById('appUpdateLaterBtn');
         if (!titleEl || !messageEl || !updateBtn || !laterBtn) return;
 
-        titleEl.textContent = force ? 'Update Required' : 'Update Available';
-        messageEl.textContent = message || (force
-            ? 'This version is no longer supported. Please update to continue.'
-            : 'A new version is available with important fixes.');
+        const lang = getPreferredLang();
+        const isPashto = lang === 'ps';
+        const defaults = {
+            updateTitle: isPashto ? 'تازه نسخه شته' : 'Update Available',
+            forceTitle: isPashto ? 'تازه کول اړین دي' : 'Update Required',
+            updateMessage: isPashto
+                ? 'نوې نسخه د مهمو اصلاحاتو سره شته.'
+                : 'A new version is available with important fixes.',
+            forceMessage: isPashto
+                ? 'دا نسخه نور نه ملاتړ کېږي. مهرباني وکړئ د دوام لپاره تازه یې کړئ.'
+                : 'This version is no longer supported. Please update to continue.',
+            nowLabel: isPashto ? 'اوس تازه کړئ' : 'Update Now',
+            laterLabel: isPashto ? 'وروسته' : 'Later'
+        };
+
+        let resolvedMessage = message;
+        if (isPashto && resolvedMessage === 'A new version is available with important fixes.') {
+            resolvedMessage = defaults.updateMessage;
+        } else if (isPashto && resolvedMessage === 'This version is no longer supported. Please update to continue.') {
+            resolvedMessage = defaults.forceMessage;
+        }
+
+        titleEl.textContent = force ? defaults.forceTitle : defaults.updateTitle;
+        messageEl.textContent = resolvedMessage || (force ? defaults.forceMessage : defaults.updateMessage);
+        updateBtn.textContent = defaults.nowLabel;
+        laterBtn.textContent = defaults.laterLabel;
 
         if (force) {
             overlay.classList.add('force');
@@ -198,6 +320,8 @@
     }
 
     async function checkAppVersionOnStartup() {
+        await languageSelectionReadyPromise;
+
         try {
             const response = await fetch(VERSION_CHECK_CONFIG_URL, {
                 cache: 'no-store'
@@ -249,7 +373,7 @@
     };
 
     // ===== INITIALIZATION =====
-    function init() {
+    async function init() {
         // Dismiss splash screen
         const splash = document.getElementById('splashScreen');
         if (splash) {
@@ -264,7 +388,12 @@
         loadDailyDua();
         applyFontSize(STATE.fontSize);
         applyTheme();
-        checkAppVersionOnStartup();
+        document.body.classList.add('startup-blocked');
+
+        await ensureLanguageSelectionBeforeStartup();
+        await checkAppVersionOnStartup();
+        document.body.classList.remove('startup-blocked');
+
         injectShareImageButtons();
         injectAudioButtons();
         renderTimeBanner();
@@ -280,7 +409,7 @@
         renderDuasBookmarksSection();
         initFontSizeControls();
 
-        // Apply saved language preference first (defaults to Pashto on first run)
+        // Apply saved language preference after startup language gate.
         if (typeof applyLanguage === 'function') applyLanguage();
         if (typeof window.toggleLanguage === 'function' && !window.__wrappedToggleLanguageForDashboard) {
             const originalToggleLanguage = window.toggleLanguage;

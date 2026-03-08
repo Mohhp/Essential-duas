@@ -801,6 +801,8 @@ function applyLanguage(lang) {
     // Body class
     document.body.classList.toggle('lang-ps', isPS);
     document.documentElement.setAttribute('lang', isPS ? 'ps' : 'en');
+    document.documentElement.setAttribute('dir', isPS ? 'rtl' : 'ltr');
+    document.body.setAttribute('dir', isPS ? 'rtl' : 'ltr');
 
     // Toggle button highlight
     const enBtn = document.getElementById('langEN');
