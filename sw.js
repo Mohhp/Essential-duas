@@ -1,4 +1,4 @@
-const CACHE_NAME = 'falah-v99';
+const CACHE_NAME = 'falah-v100';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const OFFLINE_PAGE = './offline.html';
 const PRAYER_REMINDER_STATE_CACHE = 'falah-prayer-reminder-state-v1';
@@ -115,6 +115,7 @@ const ASSETS = [
   './favicon.svg',
   './pashto.js',
   './pashto-translation-player.js',
+  './audio/pashto_local_mapping.json',
   './audio/pashto_audit/pashto_soundcloud_mapping_114.json',
   './audio/pashto_audit/pashto_archive_mapping_114.json',
   './audio/pashto_audit/pashto_archive_mapping_juz30.json',
@@ -155,6 +156,13 @@ const ASSETS = [
   './audio/duas/dua-59.mp3',
   './audio/duas/dua-60.mp3'
 ];
+
+const LOCAL_PASHTO_AUDIO_ASSETS = Array.from({ length: 114 }, function (_, index) {
+  const surah = String(index + 1).padStart(3, '0');
+  return './audio/quran-pashto-soundcloud-normalized/' + surah + '.mp3';
+});
+
+ASSETS.push.apply(ASSETS, LOCAL_PASHTO_AUDIO_ASSETS);
 
 // Install — pre-cache all core assets
 self.addEventListener('install', (event) => {

@@ -1,0 +1,703 @@
+{
+  "source": {
+    "primary": "local",
+    "fallback": [
+      "soundcloud-mapping",
+      "archive-114",
+      "archive-juz30"
+    ],
+    "generated_at": "2026-03-08T16:23:44.065Z",
+    "note": "Local normalized Pashto audio is preferred first."
+  },
+  "coverage": {
+    "total": 114,
+    "local_file_count": 114,
+    "missing_local": []
+  },
+  "rows": [
+    {
+      "surah": 1,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/001.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 2,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/002.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 3,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/003.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 4,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/004.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 5,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/005.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 6,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/006.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 7,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/007.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 8,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/008.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 9,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/009.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 10,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/010.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 11,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/011.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 12,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/012.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 13,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/013.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 14,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/014.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 15,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/015.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 16,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/016.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 17,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/017.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 18,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/018.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 19,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/019.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 20,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/020.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 21,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/021.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 22,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/022.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 23,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/023.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 24,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/024.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 25,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/025.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 26,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/026.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 27,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/027.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 28,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/028.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 29,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/029.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 30,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/030.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 31,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/031.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 32,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/032.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 33,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/033.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 34,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/034.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 35,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/035.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 36,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/036.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 37,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/037.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 38,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/038.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 39,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/039.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 40,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/040.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 41,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/041.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 42,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/042.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 43,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/043.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 44,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/044.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 45,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/045.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 46,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/046.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 47,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/047.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 48,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/048.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 49,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/049.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 50,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/050.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 51,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/051.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 52,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/052.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 53,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/053.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 54,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/054.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 55,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/055.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 56,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/056.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 57,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/057.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 58,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/058.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 59,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/059.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 60,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/060.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 61,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/061.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 62,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/062.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 63,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/063.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 64,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/064.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 65,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/065.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 66,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/066.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 67,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/067.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 68,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/068.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 69,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/069.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 70,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/070.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 71,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/071.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 72,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/072.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 73,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/073.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 74,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/074.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 75,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/075.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 76,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/076.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 77,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/077.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 78,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/078.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 79,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/079.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 80,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/080.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 81,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/081.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 82,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/082.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 83,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/083.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 84,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/084.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 85,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/085.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 86,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/086.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 87,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/087.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 88,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/088.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 89,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/089.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 90,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/090.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 91,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/091.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 92,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/092.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 93,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/093.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 94,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/094.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 95,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/095.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 96,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/096.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 97,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/097.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 98,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/098.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 99,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/099.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 100,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/100.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 101,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/101.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 102,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/102.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 103,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/103.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 104,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/104.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 105,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/105.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 106,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/106.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 107,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/107.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 108,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/108.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 109,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/109.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 110,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/110.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 111,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/111.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 112,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/112.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 113,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/113.mp3",
+      "local_available": true
+    },
+    {
+      "surah": 114,
+      "source": "local-soundcloud-normalized",
+      "pashto_audio_url": "/audio/quran-pashto-soundcloud-normalized/114.mp3",
+      "local_available": true
+    }
+  ]
+}

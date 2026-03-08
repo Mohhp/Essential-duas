@@ -1,5 +1,6 @@
 (function () {
   const DEFAULT_MAPPING_URLS = [
+    "/audio/pashto_local_mapping.json",
     "/audio/pashto_audit/pashto_soundcloud_mapping_114.json",
     "/audio/pashto_audit/pashto_archive_mapping_114.json",
     "/audio/pashto_audit/pashto_archive_mapping_juz30.json",
