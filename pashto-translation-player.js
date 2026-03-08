@@ -75,6 +75,25 @@
     return [];
   }
 
+  async function fetchWithTimeout(url, options, timeoutMs) {
+    const timeout = Math.max(1000, Number(timeoutMs) || 12000);
+    if (typeof AbortController === "undefined") {
+      return fetch(url, options || {});
+    }
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(function () {
+      controller.abort();
+    }, timeout);
+
+    try {
+      const fetchOptions = Object.assign({}, options || {}, { signal: controller.signal });
+      return await fetch(url, fetchOptions);
+    } finally {
+      window.clearTimeout(timer);
+    }
+  }
+
   function mappingCandidates() {
     return [mappingUrl].concat(
       DEFAULT_MAPPING_URLS.filter(function (url) {
@@ -90,7 +109,7 @@
 
     const p = (async function () {
       const resolvedUrl = resolveAppUrl(url);
-      const res = await fetch(resolvedUrl, { cache: "no-cache" });
+      const res = await fetchWithTimeout(resolvedUrl, { cache: "no-cache" }, 12000);
       if (!res.ok) throw new Error("HTTP " + res.status + " for " + url);
       const payload = await res.json();
       const rows = normalizeRows(payload);

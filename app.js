@@ -4506,7 +4506,7 @@ window.filterCategory = function(cat, btn) {
 
     async function resolveAyahAudioUrl(ayahKey) {
         if (AYAH_AUDIO_CACHE.has(ayahKey)) return AYAH_AUDIO_CACHE.get(ayahKey);
-        const resp = await fetch(`https://api.alquran.cloud/v1/ayah/${ayahKey}/ar.alafasy`);
+        const resp = await fetchWithTimeout(`https://api.alquran.cloud/v1/ayah/${ayahKey}/ar.alafasy`, {}, 12000);
         if (!resp.ok) throw new Error('Audio lookup failed');
         const json = await resp.json();
         const url = json?.data?.audio;
@@ -7604,7 +7604,8 @@ window.filterCategory = function(cat, btn) {
                 let geodata = null;
                 // Reverse geocode for city name
                 try {
-                    const resp = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=10`);
+                    const resp = await fetchWithTimeout(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=10`, {}, 10000);
+                    if (!resp.ok) throw new Error('Reverse geocoding failed');
                     geodata = await resp.json();
                     city = geodata.address?.city || geodata.address?.town || geodata.address?.village || geodata.address?.state || '';
                 } catch(e) { /* offline — no city name */ }
@@ -9352,6 +9353,21 @@ window.filterCategory = function(cat, btn) {
         markSurahOffline(surahNumber);
     }
 
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 12000) {
+        const timeout = Math.max(1000, Number(timeoutMs) || 12000);
+        if (typeof AbortController === 'undefined') {
+            return fetch(url, options);
+        }
+
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeout);
+        try {
+            return await fetch(url, { ...options, signal: controller.signal });
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
     async function fetchQuranMeta() {
         if (quranState.meta) return quranState.meta;
         const cached = localStorage.getItem(QURAN_META_KEY);
@@ -9363,7 +9379,8 @@ window.filterCategory = function(cat, btn) {
             } catch (error) {}
         }
 
-        const response = await fetch(`${QURAN_API_BASE}/meta`);
+        const response = await fetchWithTimeout(`${QURAN_API_BASE}/meta`, {}, 12000);
+        if (!response.ok) throw new Error('Failed to load Quran metadata');
         const json = await response.json();
         if (json?.code !== 200 || !json?.data?.surahs?.references) throw new Error('Failed to load Quran metadata');
         quranState.meta = json.data;
@@ -9484,7 +9501,7 @@ window.filterCategory = function(cat, btn) {
         if (quranState.pashtoZakariaMap) return quranState.pashtoZakariaMap;
         if (quranState.pashtoZakariaPromise) return quranState.pashtoZakariaPromise;
 
-        quranState.pashtoZakariaPromise = fetch(QURAN_PASHTO_ZAKARIA_DATA_URL, { cache: 'no-cache' })
+        quranState.pashtoZakariaPromise = fetchWithTimeout(QURAN_PASHTO_ZAKARIA_DATA_URL, { cache: 'no-cache' }, 12000)
             .then((response) => {
                 if (!response.ok) throw new Error('Failed to load Pashto Zakaria dataset');
                 return response.json();
@@ -9530,7 +9547,8 @@ window.filterCategory = function(cat, btn) {
         const settings = getQuranSettings();
         if (settings.pashtoEdition && settings.pashtoEdition.startsWith('ps.')) return settings.pashtoEdition;
         try {
-            const response = await fetch(`${QURAN_API_BASE}/edition/language/ps`);
+            const response = await fetchWithTimeout(`${QURAN_API_BASE}/edition/language/ps`, {}, 12000);
+            if (!response.ok) throw new Error('Failed to load Pashto edition list');
             const json = await response.json();
             if (json?.code === 200 && Array.isArray(json.data) && json.data[0]?.identifier) {
                 settings.pashtoEdition = json.data[0].identifier;
@@ -10059,7 +10077,8 @@ window.filterCategory = function(cat, btn) {
         }
 
         const editionList = ['quran-uthmani', 'en.sahih'];
-        const response = await fetch(`${QURAN_API_BASE}/surah/${surahNumber}/editions/${editionList.join(',')}`);
+        const response = await fetchWithTimeout(`${QURAN_API_BASE}/surah/${surahNumber}/editions/${editionList.join(',')}`, {}, 15000);
+        if (!response.ok) throw new Error('Failed to fetch surah data');
         const json = await response.json();
         const blocks = json?.data || [];
         if (!Array.isArray(blocks) || !blocks.length) throw new Error('Failed to fetch surah data');
@@ -10331,7 +10350,8 @@ window.filterCategory = function(cat, btn) {
 
         try {
             const edition = getQuranSettings().pashtoEdition || 'ps.abdulwali';
-            const response = await fetch(`${QURAN_API_BASE}/ayah/${Number(surahNumber)}:${Number(ayahNumber)}/${edition}`);
+            const response = await fetchWithTimeout(`${QURAN_API_BASE}/ayah/${Number(surahNumber)}:${Number(ayahNumber)}/${edition}`, {}, 12000);
+            if (!response.ok) throw new Error('Failed to fetch Pashto ayah audio');
             const json = await response.json();
             const secondary = Array.isArray(json?.data?.audioSecondary) ? json.data.audioSecondary : [];
             const url = json?.data?.audio || secondary[0] || null;
@@ -10425,7 +10445,8 @@ window.filterCategory = function(cat, btn) {
         if (ENGLISH_AUDIO_CACHE.has(key)) return ENGLISH_AUDIO_CACHE.get(key);
 
         try {
-            const response = await fetch(`${QURAN_API_BASE}/ayah/${Number(surahNumber)}:${Number(ayahNumber)}/en.walk`);
+            const response = await fetchWithTimeout(`${QURAN_API_BASE}/ayah/${Number(surahNumber)}:${Number(ayahNumber)}/en.walk`, {}, 12000);
+            if (!response.ok) throw new Error('Failed to fetch English ayah audio');
             const json = await response.json();
             const secondary = Array.isArray(json?.data?.audioSecondary) ? json.data.audioSecondary : [];
             const url = json?.data?.audio || secondary[0] || null;
@@ -11367,7 +11388,8 @@ window.filterCategory = function(cat, btn) {
         const candidates = [];
         try {
             for (const reciterId of aliasIds) {
-                const response = await fetch(`${QURAN_API_BASE}/ayah/${surahNumber}:${ayahNumber}/${reciterId}`);
+                const response = await fetchWithTimeout(`${QURAN_API_BASE}/ayah/${surahNumber}:${ayahNumber}/${reciterId}`, {}, 12000);
+                if (!response.ok) continue;
                 const json = await response.json();
                 if (json?.data?.audio) candidates.push(json.data.audio);
             }
@@ -11399,7 +11421,7 @@ window.filterCategory = function(cat, btn) {
             const cache = await caches.open(QURAN_AUDIO_CACHE);
             let match = await cache.match(audioUrl, { ignoreSearch: true });
             if (!match) {
-                const response = await fetch(audioUrl, { mode: 'no-cors', cache: 'no-store' });
+                const response = await fetchWithTimeout(audioUrl, { mode: 'no-cors', cache: 'no-store' }, 12000);
                 if (response && (response.ok || response.type === 'opaque')) {
                     await cache.put(audioUrl, response.clone());
                     match = response;
@@ -11822,7 +11844,7 @@ window.filterCategory = function(cat, btn) {
             const exists = await cache.match(audioUrl, { ignoreSearch: true });
             if (exists) continue;
             try {
-                const resp = await fetch(audioUrl, { mode: 'no-cors', cache: 'no-store' });
+                const resp = await fetchWithTimeout(audioUrl, { mode: 'no-cors', cache: 'no-store' }, 12000);
                 if (resp && (resp.ok || resp.type === 'opaque')) await cache.put(audioUrl, resp.clone());
             } catch (error) {}
         }

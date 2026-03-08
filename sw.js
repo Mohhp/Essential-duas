@@ -9,6 +9,7 @@ const PRAYER_REMINDER_STATE_CACHE = 'falah-prayer-reminder-state-v1';
 const PRAYER_REMINDER_STATE_URL = '/__prayer-reminder-state__';
 const PRAYER_REMINDER_DUE_WINDOW_MS = 2 * 60 * 1000;
 const PRAYER_REMINDER_GRACE_MS = 3 * 60 * 60 * 1000;
+const NETWORK_FETCH_TIMEOUT_MS = 12000;
 
 let prayerReminderState = {
   generatedAt: 0,
@@ -16,6 +17,21 @@ let prayerReminderState = {
   reminders: []
 };
 const firedReminderMap = new Map();
+
+async function fetchWithTimeout(request, options = {}, timeoutMs = NETWORK_FETCH_TIMEOUT_MS) {
+  const timeout = Math.max(1000, Number(timeoutMs) || NETWORK_FETCH_TIMEOUT_MS);
+  if (typeof AbortController === 'undefined') {
+    return fetch(request, options);
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+  try {
+    return await fetch(request, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 async function readQuranAudioRuntimeMeta() {
   const cache = await caches.open(QURAN_AUDIO_RUNTIME_META_CACHE);
@@ -354,7 +370,7 @@ self.addEventListener('fetch', (event) => {
         if (cachedApp) return cachedApp;
 
         try {
-          const response = await fetch(event.request);
+          const response = await fetchWithTimeout(event.request);
           if (response && response.ok) {
             const forAudio = response.clone();
             if (shouldUseRuntimeLimit) {
@@ -377,7 +393,7 @@ self.addEventListener('fetch', (event) => {
   // For navigation requests (HTML pages)
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
+      fetchWithTimeout(event.request)
         .then((response) => {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
@@ -394,7 +410,7 @@ self.addEventListener('fetch', (event) => {
 
   // For all other assets (CSS, JS, images, fonts)
   event.respondWith(
-    fetch(event.request)
+    fetchWithTimeout(event.request)
       .then((response) => {
         const clone = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
