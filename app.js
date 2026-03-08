@@ -14,7 +14,7 @@
     const QURAN_STREAK_KEY = 'crown_quran_streak';
     const QURAN_STREAK_LAST_DAY_KEY = 'crown_quran_streak_last_day';
     const CURRENT_APP_VERSION = 1;
-    const VERSION_CHECK_CONFIG_URL = 'version.json';
+    const VERSION_CHECK_CONFIG_URL = 'https://mohhp.github.io/Essential-duas/version.json';
     const DEFAULT_PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=io.github.mohhp.essentialduas';
     const APP_UPDATE_DIALOG_ID = 'appUpdateOverlay';
     const LANGUAGE_STORAGE_KEY = 'crown_lang';
