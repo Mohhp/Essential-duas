@@ -13,6 +13,10 @@
     };
     const QURAN_STREAK_KEY = 'crown_quran_streak';
     const QURAN_STREAK_LAST_DAY_KEY = 'crown_quran_streak_last_day';
+    const CURRENT_APP_VERSION = 1;
+    const VERSION_CHECK_CONFIG_URL = 'version.json';
+    const DEFAULT_PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=io.github.mohhp.essentialduas';
+    const APP_UPDATE_DIALOG_ID = 'appUpdateOverlay';
 
     function getPreferredLang() {
         if (typeof getCurrentLang === 'function') return getCurrentLang();
@@ -122,6 +126,110 @@
         scheduleNumberRelocalization();
     }
 
+    function toIntegerVersion(value, fallback = 0) {
+        const parsed = Number.parseInt(String(value), 10);
+        return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    function openAppStoreLink(rawUrl) {
+        const url = String(rawUrl || DEFAULT_PLAY_STORE_URL).trim() || DEFAULT_PLAY_STORE_URL;
+        const bridge = getAndroidReminderBridge();
+        if (bridge && typeof bridge.openStoreUpdate === 'function') {
+            try {
+                const handled = bridge.openStoreUpdate(url);
+                if (handled === true || handled === 'true' || handled === 1 || handled === '1' || handled == null) {
+                    return;
+                }
+            } catch (_) {}
+        }
+        window.open(url, '_blank', 'noopener');
+    }
+
+    function ensureAppUpdateDialog() {
+        let overlay = document.getElementById(APP_UPDATE_DIALOG_ID);
+        if (overlay) return overlay;
+
+        overlay = document.createElement('div');
+        overlay.id = APP_UPDATE_DIALOG_ID;
+        overlay.className = 'app-update-overlay';
+        overlay.innerHTML = `
+            <div class="app-update-card" role="dialog" aria-modal="true" aria-labelledby="appUpdateTitle" aria-describedby="appUpdateMessage">
+                <img src="icon-192.png" alt="App icon" class="app-update-icon" width="64" height="64">
+                <h2 id="appUpdateTitle" class="app-update-title">Update Available</h2>
+                <p id="appUpdateMessage" class="app-update-message"></p>
+                <div class="app-update-actions">
+                    <button type="button" class="app-update-btn primary" id="appUpdateNowBtn">Update Now</button>
+                    <button type="button" class="app-update-btn" id="appUpdateLaterBtn">Later</button>
+                </div>
+            </div>`;
+
+        document.body.appendChild(overlay);
+        return overlay;
+    }
+
+    function showAppUpdateDialog({ force = false, message = '', updateUrl = DEFAULT_PLAY_STORE_URL } = {}) {
+        const overlay = ensureAppUpdateDialog();
+        const titleEl = document.getElementById('appUpdateTitle');
+        const messageEl = document.getElementById('appUpdateMessage');
+        const updateBtn = document.getElementById('appUpdateNowBtn');
+        const laterBtn = document.getElementById('appUpdateLaterBtn');
+        if (!titleEl || !messageEl || !updateBtn || !laterBtn) return;
+
+        titleEl.textContent = force ? 'Update Required' : 'Update Available';
+        messageEl.textContent = message || (force
+            ? 'This version is no longer supported. Please update to continue.'
+            : 'A new version is available with important fixes.');
+
+        if (force) {
+            overlay.classList.add('force');
+            laterBtn.style.display = 'none';
+        } else {
+            overlay.classList.remove('force');
+            laterBtn.style.display = '';
+            laterBtn.onclick = () => {
+                overlay.classList.remove('active');
+                document.body.classList.remove('app-update-open');
+            };
+        }
+
+        updateBtn.onclick = () => openAppStoreLink(updateUrl);
+        overlay.classList.add('active');
+        document.body.classList.add('app-update-open');
+    }
+
+    async function checkAppVersionOnStartup() {
+        try {
+            const response = await fetch(VERSION_CHECK_CONFIG_URL, {
+                cache: 'no-store'
+            });
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const latestVersion = toIntegerVersion(data?.latestVersion, CURRENT_APP_VERSION);
+            const minRequiredVersion = toIntegerVersion(data?.minRequiredVersion, latestVersion);
+            const updateUrl = String(data?.updateUrl || DEFAULT_PLAY_STORE_URL).trim() || DEFAULT_PLAY_STORE_URL;
+
+            if (CURRENT_APP_VERSION < minRequiredVersion) {
+                showAppUpdateDialog({
+                    force: true,
+                    updateUrl,
+                    message: data?.forceUpdateMessage
+                });
+                return;
+            }
+
+            if (CURRENT_APP_VERSION < latestVersion) {
+                showAppUpdateDialog({
+                    force: false,
+                    updateUrl,
+                    message: data?.updateMessage
+                });
+            }
+        } catch (_) {
+            // Graceful fallback: if version metadata cannot be fetched, continue app startup.
+        }
+    }
+
     // ===== DOM ELEMENTS =====
     const els = {
         cards: document.querySelectorAll('.dua-card'),
@@ -156,6 +264,7 @@
         loadDailyDua();
         applyFontSize(STATE.fontSize);
         applyTheme();
+        checkAppVersionOnStartup();
         injectShareImageButtons();
         injectAudioButtons();
         renderTimeBanner();
@@ -4063,7 +4172,7 @@ window.filterCategory = function(cat, btn) {
     };
 
     window.rateApp = function() {
-        window.open('https://play.google.com/store/apps/details?id=com.fallah.essentialduas', '_blank', 'noopener');
+        openAppStoreLink(DEFAULT_PLAY_STORE_URL);
     };
 
     // ===== PROGRESS PANEL =====

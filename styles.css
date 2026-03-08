@@ -5517,6 +5517,98 @@
             background: rgba(46, 196, 122, 0.18);
             color: var(--emerald-light);
         }
+
+        .app-update-open {
+            overflow: hidden;
+        }
+        .app-update-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 12000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(5, 12, 23, 0.78);
+            backdrop-filter: blur(6px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 220ms ease;
+        }
+        .app-update-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .app-update-card {
+            width: min(92vw, 420px);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+            border: 1px solid rgba(201, 168, 76, 0.28);
+            border-radius: 18px;
+            box-shadow: var(--shadow-elevated), 0 0 40px rgba(201, 168, 76, 0.12);
+            padding: 22px 18px 18px;
+            text-align: center;
+        }
+        .app-update-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            margin: 0 auto 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+        .app-update-title {
+            font: var(--text-h1);
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        .app-update-message {
+            color: var(--text-secondary);
+            line-height: 1.65;
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+        }
+        .app-update-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .app-update-btn {
+            min-width: 120px;
+            min-height: 44px;
+            border-radius: 999px;
+            border: 1px solid rgba(201, 168, 76, 0.28);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 10px 16px;
+            transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
+        }
+        .app-update-btn:active {
+            transform: scale(0.98);
+        }
+        .app-update-btn.primary {
+            background: rgba(201, 168, 76, 0.24);
+            border-color: rgba(201, 168, 76, 0.58);
+            color: #fff8e0;
+        }
+        .app-update-overlay.force .app-update-card {
+            border-color: rgba(229, 103, 103, 0.45);
+            box-shadow: var(--shadow-elevated), 0 0 36px rgba(229, 103, 103, 0.16);
+        }
+        [data-theme="light"] .app-update-overlay {
+            background: rgba(34, 28, 17, 0.42);
+        }
+        [data-theme="light"] .app-update-card {
+            background: linear-gradient(180deg, #ffffff, #f6f2ea);
+            border-color: rgba(116, 89, 33, 0.3);
+        }
+        [data-theme="light"] .app-update-message {
+            color: rgba(26, 26, 46, 0.76);
+        }
         /* ============================================ */
         @media (max-width: 420px) {
             h1 { font-size: 1.5rem; }

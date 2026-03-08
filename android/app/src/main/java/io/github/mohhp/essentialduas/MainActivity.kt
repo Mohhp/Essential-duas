@@ -242,6 +242,15 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
         }
     }
 
+    fun openStoreUpdate(url: String?): Boolean {
+        val target = url?.trim().orEmpty().ifBlank { APP_PLAY_STORE_URL }
+        val parsed = runCatching { Uri.parse(target) }.getOrNull() ?: return false
+        runOnUiThread {
+            openExternalUri(parsed)
+        }
+        return true
+    }
+
     private inner class AssetWebViewClient : WebViewClient() {
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
@@ -294,5 +303,6 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
     companion object {
         private const val APP_HOST = "appassets.androidplatform.net"
         private const val APP_URL = "https://appassets.androidplatform.net/index.html"
+        private const val APP_PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=io.github.mohhp.essentialduas"
     }
 }

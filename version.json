@@ -1,5 +1,7 @@
 {
-  "latest": "2.0.17",
-  "minRequired": "2.0.0",
-  "updateUrl": "https://play.google.com/store/apps/details?id=io.github.mohhp.essentialduas"
+  "latestVersion": 1,
+  "minRequiredVersion": 1,
+  "updateUrl": "https://play.google.com/store/apps/details?id=io.github.mohhp.essentialduas",
+  "updateMessage": "A new version is available with important fixes.",
+  "forceUpdateMessage": "This version is no longer supported. Please update to continue."
 }

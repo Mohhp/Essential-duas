@@ -40,6 +40,11 @@ class ReminderBridge(
     }
 
     @JavascriptInterface
+    fun openStoreUpdate(url: String?): Boolean {
+        return activity.openStoreUpdate(url)
+    }
+
+    @JavascriptInterface
     fun getStatusJson(): String {
         val base = JsonParser.parseString(activity.buildBridgeStateJson("status"))
         return gson.toJson(base)
