@@ -2572,6 +2572,22 @@
             border-color: rgba(46, 196, 122, 0.3);
             background: rgba(46, 196, 122, 0.12);
         }
+        .foreground-reminder-banner {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(224, 160, 72, 0.38);
+            background: rgba(224, 160, 72, 0.14);
+            color: rgba(255, 236, 196, 0.96);
+            font-family: var(--font-text);
+            font-size: 0.73rem;
+            line-height: 1.45;
+            letter-spacing: 0.01em;
+        }
+        .foreground-reminder-banner.active {
+            display: block;
+        }
         .prayer-reminder-title {
             font-family: var(--font-title); font-size: 0.6rem;
             letter-spacing: 0.4px;
@@ -8288,6 +8304,35 @@
             color: #1a1a2e !important;
         }
 
+        [data-theme="light"] .prayer-row.next-prayer {
+            background: rgba(201, 168, 76, 0.22) !important;
+            border-color: rgba(154, 122, 47, 0.42) !important;
+            box-shadow: 0 8px 18px rgba(154, 122, 47, 0.1) !important;
+        }
+
+        [data-theme="light"] .prayer-row .prayer-time {
+            color: #2b2340 !important;
+        }
+
+        [data-theme="light"] .prayer-row.next-prayer .prayer-name,
+        [data-theme="light"] .prayer-row.next-prayer .prayer-time {
+            color: #5f4613 !important;
+            font-weight: 700 !important;
+        }
+
+        [data-theme="light"] .prayer-row .prayer-badge {
+            background: rgba(201, 168, 76, 0.16) !important;
+            color: #6f5518 !important;
+            border-color: rgba(154, 122, 47, 0.34) !important;
+            font-weight: 700 !important;
+        }
+
+        [data-theme="light"] .prayer-row.current-prayer .prayer-badge {
+            background: rgba(22, 152, 90, 0.16) !important;
+            color: #0f6d43 !important;
+            border-color: rgba(22, 152, 90, 0.32) !important;
+        }
+
         [data-theme="light"] .quran-revelation-text.is-makki,
         [data-theme="light"] .quran-popular-revelation.is-makki {
             background: rgba(201, 168, 76, 0.08) !important;
@@ -9626,6 +9671,10 @@
             margin: 0 0 var(--space-12) !important;
         }
 
+        .foreground-reminder-banner {
+            margin-bottom: var(--space-8);
+        }
+
         .prayer-reminder-status,
         .prayer-reminder-title {
             color: var(--text-muted) !important;
@@ -9852,4 +9901,23 @@
         [data-theme="light"] .dashboard-prayer-countdown,
         [data-theme="light"] .prayer-countdown-time {
             color: var(--text-accent) !important;
+        }
+
+        [data-theme="light"] .prayer-countdown-card {
+            background: linear-gradient(180deg, #fffdf9 0%, #f6f0e6 100%) !important;
+            border: 1px solid rgba(154, 122, 47, 0.18) !important;
+            box-shadow: 0 10px 24px rgba(42, 33, 18, 0.08) !important;
+        }
+
+        [data-theme="light"] .prayer-countdown-card .prayer-countdown-label {
+            color: #75684f !important;
+        }
+
+        [data-theme="light"] .prayer-countdown-card .prayer-countdown-name {
+            color: #1f2940 !important;
+        }
+
+        [data-theme="light"] .prayer-countdown-card .prayer-countdown-time {
+            color: #7b5a17 !important;
+            text-shadow: none !important;
         }

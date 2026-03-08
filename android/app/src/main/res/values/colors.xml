@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="falah_background">#0A1210</color>
+    <color name="falah_surface">#10211C</color>
+    <color name="falah_accent">#C5A25D</color>
+    <color name="falah_notification_tint">#FFFFFF</color>
+</resources>
