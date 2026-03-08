@@ -19,6 +19,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import io.github.mohhp.essentialduas.reminders.PrayerAlarmScheduler
@@ -31,6 +32,7 @@ import java.util.Locale
 
 class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
     private lateinit var webView: WebView
+    private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var repository: ReminderRepository
     private lateinit var scheduler: PrayerAlarmScheduler
     private lateinit var bridge: ReminderBridge
@@ -73,6 +75,7 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
         permissionChecker = SystemReminderPermissionChecker(this)
         scheduler = PrayerAlarmScheduler(this, repository, permissionChecker)
         bridge = ReminderBridge(this, repository, scheduler)
+        swipeRefresh = findViewById(R.id.swipeRefresh)
         webView = findViewById(R.id.webView)
 
         configureWebView()
@@ -183,6 +186,14 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
+        swipeRefresh.setOnRefreshListener {
+            webView.reload()
+        }
+        swipeRefresh.setOnChildScrollUpCallback { _, _ ->
+            // Allow pull-to-refresh only when the WebView is already at top.
+            webView.canScrollVertically(-1)
+        }
+
         with(webView.settings) {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -232,6 +243,11 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
     }
 
     private inner class AssetWebViewClient : WebViewClient() {
+        override fun onPageFinished(view: WebView?, url: String?) {
+            super.onPageFinished(view, url)
+            swipeRefresh.isRefreshing = false
+        }
+
         override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
             val uri = request?.url ?: return false
             if (uri.scheme != "https") return false

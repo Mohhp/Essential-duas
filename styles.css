@@ -5167,6 +5167,10 @@
             color: var(--text-primary);
         }
 
+        .native-android-app .pull-refresh-indicator {
+            display: none !important;
+        }
+
         .routine-panel.active,
         .quran-panel.active,
         .tasbeeh-panel.active,

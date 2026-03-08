@@ -3780,6 +3780,13 @@ window.filterCategory = function(cat, btn) {
         const indicator = document.getElementById('pullRefreshIndicator');
         if (!homePanel || !indicator || homePanel.dataset.pullRefreshBound === '1') return;
 
+        if (isNativeAndroidReminderMode()) {
+            indicator.setAttribute('aria-hidden', 'true');
+            indicator.style.display = 'none';
+            homePanel.dataset.pullRefreshBound = '1';
+            return;
+        }
+
         let startY = 0;
         let pulling = false;
         let refreshTriggered = false;
@@ -3818,10 +3825,10 @@ window.filterCategory = function(cat, btn) {
             indicator.style.transform = 'translate(-50%, -12px)';
             if (refreshTriggered) {
                 indicator.classList.add('refreshing');
-                refreshHomeContentData();
+                // Browser/PWA fallback: perform a real reload so all dynamic state is recomputed.
                 setTimeout(() => {
-                    indicator.classList.remove('visible', 'armed', 'refreshing');
-                }, 700);
+                    window.location.reload();
+                }, 80);
             } else {
                 indicator.classList.remove('visible', 'armed', 'refreshing');
             }
@@ -8949,7 +8956,10 @@ window.filterCategory = function(cat, btn) {
 
     // Auto-calculate prayer times on load if location is cached (for time banner enhancement)
     document.addEventListener('DOMContentLoaded', function() {
-        if (isNativeAndroidReminderMode()) {
+        const nativeMode = isNativeAndroidReminderMode();
+        document.documentElement.classList.toggle('native-android-app', nativeMode);
+
+        if (nativeMode) {
             ensureNativeAndroidReminderState();
             syncPrayerReminderStateToServiceWorker([]);
             postNativeReminderModeToServiceWorker(true, 'startup');
@@ -8958,7 +8968,7 @@ window.filterCategory = function(cat, btn) {
             maybeSuggestNativeAppForReminders();
         }
         bootstrapPrayerStateFromCache();
-        if (!isNativeAndroidReminderMode()) syncPrayerReminderStateToServiceWorker('bootstrap-clear');
+        if (!nativeMode) syncPrayerReminderStateToServiceWorker('bootstrap-clear');
     });
 
     // ===== QURAN READING FEATURE =====
