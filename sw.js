@@ -1,5 +1,9 @@
 const CACHE_NAME = 'falah-v100';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
+const QURAN_AUDIO_RUNTIME_META_CACHE = 'crown-quran-audio-meta-v1';
+const QURAN_AUDIO_RUNTIME_META_URL = '/__quran-audio-runtime-meta__';
+const QURAN_AUDIO_MAX_BYTES = 200 * 1024 * 1024;
+const QURAN_AUDIO_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 const OFFLINE_PAGE = './offline.html';
 const PRAYER_REMINDER_STATE_CACHE = 'falah-prayer-reminder-state-v1';
 const PRAYER_REMINDER_STATE_URL = '/__prayer-reminder-state__';
@@ -12,6 +16,106 @@ let prayerReminderState = {
   reminders: []
 };
 const firedReminderMap = new Map();
+
+async function readQuranAudioRuntimeMeta() {
+  const cache = await caches.open(QURAN_AUDIO_RUNTIME_META_CACHE);
+  const response = await cache.match(QURAN_AUDIO_RUNTIME_META_URL);
+  if (!response) return { entries: {} };
+
+  try {
+    const data = await response.json();
+    return {
+      entries: data && typeof data.entries === 'object' && data.entries ? data.entries : {}
+    };
+  } catch (_) {
+    return { entries: {} };
+  }
+}
+
+async function writeQuranAudioRuntimeMeta(meta) {
+  const cache = await caches.open(QURAN_AUDIO_RUNTIME_META_CACHE);
+  const response = new Response(JSON.stringify(meta || { entries: {} }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+  await cache.put(QURAN_AUDIO_RUNTIME_META_URL, response);
+}
+
+async function responseSizeBytes(response) {
+  const rawLength = response.headers && response.headers.get ? response.headers.get('content-length') : null;
+  const parsedLength = Number(rawLength);
+  if (Number.isFinite(parsedLength) && parsedLength > 0) return parsedLength;
+  const blob = await response.clone().blob();
+  return Number(blob.size) || 0;
+}
+
+function isPashtoRuntimeAudioRequest(requestUrl) {
+  return requestUrl.pathname.includes('/audio/quran-pashto-soundcloud-normalized/') && /\.mp3$/i.test(requestUrl.pathname);
+}
+
+async function enforceQuranAudioRuntimeLimits(audioCache, meta) {
+  const now = Date.now();
+  const entries = (meta && meta.entries) || {};
+
+  Object.keys(entries).forEach((key) => {
+    const entry = entries[key];
+    if (!entry || typeof entry.cachedAt !== 'number') {
+      delete entries[key];
+      return;
+    }
+    if (now - entry.cachedAt > QURAN_AUDIO_MAX_AGE_MS) {
+      delete entries[key];
+      audioCache.delete(key).catch(() => {});
+    }
+  });
+
+  let totalBytes = Object.values(entries).reduce((sum, item) => sum + (Number(item?.size) || 0), 0);
+  if (totalBytes <= QURAN_AUDIO_MAX_BYTES) {
+    meta.entries = entries;
+    return;
+  }
+
+  const sorted = Object.entries(entries)
+    .sort((a, b) => {
+      const timeA = Number(a[1]?.cachedAt) || 0;
+      const timeB = Number(b[1]?.cachedAt) || 0;
+      return timeA - timeB;
+    });
+
+  for (const [url, item] of sorted) {
+    if (totalBytes <= QURAN_AUDIO_MAX_BYTES) break;
+    totalBytes -= Number(item?.size) || 0;
+    delete entries[url];
+    await audioCache.delete(url).catch(() => {});
+  }
+
+  meta.entries = entries;
+}
+
+async function putPashtoRuntimeAudio(eventRequest, response, audioCache) {
+  const meta = await readQuranAudioRuntimeMeta();
+  const requestUrl = new URL(eventRequest.url);
+  const normalizedUrl = requestUrl.origin + requestUrl.pathname;
+  const size = await responseSizeBytes(response);
+
+  meta.entries[normalizedUrl] = {
+    size: Number(size) || 0,
+    cachedAt: Date.now()
+  };
+
+  await audioCache.put(eventRequest, response);
+  await enforceQuranAudioRuntimeLimits(audioCache, meta);
+  await writeQuranAudioRuntimeMeta(meta);
+}
+
+async function touchPashtoRuntimeAudio(eventRequest) {
+  const meta = await readQuranAudioRuntimeMeta();
+  const requestUrl = new URL(eventRequest.url);
+  const normalizedUrl = requestUrl.origin + requestUrl.pathname;
+  const entry = meta.entries[normalizedUrl];
+  if (!entry) return;
+  entry.cachedAt = Date.now();
+  await writeQuranAudioRuntimeMeta(meta);
+}
 
 async function persistPrayerReminderState() {
   const cache = await caches.open(PRAYER_REMINDER_STATE_CACHE);
@@ -157,13 +261,6 @@ const ASSETS = [
   './audio/duas/dua-60.mp3'
 ];
 
-const LOCAL_PASHTO_AUDIO_ASSETS = Array.from({ length: 114 }, function (_, index) {
-  const surah = String(index + 1).padStart(3, '0');
-  return './audio/quran-pashto-soundcloud-normalized/' + surah + '.mp3';
-});
-
-ASSETS.push.apply(ASSETS, LOCAL_PASHTO_AUDIO_ASSETS);
-
 // Install — pre-cache all core assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -184,7 +281,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter(k => k !== CACHE_NAME && k !== PRAYER_REMINDER_STATE_CACHE).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME && k !== PRAYER_REMINDER_STATE_CACHE && k !== QURAN_AUDIO_RUNTIME_META_CACHE).map(k => caches.delete(k))
       );
     }).then(async () => {
       await restorePrayerReminderState();
@@ -243,9 +340,15 @@ self.addEventListener('fetch', (event) => {
       (async () => {
         const audioCache = await caches.open(QURAN_AUDIO_CACHE);
         const appCache = await caches.open(CACHE_NAME);
+        const shouldUseRuntimeLimit = isPashtoRuntimeAudioRequest(requestUrl);
 
         const cachedAudio = await audioCache.match(event.request, { ignoreSearch: true });
-        if (cachedAudio) return cachedAudio;
+        if (cachedAudio) {
+          if (shouldUseRuntimeLimit) {
+            touchPashtoRuntimeAudio(event.request).catch(() => {});
+          }
+          return cachedAudio;
+        }
 
         const cachedApp = await appCache.match(event.request, { ignoreSearch: true });
         if (cachedApp) return cachedApp;
@@ -254,9 +357,11 @@ self.addEventListener('fetch', (event) => {
           const response = await fetch(event.request);
           if (response && response.ok) {
             const forAudio = response.clone();
-            const forApp = response.clone();
-            audioCache.put(event.request, forAudio).catch(() => {});
-            appCache.put(event.request, forApp).catch(() => {});
+            if (shouldUseRuntimeLimit) {
+              await putPashtoRuntimeAudio(event.request, forAudio, audioCache);
+            } else {
+              audioCache.put(event.request, forAudio).catch(() => {});
+            }
           }
           return response;
         } catch (error) {
