@@ -12,6 +12,7 @@ data class ReminderSettings(
     val enabled: Boolean = false,
     val mode: String = "tone",
     val soundId: String = "ding",
+    val playAdhanSound: Boolean = true,
     val sameSoundForAll: Boolean = true,
     val prayerSounds: Map<String, String> = DEFAULT_PRAYER_SOUNDS,
     val offsetMinutes: Int = 0,

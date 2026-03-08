@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory
 import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import io.github.mohhp.essentialduas.MainActivity
@@ -22,9 +23,11 @@ class PrayerAlarmScheduler(
     private val repository: ReminderRepository,
     private val permissionChecker: ReminderPermissionChecker
 ) {
+    private val logTag = "PrayerAlarm"
     private val alarmManager: AlarmManager? = context.getSystemService(AlarmManager::class.java)
 
     fun rescheduleAll(reason: String): ScheduledReminder? {
+        Log.d(logTag, "rescheduleAll called: $reason")
         cancelAll(saveState = false)
         if (alarmManager == null) {
             repository.saveNextReminder(null)
@@ -61,6 +64,7 @@ class PrayerAlarmScheduler(
                 triggerAt = triggerAt.toEpochMilli(),
                 offsetMinutes = settings.offsetMinutes
             )
+            Log.d(logTag, "Scheduling alarm for $prayerName at $triggerAt")
             scheduleExactAlarm(reminder)
             reminder
         }
@@ -78,7 +82,7 @@ class PrayerAlarmScheduler(
         if (saveState) repository.clearLastSchedule()
     }
 
-    fun notifyReminder(reminder: ScheduledReminder) {
+    fun notifyReminder(reminder: ScheduledReminder, forceSilent: Boolean = false) {
         val settings = repository.getSettings()
         val prayerLabel = reminder.prayerName.replaceFirstChar { it.uppercase() }
         val title = if (reminder.offsetMinutes > 0) {
@@ -110,7 +114,7 @@ class PrayerAlarmScheduler(
 
         val builder = NotificationCompat.Builder(
             context,
-            if (settings.mode == "silent" || settings.soundId == "silent") SILENT_CHANNEL_ID else AUDIBLE_CHANNEL_ID
+            if (forceSilent || settings.mode == "silent" || settings.soundId == "silent") SILENT_CHANNEL_ID else AUDIBLE_CHANNEL_ID
         )
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
@@ -122,7 +126,7 @@ class PrayerAlarmScheduler(
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 
         if (largeIcon != null) builder.setLargeIcon(largeIcon)
-        if (settings.mode != "silent" && settings.soundId != "silent") {
+        if (!forceSilent && settings.mode != "silent" && settings.soundId != "silent") {
             builder.setDefaults(NotificationCompat.DEFAULT_ALL)
         } else {
             builder.setSilent(true)

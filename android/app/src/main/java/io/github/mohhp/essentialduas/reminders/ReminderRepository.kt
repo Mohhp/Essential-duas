@@ -133,6 +133,7 @@ class ReminderRepository(context: Context) {
         return settings.copy(
             mode = settings.mode.takeIf { it in setOf("adhan", "tone", "silent") } ?: "tone",
             soundId = settings.soundId.ifBlank { "ding" },
+            playAdhanSound = settings.playAdhanSound,
             offsetMinutes = clampedOffset,
             prayerSounds = DEFAULT_PRAYER_SOUNDS + settings.prayerSounds.filterKeys { it in REMINDER_PRAYER_ORDER },
             prayers = DEFAULT_ENABLED_PRAYERS + settings.prayers.filterKeys { it in REMINDER_PRAYER_ORDER }

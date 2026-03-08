@@ -7,6 +7,7 @@ const QURAN_AUDIO_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 const OFFLINE_PAGE = './offline.html';
 const PRAYER_REMINDER_STATE_CACHE = 'falah-prayer-reminder-state-v1';
 const PRAYER_REMINDER_STATE_URL = '/__prayer-reminder-state__';
+const NATIVE_REMINDER_MODE_STATE_URL = '/__native-reminder-mode__';
 const PRAYER_REMINDER_DUE_WINDOW_MS = 2 * 60 * 1000;
 const PRAYER_REMINDER_GRACE_MS = 3 * 60 * 60 * 1000;
 const NETWORK_FETCH_TIMEOUT_MS = 12000;
@@ -16,6 +17,7 @@ let prayerReminderState = {
   timezoneOffsetMinutes: null,
   reminders: []
 };
+let nativeReminderModeEnabled = false;
 const firedReminderMap = new Map();
 
 async function fetchWithTimeout(request, options = {}, timeoutMs = NETWORK_FETCH_TIMEOUT_MS) {
@@ -158,6 +160,26 @@ async function restorePrayerReminderState() {
   return prayerReminderState;
 }
 
+async function persistNativeReminderMode() {
+  const cache = await caches.open(PRAYER_REMINDER_STATE_CACHE);
+  const response = new Response(JSON.stringify({ enabled: !!nativeReminderModeEnabled }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+  await cache.put(NATIVE_REMINDER_MODE_STATE_URL, response);
+}
+
+async function restoreNativeReminderMode() {
+  const cache = await caches.open(PRAYER_REMINDER_STATE_CACHE);
+  const response = await cache.match(NATIVE_REMINDER_MODE_STATE_URL);
+  if (!response) return nativeReminderModeEnabled;
+
+  try {
+    const data = await response.json();
+    nativeReminderModeEnabled = !!data?.enabled;
+  } catch (_) {}
+  return nativeReminderModeEnabled;
+}
+
 function cleanupFiredReminderMap(nowTs) {
   for (const [key, firedAt] of firedReminderMap.entries()) {
     if (nowTs - firedAt > 24 * 60 * 60 * 1000) firedReminderMap.delete(key);
@@ -170,6 +192,8 @@ async function broadcastReminderDue(payload) {
 }
 
 async function checkDuePrayerReminders(reason = 'manual') {
+  if (nativeReminderModeEnabled) return;
+
   if (!Array.isArray(prayerReminderState.reminders) || !prayerReminderState.reminders.length) {
     await restorePrayerReminderState();
   }
@@ -301,6 +325,7 @@ self.addEventListener('activate', (event) => {
       );
     }).then(async () => {
       await restorePrayerReminderState();
+      await restoreNativeReminderMode();
       // Notify all open clients that a new version is active
       return self.clients.matchAll({ type: 'window' }).then(clients => {
         clients.forEach(client => client.postMessage({ type: 'SW_UPDATED' }));
@@ -312,7 +337,36 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('message', (event) => {
   const data = event.data || {};
+  if (data.type === 'SET_NATIVE_REMINDER_MODE') {
+    nativeReminderModeEnabled = !!data.enabled;
+    event.waitUntil((async () => {
+      if (nativeReminderModeEnabled) {
+        prayerReminderState = {
+          generatedAt: Date.now(),
+          timezoneOffsetMinutes: null,
+          reminders: []
+        };
+        await persistPrayerReminderState();
+      }
+      await persistNativeReminderMode();
+    })());
+    return;
+  }
+
   if (data.type === 'SYNC_PRAYER_REMINDERS') {
+    if (nativeReminderModeEnabled) {
+      // Native Android reminder mode owns scheduling; ignore web reminder payloads.
+      event.waitUntil((async () => {
+        prayerReminderState = {
+          generatedAt: Date.now(),
+          timezoneOffsetMinutes: null,
+          reminders: []
+        };
+        await persistPrayerReminderState();
+      })());
+      return;
+    }
+
     prayerReminderState = {
       generatedAt: data.generatedAt || Date.now(),
       timezoneOffsetMinutes: data.timezoneOffsetMinutes,

@@ -6357,6 +6357,41 @@ window.filterCategory = function(cat, btn) {
         return !!getAndroidReminderBridge();
     }
 
+    function postNativeReminderModeToServiceWorker(enabled, source = 'app') {
+        if (!('serviceWorker' in navigator)) return;
+        const payload = {
+            type: 'SET_NATIVE_REMINDER_MODE',
+            enabled: !!enabled,
+            source,
+            sentAt: Date.now()
+        };
+
+        navigator.serviceWorker.ready
+            .then((registration) => {
+                const active = registration?.active;
+                if (active) active.postMessage(payload);
+                if (navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage(payload);
+                }
+            })
+            .catch(() => {});
+    }
+
+    function maybeSuggestNativeAppForReminders() {
+        if (isNativeAndroidReminderMode()) return;
+        if (typeof navigator.getInstalledRelatedApps !== 'function') return;
+        const promptKey = 'crown_native_app_hint_shown';
+        if (sessionStorage.getItem(promptKey) === '1') return;
+
+        navigator.getInstalledRelatedApps()
+            .then((apps) => {
+                if (!Array.isArray(apps) || apps.length === 0) return;
+                sessionStorage.setItem(promptKey, '1');
+                showToast('Native app detected. For reliable background reminders, use the Android app.');
+            })
+            .catch(() => {});
+    }
+
     function parseJsonSafely(raw, fallback = null) {
         if (raw == null || raw === '') return fallback;
         try {
@@ -6980,6 +7015,7 @@ window.filterCategory = function(cat, btn) {
             enabled: false,
             mode: 'tone',
             soundId: 'ding',
+            playAdhanSound: true,
             sameSoundForAll: true,
             prayerSounds: {
                 fajr: 'bell',
@@ -7016,6 +7052,7 @@ window.filterCategory = function(cat, btn) {
                 enabled: !!raw?.enabled,
                 mode: ['adhan', 'tone', 'silent'].includes(raw?.mode) ? raw.mode : defaults.mode,
                 soundId: normalizeSoundId(raw?.soundId),
+                playAdhanSound: typeof raw?.playAdhanSound === 'boolean' ? raw.playAdhanSound : defaults.playAdhanSound,
                 sameSoundForAll: typeof raw?.sameSoundForAll === 'boolean' ? raw.sameSoundForAll : defaults.sameSoundForAll,
                 prayerSounds: {
                     ...defaults.prayerSounds,
@@ -7057,6 +7094,9 @@ window.filterCategory = function(cat, btn) {
         const sameSoundToggle = document.getElementById('sameSoundForAllToggle');
         if (sameSoundToggle) sameSoundToggle.checked = !!settings.sameSoundForAll;
 
+        const playAdhanToggle = document.getElementById('playAdhanSoundToggle');
+        if (playAdhanToggle) playAdhanToggle.checked = settings.playAdhanSound !== false;
+
         renderReminderSoundSelector();
         renderPerPrayerSoundSelectors();
 
@@ -7073,12 +7113,14 @@ window.filterCategory = function(cat, btn) {
         const masterLabel = document.getElementById('reminderMasterLabel');
         const soundLabel = document.getElementById('reminderSoundLabel');
         const sameAllLabel = document.getElementById('sameSoundAllLabel');
+        const playAdhanLabel = document.getElementById('playAdhanSoundLabel');
         const beforeLabel = document.getElementById('reminderBeforeLabel');
 
         if (sectionTitle) sectionTitle.textContent = uiText.reminderSettingsTitle;
         if (masterLabel) masterLabel.textContent = uiText.reminderMaster;
         if (soundLabel) soundLabel.textContent = 'Reminder Sound / د یادونې غږ';
         if (sameAllLabel) sameAllLabel.textContent = isPashtoMode() ? 'د ټولو لمونځونو لپاره یو غږ' : 'Same sound for all prayers';
+        if (playAdhanLabel) playAdhanLabel.textContent = isPashtoMode() ? 'د اذان غږ فعال وساتئ (Android)' : 'Play adhan sound (Android app)';
         if (beforeLabel) beforeLabel.textContent = uiText.reminderBefore;
 
         const beforeSelect = document.getElementById('reminderBefore');
@@ -7151,6 +7193,11 @@ window.filterCategory = function(cat, btn) {
                 const nativeMode = isNativeAndroidReminderMode();
                 const previousPrayerEnabled = !!settings.prayers[name];
                 const requestedEnabled = !!input.checked;
+
+                if (requestedEnabled) {
+                    console.log('[DEBUG] Native mode:', isNativeAndroidReminderMode());
+                    console.log('[DEBUG] Bridge available:', !!getAndroidReminderBridge());
+                }
 
                 const applyPrayerSelection = (enabledValue) => {
                     settings.prayers[name] = enabledValue;
@@ -7231,6 +7278,19 @@ window.filterCategory = function(cat, btn) {
                 const settings = loadReminderSettings();
                 settings.sameSoundForAll = !!sameSoundToggle.checked;
                 saveReminderSettings();
+                showToast(getPrayerUiText().reminderSaved);
+            });
+        }
+
+        const playAdhanToggle = document.getElementById('playAdhanSoundToggle');
+        if (playAdhanToggle) {
+            playAdhanToggle.addEventListener('change', () => {
+                const settings = loadReminderSettings();
+                settings.playAdhanSound = !!playAdhanToggle.checked;
+                saveReminderSettings();
+                if (settings.enabled && isNativeAndroidReminderMode()) {
+                    syncNativeAndroidReminderState('adhan-toggle');
+                }
                 showToast(getPrayerUiText().reminderSaved);
             });
         }
@@ -7778,6 +7838,11 @@ window.filterCategory = function(cat, btn) {
         const previousPrayerEnabled = !!settings.prayers[prayerName];
         const previousMasterEnabled = !!settings.enabled;
         const nextEnabled = !previousPrayerEnabled;
+
+        if (nextEnabled) {
+            console.log('[DEBUG] Native mode:', isNativeAndroidReminderMode());
+            console.log('[DEBUG] Bridge available:', !!getAndroidReminderBridge());
+        }
 
         if (nextEnabled && nativeMode && !ensureNativeAndroidPermissionsBeforeReminderEnable(`toggle-prayer-${prayerName}`)) {
             syncReminderUi();
@@ -8381,9 +8446,16 @@ window.filterCategory = function(cat, btn) {
         }));
     }
 
-    function syncPrayerReminderStateToServiceWorker(reason = 'schedule') {
-        if (isNativeAndroidReminderMode()) return;
+    function syncPrayerReminderStateToServiceWorker(reasonOrReminders = 'schedule', remindersOverride = undefined) {
         if (!('serviceWorker' in navigator)) return;
+
+        const reason = Array.isArray(reasonOrReminders) ? 'schedule' : (reasonOrReminders || 'schedule');
+        const overrideReminders = Array.isArray(reasonOrReminders) ? reasonOrReminders : remindersOverride;
+
+        const nativeMode = isNativeAndroidReminderMode();
+        const reminders = nativeMode
+            ? []
+            : (Array.isArray(overrideReminders) ? overrideReminders : []);
 
         // Web reminders are intentionally foreground-only. Clear any old background
         // reminder state in the service worker so the app does not imply reliable
@@ -8393,12 +8465,15 @@ window.filterCategory = function(cat, btn) {
             reason,
             generatedAt: Date.now(),
             timezoneOffsetMinutes: new Date().getTimezoneOffset(),
-            reminders: []
+            reminders
         };
 
         navigator.serviceWorker.ready
             .then((registration) => {
                 if (registration?.active) registration.active.postMessage(payload);
+                if (nativeMode) {
+                    postNativeReminderModeToServiceWorker(true, `sync:${reason}`);
+                }
             })
             .catch(() => {});
     }
@@ -8610,6 +8685,11 @@ window.filterCategory = function(cat, btn) {
         const settings = loadReminderSettings();
         const nativeMode = isNativeAndroidReminderMode();
         const uiText = getPrayerUiText();
+
+        if (enabled) {
+            console.log('[DEBUG] Native mode:', isNativeAndroidReminderMode());
+            console.log('[DEBUG] Bridge available:', !!getAndroidReminderBridge());
+        }
 
         if (enabled) {
             if (nativeMode && !ensureNativeAndroidPermissionsBeforeReminderEnable('enable-master-reminder')) {
@@ -8869,7 +8949,14 @@ window.filterCategory = function(cat, btn) {
 
     // Auto-calculate prayer times on load if location is cached (for time banner enhancement)
     document.addEventListener('DOMContentLoaded', function() {
-        if (isNativeAndroidReminderMode()) ensureNativeAndroidReminderState();
+        if (isNativeAndroidReminderMode()) {
+            ensureNativeAndroidReminderState();
+            syncPrayerReminderStateToServiceWorker([]);
+            postNativeReminderModeToServiceWorker(true, 'startup');
+        } else {
+            postNativeReminderModeToServiceWorker(false, 'startup');
+            maybeSuggestNativeAppForReminders();
+        }
         bootstrapPrayerStateFromCache();
         if (!isNativeAndroidReminderMode()) syncPrayerReminderStateToServiceWorker('bootstrap-clear');
     });
