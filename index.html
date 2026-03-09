@@ -13,7 +13,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="styles.css?v=20260309a">
+    <link rel="stylesheet" href="styles.css?v=20260309f">
 </head>
 
     <body class="startup-blocked">
@@ -2887,18 +2887,6 @@
     <div class="dua-swipe-dots" id="duaSwipeDots" aria-hidden="true"></div>
 </div>
 
-<!-- ===== PASHTO LANGUAGE SUPPORT ===== -->
-<script src="pashto.js"></script>
-<script src="pashto-translation-player.js?v=20260309a"></script>
-
-<!-- ══════════════════════════════════════════ -->
-<!-- ===== JAVASCRIPT ENGINE ===== -->
-<!-- ══════════════════════════════════════════ -->
-<!-- Production assets (active) -->
-<script src="app.js?v=20260309e"></script>
-<!-- Source assets (fallback for local debugging) -->
-<!-- <script src="app.js?v=20260306k"></script> -->
-
 <!-- ===== OVERLAY ===== -->
 <div class="overlay" onclick="toggleBookmarksPanel()"></div>
 
@@ -2948,113 +2936,11 @@
     </div>
 </div>
 
-<!-- ===== QURAN PANEL ===== -->
-<div class="quran-panel panel" onclick="if(event.target === this) closeQuran()">
-    <div class="quran-panel-content" id="quranPanelContent">
-        <button class="panel-back-btn" onclick="closeQuran()" aria-label="Back">← Back / ← بیرته</button>
-        <div class="panel-loading-overlay" id="quranPanelLoading" aria-hidden="true">Loading…</div>
-        <div class="quran-shell">
-            <div class="quran-top-progress" id="quranTopProgress">
-                <span id="quranTopProgressFill"></span>
-                <div class="quran-top-progress-copy">
-                    <span class="quran-top-progress-kicker" id="quranPanelEyebrow">Quran</span>
-                    <span class="quran-top-progress-label" id="quranTopProgressLabel">Surah 1 · Ayah 1</span>
-                </div>
-            </div>
-
-            <div class="quran-header-row">
-                <div class="quran-header-copy">
-                    <h2 id="quranPanelTitle">Quran</h2>
-                    <p id="quranPanelSubtitle">Read with Arabic text, optional Pashto and English translations, and separate audio controls.</p>
-                </div>
-                <div class="quran-header-nav">
-                    <button type="button" class="quran-nav-btn" id="quranPrevSurahBtn" aria-label="Previous surah">←</button>
-                    <button type="button" class="quran-nav-btn" id="quranNextSurahBtn" aria-label="Next surah">→</button>
-                </div>
-            </div>
-
-            <div class="quran-continue-card" id="quranContinueCard"></div>
-
-            <div class="quran-control-card">
-                <div class="quran-control-head">
-                    <label for="quranSurahSelectNative" class="quran-control-label" id="quranSurahSelectLabel">Select Surah</label>
-                    <button type="button" class="quran-chip-btn" id="quranResumeBtn">Resume</button>
-                </div>
-                <div class="quran-surah-select-wrap">
-                    <select id="quranSurahSelectNative" class="prayer-reminder-select"></select>
-                </div>
-                <div class="quran-toggle-grid" aria-label="Translation toggles">
-                    <label class="quran-toggle-pill" for="quranTogglePashto">
-                        <input type="checkbox" id="quranTogglePashto">
-                        <span id="quranTogglePashtoLabel">Show Pashto</span>
-                    </label>
-                    <label class="quran-toggle-pill" for="quranToggleEnglish">
-                        <input type="checkbox" id="quranToggleEnglish">
-                        <span id="quranToggleEnglishLabel">Show English</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="quran-reader-screen active" id="quranReaderScreen">
-                <div class="quran-reader-sticky" id="quranReaderSticky">
-                    <div class="quran-reader-header" id="quranReaderHeader"></div>
-                    <div class="quran-audio-stack" id="quranAudioStack">
-                        <div class="quran-audio-row" data-audio-row="arabic">
-                            <div class="quran-audio-copy">
-                                <div class="quran-audio-label" id="quranArabicAudioLabel">Arabic Recitation</div>
-                                <div class="quran-audio-status" id="quranArabicStatus">Ready</div>
-                            </div>
-                            <div class="quran-audio-actions">
-                                <div class="quran-reciter-inline">
-                                    <label for="quranInlineReciterSelect" id="quranInlineReciterLabel">Reciter</label>
-                                    <select id="quranInlineReciterSelect" class="prayer-reminder-select"></select>
-                                </div>
-                                <button type="button" class="quran-row-btn quran-row-btn-main" id="quranPlayPauseBtn">Play Arabic</button>
-                            </div>
-                        </div>
-                        <div class="quran-audio-row" data-audio-row="pashto">
-                            <div class="quran-audio-copy">
-                                <div class="quran-audio-label" id="quranPashtoAudioLabel">Pashto Translation Audio</div>
-                                <div class="quran-audio-status" id="quranPashtoStatus">Checking availability…</div>
-                            </div>
-                            <div class="quran-audio-actions">
-                                <button type="button" class="quran-row-btn" id="quranPlayPashtoBtn">Play Pashto</button>
-                            </div>
-                        </div>
-                        <div class="quran-audio-row" data-audio-row="english">
-                            <div class="quran-audio-copy">
-                                <div class="quran-audio-label" id="quranEnglishAudioLabel">English Translation Audio</div>
-                                <div class="quran-audio-status" id="quranEnglishStatus">Ibrahim Walk translation audio</div>
-                            </div>
-                            <div class="quran-audio-actions">
-                                <button type="button" class="quran-row-btn" id="quranPlayEnglishBtn">Play English</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="quran-scroll-content" id="quranScrollContent">
-                    <div class="quran-skeleton-list" id="quranSkeletonList"></div>
-                    <div class="quran-ayah-list" id="quranAyahList"></div>
-                    <div class="quran-load-more" id="quranLoadMore">Load more…</div>
-                </div>
-            </div>
-
-            <div class="quran-bottom-progress" id="quranBottomProgress">
-                <div class="quran-bottom-progress-track"><span id="quranBottomProgressFill"></span></div>
-                <div class="quran-bottom-progress-meta">
-                    <span class="quran-bottom-progress-current" id="quranBottomProgressCurrent">Surah 1 · Ayah 1</span>
-                    <span class="quran-bottom-progress-last" id="quranBottomProgressLast">Last read: Surah 1, Ayah 1</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- ===== PRAYER PANEL ===== -->
 <div class="prayer-panel panel" onclick="if(event.target === this) closePrayer()">
     <div class="prayer-panel-content" id="prayerPanelContent">
         <div class="panel-loading-overlay" id="prayerPanelLoading" aria-hidden="true">Loading…</div>
+        <button class="panel-back-btn" onclick="closePrayer()" aria-label="Back" style="align-self:flex-start;flex-shrink:0;">← Back / ← بیرته</button>
         <div class="prayer-subtabs" id="prayerSubtabs" role="tablist" aria-label="Prayer sections">
             <button type="button" class="prayer-subtab active" id="prayerSubtabTimes" data-prayer-tab="times" role="tab" aria-selected="true"><span class="prayer-subtab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/></svg></span><span class="prayer-subtab-label">Times</span></button>
             <button type="button" class="prayer-subtab" id="prayerSubtabQibla" data-prayer-tab="qibla" role="tab" aria-selected="false"><span class="prayer-subtab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M14.8 9.2l-4.6 1.8 1.8 4.6 2.8-6.4z"/></svg></span><span class="prayer-subtab-label">Qibla</span></button>
@@ -3083,6 +2969,32 @@
             </div>
             <div class="prayer-reminder-status" id="prayerReminderStatus" aria-live="polite">Reminders are off</div>
             <div class="prayer-times-grid" id="prayerTimesGrid"></div>
+            <div class="prayer-calc-settings" id="prayerCalcSettings">
+                <div class="prayer-calc-row">
+                    <label class="prayer-calc-label" for="prayerCalcMethod">Calculation method</label>
+                    <select id="prayerCalcMethod" class="prayer-calc-select">
+                        <option value="MuslimWorldLeague">Muslim World League</option>
+                        <option value="Egyptian">Egyptian General Authority</option>
+                        <option value="Karachi">University of Islamic Sciences, Karachi</option>
+                        <option value="UmmAlQura">Umm al-Qura, Mecca</option>
+                        <option value="Dubai">Dubai</option>
+                        <option value="Kuwait">Kuwait</option>
+                        <option value="Qatar">Qatar</option>
+                        <option value="Singapore">Singapore</option>
+                        <option value="Turkey">Turkey</option>
+                        <option value="Tehran">Tehran</option>
+                        <option value="MoonsightingCommittee">ISNA (Moonsighting Committee)</option>
+                        <option value="NorthAmerica">North America (ISNA)</option>
+                    </select>
+                </div>
+                <div class="prayer-calc-row">
+                    <label class="prayer-calc-label" for="prayerCalcMadhab">Asr time</label>
+                    <select id="prayerCalcMadhab" class="prayer-calc-select">
+                        <option value="Shafi">Standard / Shafi (shadow = 1×)</option>
+                        <option value="Hanafi">Later / Hanafi (shadow = 2×)</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <div class="prayer-subtab-pane prayer-tab-qibla" id="prayerTabQibla" role="tabpanel">
@@ -3181,6 +3093,129 @@
     </div>
 </div>
 
+<div class="about-panel panel" onclick="if(event.target===this) closeAboutPanel()">
+    <div class="about-panel-content" id="aboutPanelContent">
+        <button class="panel-back-btn" onclick="closeAboutPanel()" aria-label="Back">← Back / ← بیرته</button>
+        <div class="about-logo-mark">
+            <div class="fallah-mark">
+                <div class="fallah-crescent"></div>
+                <span class="fallah-fa">ف</span>
+            </div>
+        </div>
+        <h2 id="aboutAppName">Falah — فلاح</h2>
+        <p id="aboutDescription">Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.</p>
+        <p id="aboutDescriptionPs">ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.</p>
+        <p id="aboutTagline">حي على الفلاح — Come to Success</p>
+        <p id="aboutVersion">Version: 2.0.17</p>
+        <div class="about-meta">
+            <div id="aboutDeveloper">Developer: Falah</div>
+            <div id="aboutCopyright">© 2026 Falah. All rights reserved.</div>
+            <div class="more-list">
+                <button class="more-row" type="button" onclick="openContactEmail()">
+                    <span class="more-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2" ry="2"/><path d="M3 7l9 6 9-6"/></svg></span>
+                    <span class="more-label" id="aboutContactLabel">Contact Us / اړیکه ونیسئ</span>
+                    <span class="more-arrow">›</span>
+                </button>
+            </div>
+            <a href="privacy.html" target="_blank" rel="noopener" id="aboutPrivacyLink">Privacy Policy</a>
+            <div id="aboutLicenses">Open-source libraries: Adhan.js and web platform APIs</div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- ===== QURAN PANEL ===== -->
+<div class="quran-panel panel" onclick="if(event.target === this) closeQuran()">
+    <div class="quran-panel-content" id="quranPanelContent">
+        <button class="panel-back-btn" onclick="closeQuran()" aria-label="Back">← Back / ← بیرته</button>
+        <div class="panel-loading-overlay" id="quranPanelLoading" aria-hidden="true">Loading…</div>
+        <div class="quran-shell">
+            <div class="quran-top-progress" id="quranTopProgress">
+                <span id="quranTopProgressFill"></span>
+                <div class="quran-top-progress-copy">
+                    <span class="quran-top-progress-kicker" id="quranPanelEyebrow">Quran</span>
+                    <span class="quran-top-progress-label" id="quranTopProgressLabel">Surah 1 · Ayah 1</span>
+                </div>
+            </div>
+
+            <div class="quran-control-card">
+                <div class="quran-control-head">
+                    <label for="quranSurahSelectNative" class="quran-control-label" id="quranSurahSelectLabel">Select Surah</label>
+                    <div class="quran-control-actions">
+                        <button type="button" class="quran-nav-btn" id="quranPrevSurahBtn" aria-label="Previous surah">←</button>
+                        <button type="button" class="quran-chip-btn" id="quranResumeBtn">Resume</button>
+                        <button type="button" class="quran-nav-btn" id="quranNextSurahBtn" aria-label="Next surah">→</button>
+                    </div>
+                </div>
+                <div class="quran-surah-select-wrap">
+                    <select id="quranSurahSelectNative" class="prayer-reminder-select"></select>
+                </div>
+                <div class="quran-toggle-grid" aria-label="Translation toggles">
+                    <label class="quran-toggle-pill" for="quranTogglePashto">
+                        <input type="checkbox" id="quranTogglePashto">
+                        <span id="quranTogglePashtoLabel">Show Pashto</span>
+                    </label>
+                    <label class="quran-toggle-pill" for="quranToggleEnglish">
+                        <input type="checkbox" id="quranToggleEnglish">
+                        <span id="quranToggleEnglishLabel">Show English</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="quran-reader-screen active" id="quranReaderScreen">
+                <div class="quran-reader-sticky" id="quranReaderSticky">
+                    <div class="quran-reader-header" id="quranReaderHeader"></div>
+                    <div class="quran-audio-hub" id="quranAudioStack">
+                        <div class="quran-audio-summary">
+                            <div class="quran-audio-summary-copy">
+                                <div class="quran-audio-summary-kicker" id="quranAudioNowLabel">Now Playing</div>
+                                <div class="quran-audio-summary-title" id="quranAudioActiveTitle">Arabic Recitation</div>
+                                <div class="quran-audio-summary-status" id="quranAudioActiveStatus">Choose a source below.</div>
+                            </div>
+                            <div class="quran-reciter-inline">
+                                <label for="quranInlineReciterSelect" id="quranInlineReciterLabel">Reciter</label>
+                                <select id="quranInlineReciterSelect" class="prayer-reminder-select"></select>
+                            </div>
+                        </div>
+                        <div class="quran-audio-source-tabs" aria-label="Quran audio sources">
+                            <button type="button" class="quran-audio-source quran-row-btn quran-row-btn-main" data-audio-row="arabic" id="quranPlayPauseBtn">
+                                <span class="quran-audio-source-label" id="quranArabicAudioLabel">Arabic</span>
+                                <span class="quran-audio-source-meta" id="quranArabicStatus">Reciter</span>
+                                <span class="quran-audio-source-action" id="quranArabicAction">Play</span>
+                            </button>
+                            <button type="button" class="quran-audio-source quran-row-btn" data-audio-row="pashto" id="quranPlayPashtoBtn">
+                                <span class="quran-audio-source-label" id="quranPashtoAudioLabel">Pashto</span>
+                                <span class="quran-audio-source-meta" id="quranPashtoStatus">Checking availability…</span>
+                                <span class="quran-audio-source-action" id="quranPashtoAction">Play</span>
+                            </button>
+                            <button type="button" class="quran-audio-source quran-row-btn" data-audio-row="english" id="quranPlayEnglishBtn">
+                                <span class="quran-audio-source-label" id="quranEnglishAudioLabel">English</span>
+                                <span class="quran-audio-source-meta" id="quranEnglishStatus">Ibrahim Walk</span>
+                                <span class="quran-audio-source-action" id="quranEnglishAction">Play</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quran-scroll-content" id="quranScrollContent">
+                    <div class="quran-skeleton-list" id="quranSkeletonList"></div>
+                    <div class="quran-ayah-list" id="quranAyahList"></div>
+                    <div class="quran-load-more" id="quranLoadMore">Load more…</div>
+                </div>
+            </div>
+
+            <div class="quran-bottom-progress" id="quranBottomProgress">
+                <div class="quran-bottom-progress-track"><span id="quranBottomProgressFill"></span></div>
+                <div class="quran-bottom-progress-meta">
+                    <span class="quran-bottom-progress-current" id="quranBottomProgressCurrent">Surah 1 · Ayah 1</span>
+                    <span class="quran-bottom-progress-last" id="quranBottomProgressLast">Last read: Surah 1, Ayah 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- ===== MORE PANEL ===== -->
 <div class="more-panel panel" onclick="if(event.target === this) closeMorePanel()">
     <div class="more-panel-content" id="morePanelContent">
@@ -3219,37 +3254,6 @@
             <button class="more-row" onclick="openAboutFromMore()"><span class="more-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v6"/><path d="M12 8h.01"/></svg></span><span class="more-label" id="moreAboutLabel">About</span><span class="more-arrow">›</span></button>
         </div>
     </div>
-</div>
-
-<div class="about-panel panel" onclick="if(event.target===this) closeAboutPanel()">
-    <div class="about-panel-content" id="aboutPanelContent">
-        <button class="panel-back-btn" onclick="closeAboutPanel()" aria-label="Back">← Back / ← بیرته</button>
-        <div class="about-logo-mark">
-            <div class="fallah-mark">
-                <div class="fallah-crescent"></div>
-                <span class="fallah-fa">ف</span>
-            </div>
-        </div>
-        <h2 id="aboutAppName">Falah — فلاح</h2>
-        <p id="aboutDescription">Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.</p>
-        <p id="aboutDescriptionPs">ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.</p>
-        <p id="aboutTagline">حي على الفلاح — Come to Success</p>
-        <p id="aboutVersion">Version: 2.0.17</p>
-        <div class="about-meta">
-            <div id="aboutDeveloper">Developer: Falah</div>
-            <div id="aboutCopyright">© 2026 Falah. All rights reserved.</div>
-            <div class="more-list">
-                <button class="more-row" type="button" onclick="openContactEmail()">
-                    <span class="more-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2" ry="2"/><path d="M3 7l9 6 9-6"/></svg></span>
-                    <span class="more-label" id="aboutContactLabel">Contact Us / اړیکه ونیسئ</span>
-                    <span class="more-arrow">›</span>
-                </button>
-            </div>
-            <a href="privacy.html" target="_blank" rel="noopener" id="aboutPrivacyLink">Privacy Policy</a>
-            <div id="aboutLicenses">Open-source libraries: Adhan.js and web platform APIs</div>
-        </div>
-    </div>
-</div>
 </div>
 
 <!-- ===== TOAST ===== -->
@@ -3341,3 +3345,16 @@
     <button type="button" class="dot-popup-btn" id="dot-stop">⏹ Stop</button>
     <button type="button" class="dot-popup-btn" id="dot-close">× Close</button>
 </div>
+
+<!-- ===== PASHTO LANGUAGE SUPPORT ===== -->
+<script src="pashto.js"></script>
+<script src="pashto-translation-player.js?v=20260309c"></script>
+<script src="vendor/adhan.umd.min.js?v=20260309a"></script>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- ===== JAVASCRIPT ENGINE ===== -->
+<!-- ══════════════════════════════════════════ -->
+<!-- Production assets (active) -->
+    <script src="app.js?v=20260309k"></script>
+<!-- Source assets (fallback for local debugging) -->
+<!-- <script src="app.js?v=20260306k"></script> -->
