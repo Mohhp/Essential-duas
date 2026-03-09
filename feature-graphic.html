@@ -4,190 +4,423 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=1024">
     <title>Feature Graphic — Falah</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Naskh+Arabic:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --navy-900: #050b14;
+            --navy-800: #0a1628;
+            --navy-700: #0f1d30;
+            --gold-500: #c9a84c;
+            --gold-300: #efd082;
+            --green-500: #2ecc71;
+            --text-main: rgba(255, 255, 255, 0.96);
+            --text-soft: rgba(232, 239, 247, 0.78);
+        }
+
+        html, body {
             width: 1024px;
             height: 500px;
             overflow: hidden;
-            font-family: 'Cinzel', serif;
+            background: var(--navy-900);
+            font-family: 'Inter', system-ui, sans-serif;
         }
+
         .graphic {
+            position: relative;
             width: 1024px;
             height: 500px;
-            background: linear-gradient(145deg, #0a1a10 0%, #0c2218 30%, #0a1a10 60%, #101810 100%);
+            overflow: hidden;
+            background:
+                radial-gradient(46% 70% at 18% 18%, rgba(201, 168, 76, 0.18) 0%, rgba(201, 168, 76, 0.04) 35%, transparent 72%),
+                radial-gradient(42% 65% at 76% 82%, rgba(46, 204, 113, 0.18) 0%, rgba(46, 204, 113, 0.04) 38%, transparent 74%),
+                linear-gradient(135deg, #14233a 0%, #0f1d30 32%, #0a1628 68%, #050b14 100%);
+        }
+
+        .graphic::before {
+            content: '';
+            position: absolute;
+            inset: 18px;
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            pointer-events: none;
+        }
+
+        .graphic::after {
+            content: '';
+            position: absolute;
+            inset: -120px auto auto -80px;
+            width: 620px;
+            height: 620px;
+            border-radius: 50%;
+            border: 1px solid rgba(201, 168, 76, 0.08);
+            pointer-events: none;
+        }
+
+        .curve-one,
+        .curve-two {
+            position: absolute;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            pointer-events: none;
+        }
+
+        .curve-one {
+            width: 540px;
+            height: 540px;
+            right: -120px;
+            top: -140px;
+        }
+
+        .curve-two {
+            width: 700px;
+            height: 700px;
+            right: -220px;
+            top: -220px;
+            border-color: rgba(201, 168, 76, 0.06);
+        }
+
+        .layout {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1.02fr 0.98fr;
+            width: 100%;
+            height: 100%;
+            padding: 38px 44px 34px;
+            gap: 18px;
+        }
+
+        .copy {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 12px;
+        }
+
+        .brand-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .brand-mark {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+        }
+
+        .brand-mark svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--gold-500);
+            filter: drop-shadow(0 0 10px rgba(201, 168, 76, 0.22));
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .brand-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+        }
+
+        .brand-subtitle {
+            font-family: 'Amiri', serif;
+            font-size: 17px;
+            color: rgba(239, 208, 130, 0.92);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: rgba(201, 168, 76, 0.88);
+        }
+
+        .eyebrow::before {
+            content: '';
+            width: 42px;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(46, 204, 113, 0), rgba(46, 204, 113, 0.9));
+        }
+
+        h1 {
+            max-width: 430px;
+            margin-bottom: 14px;
+            font-size: 48px;
+            line-height: 0.98;
+            letter-spacing: -0.045em;
+            color: var(--text-main);
+            text-wrap: balance;
+        }
+
+        .headline-accent {
+            background: linear-gradient(135deg, #ffffff 0%, #efd082 52%, #c9a84c 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .summary {
+            max-width: 410px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-soft);
+            margin-bottom: 24px;
+        }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            max-width: 440px;
+            margin-bottom: 22px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            white-space: nowrap;
+        }
+
+        .pill-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--gold-500);
+            box-shadow: 0 0 10px rgba(201, 168, 76, 0.3);
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            color: rgba(255, 255, 255, 0.72);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .meta-accent {
+            color: rgba(46, 204, 113, 0.95);
+        }
+
+        .devices {
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
-        /* Background pattern */
-        .graphic::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(ellipse at 20% 30%, rgba(46, 196, 122, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 60%, rgba(201, 168, 76, 0.06) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(46, 196, 122, 0.03) 0%, transparent 70%);
-        }
-        /* Decorative geometric lines */
-        .graphic::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 600px;
-            height: 600px;
-            transform: translate(-50%, -50%) rotate(45deg);
-            border: 1px solid rgba(201, 168, 76, 0.06);
-            border-radius: 50%;
-        }
-        .content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            padding: 40px;
-        }
-        /* Crescent + star icon */
-        .icon-group {
-            margin-bottom: 20px;
-        }
-        .crescent {
-            font-size: 52px;
-            color: #c9a84c;
-            text-shadow: 0 0 40px rgba(201, 168, 76, 0.3);
-            display: inline-block;
-        }
-        .app-name-ar {
-            font-family: 'Noto Naskh Arabic', serif;
-            font-size: 38px;
-            font-weight: 700;
-            color: #c9a84c;
-            text-shadow: 0 2px 20px rgba(201, 168, 76, 0.25);
-            margin-bottom: 6px;
-            direction: rtl;
-        }
-        .app-name-en {
-            font-family: 'Cinzel', serif;
-            font-size: 42px;
-            font-weight: 700;
-            color: rgba(235, 245, 220, 0.95);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
-            margin-bottom: 8px;
-        }
-        .tagline {
-            font-family: 'Cinzel', serif;
-            font-size: 15px;
-            font-weight: 400;
-            color: rgba(200, 225, 210, 0.65);
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            margin-bottom: 24px;
-        }
-        .features {
-            display: flex;
-            gap: 28px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .feature-pill {
-            background: rgba(46, 196, 122, 0.08);
-            border: 1px solid rgba(46, 196, 122, 0.15);
-            color: rgba(200, 225, 210, 0.8);
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 13px;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            font-family: 'Cinzel', serif;
-        }
-        /* Corner decorations */
-        .corner {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            border-color: rgba(201, 168, 76, 0.15);
-            border-style: solid;
-        }
-        .corner.tl { top: 24px; left: 24px; border-width: 2px 0 0 2px; }
-        .corner.tr { top: 24px; right: 24px; border-width: 2px 2px 0 0; }
-        .corner.bl { bottom: 24px; left: 24px; border-width: 0 0 2px 2px; }
-        .corner.br { bottom: 24px; right: 24px; border-width: 0 2px 2px 0; }
 
-        /* Small decorative dots */
-        .dot-row {
+        .device-glow {
             position: absolute;
-            bottom: 40px;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(201, 168, 76, 0.16) 0%, rgba(46, 204, 113, 0.08) 36%, transparent 72%);
+            filter: blur(10px);
+        }
+
+        .phone {
+            position: absolute;
+            overflow: hidden;
+            border-radius: 32px;
+            background: #08111e;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.38);
+        }
+
+        .phone::before {
+            content: '';
+            position: absolute;
+            top: 10px;
             left: 50%;
             transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
+            width: 92px;
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.08);
+            z-index: 2;
         }
-        .dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: rgba(201, 168, 76, 0.3);
-        }
-        .dot.active { background: #c9a84c; }
 
-        /* Instructions (hidden in screenshot) */
+        .phone img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .phone.back {
+            width: 176px;
+            height: 390px;
+            right: 74px;
+            top: 34px;
+            transform: rotate(10deg);
+            opacity: 0.92;
+        }
+
+        .phone.front {
+            width: 206px;
+            height: 430px;
+            right: 178px;
+            top: 38px;
+            transform: rotate(-4deg);
+        }
+
+        .floating-card {
+            position: absolute;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(8, 17, 30, 0.72);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(14px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.22);
+        }
+
+        .floating-card.top {
+            top: 52px;
+            right: 0;
+            width: 178px;
+        }
+
+        .floating-card.bottom {
+            bottom: 42px;
+            left: 10px;
+            width: 194px;
+        }
+
+        .card-kicker {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: rgba(201, 168, 76, 0.8);
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 21px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .card-copy {
+            font-size: 12px;
+            line-height: 1.45;
+            color: rgba(255, 255, 255, 0.72);
+        }
+
+        .card-value.green { color: rgba(46, 204, 113, 0.96); }
+
         .instructions {
             position: fixed;
             top: 510px;
             left: 0;
-            padding: 20px;
-            color: #888;
-            font-family: system-ui;
-            font-size: 14px;
-            line-height: 1.6;
+            padding: 18px;
+            color: #7b8394;
+            font-family: system-ui, sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
     <div class="graphic">
-        <div class="corner tl"></div>
-        <div class="corner tr"></div>
-        <div class="corner bl"></div>
-        <div class="corner br"></div>
+        <div class="curve-one"></div>
+        <div class="curve-two"></div>
 
-        <div class="content">
-            <div class="icon-group">
-                <span class="crescent">☪</span>
-            </div>
-            <div class="app-name-ar">الأدعية الأساسية</div>
-            <div class="app-name-en">Falah</div>
-            <div class="tagline">The Crown Collection — by فلاح</div>
-            <div class="features">
-                <span class="feature-pill">63 Duas</span>
-                <span class="feature-pill">Prayer Times</span>
-                <span class="feature-pill">Tasbeeh</span>
-                <span class="feature-pill">Qibla</span>
-                <span class="feature-pill">Memorize</span>
-            </div>
-        </div>
+        <div class="layout">
+            <section class="copy">
+                <div class="brand-row">
+                    <div class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <div class="brand-title">Falah</div>
+                        <div class="brand-subtitle">فلاح</div>
+                    </div>
+                </div>
 
-        <div class="dot-row">
-            <div class="dot"></div>
-            <div class="dot active"></div>
-            <div class="dot"></div>
+                <div class="eyebrow">The Crown Collection</div>
+                <h1><span class="headline-accent">Quran, Duas</span> & Prayer In One Companion</h1>
+                <p class="summary">
+                    A polished Islamic app for daily worship with authenticated duas, prayer times, Qibla, tasbeeh, memorization, bookmarks, and offline access.
+                </p>
+
+                <div class="pill-row">
+                    <div class="pill"><span class="pill-dot"></span>63 Authenticated Duas</div>
+                    <div class="pill"><span class="pill-dot"></span>Prayer Times & Qibla</div>
+                    <div class="pill"><span class="pill-dot"></span>Tasbeeh & Memorization</div>
+                </div>
+
+                <div class="meta-row">
+                    <span>Premium design</span>
+                    <span class="meta-accent">English + Pashto</span>
+                    <span>Works offline</span>
+                </div>
+            </section>
+
+            <section class="devices" aria-hidden="true">
+                <div class="device-glow"></div>
+
+                <div class="phone back">
+                    <img src="screenshots/mobile-cards-en.png" alt="">
+                </div>
+
+                <div class="phone front">
+                    <img src="screenshots/mobile-hero.png" alt="">
+                </div>
+
+                <div class="floating-card top">
+                    <div class="card-kicker">Prayer</div>
+                    <div class="card-value">Qibla + Times</div>
+                    <div class="card-copy">Built for your daily routine with calm, focused utility.</div>
+                </div>
+
+                <div class="floating-card bottom">
+                    <div class="card-kicker">Access</div>
+                    <div class="card-value green">Offline Ready</div>
+                    <div class="card-copy">Keep your duas, Quran flow, and worship tools close wherever you are.</div>
+                </div>
+            </section>
         </div>
     </div>
 
     <div class="instructions">
-        <strong>How to export as 1024×500 PNG:</strong><br>
-        1. Open this file in Chrome at 100% zoom<br>
-        2. Press F12 → toggle device toolbar (Ctrl+Shift+M)<br>
-        3. Set dimensions to 1024 × 500<br>
-        4. Right-click → "Capture screenshot" or use DevTools: ⋮ → "Capture screenshot"<br>
-        <br>
-        Or use a command-line tool:<br>
-        <code>npx puppeteer screenshot --width 1024 --height 500 feature-graphic.html feature-graphic.png</code>
+        Export target: 1024x500 PNG. Suggested file name: <code>feature-graphic.png</code>
     </div>
 </body>
 </html>

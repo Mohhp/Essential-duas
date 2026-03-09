@@ -430,6 +430,7 @@
         enhanceAccessibility();
         setBottomNavActive('home');
         initBottomNavTouchHandlers();
+        initNativeAndroidScrollSync();
         initHomePullToRefresh();
 
         // Legacy search listener (kept for compatibility if input exists)
@@ -1152,6 +1153,10 @@
         if (isDuaSwipeViewerActive()) {
             return document.querySelector('.dua-swipe-slide.slot-current .dua-swipe-content') || window;
         }
+        const mainContainer = document.getElementById('mainContainer');
+        if (mainContainer?.classList.contains('active')) {
+            return mainContainer;
+        }
         if (document.querySelector('.quran-panel.active')) {
             return document.querySelector('.quran-panel');
         }
@@ -1177,6 +1182,100 @@
             return document.querySelector('.more-panel');
         }
         return document.scrollingElement || document.documentElement || document.body || window;
+    }
+
+    const NATIVE_ANDROID_SCROLL_SYNC_SELECTORS = [
+        '#mainContainer',
+        '.quran-panel',
+        '.prayer-panel',
+        '.routine-panel',
+        '.tasbeeh-panel',
+        '.etiquette-panel',
+        '.progress-panel',
+        '.about-panel',
+        '.more-panel',
+        '#bookmarksPanel'
+    ];
+    let nativeAndroidScrollSyncRaf = null;
+    let lastNativeAndroidReportedScrollTop = null;
+
+    function getScrollableElementTop(element) {
+        if (!element || element === window) {
+            return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+        }
+        return Number(element.scrollTop || 0);
+    }
+
+    function reportNativeAndroidScrollTop(scrollTop) {
+        const bridge = getAndroidReminderBridge();
+        if (!bridge || typeof bridge.reportScrollTop !== 'function') return;
+        const normalizedTop = Math.max(0, Math.round(Number(scrollTop) || 0));
+        if (lastNativeAndroidReportedScrollTop === normalizedTop) return;
+        lastNativeAndroidReportedScrollTop = normalizedTop;
+        try {
+            bridge.reportScrollTop(normalizedTop);
+        } catch (_) {}
+    }
+
+    function syncNativeAndroidScrollTop() {
+        nativeAndroidScrollSyncRaf = null;
+        const activeScroller = getActiveScrollableElement();
+        reportNativeAndroidScrollTop(getScrollableElementTop(activeScroller));
+    }
+
+    function scheduleNativeAndroidScrollTopSync() {
+        if (nativeAndroidScrollSyncRaf != null) return;
+        nativeAndroidScrollSyncRaf = window.requestAnimationFrame(syncNativeAndroidScrollTop);
+    }
+
+    function initNativeAndroidScrollSync() {
+        if (document.body?.dataset.nativeAndroidScrollSyncBound === '1') {
+            scheduleNativeAndroidScrollTopSync();
+            return;
+        }
+
+        const onScroll = () => scheduleNativeAndroidScrollTopSync();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        document.addEventListener('scroll', onScroll, { passive: true });
+
+        NATIVE_ANDROID_SCROLL_SYNC_SELECTORS
+            .map((selector) => document.querySelector(selector))
+            .filter(Boolean)
+            .forEach((element) => {
+                element.addEventListener('scroll', onScroll, { passive: true });
+            });
+
+        if (typeof MutationObserver !== 'undefined') {
+            const observedNodes = [
+                document.body,
+                document.getElementById('mainContainer'),
+                document.getElementById('quranReaderScreen'),
+                ...NATIVE_ANDROID_SCROLL_SYNC_SELECTORS
+                    .map((selector) => document.querySelector(selector))
+                    .filter(Boolean)
+            ].filter((node, index, list) => !!node && list.indexOf(node) === index);
+
+            const observer = new MutationObserver(() => {
+                scheduleNativeAndroidScrollTopSync();
+            });
+
+            observedNodes.forEach((node) => {
+                observer.observe(node, {
+                    attributes: true,
+                    attributeFilter: ['class', 'data-main-mode', 'data-active-tab']
+                });
+            });
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            scheduleNativeAndroidScrollTopSync();
+        });
+        window.addEventListener('popstate', () => {
+            scheduleNativeAndroidScrollTopSync();
+        });
+
+        document.body.dataset.nativeAndroidScrollSyncBound = '1';
+        scheduleNativeAndroidScrollTopSync();
     }
 
     function shouldShowBackFab(route, state = null) {
@@ -6584,6 +6683,7 @@ window.filterCategory = function(cat, btn) {
     const PRAYER_SUBTAB_STORAGE_KEY = 'crown_prayer_active_tab';
     let nativeAndroidReminderState = null;
     let nativeAndroidReminderBootstrapDone = false;
+    let pendingNativeAndroidPermissionRequest = null;
     let lastNativePermissionPromptKey = null;
     const ANDROID_REMINDER_PERMISSION_REQUIRED_MESSAGE = 'Please grant notification and alarm permissions to enable reminders.';
 
@@ -6712,13 +6812,58 @@ window.filterCategory = function(cat, btn) {
         return applyNativeAndroidReminderState(response);
     }
 
-    function ensureNativeAndroidPermissionsBeforeReminderEnable(reason = 'android-reminder-enable') {
-        if (!isNativeAndroidReminderMode()) return true;
-        const current = ensureNativeAndroidReminderState();
-        if (current?.permissions?.ready) return true;
-        requestNativeAndroidReminderPermissions(reason);
-        showToast(ANDROID_REMINDER_PERMISSION_REQUIRED_MESSAGE);
+    function resolvePendingNativeAndroidPermissionRequest(granted) {
+        if (!pendingNativeAndroidPermissionRequest) return;
+        const pending = pendingNativeAndroidPermissionRequest;
+        pendingNativeAndroidPermissionRequest = null;
+        if (pending.timeoutId) clearTimeout(pending.timeoutId);
+        pending.resolve(!!granted);
+    }
+
+    function isNativeAndroidPermissionResultFinal(detail) {
+        const reason = String(detail?.reason || '');
+        const notificationsGranted = !!detail?.permissions?.notificationsGranted;
+        const exactAlarmGranted = !!detail?.permissions?.exactAlarmGranted;
+
+        if (reason === 'permissions-revoked') return true;
+        if (reason === 'exact-alarm-settings') return true;
+        if (reason === 'notifications-updated' && !notificationsGranted) return true;
+        if (reason === 'activity-resume' && !notificationsGranted && exactAlarmGranted) return true;
         return false;
+    }
+
+    function ensureNativeAndroidPermissionsBeforeReminderEnable(reason = 'android-reminder-enable') {
+        if (!isNativeAndroidReminderMode()) return Promise.resolve(true);
+        const current = ensureNativeAndroidReminderState();
+        if (current?.permissions?.ready) return Promise.resolve(true);
+        if (pendingNativeAndroidPermissionRequest?.promise) return pendingNativeAndroidPermissionRequest.promise;
+
+        pendingNativeAndroidPermissionRequest = {};
+        pendingNativeAndroidPermissionRequest.promise = new Promise((resolve) => {
+            pendingNativeAndroidPermissionRequest.resolve = resolve;
+            pendingNativeAndroidPermissionRequest.timeoutId = setTimeout(() => {
+                const latest = ensureNativeAndroidReminderState();
+                resolvePendingNativeAndroidPermissionRequest(!!latest?.permissions?.ready);
+            }, 30000);
+        });
+
+        const requestedState = requestNativeAndroidReminderPermissions(reason);
+        showToast(ANDROID_REMINDER_PERMISSION_REQUIRED_MESSAGE);
+
+        if (requestedState?.permissions?.ready) {
+            resolvePendingNativeAndroidPermissionRequest(true);
+        }
+
+        return pendingNativeAndroidPermissionRequest.promise;
+    }
+
+    async function confirmReminderEnablePermissions(reason = 'android-reminder-enable') {
+        if (isNativeAndroidReminderMode()) {
+            const nativeGranted = await ensureNativeAndroidPermissionsBeforeReminderEnable(reason);
+            if (!nativeGranted) return false;
+            return requestNotificationPermissionIfNeeded({ nativePermissionReady: true });
+        }
+        return requestNotificationPermissionIfNeeded();
     }
 
     window.addEventListener('android-prayer-reminder-state', (event) => {
@@ -6727,6 +6872,12 @@ window.filterCategory = function(cat, btn) {
         applyNativeAndroidReminderState(detail);
 
         const permissionsReady = !!detail?.permissions?.ready;
+        if (permissionsReady) {
+            resolvePendingNativeAndroidPermissionRequest(true);
+        } else if (pendingNativeAndroidPermissionRequest && isNativeAndroidPermissionResultFinal(detail)) {
+            resolvePendingNativeAndroidPermissionRequest(false);
+        }
+
         const reasonKey = `${detail?.reason || 'state'}:${permissionsReady ? 'ready' : 'missing'}`;
         if (!permissionsReady && lastNativePermissionPromptKey !== reasonKey && detail?.reason?.includes('permissions')) {
             lastNativePermissionPromptKey = reasonKey;
@@ -7319,9 +7470,10 @@ window.filterCategory = function(cat, btn) {
         return reminderSettings;
     }
 
-    function saveReminderSettings() {
-        if (!reminderSettings) return;
-        localStorage.setItem('crown_prayer_reminders', JSON.stringify(reminderSettings));
+    function saveReminderSettings(settingsOverride = reminderSettings) {
+        if (!settingsOverride) return;
+        reminderSettings = settingsOverride;
+        localStorage.setItem('crown_prayer_reminders', JSON.stringify(settingsOverride));
     }
 
     function syncReminderUi() {
@@ -7426,14 +7578,14 @@ window.filterCategory = function(cat, btn) {
         const masterToggle = document.getElementById('notifyToggle');
         if (masterToggle) {
             masterToggle.addEventListener('change', () => {
-                window.togglePrayerNotifications(masterToggle.checked);
+                void window.togglePrayerNotifications(masterToggle.checked);
             });
         }
 
         REMINDER_PRAYERS.forEach(name => {
             const input = document.getElementById(`remPrayer-${name}`);
             if (!input) return;
-            input.addEventListener('change', () => {
+            input.addEventListener('change', async () => {
                 const settings = loadReminderSettings();
                 const nativeMode = isNativeAndroidReminderMode();
                 const previousPrayerEnabled = !!settings.prayers[name];
@@ -7457,11 +7609,6 @@ window.filterCategory = function(cat, btn) {
                     if (nativeMode) showToast(ANDROID_REMINDER_PERMISSION_REQUIRED_MESSAGE);
                 };
 
-                if (requestedEnabled && nativeMode && !ensureNativeAndroidPermissionsBeforeReminderEnable(`enable-prayer-${name}`)) {
-                    denyAndRevert();
-                    return;
-                }
-
                 if (!requestedEnabled) {
                     applyPrayerSelection(false);
                     if (settings.enabled) {
@@ -7473,21 +7620,20 @@ window.filterCategory = function(cat, btn) {
                     return;
                 }
 
-                requestNotificationPermissionIfNeeded().then((granted) => {
-                    if (!granted) {
-                        denyAndRevert();
-                        return;
-                    }
+                const granted = await confirmReminderEnablePermissions(`enable-prayer-${name}`);
+                if (!granted) {
+                    denyAndRevert();
+                    return;
+                }
 
-                    applyPrayerSelection(true);
-                    if (settings.enabled) {
-                        schedulePrayerNotifications();
-                        showReminderSetConfirmation(name);
-                    } else {
-                        showToast(getPrayerUiText().reminderSaved);
-                    }
-                    renderPrayerGrid();
-                });
+                applyPrayerSelection(true);
+                if (settings.enabled) {
+                    schedulePrayerNotifications();
+                    showReminderSetConfirmation(name);
+                } else {
+                    showToast(getPrayerUiText().reminderSaved);
+                }
+                renderPrayerGrid();
             });
         });
 
@@ -8075,7 +8221,7 @@ window.filterCategory = function(cat, btn) {
         grid.dataset.boundReminderBells = '1';
     }
 
-    window.togglePrayerReminderFor = function(prayerName) {
+    window.togglePrayerReminderFor = async function(prayerName) {
         if (!REMINDER_PRAYERS.includes(prayerName)) return;
 
         const settings = loadReminderSettings();
@@ -8089,18 +8235,12 @@ window.filterCategory = function(cat, btn) {
             console.log('[DEBUG] Bridge available:', !!getAndroidReminderBridge());
         }
 
-        if (nextEnabled && nativeMode && !ensureNativeAndroidPermissionsBeforeReminderEnable(`toggle-prayer-${prayerName}`)) {
-            syncReminderUi();
-            renderPrayerGrid();
-            return;
-        }
-
         const commitAndRender = () => {
             const hasAnyEnabledPrayer = REMINDER_PRAYERS.some((name) => !!settings.prayers[name]);
             if (!hasAnyEnabledPrayer) settings.enabled = false;
 
             localStorage.setItem('crown_notifications', settings.enabled ? 'true' : 'false');
-            saveReminderSettings();
+            saveReminderSettings(settings);
             syncReminderUi();
             renderPrayerGrid();
 
@@ -8116,25 +8256,19 @@ window.filterCategory = function(cat, btn) {
             initDailyReminderPrompt();
         };
 
-        if (nextEnabled && !settings.enabled) {
-            window.togglePrayerNotifications(true);
-            renderPrayerGrid();
-            return;
-        }
-
         if (nextEnabled) {
-            requestNotificationPermissionIfNeeded().then((granted) => {
-                if (!granted) {
-                    settings.prayers[prayerName] = previousPrayerEnabled;
-                    settings.enabled = previousMasterEnabled;
-                    syncReminderUi();
-                    renderPrayerGrid();
-                    if (nativeMode) showToast(ANDROID_REMINDER_PERMISSION_REQUIRED_MESSAGE);
-                    return;
-                }
-                settings.prayers[prayerName] = true;
-                commitAndRender();
-            });
+            const granted = await confirmReminderEnablePermissions(`toggle-prayer-${prayerName}`);
+            if (!granted) {
+                settings.prayers[prayerName] = previousPrayerEnabled;
+                settings.enabled = previousMasterEnabled;
+                syncReminderUi();
+                renderPrayerGrid();
+                if (nativeMode) showToast(ANDROID_REMINDER_PERMISSION_REQUIRED_MESSAGE);
+                return;
+            }
+            settings.prayers[prayerName] = true;
+            settings.enabled = true;
+            commitAndRender();
             return;
         }
 
@@ -8723,13 +8857,12 @@ window.filterCategory = function(cat, btn) {
             .catch(() => {});
     }
 
-    function requestNotificationPermissionIfNeeded() {
+    function requestNotificationPermissionIfNeeded(options = {}) {
+        const nativePermissionReady = !!options.nativePermissionReady;
         const uiText = getPrayerUiText();
         if (isNativeAndroidReminderMode()) {
-            const nativeState = requestNativeAndroidReminderPermissions('android-reminder-permissions');
-            if (!nativeState?.permissions?.ready) {
-                showToast(uiText.alertsNativePermissionPending);
-            }
+            if (nativePermissionReady) return Promise.resolve(true);
+            const nativeState = ensureNativeAndroidReminderState();
             return Promise.resolve(!!nativeState?.permissions?.ready);
         }
         console.log('=== REMINDER SETUP ===');
@@ -8926,7 +9059,7 @@ window.filterCategory = function(cat, btn) {
         }
     }
 
-    window.togglePrayerNotifications = function(enabled) {
+    window.togglePrayerNotifications = async function(enabled) {
         const settings = loadReminderSettings();
         const nativeMode = isNativeAndroidReminderMode();
         const uiText = getPrayerUiText();
@@ -8937,35 +9070,26 @@ window.filterCategory = function(cat, btn) {
         }
 
         if (enabled) {
-            if (nativeMode && !ensureNativeAndroidPermissionsBeforeReminderEnable('enable-master-reminder')) {
+            const granted = await confirmReminderEnablePermissions('enable-master-reminder');
+            if (!granted) {
                 syncReminderUi();
                 renderPrayerGrid();
                 initDailyReminderPrompt();
                 return;
             }
 
-            requestNotificationPermissionIfNeeded().then((granted) => {
-                if (!granted) {
-                    syncReminderUi();
-                    renderPrayerGrid();
-
-                    if (nativeMode) showToast(ANDROID_REMINDER_PERMISSION_REQUIRED_MESSAGE);
-                    return;
-                }
-
-                settings.enabled = true;
-                localStorage.setItem('crown_notifications', 'true');
-                saveReminderSettings();
-                syncReminderUi();
-                schedulePrayerNotifications();
-                scheduleDailyDuaReminder();
-                showToast(isForegroundOnlyReminderMode() ? uiText.alertsForegroundOnly : uiText.alertsEnabled);
-                showFirstEnabledReminderConfirmation();
-            });
+            settings.enabled = true;
+            localStorage.setItem('crown_notifications', 'true');
+            saveReminderSettings(settings);
+            syncReminderUi();
+            schedulePrayerNotifications();
+            scheduleDailyDuaReminder();
+            showToast(isForegroundOnlyReminderMode() ? uiText.alertsForegroundOnly : uiText.alertsEnabled);
+            showFirstEnabledReminderConfirmation();
         } else {
             settings.enabled = false;
             localStorage.setItem('crown_notifications', 'false');
-            saveReminderSettings();
+            saveReminderSettings(settings);
             syncReminderUi();
             clearPrayerNotifications();
             clearDailyDuaReminder();
@@ -9377,6 +9501,7 @@ window.filterCategory = function(cat, btn) {
             bismillah: 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ',
             arabicOnly: isPS ? 'یوازې عربي' : 'Arabic only',
             defaultReciter: isPS ? 'اصلي قاري' : 'Default reciter',
+            arabicReciter: isPS ? 'د عربي تلاوت قاري' : 'Arabic reciter',
             reciterLabel: isPS ? 'قاري' : 'Reciter',
             translationMode: isPS ? 'د ژباړې حالت' : 'Translation display',
             arabicFontSize: isPS ? 'د عربي لیک کچه' : 'Arabic font size',
@@ -9388,6 +9513,8 @@ window.filterCategory = function(cat, btn) {
             flowArabicEnglish: isPS ? 'عربي + انګلیسي (پرله پسې)' : 'Arabic + English (Sequential)',
             playPashtoAudio: isPS ? 'عربي بیا پښتو غږیزه ژباړه' : 'Arabic then Pashto audio translation',
             stopPashtoAudio: isPS ? 'د پښتو غږیزه ژباړه بنده کړئ' : 'Stop Pashto audio translation',
+            pashtoAudioOptionLabel: isPS ? 'د پښتو غږیزه ژباړه' : 'Pashto translation audio',
+            pashtoAudioOptionHint: isPS ? 'دا د پښتو ژباړې جلا غږ دی او د Pashto translation player له لارې چلېږي.' : 'This is a separate Pashto translation audio track and uses the Pashto translation player.',
             pashtoAudioStatus: isPS ? 'پښتو غږیزه ژباړه' : 'Pashto audio translation',
             pashtoAudioHint: isPS ? 'پلې کېکاږئ: سورت به په عربي تلاوت شي، وروسته به د هماغه سورت پښتو غږیزه ژباړه چلېږي' : 'Press Play: the surah will recite in Arabic first, then the Pashto audio translation for that surah will play',
             pashtoAudioLoadingBanner: isPS ? 'د پښتو غږیزه ژباړه چمتو کېږي...' : 'Preparing Pashto audio translation...',
@@ -9563,15 +9690,31 @@ window.filterCategory = function(cat, btn) {
     function renderQuranInlineReciterSelect() {
         const select = document.getElementById('quranInlineReciterSelect');
         const label = document.getElementById('quranInlineReciterLabel');
+        const wrap = select?.closest('.quran-reciter-inline');
         if (!select) return;
 
         const ui = getQuranUiText();
         const settings = getQuranSettings();
-        if (label) label.textContent = ui.reciterLabel;
+        const isPashtoPanel = normalizeQuranPanelMode(quranState.panelMode) === 'pashto';
+        if (label) label.textContent = isPashtoPanel ? ui.arabicReciter : ui.reciterLabel;
 
         select.innerHTML = QURAN_RECITERS
             .map((reciter) => `<option value="${reciter.id}" ${settings.reciter === reciter.id ? 'selected' : ''}>${reciter.name}</option>`)
             .join('');
+
+        if (wrap) {
+            let note = wrap.querySelector('.quran-reciter-note');
+            if (isPashtoPanel) {
+                if (!note) {
+                    note = document.createElement('div');
+                    note.className = 'quran-reciter-note';
+                    wrap.appendChild(note);
+                }
+                note.innerHTML = `<strong>${escapeHtml(ui.pashtoAudioOptionLabel)}:</strong> ${escapeHtml(ui.pashtoAudioOptionHint)}`;
+            } else if (note) {
+                note.remove();
+            }
+        }
 
         if (select.dataset.bound === '1') return;
 
@@ -9686,6 +9829,14 @@ window.filterCategory = function(cat, btn) {
             data
         }));
         markSurahOffline(surahNumber);
+    }
+
+    function isCachedSurahBundleUsable(cachedEntry, { requirePashto = false } = {}) {
+        const data = cachedEntry?.data;
+        const ayahs = Array.isArray(data?.ayahs) ? data.ayahs : [];
+        if (!ayahs.length) return false;
+        if (!requirePashto) return true;
+        return ayahs.every((ayah) => ayah && Object.prototype.hasOwnProperty.call(ayah, 'pashto'));
     }
 
     async function fetchWithTimeout(url, options = {}, timeoutMs = 12000) {
@@ -10325,16 +10476,33 @@ window.filterCategory = function(cat, btn) {
         if (!list) return;
         const ui = getQuranUiText();
         const settings = getQuranSettings();
+        const isPashtoPanel = normalizeQuranPanelMode(quranState.panelMode) === 'pashto';
+        const currentReciter = QURAN_RECITERS.find((reciter) => reciter.id === settings.reciter)?.name || QURAN_RECITERS[0].name;
 
         list.innerHTML = `
             <div class="quran-settings-card">
                 <div class="quran-settings-grid">
-                    <div>
-                        <label for="quranReciterSelect">${ui.defaultReciter}</label>
-                        <select id="quranReciterSelect" class="prayer-reminder-select">
-                            ${QURAN_RECITERS.map(reciter => `<option value="${reciter.id}" ${settings.reciter === reciter.id ? 'selected' : ''}>${reciter.name}</option>`).join('')}
-                        </select>
-                    </div>
+                    ${isPashtoPanel ? `
+                        <div class="quran-settings-info-card">
+                            <label>${ui.arabicReciter}</label>
+                            <div class="quran-settings-info-value">${escapeHtml(currentReciter)}</div>
+                            <div class="quran-settings-info-note">${escapeHtml(ui.pashtoAudioOptionHint)}</div>
+                        </div>
+                    ` : `
+                        <div>
+                            <label for="quranReciterSelect">${ui.defaultReciter}</label>
+                            <select id="quranReciterSelect" class="prayer-reminder-select">
+                                ${QURAN_RECITERS.map(reciter => `<option value="${reciter.id}" ${settings.reciter === reciter.id ? 'selected' : ''}>${reciter.name}</option>`).join('')}
+                            </select>
+                        </div>
+                    `}
+                    ${isPashtoPanel ? `
+                        <div class="quran-settings-info-card">
+                            <label>${ui.pashtoAudioOptionLabel}</label>
+                            <div class="quran-settings-info-value">${escapeHtml(ui.pashtoAudioStatus)}</div>
+                            <div class="quran-settings-info-note">${escapeHtml(ui.pashtoAudioOptionHint)}</div>
+                        </div>
+                    ` : ''}
                     <div>
                         <label for="quranTranslationModeSelect">${ui.translationMode}</label>
                         <select id="quranTranslationModeSelect" class="prayer-reminder-select">
@@ -10404,7 +10572,8 @@ window.filterCategory = function(cat, btn) {
     async function fetchSurahBundle(surahNumber, forceRefresh = false) {
         if (!forceRefresh) {
             const cached = getCachedSurahData(surahNumber);
-            if (cached?.data?.ayahs?.length) return cached.data;
+            const requirePashto = shouldShowTranslationBlock(getTranslationModeEffective(), 'ps');
+            if (isCachedSurahBundleUsable(cached, { requirePashto })) return cached.data;
         }
 
         if (!quranState.pashtoZakariaMap) {

@@ -40,6 +40,8 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
     private val gson = Gson()
 
     private var pendingGeoRequest: Triple<String, GeolocationPermissions.Callback, Boolean>? = null
+    @Volatile
+    private var lastReportedContentScrollTopPx: Double = 0.0
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -184,14 +186,18 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
         }
     }
 
+    fun updateReportedContentScrollTop(scrollTop: Double) {
+        lastReportedContentScrollTopPx = scrollTop.coerceAtLeast(0.0)
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         swipeRefresh.setOnRefreshListener {
             webView.reload()
         }
         swipeRefresh.setOnChildScrollUpCallback { _, _ ->
-            // Allow pull-to-refresh only when the WebView is already at top.
-            webView.canScrollVertically(-1)
+            // DOM panels own scrolling in this app, so use the last scrollTop reported from JS.
+            lastReportedContentScrollTopPx > 0.5
         }
 
         with(webView.settings) {
@@ -254,6 +260,7 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
     private inner class AssetWebViewClient : WebViewClient() {
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
+            updateReportedContentScrollTop(0.0)
             swipeRefresh.isRefreshing = false
         }
 

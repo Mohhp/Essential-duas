@@ -40,6 +40,11 @@ class ReminderBridge(
     }
 
     @JavascriptInterface
+    fun reportScrollTop(scrollTop: Double) {
+        activity.updateReportedContentScrollTop(scrollTop)
+    }
+
+    @JavascriptInterface
     fun openStoreUpdate(url: String?): Boolean {
         return activity.openStoreUpdate(url)
     }

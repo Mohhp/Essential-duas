@@ -3352,6 +3352,17 @@
             font-size: 0.72rem;
         }
 
+        .quran-reciter-note {
+            grid-column: 1 / -1;
+            font-size: 0.66rem;
+            line-height: 1.5;
+            color: var(--text-subtle);
+        }
+
+        .quran-reciter-note strong {
+            color: var(--text-primary);
+        }
+
         .quran-audio-banner {
             display: none;
             border: 1px solid rgba(201, 168, 76, 0.3);
@@ -3731,6 +3742,26 @@
         .quran-settings-grid select,
         .quran-settings-grid input[type="range"] {
             width: 100%;
+        }
+
+        .quran-settings-info-card {
+            padding: 9px 10px;
+            border: 1px solid rgba(46, 196, 122, 0.14);
+            border-radius: 12px;
+            background: rgba(46, 196, 122, 0.06);
+        }
+
+        .quran-settings-info-value {
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            margin-top: 2px;
+        }
+
+        .quran-settings-info-note {
+            color: var(--text-subtle);
+            font-size: 0.7rem;
+            line-height: 1.5;
+            margin-top: 4px;
         }
 
         #quranPaneSettings .quran-settings-card {
@@ -5199,27 +5230,6 @@
 
         .tasbeeh-panel.active {
             transform: none !important;
-        }
-
-        [data-theme="light"] #mainContainer.home-panel,
-        [data-theme="light"] .routine-panel,
-        [data-theme="light"] .quran-panel,
-        [data-theme="light"] .tasbeeh-panel,
-        [data-theme="light"] .prayer-panel,
-        [data-theme="light"] body {
-            background: var(--bg-dark) !important;
-        }
-
-        html,
-        body,
-        #mainContainer,
-        .quran-panel,
-        .prayer-panel,
-        .routine-panel,
-        .tasbeeh-panel,
-        .etiquette-panel,
-        .progress-panel {
-            background-color: var(--bg-dark) !important;
         }
 
         .panel-loading-overlay {
@@ -9126,19 +9136,6 @@
         /* ============================================ */
         /* ===== DESIGN SYSTEM ENFORCEMENT ===== */
         /* ============================================ */
-
-        html,
-        body {
-            background: var(--bg-primary) !important;
-        }
-
-        body,
-        button,
-        input,
-        select,
-        textarea {
-            font-family: 'Inter', system-ui, sans-serif;
-        }
 
         body {
             font: var(--text-body);

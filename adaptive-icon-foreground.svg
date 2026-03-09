@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="goldGrad" x1="18%" y1="12%" x2="82%" y2="88%">
+      <stop offset="0%" stop-color="#D8BC67"/>
+      <stop offset="55%" stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#B88F2A"/>
+    </linearGradient>
+    <mask id="crescentMask">
+      <rect width="1024" height="1024" fill="black"/>
+      <circle cx="462" cy="350" r="180" fill="white"/>
+      <circle cx="540" cy="316" r="162" fill="black"/>
+    </mask>
+    <filter id="crescentGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#D4AF37" flood-opacity="0.2"/>
+    </filter>
+    <filter id="calligraphyGlow" x="-35%" y="-35%" width="170%" height="170%">
+      <feDropShadow dx="0" dy="0" stdDeviation="14" flood-color="#D4AF37" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#crescentGlow)">
+    <rect width="1024" height="1024" fill="url(#goldGrad)" mask="url(#crescentMask)"/>
+  </g>
+
+  <g filter="url(#calligraphyGlow)">
+    <text x="512" y="602" text-anchor="middle" direction="rtl" unicode-bidi="bidi-override" font-family="Noto Naskh Arabic, serif" font-size="256" font-weight="700" fill="#FFF8E7">فلاح</text>
+  </g>
+
+  <g opacity="0.66">
+    <path d="M360 706c46-25 97-37 152-37 55 0 106 12 152 37" fill="none" stroke="#E9D8AA" stroke-width="18" stroke-linecap="round"/>
+    <path d="M420 691c29-8 60-12 92-12 32 0 63 4 92 12" fill="none" stroke="#C9A84C" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+  </g>
+</svg>
