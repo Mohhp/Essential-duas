@@ -2519,8 +2519,17 @@ window.filterCategory = function(cat, btn) {
         }
     }
 
+    function ensurePanelHostedInBody(selectorOrElement) {
+        const panel = typeof selectorOrElement === 'string'
+            ? document.querySelector(selectorOrElement)
+            : selectorOrElement;
+        if (!panel || panel.parentElement === document.body) return panel;
+        document.body.appendChild(panel);
+        return panel;
+    }
+
     function showAuxPanel(selector, navName = 'more') {
-        const target = document.querySelector(selector);
+        const target = ensurePanelHostedInBody(selector);
         if (!target) return;
         document.querySelectorAll('.panel').forEach((panel) => panel.classList.remove('active'));
         target.classList.add('active');
@@ -2601,8 +2610,9 @@ window.filterCategory = function(cat, btn) {
             saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
             tasbeehCount = 0;
         }
-        openMorePanel();
-        recordInAppRoute(false);
+        const tp = document.querySelector('.tasbeeh-panel');
+        if (tp) tp.classList.remove('active');
+        history.back();
     };
 
     let lastTasbeehTapAt = 0;
@@ -2765,9 +2775,8 @@ window.filterCategory = function(cat, btn) {
     window.closeEtiquette = function() {
         const ep = document.querySelector('.etiquette-panel');
         if (ep) ep.classList.remove('active');
-        openMorePanel();
         unlockScroll();
-        recordInAppRoute(false);
+        history.back();
     };
 
     function getRoutineUiText() {
@@ -2894,8 +2903,9 @@ window.filterCategory = function(cat, btn) {
     };
 
     window.closeRoutine = function() {
-        openMorePanel();
-        recordInAppRoute(false);
+        const rp = document.querySelector('.routine-panel');
+        if (rp) rp.classList.remove('active');
+        history.back();
     };
 
     // ===== SHARE =====
@@ -3413,6 +3423,20 @@ window.filterCategory = function(cat, btn) {
         };
     }
 
+    function getPrayerCalcParams() {
+        const VALID_METHODS = new Set([
+            'MuslimWorldLeague', 'Egyptian', 'Karachi', 'UmmAlQura', 'Dubai',
+            'Kuwait', 'Qatar', 'Singapore', 'Turkey', 'Tehran',
+            'MoonsightingCommittee', 'NorthAmerica'
+        ]);
+        const methodKey = localStorage.getItem('prayer_calc_method') || 'MuslimWorldLeague';
+        const madhabKey = localStorage.getItem('prayer_calc_madhab') || 'Hanafi';
+        const safeMethod = VALID_METHODS.has(methodKey) ? methodKey : 'MuslimWorldLeague';
+        const params = adhan.CalculationMethod[safeMethod]();
+        params.madhab = madhabKey === 'Shafi' ? adhan.Madhab.Shafi : adhan.Madhab.Hanafi;
+        return params;
+    }
+
     function refreshHomeNextPrayerCard() {
         const label = document.getElementById('dashboardPrayerLabel');
         const name = document.getElementById('dashboardPrayerName');
@@ -3465,8 +3489,7 @@ window.filterCategory = function(cat, btn) {
                 try {
                     const loc = JSON.parse(cached);
                     const coords = new adhan.Coordinates(loc.lat, loc.lng);
-                    const params = adhan.CalculationMethod.MuslimWorldLeague();
-                    params.madhab = adhan.Madhab.Hanafi;
+                    const params = getPrayerCalcParams();
                     const tomorrowTimes = new adhan.PrayerTimes(coords, tomorrow, params);
                     nextTarget = tomorrowTimes.fajr;
                 } catch (_) {
@@ -4320,6 +4343,7 @@ window.filterCategory = function(cat, btn) {
     };
 
     window.openMorePanel = function() {
+        ensurePanelHostedInBody('.more-panel');
         switchTab('more');
         const morePanel = document.querySelector('.more-panel');
         if (morePanel) morePanel.scrollTop = 0;
@@ -4377,7 +4401,7 @@ window.filterCategory = function(cat, btn) {
     }
 
     window.openAboutPanel = function() {
-        const ap = document.querySelector('.about-panel');
+        const ap = ensurePanelHostedInBody('.about-panel');
         if (!ap) return;
         renderAboutPanelContent();
         showAuxPanel('.about-panel');
@@ -4390,12 +4414,9 @@ window.filterCategory = function(cat, btn) {
     };
 
     window.closeAboutPanel = function() {
-        openMorePanel();
-        recordInAppRoute(false, {
-            view: IN_APP_VIEWS.PANEL,
-            panel: 'more',
-            ts: Date.now()
-        });
+        const ap = document.querySelector('.about-panel');
+        if (ap) ap.classList.remove('active');
+        history.back();
     };
 
     window.openContactEmail = function() {
@@ -4418,6 +4439,7 @@ window.filterCategory = function(cat, btn) {
                 <div class="progress-panel-content" id="progressPanelContent"></div>`;
             document.body.appendChild(pp);
         }
+        pp = ensurePanelHostedInBody(pp);
         enhanceAccessibility();
         renderProgressPanel();
         showAuxPanel('.progress-panel');
@@ -4428,9 +4450,8 @@ window.filterCategory = function(cat, btn) {
     window.closeProgress = function() {
         const pp = document.querySelector('.progress-panel');
         if (pp) pp.classList.remove('active');
-        openMorePanel();
         unlockScroll();
-        recordInAppRoute(false);
+        history.back();
     };
 
     window.refreshProgressLanguage = function() {
@@ -7398,6 +7419,32 @@ window.filterCategory = function(cat, btn) {
         setPrayerSubtab(getSavedPrayerTab(), false);
     }
 
+    function initPrayerCalcSettings() {
+        const methodEl = document.getElementById('prayerCalcMethod');
+        const madhabEl = document.getElementById('prayerCalcMadhab');
+        if (!methodEl || !madhabEl) return;
+        if (methodEl.dataset.bound === '1') return;
+
+        methodEl.value = localStorage.getItem('prayer_calc_method') || 'MuslimWorldLeague';
+        madhabEl.value = localStorage.getItem('prayer_calc_madhab') || 'Hanafi';
+
+        function onCalcChange() {
+            localStorage.setItem('prayer_calc_method', methodEl.value);
+            localStorage.setItem('prayer_calc_madhab', madhabEl.value);
+            const cached = (() => {
+                try { return JSON.parse(localStorage.getItem('crown_location') || 'null'); }
+                catch (_) { return null; }
+            })();
+            if (cached && typeof cached.lat === 'number' && typeof cached.lng === 'number') {
+                calculateAndRenderPrayers(cached.lat, cached.lng);
+            }
+        }
+
+        methodEl.addEventListener('change', onCalcChange);
+        madhabEl.addEventListener('change', onCalcChange);
+        methodEl.dataset.bound = '1';
+    }
+
     function setCitySearchVisibility(visible) {
         const shell = document.getElementById('citySearchShell');
         if (!shell) return;
@@ -7949,6 +7996,7 @@ window.filterCategory = function(cat, btn) {
         buildQiblaDegreeRing();
         if (typeof window.refreshCitySelectorLanguage === 'function') window.refreshCitySelectorLanguage();
         initPrayerSubtabs();
+        initPrayerCalcSettings();
         if (typeof window.refreshHomeDashboard === 'function') window.refreshHomeDashboard();
     };
 
@@ -7992,7 +8040,7 @@ window.filterCategory = function(cat, btn) {
     }
 
     window.openPrayer = function() {
-        const pp = document.querySelector('.prayer-panel');
+        const pp = ensurePanelHostedInBody('.prayer-panel');
         if (pp) showAuxPanel('.prayer-panel');
         if (pp) pp.scrollTop = 0;
         const closeBtn = pp?.querySelector('.panel-back-btn');
@@ -8001,6 +8049,7 @@ window.filterCategory = function(cat, btn) {
         initPrayerGridBellActions();
         initCitySelector();
         initPrayerSubtabs();
+        initPrayerCalcSettings();
         preloadPrayerReminderAudio();
         if (typeof window.refreshPrayerLanguage === 'function') window.refreshPrayerLanguage();
 
@@ -8027,9 +8076,10 @@ window.filterCategory = function(cat, btn) {
 
     window.closePrayer = function() {
         setPanelLoading('prayer', false);
-        openMorePanel();
+        const pp = document.querySelector('.prayer-panel');
+        if (pp) pp.classList.remove('active');
         if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
-        recordInAppRoute(false);
+        history.back();
     };
 
     window.requestLocation = function() {
@@ -8149,8 +8199,7 @@ window.filterCategory = function(cat, btn) {
         calculateAndRenderPrayers._retries = 0;
 
         const coordinates = new adhan.Coordinates(lat, lng);
-        const params = adhan.CalculationMethod.MuslimWorldLeague();
-        params.madhab = adhan.Madhab.Hanafi;
+        const params = getPrayerCalcParams();
         const date = new Date();
         const pt = new adhan.PrayerTimes(coordinates, date, params);
 
@@ -8322,8 +8371,7 @@ window.filterCategory = function(cat, btn) {
             if (cached && typeof adhan !== 'undefined') {
                 const loc = JSON.parse(cached);
                 const coords = new adhan.Coordinates(loc.lat, loc.lng);
-                const params = adhan.CalculationMethod.MuslimWorldLeague();
-                params.madhab = adhan.Madhab.Hanafi;
+                const params = getPrayerCalcParams();
                 const tpt = new adhan.PrayerTimes(coords, tomorrow, params);
                 target = tpt.fajr;
             } else {
@@ -8648,8 +8696,7 @@ window.filterCategory = function(cat, btn) {
         clearPrayerBootstrapRetry();
 
         const coordinates = new adhan.Coordinates(loc.lat, loc.lng);
-        const params = adhan.CalculationMethod.MuslimWorldLeague();
-        params.madhab = adhan.Madhab.Hanafi;
+        const params = getPrayerCalcParams();
         const pt = new adhan.PrayerTimes(coordinates, new Date(), params);
 
         prayerTimesData = {
@@ -8941,8 +8988,7 @@ window.filterCategory = function(cat, btn) {
         if (!coords || typeof adhan === 'undefined') return null;
 
         const coordinates = new adhan.Coordinates(coords.lat, coords.lng);
-        const params = adhan.CalculationMethod.MuslimWorldLeague();
-        params.madhab = adhan.Madhab.Hanafi;
+        const params = getPrayerCalcParams();
         const pt = new adhan.PrayerTimes(coordinates, date, params);
         console.log('[PrayerReminder] Prayer time parsed', {
             prayerName,
@@ -9414,6 +9460,7 @@ window.filterCategory = function(cat, btn) {
         isPashtoAyahSegmentPlayback: false,
         isTransitioningToPashto: false,
         pashtoTranslationSurah: null,
+        pashtoPlaybackSession: 0,
         pashtoZakariaMap: null,
         pashtoZakariaPromise: null,
         loadingReader: false,
@@ -10206,6 +10253,7 @@ window.filterCategory = function(cat, btn) {
 
     function stopPashtoTranslationSafe() {
         if (typeof window.stopPashtoTranslation !== 'function') return;
+        quranState.pashtoPlaybackSession += 1;
         try {
             window.stopPashtoTranslation();
         } catch (error) {}
@@ -10217,6 +10265,8 @@ window.filterCategory = function(cat, btn) {
             try {
                 quranState.audio.pause();
                 quranState.audio.currentTime = 0;
+                quranState.audio.src = '';
+                quranState.audio.load();
                 quranState.audio.muted = false;
                 quranState.audio.volume = 1;
             } catch (error) {}
@@ -10552,6 +10602,8 @@ window.filterCategory = function(cat, btn) {
         stopPashtoTranslationSafe();
         quranState.isTransitioningToPashto = true;
 
+        quranState.pashtoPlaybackSession += 1;
+        const mySession = quranState.pashtoPlaybackSession;
         quranState.isPashtoTranslationActive = true;
         quranState.pashtoTranslationSurah = surah;
         quranState.audioAyah = `${surah}:1`;
@@ -10575,8 +10627,10 @@ window.filterCategory = function(cat, btn) {
             return false;
         } finally {
             quranState.isTransitioningToPashto = false;
-            quranState.isPashtoTranslationActive = false;
-            quranState.pashtoTranslationSurah = null;
+            if (quranState.pashtoPlaybackSession === mySession) {
+                quranState.isPashtoTranslationActive = false;
+                quranState.pashtoTranslationSurah = null;
+            }
             setQuranPlayButtonLoading(false);
             updateQuranFloatingAudioUi();
         }
@@ -10596,21 +10650,25 @@ window.filterCategory = function(cat, btn) {
             updateQuranFloatingAudioUi();
         });
         quranState.audio.addEventListener('waiting', () => {
+            if ((quranState.activeFlowMode || 'ar') === 'ps') return;
             if (quranState.playerState === 'playing' || quranState.isChainedPlayback) setQuranPlayerState('loading');
             setQuranPlayButtonLoading(true);
             scheduleQuranAudioRecovery('waiting');
         });
         quranState.audio.addEventListener('stalled', () => {
+            if ((quranState.activeFlowMode || 'ar') === 'ps') return;
             if (quranState.playerState === 'playing' || quranState.isChainedPlayback) setQuranPlayerState('loading');
             setQuranPlayButtonLoading(true);
             scheduleQuranAudioRecovery('stalled');
         });
         quranState.audio.addEventListener('canplay', () => {
+            if ((quranState.activeFlowMode || 'ar') === 'ps') return;
             clearQuranAudioRecovery();
             setQuranPlayButtonLoading(false);
             if (!quranState.audio.paused && quranState.playerState !== 'paused') setQuranPlayerState('playing');
         });
         quranState.audio.addEventListener('playing', () => {
+            if ((quranState.activeFlowMode || 'ar') === 'ps') return;
             clearQuranAudioRecovery();
             quranState.isChainedPlayback = false;
             setQuranPlayerState('playing');
@@ -10619,7 +10677,7 @@ window.filterCategory = function(cat, btn) {
         });
         quranState.audio.addEventListener('ended', async () => {
             clearQuranAudioRecovery();
-            if ((quranState.activeFlowMode || 'ar') === 'ps' && quranState.isPashtoTranslationActive) {
+            if ((quranState.activeFlowMode || 'ar') === 'ps') {
                 quranState.isContinuousSurahPlayback = false;
                 return;
             }
@@ -10671,7 +10729,7 @@ window.filterCategory = function(cat, btn) {
         });
         quranState.audio.addEventListener('error', () => {
             clearQuranAudioRecovery();
-            if ((quranState.activeFlowMode || 'ar') === 'ps' && quranState.isPashtoTranslationActive) {
+            if ((quranState.activeFlowMode || 'ar') === 'ps') {
                 return;
             }
             if (quranState.audioSwitchingSource) return;
@@ -10686,7 +10744,7 @@ window.filterCategory = function(cat, btn) {
         });
         quranState.audio.addEventListener('pause', () => {
             updateQuranMediaSession();
-            if (quranState.audioSwitchingSource || quranState.audioPausedManually || quranState.playerState === 'hidden' || quranState.isPashtoTranslationActive || quranState.isTransitioningToPashto) {
+            if ((quranState.activeFlowMode || 'ar') === 'ps' || quranState.audioSwitchingSource || quranState.audioPausedManually || quranState.playerState === 'hidden' || quranState.isPashtoTranslationActive || quranState.isTransitioningToPashto) {
                 clearQuranAudioRecovery();
                 return;
             }
@@ -10804,14 +10862,19 @@ window.filterCategory = function(cat, btn) {
         clearQuranAudioRecovery();
         stopTranslationOverlayAudio();
         stopPashtoTranslationSafe();
+        quranState.audioPausedManually = false;
         if (quranState.audio) {
             try {
                 quranState.audio.pause();
                 quranState.audio.currentTime = 0;
+                quranState.audio.src = '';
+                quranState.audio.load();
                 quranState.audio.muted = false;
                 quranState.audio.volume = 1;
             } catch (error) {}
         }
+        quranState.pashtoPlaybackSession += 1;
+        const mySession = quranState.pashtoPlaybackSession;
         quranState.isPashtoTranslationActive = true;
         quranState.pashtoTranslationSurah = surah;
         quranState.audioAyah = `${surah}:1`;
@@ -10834,10 +10897,12 @@ window.filterCategory = function(cat, btn) {
             return false;
         } finally {
             quranState.isContinuousSurahPlayback = false;
-            quranState.isPashtoTranslationActive = false;
-            quranState.pashtoTranslationSurah = null;
+            if (quranState.pashtoPlaybackSession === mySession) {
+                quranState.isPashtoTranslationActive = false;
+                quranState.pashtoTranslationSurah = null;
+                setQuranPlayerState('hidden');
+            }
             setQuranPlayButtonLoading(false);
-            setQuranPlayerState('hidden');
             updateQuranFloatingAudioUi();
         }
     }
@@ -10900,7 +10965,7 @@ window.filterCategory = function(cat, btn) {
     function scheduleQuranAudioRecovery(reason = 'buffering') {
         clearQuranAudioRecovery();
 
-        if (!quranState.audioAyah || quranState.audioPausedManually || quranState.audioSwitchingSource || quranState.isPashtoTranslationActive || quranState.isTransitioningToPashto) {
+        if ((quranState.activeFlowMode || 'ar') === 'ps' || !quranState.audioAyah || quranState.audioPausedManually || quranState.audioSwitchingSource || quranState.isPashtoTranslationActive || quranState.isTransitioningToPashto) {
             return;
         }
 
@@ -10908,7 +10973,7 @@ window.filterCategory = function(cat, btn) {
             quranAudioRecoveryTimer = null;
 
             const audio = quranState.audio;
-            if (!audio || !quranState.audioAyah || quranState.audioPausedManually || quranState.audioSwitchingSource || quranState.isPashtoTranslationActive || quranState.isTransitioningToPashto) {
+            if ((quranState.activeFlowMode || 'ar') === 'ps' || !audio || !quranState.audioAyah || quranState.audioPausedManually || quranState.audioSwitchingSource || quranState.isPashtoTranslationActive || quranState.isTransitioningToPashto) {
                 return;
             }
 
@@ -11751,7 +11816,7 @@ window.filterCategory = function(cat, btn) {
         const activeSource = getQuranActiveAudioSource();
         const sessionActive = isQuranAudioSessionActive();
 
-        document.querySelectorAll('.quran-audio-row[data-audio-row]').forEach((row) => {
+        document.querySelectorAll('.quran-audio-source[data-audio-row]').forEach((row) => {
             const rowSource = row.getAttribute('data-audio-row');
             row.classList.toggle('is-selected', rowSource === preferredSource);
             row.classList.toggle('is-playing', sessionActive && rowSource === activeSource);
@@ -11969,7 +12034,7 @@ window.filterCategory = function(cat, btn) {
         const root = document.querySelector('.quran-panel');
         quranState.ayahObserver = new IntersectionObserver(handleQuranAyahVisibility, {
             root,
-            rootMargin: '-220px 0px -35% 0px',
+            rootMargin: '-96px 0px -35% 0px',
             threshold: [0.25, 0.5, 0.75]
         });
         return quranState.ayahObserver;
@@ -12127,13 +12192,22 @@ window.filterCategory = function(cat, btn) {
         const arabicBtn = document.getElementById('quranPlayPauseBtn');
         const pashtoBtn = document.getElementById('quranPlayPashtoBtn');
         const englishBtn = document.getElementById('quranPlayEnglishBtn');
+        const arabicAction = document.getElementById('quranArabicAction');
+        const pashtoAction = document.getElementById('quranPashtoAction');
+        const englishAction = document.getElementById('quranEnglishAction');
         const arabicStatus = document.getElementById('quranArabicStatus');
         const pashtoStatus = document.getElementById('quranPashtoStatus');
         const englishStatus = document.getElementById('quranEnglishStatus');
+        const activeTitle = document.getElementById('quranAudioActiveTitle');
+        const activeStatus = document.getElementById('quranAudioActiveStatus');
+        const activeKicker = document.getElementById('quranAudioNowLabel');
 
-        if (arabicBtn) arabicBtn.textContent = activeSource === 'arabic' && visualPlaying ? (isPashtoMode() ? 'تم' : 'Pause') : (isPashtoMode() ? 'عربي وغږوئ' : 'Play Arabic');
-        if (pashtoBtn) pashtoBtn.textContent = activeSource === 'pashto' && visualPlaying ? (isPashtoMode() ? 'تم' : 'Pause') : (isPashtoMode() ? 'پښتو وغږوئ' : 'Play Pashto');
-        if (englishBtn) englishBtn.textContent = activeSource === 'english' && visualPlaying ? (isPashtoMode() ? 'تم' : 'Pause') : (isPashtoMode() ? 'انګلیسي وغږوئ' : 'Play English');
+        if (arabicAction) arabicAction.textContent = activeSource === 'arabic' && visualPlaying ? (isPashtoMode() ? 'تم' : 'Pause') : (isPashtoMode() ? 'وغږوئ' : 'Play');
+        if (pashtoAction) pashtoAction.textContent = activeSource === 'pashto' && visualPlaying ? (isPashtoMode() ? 'تم' : 'Pause') : (isPashtoMode() ? 'وغږوئ' : 'Play');
+        if (englishAction) englishAction.textContent = activeSource === 'english' && visualPlaying ? (isPashtoMode() ? 'تم' : 'Pause') : (isPashtoMode() ? 'وغږوئ' : 'Play');
+        if (arabicBtn) arabicBtn.setAttribute('aria-pressed', activeSource === 'arabic' && sessionActive ? 'true' : 'false');
+        if (pashtoBtn) pashtoBtn.setAttribute('aria-pressed', activeSource === 'pashto' && sessionActive ? 'true' : 'false');
+        if (englishBtn) englishBtn.setAttribute('aria-pressed', activeSource === 'english' && sessionActive ? 'true' : 'false');
 
         if (arabicStatus) {
             arabicStatus.textContent = activeSource === 'arabic' && sessionActive
@@ -12164,6 +12238,36 @@ window.filterCategory = function(cat, btn) {
                 : (isPashtoMode() ? 'Ibrahim Walk انګلیسي ژباړه' : 'Ibrahim Walk translation audio');
         }
 
+        if (activeKicker) activeKicker.textContent = sessionActive
+            ? (isPashtoMode() ? 'اوس غږېږي' : 'Now Playing')
+            : (isPashtoMode() ? 'ټاکل شوې سرچینه' : 'Selected Source');
+
+        const activeSourceLabel = activeSource === 'pashto'
+            ? (isPashtoMode() ? 'پښتو ژباړې غږ' : 'Pashto Translation Audio')
+            : activeSource === 'english'
+            ? (isPashtoMode() ? 'انګلیسي ژباړې غږ' : 'English Translation Audio')
+            : (isPashtoMode() ? 'عربي تلاوت' : 'Arabic Recitation');
+        const selectedSource = getQuranPreferredAudioSource();
+        const selectedSourceLabel = selectedSource === 'pashto'
+            ? (isPashtoMode() ? 'پښتو ژباړې غږ' : 'Pashto Translation Audio')
+            : selectedSource === 'english'
+            ? (isPashtoMode() ? 'انګلیسي ژباړې غږ' : 'English Translation Audio')
+            : (isPashtoMode() ? 'عربي تلاوت' : 'Arabic Recitation');
+        if (activeTitle) activeTitle.textContent = sessionActive ? activeSourceLabel : selectedSourceLabel;
+        if (activeStatus) {
+            if (sessionActive) {
+                activeStatus.textContent = activeSource === 'pashto'
+                    ? (pashtoStatus?.textContent || '')
+                    : activeSource === 'english'
+                    ? (englishStatus?.textContent || '')
+                    : (arabicStatus?.textContent || '');
+            } else {
+                activeStatus.textContent = isPashtoMode()
+                    ? 'لاندې سرچینه وټاکئ.'
+                    : 'Choose a source below.';
+            }
+        }
+
         updateQuranPanelModeUi();
     }
 
@@ -12178,14 +12282,22 @@ window.filterCategory = function(cat, btn) {
 
         const activeSource = getQuranActiveAudioSource();
         const sameSource = activeSource === preferredSource;
-        if (!forceRestart && sameSource && (quranState.playerState === 'playing' || quranState.playerState === 'paused')) {
-            toggleQuranPlayPause();
-            return;
+        const samePashtoSession = preferredSource !== 'pashto'
+            || !quranState.pashtoTranslationSurah
+            || Number(quranState.pashtoTranslationSurah) === Number(quranState.currentSurah);
+        if (!forceRestart && sameSource && samePashtoSession) {
+            if (quranState.playerState === 'loading') {
+                return;
+            }
+            if (quranState.playerState === 'playing' || quranState.playerState === 'paused') {
+                toggleQuranPlayPause();
+                return;
+            }
         }
 
         if (preferredSource === 'pashto') {
             quranState.activeFlowMode = 'ps';
-            await playQuranAyahInternal(Number(quranState.currentSurah), 1, 0, true);
+            await playPashtoCombinedSurahAudio(Number(quranState.currentSurah));
             return;
         }
 
@@ -12428,6 +12540,7 @@ window.filterCategory = function(cat, btn) {
         const arabicLabel = document.getElementById('quranArabicAudioLabel');
         const pashtoLabel = document.getElementById('quranPashtoAudioLabel');
         const englishLabel = document.getElementById('quranEnglishAudioLabel');
+        const audioNowLabel = document.getElementById('quranAudioNowLabel');
         const loadMore = document.getElementById('quranLoadMore');
 
         if (eyebrow) eyebrow.textContent = isPashtoMode() ? 'قرآن کریم' : 'Quran';
@@ -12436,9 +12549,10 @@ window.filterCategory = function(cat, btn) {
         if (resumeBtn) resumeBtn.textContent = isPashtoMode() ? 'بیا پیل' : 'Resume';
         if (pashtoToggleLabel) pashtoToggleLabel.textContent = isPashtoMode() ? 'پښتو ژباړه وښایئ' : 'Show Pashto';
         if (englishToggleLabel) englishToggleLabel.textContent = isPashtoMode() ? 'انګلیسي ژباړه وښایئ' : 'Show English';
-        if (arabicLabel) arabicLabel.textContent = isPashtoMode() ? 'عربي تلاوت' : 'Arabic Recitation';
-        if (pashtoLabel) pashtoLabel.textContent = isPashtoMode() ? 'پښتو ژباړې غږ' : 'Pashto Translation Audio';
-        if (englishLabel) englishLabel.textContent = isPashtoMode() ? 'انګلیسي ژباړې غږ' : 'English Translation Audio';
+        if (audioNowLabel) audioNowLabel.textContent = isPashtoMode() ? 'اوس غږېږي' : 'Now Playing';
+        if (arabicLabel) arabicLabel.textContent = isPashtoMode() ? 'عربي' : 'Arabic';
+        if (pashtoLabel) pashtoLabel.textContent = isPashtoMode() ? 'پښتو' : 'Pashto';
+        if (englishLabel) englishLabel.textContent = isPashtoMode() ? 'انګلیسي' : 'English';
         if (loadMore) loadMore.textContent = isPashtoMode() ? 'نور آیتونه ښکاره کړئ…' : 'Load more…';
 
         renderQuranInlineReciterSelect();
