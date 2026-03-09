@@ -318,10 +318,17 @@
         function onCanPlay() {
           clearLoadTimeout();
           emitState("ready", { surahNumber: surah, url: url });
+          // If the audio stalled mid-playback and the browser has now buffered enough,
+          // try resuming without waiting for the 4-second recovery timer.
+          if (!settled && audio.paused && audio.currentTime > 0) {
+            clearRecoveryTimer();
+            audio.play().catch(function () {});
+          }
         }
 
         function onPlaying() {
           clearLoadTimeout();
+          clearRecoveryTimer(); // browser recovered on its own — cancel redundant 4-second timer
           emitState("playing", { surahNumber: surah, url: url });
         }
 

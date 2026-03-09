@@ -4,6 +4,7 @@
   "description": "",
   "main": "pashto.js",
   "dependencies": {
+    "adhan": "^4.4.3",
     "agent-base": "^7.1.4",
     "ansi-regex": "^5.0.1",
     "ansi-styles": "^4.3.0",
