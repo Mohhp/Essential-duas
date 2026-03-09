@@ -1399,7 +1399,6 @@
             } else if (view === IN_APP_VIEWS.QURAN_TAB) {
                 await openQuran();
                 closeQuranReader({ skipHistory: true });
-                setQuranView('surah');
             } else if (view === IN_APP_VIEWS.SURAH_READER) {
                 await openQuran();
                 await openQuranSurah(Number(state.surah) || 1, Number(state.ayah) || 1);
@@ -9353,9 +9352,21 @@ window.filterCategory = function(cat, btn) {
     const QURAN_ACTIVE_TAB_KEY = 'crown_quran_active_tab';
     const QURAN_PANEL_MODE_KEY = 'crown_quran_panel_mode';
     const QURAN_SETTINGS_KEY = 'crown_quran_settings';
+    const QURAN_SHOW_PASHTO_KEY = 'crown_quran_show_pashto';
+    const QURAN_SHOW_ENGLISH_KEY = 'crown_quran_show_english';
+    const QURAN_LAST_SURAH_KEY = 'crown_quran_last_surah';
+    const QURAN_LAST_AYAH_KEY = 'crown_quran_last_ayah';
     const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
     const QURAN_FALLBACK_RECITER = 'ar.alafasy';
     const quranSavedPanelMode = localStorage.getItem(QURAN_PANEL_MODE_KEY);
+
+    function normalizeQuranPanelMode(mode) {
+        const value = String(mode || '').toLowerCase();
+        if (value === 'pashto' || value === 'ps' || value === 'ar-ps') return 'pashto';
+        if (value === 'english' || value === 'en' || value === 'ar-en') return 'english';
+        if (value === 'all') return isPashtoMode() ? 'pashto' : 'english';
+        return 'arabic';
+    }
 
     if (PASHTO_AUDIO_BASE_URL && typeof window.setPashtoAudioBaseUrl === 'function') {
         window.setPashtoAudioBaseUrl(PASHTO_AUDIO_BASE_URL);
@@ -9371,23 +9382,11 @@ window.filterCategory = function(cat, btn) {
 
     const QURAN_TRANSLATION_MODES = ['all', 'ar-ps', 'ar-en', 'ar'];
     const QURAN_AUDIO_SPEEDS = [0.75, 1, 1.25];
-    const QURAN_JUZ_STARTS = [
-        { surah: 1, ayah: 1 }, { surah: 2, ayah: 142 }, { surah: 2, ayah: 253 }, { surah: 3, ayah: 93 },
-        { surah: 4, ayah: 24 }, { surah: 4, ayah: 148 }, { surah: 5, ayah: 82 }, { surah: 6, ayah: 111 },
-        { surah: 7, ayah: 88 }, { surah: 8, ayah: 41 }, { surah: 9, ayah: 93 }, { surah: 11, ayah: 6 },
-        { surah: 12, ayah: 53 }, { surah: 15, ayah: 1 }, { surah: 17, ayah: 1 }, { surah: 18, ayah: 75 },
-        { surah: 21, ayah: 1 }, { surah: 23, ayah: 1 }, { surah: 25, ayah: 21 }, { surah: 27, ayah: 56 },
-        { surah: 29, ayah: 46 }, { surah: 33, ayah: 31 }, { surah: 36, ayah: 28 }, { surah: 39, ayah: 32 },
-        { surah: 41, ayah: 47 }, { surah: 46, ayah: 1 }, { surah: 51, ayah: 31 }, { surah: 58, ayah: 1 },
-        { surah: 67, ayah: 1 }, { surah: 78, ayah: 1 }
-    ];
     const quranState = {
         initialized: false,
         meta: null,
         surahStartOffsets: null,
-        view: localStorage.getItem(QURAN_ACTIVE_TAB_KEY) || 'surah',
-        panelMode: quranSavedPanelMode || (isPashtoMode() ? 'pashto' : 'arabic'),
-        search: '',
+        panelMode: normalizeQuranPanelMode(quranSavedPanelMode || (isPashtoMode() ? 'pashto' : 'arabic')),
         currentSurah: null,
         currentSurahData: null,
         renderedAyahs: 0,
@@ -9419,20 +9418,14 @@ window.filterCategory = function(cat, btn) {
         pashtoZakariaPromise: null,
         loadingReader: false,
         loadingList: false,
-        dropdownOpen: false
+        showPashto: localStorage.getItem(QURAN_SHOW_PASHTO_KEY) !== 'false',
+        showEnglish: localStorage.getItem(QURAN_SHOW_ENGLISH_KEY) === 'true',
+        currentVisibleAyah: 1,
+        lastEnglishAudioError: '',
+        ayahObserver: null,
+        ayahVisibility: new Map()
     };
 
-    function normalizeQuranPanelMode(mode) {
-        if (mode === 'pashto' || mode === 'english' || mode === 'arabic') return mode;
-        return 'arabic';
-    }
-
-    function getFlowModeFromPanelMode(mode) {
-        const panel = normalizeQuranPanelMode(mode);
-        if (panel === 'pashto') return 'ar-ps';
-        if (panel === 'english') return 'ar-en';
-        return 'ar';
-    }
 
     function getTranslationModeFromPanelMode(mode) {
         const panel = normalizeQuranPanelMode(mode);
@@ -9442,16 +9435,13 @@ window.filterCategory = function(cat, btn) {
         return 'ar';
     }
 
-    const QURAN_POPULAR_ITEMS = [
-        { type: 'surah', number: 1, fallbackEn: 'Al-Fatiha' },
-        { type: 'surah', number: 2, fallbackEn: 'Al-Baqarah' },
-        { type: 'surah', number: 36, fallbackEn: 'Yasin' },
-        { type: 'surah', number: 67, fallbackEn: 'Al-Mulk' },
-        { type: 'surah', number: 55, fallbackEn: 'Ar-Rahman' },
-        { type: 'surah', number: 18, fallbackEn: 'Al-Kahf' },
-        { type: 'surah', number: 56, fallbackEn: "Al-Waqi'ah" },
-        { type: 'juz', number: 30, fallbackEn: 'Juz Amma' }
-    ];
+    function getFlowModeFromPanelMode(mode) {
+        const panel = normalizeQuranPanelMode(mode);
+        if (panel === 'pashto') return 'ar-ps';
+        if (panel === 'english') return 'ar-en';
+        return 'ar';
+    }
+
     let quranDotLongPressTimer = null;
     let quranDotLongPressFired = false;
     let quranReaderControlsTimer = null;
@@ -9725,12 +9715,70 @@ window.filterCategory = function(cat, btn) {
         try { return JSON.parse(localStorage.getItem(QURAN_LAST_READ_KEY) || 'null'); } catch (error) { return null; }
     }
 
+    function getRelativeLastReadText(timestamp) {
+        const value = Number(timestamp || 0);
+        if (!Number.isFinite(value) || value <= 0) {
+            return isPashtoMode() ? 'وروستی لوستل: همدا اوس' : 'Last read just now';
+        }
+
+        const elapsedMs = Math.max(0, Date.now() - value);
+        const elapsedMinutes = Math.floor(elapsedMs / 60000);
+        if (elapsedMinutes < 1) return isPashtoMode() ? 'وروستی لوستل: همدا اوس' : 'Last read just now';
+        if (elapsedMinutes < 60) {
+            return isPashtoMode()
+                ? `وروستی لوستل: ${localizeQuranNumber(elapsedMinutes)} دقیقې مخکې`
+                : `Last read ${elapsedMinutes} min ago`;
+        }
+
+        const elapsedHours = Math.floor(elapsedMinutes / 60);
+        if (elapsedHours < 24) {
+            return isPashtoMode()
+                ? `وروستی لوستل: ${localizeQuranNumber(elapsedHours)} ساعته مخکې`
+                : `Last read ${elapsedHours} hr ago`;
+        }
+
+        const elapsedDays = Math.floor(elapsedHours / 24);
+        return isPashtoMode()
+            ? `وروستی لوستل: ${localizeQuranNumber(elapsedDays)} ورځې مخکې`
+            : `Last read ${elapsedDays} day${elapsedDays === 1 ? '' : 's'} ago`;
+    }
+
     function setQuranLastRead(payload) {
         const ts = Date.now();
-        localStorage.setItem(QURAN_LAST_READ_KEY, JSON.stringify({ ...payload, ts }));
+        const surahNumber = Number(payload?.surahNumber || 0);
+        const ayahNumber = Number(payload?.ayahNumber || 1);
+        localStorage.setItem(QURAN_LAST_READ_KEY, JSON.stringify({ ...payload, surahNumber, ayahNumber, ts }));
+        if (surahNumber > 0) localStorage.setItem(QURAN_LAST_SURAH_KEY, String(surahNumber));
+        localStorage.setItem(QURAN_LAST_AYAH_KEY, String(Math.max(1, ayahNumber)));
         registerQuranReadForStreak(ts);
         refreshHomeQuranStreakCard();
         refreshHomeDashboardProgress();
+    }
+
+    function getQuranResumeTarget() {
+        const savedSurah = Number(localStorage.getItem(QURAN_LAST_SURAH_KEY) || 0);
+        const savedAyah = Number(localStorage.getItem(QURAN_LAST_AYAH_KEY) || 0);
+        if (savedSurah > 0) {
+            return {
+                surahNumber: savedSurah,
+                ayahNumber: Math.max(1, savedAyah || 1)
+            };
+        }
+
+        const last = getQuranLastRead();
+        if (!last?.surahNumber) return null;
+        return {
+            surahNumber: Number(last.surahNumber),
+            ayahNumber: Math.max(1, Number(last.ayahNumber || 1))
+        };
+    }
+
+    function getQuranSurahDisplayName(surahNumber) {
+        const meta = getCurrentSurahMetaByNumber(surahNumber);
+        if (!meta) return `${isPashtoMode() ? 'سورت' : 'Surah'} ${localizeQuranNumber(surahNumber)}`;
+        return isPashtoMode()
+            ? cleanSurahArabicName(meta.name)
+            : (meta.englishName || cleanSurahArabicName(meta.name));
     }
 
     function getQuranRecent() {
@@ -9996,515 +10044,9 @@ window.filterCategory = function(cat, btn) {
         return null;
     }
 
-    function getTranslationModeEffective() {
-        const panel = normalizeQuranPanelMode(quranState.panelMode);
-        if (panel === 'pashto') return 'ar-ps';
-        if (panel === 'english') return 'ar-en';
-        return getQuranSettings().translationMode || 'ar';
-    }
-
-    function updateQuranPanelModeUi() {
-        const activeMode = normalizeQuranPanelMode(quranState.panelMode);
-
-        document.querySelectorAll('.quran-view-tab[data-qview]').forEach((tab) => {
-            const isActive = tab.getAttribute('data-qview') === activeMode;
-            tab.classList.toggle('active', isActive);
-            tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        });
-
-        document.querySelectorAll('.quran-mode-btn[data-qmode]').forEach((btn) => {
-            const isActive = btn.getAttribute('data-qmode') === activeMode;
-            btn.classList.toggle('active', isActive);
-            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-        });
-
-        syncQuranSegmentedThumb();
-    }
-
-    function setQuranPanelMode(mode, { restartAudio = true } = {}) {
-        const nextMode = normalizeQuranPanelMode(mode);
-        quranState.panelMode = nextMode;
-        localStorage.setItem(QURAN_PANEL_MODE_KEY, nextMode);
-
-        quranState.activeFlowMode = getFlowModeFromPanelMode(nextMode);
-        updateQuranPanelModeUi();
-
-        if (quranState.currentSurahData) {
-            renderQuranAyahChunk(true);
-            highlightPlayingAyah();
-        }
-
-        if (quranState.currentSurah) void refreshQuranPashtoAudioAvailability();
-
-        if (restartAudio && quranState.currentSurah && isQuranAudioSessionActive()) {
-            const ayahNo = quranState.audioAyah
-                ? Number((quranState.audioAyah.split(':')[1]))
-                : Number(quranState.lastPlayedAyah || 1);
-            playQuranAyahInternal(Number(quranState.currentSurah), Math.max(1, ayahNo), 0, true);
-        }
-    }
-
     function applyQuranArabicFontSize() {
         const settings = getQuranSettings();
         document.documentElement.style.setProperty('--quran-ar-size', `${settings.arabicSize}rem`);
-    }
-
-    function buildQuranSurahList(search = '') {
-        const refs = quranState.meta?.surahs?.references || [];
-        const query = String(search || '').trim();
-        if (!query) return refs;
-
-        const hasArabic = /[\u0600-\u06FF]/.test(query);
-
-        return refs.filter((surah) => {
-            const number = String(surah.number);
-            const ar = cleanSurahArabicName(surah.name);
-            const en = String(surah.englishName || '');
-            const enTranslation = String(surah.englishNameTranslation || '');
-            if (number.includes(query)) return true;
-            if (hasArabic) return includesFuzzyArabic(ar, query);
-            return includesFuzzyLatin(en, query)
-                || includesFuzzyLatin(enTranslation, query)
-                || includesFuzzyArabic(ar, query);
-        });
-    }
-
-    function getRelativeLastReadText(timestamp) {
-        const ts = Number(timestamp || 0);
-        if (!Number.isFinite(ts) || ts <= 0) {
-            return isPashtoMode() ? 'وروستی لوستل: همدا اوس' : 'Last read just now';
-        }
-        const diffMs = Math.max(0, Date.now() - ts);
-        const minutes = Math.floor(diffMs / 60000);
-        const hours = Math.floor(minutes / 60);
-        const days = Math.floor(hours / 24);
-
-        if (days > 0) {
-            return isPashtoMode()
-                ? `وروستی لوستل: ${localizeQuranNumber(days)} ورځې مخکې`
-                : `Last read ${days} day${days === 1 ? '' : 's'} ago`;
-        }
-        if (hours > 0) {
-            return isPashtoMode()
-                ? `وروستی لوستل: ${localizeQuranNumber(hours)} ساعت مخکې`
-                : `Last read ${hours} hour${hours === 1 ? '' : 's'} ago`;
-        }
-        if (minutes > 0) {
-            return isPashtoMode()
-                ? `وروستی لوستل: ${localizeQuranNumber(minutes)} دقیقې مخکې`
-                : `Last read ${minutes} minute${minutes === 1 ? '' : 's'} ago`;
-        }
-        return isPashtoMode() ? 'وروستی لوستل: همدا اوس' : 'Last read just now';
-    }
-
-    function renderQuranContinueCard() {
-        const card = document.getElementById('quranContinueCard');
-        if (!card) return;
-        const ui = getQuranUiText();
-        const last = getQuranLastRead();
-        if (!last || !last.surahNumber) {
-            card.innerHTML = '';
-            return;
-        }
-        const meta = getCurrentSurahMetaByNumber(last.surahNumber);
-        if (!meta) {
-            card.innerHTML = '';
-            return;
-        }
-
-        const surahName = isPashtoMode() ? cleanSurahArabicName(meta.name) : meta.englishName;
-        const ayahLabel = isPashtoMode() ? 'آیت' : 'Ayah';
-        const lastReadLabel = getRelativeLastReadText(last.timestamp);
-        const continueIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" fill="currentColor" fill-opacity="0.15"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" fill="currentColor" fill-opacity="0.15"/><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-        card.innerHTML = `
-            <div class="quran-continue-inner">
-                <div class="quran-continue-head">
-                    <span class="quran-continue-icon" aria-hidden="true">${continueIcon}</span>
-                    <span class="quran-continue-kicker">${ui.continueReading}</span>
-                </div>
-                <div class="quran-continue-main">
-                    <div class="quran-continue-copy">
-                        <div class="quran-continue-surah">${surahName}</div>
-                        <div class="quran-continue-ayah">${ayahLabel} ${localizeQuranNumber(last.ayahNumber || 1)}</div>
-                        <div class="quran-continue-lastread">${lastReadLabel}</div>
-                    </div>
-                    <button class="quran-row-btn quran-continue-btn" type="button" onclick="resumeQuranReading()">${ui.continue}</button>
-                </div>
-            </div>`;
-    }
-
-    function renderQuranRecentSection() {
-        const wrap = document.getElementById('quranRecentWrap');
-        if (wrap) wrap.innerHTML = '';
-    }
-
-    function getQuranPopularItemsResolved() {
-        const refs = quranState.meta?.surahs?.references || [];
-        const refByNo = new Map(refs.map((item) => [Number(item.number), item]));
-        return QURAN_POPULAR_ITEMS.map((item) => {
-            if (item.type === 'juz') {
-                return {
-                    ...item,
-                    titleAr: 'الجزء الثلاثون',
-                    titleEn: isPashtoMode() ? 'جز عم' : item.fallbackEn,
-                    ayahCount: 564
-                };
-            }
-
-            const meta = refByNo.get(Number(item.number));
-            const titleAr = cleanSurahArabicName(meta?.name || item.fallbackEn);
-            const titleEn = isPashtoMode()
-                ? String(meta?.englishNameTranslation || meta?.englishName || item.fallbackEn)
-                : String(meta?.englishName || item.fallbackEn);
-            const ayahCount = Number(meta?.numberOfAyahs || 0);
-            const revelation = getRevelationMeta(meta?.revelationType);
-            return {
-                ...item,
-                titleAr,
-                titleEn,
-                ayahCount,
-                revelationLabel: revelation.label,
-                revelationTone: revelation.tone
-            };
-        });
-    }
-
-    function renderQuranPopularGrid() {
-        const grid = document.getElementById('quranPopularGrid');
-        const title = document.getElementById('quranPopularTitle');
-        if (!grid) return;
-        if (title) title.textContent = isPashtoMode() ? 'مشهور سورتونه' : 'Popular Surahs';
-
-        const ui = getQuranUiText();
-        const list = getQuranPopularItemsResolved();
-        grid.innerHTML = list.map((item) => {
-            const action = item.type === 'juz'
-                ? `openQuranJuz(${Number(item.number)})`
-                : `openQuranSurah(${Number(item.number)})`;
-
-            return `
-                <div class="quran-popular-card" onclick="${action}">
-                    <div class="quran-popular-topline">
-                        <span class="quran-popular-badge">${localizeQuranNumber(item.number || 0)}</span>
-                        ${item.type === 'surah' ? `<span class="quran-popular-revelation ${item.revelationTone === 'makki' ? 'is-makki' : 'is-madani'}">${escapeHtml(item.revelationLabel || '')}</span>` : ''}
-                    </div>
-                    <div class="quran-popular-ar" dir="rtl">${escapeHtml(item.titleAr || '')}</div>
-                    <div class="quran-popular-name">${escapeHtml(item.titleEn || '')}</div>
-                    <div class="quran-popular-meta">${localizeQuranNumber(item.ayahCount || 0)} ${ui.ayahs}</div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function updateQuranSurahSelectLabel() {
-        const btn = document.getElementById('quranSurahSelectBtn');
-        if (!btn) return;
-        const currentMeta = getCurrentSurahMetaByNumber(quranState.currentSurah);
-        if (!currentMeta) {
-            btn.textContent = isPashtoMode() ? 'سوره وټاکئ' : 'Select Surah / سوره وټاکئ';
-            return;
-        }
-
-        const ar = cleanSurahArabicName(currentMeta.name);
-        const en = isPashtoMode()
-            ? (currentMeta.englishNameTranslation || currentMeta.englishName)
-            : currentMeta.englishName;
-        btn.textContent = `${localizeQuranNumber(currentMeta.number)} • ${ar} • ${en}`;
-    }
-
-    function renderQuranJumpRail(rows) {
-        const rail = document.getElementById('quranJumpRail');
-        if (!rail) return;
-        // Disabled to prevent broken numeric rail overlap on narrow screens.
-        rail.innerHTML = '';
-    }
-
-    function closeQuranSurahDropdown() {
-        const dropdown = document.getElementById('quranSurahDropdown');
-        const btn = document.getElementById('quranSurahSelectBtn');
-        if (!dropdown || !btn) return;
-        dropdown.classList.remove('open');
-        dropdown.setAttribute('aria-hidden', 'true');
-        btn.setAttribute('aria-expanded', 'false');
-        quranState.dropdownOpen = false;
-    }
-
-    function toggleQuranSurahDropdown(forceOpen = null) {
-        const dropdown = document.getElementById('quranSurahDropdown');
-        const btn = document.getElementById('quranSurahSelectBtn');
-        if (!dropdown || !btn) return;
-        const shouldOpen = forceOpen == null ? !quranState.dropdownOpen : !!forceOpen;
-        quranState.dropdownOpen = shouldOpen;
-        dropdown.classList.toggle('open', shouldOpen);
-        dropdown.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
-        btn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
-        if (!shouldOpen) {
-            const input = document.getElementById('quranSearchInput');
-            if (input) input.blur();
-        }
-    }
-
-    function getQuranPaneByView(view) {
-        const map = {
-            surah: document.getElementById('quranPaneSurah'),
-            juz: document.getElementById('quranPaneJuz'),
-            bookmarks: document.getElementById('quranPaneBookmarks'),
-            settings: document.getElementById('quranPaneSettings')
-        };
-        return map[view] || map.surah;
-    }
-
-    function getQuranListContainerByView(view) {
-        const map = {
-            surah: document.getElementById('quranSurahList'),
-            juz: document.getElementById('quranJuzList'),
-            bookmarks: document.getElementById('quranBookmarksList'),
-            settings: document.getElementById('quranSettingsList')
-        };
-        return map[view] || map.surah;
-    }
-
-    function setQuranView(view, { skipHistory = false } = {}) {
-        const nextView = ['surah', 'juz', 'bookmarks', 'settings'].includes(view) ? view : 'surah';
-        quranState.view = nextView;
-        localStorage.setItem(QURAN_ACTIVE_TAB_KEY, nextView);
-
-        document.querySelectorAll('.quran-subtab-pane').forEach(pane => pane.classList.remove('active'));
-        const activePane = getQuranPaneByView(nextView);
-        if (activePane) activePane.classList.add('active');
-
-        const listScreen = document.getElementById('quranListScreen');
-        const selector = document.getElementById('quranSurahSelector');
-        const reader = document.getElementById('quranReaderScreen');
-        const readerWasActive = !!(reader && reader.classList.contains('active'));
-
-        if (readerWasActive && isQuranAudioSessionActive()) {
-            stopQuranAudio({ resetTime: true, navigatedAway: true });
-        }
-
-        if (listScreen) listScreen.style.display = '';
-        const activeList = getQuranListContainerByView(nextView);
-        if (activeList) activeList.style.display = '';
-        if (reader) reader.classList.remove('active');
-        if (selector) selector.style.display = '';
-        renderQuranContinueCard();
-        renderQuranSurahRows();
-        renderQuranPopularGrid();
-
-        updateInAppFabVisibility();
-        if (!skipHistory && document.querySelector('.quran-panel.active')) recordInAppRoute(false);
-    }
-
-    function renderQuranSurahRows() {
-        const list = document.getElementById('quranSurahList');
-        if (!list) return;
-        const ui = getQuranUiText();
-        const rows = buildQuranSurahList(quranState.search);
-        const offlineSet = new Set(getOfflineSurahs().map(Number));
-        const lastRead = getQuranLastRead();
-        const recentlyReadSurah = Number(lastRead?.surahNumber || 0);
-
-        list.innerHTML = rows.map((surah) => {
-            const revelation = getRevelationMeta(surah.revelationType);
-            const primary = isPashtoMode()
-                ? (surah.englishNameTranslation || surah.englishName)
-                : surah.englishName;
-            const secondary = isPashtoMode()
-                ? surah.englishName
-                : (surah.englishNameTranslation || surah.englishName);
-            const arabicName = cleanSurahArabicName(surah.name);
-            const cached = offlineSet.has(Number(surah.number));
-            const isRecentlyRead = recentlyReadSurah === Number(surah.number);
-            const revRaw = String(surah.revelationType || '').toLowerCase();
-            const revelationClass = revRaw.includes('mad') ? 'is-madani' : 'is-makki';
-
-            return `
-                <div class="quran-surah-row ${revelationClass} ${isRecentlyRead ? 'is-recently-read' : ''}" data-surah-no="${surah.number}" onclick="openQuranSurah(${surah.number})">
-                    <div class="quran-surah-num">${localizeQuranNumber(surah.number)}</div>
-                    <div class="quran-surah-main">
-                        <div class="quran-surah-top-line">
-                            <span class="quran-surah-name-secondary">${escapeHtml(primary)}${secondary ? ` • ${escapeHtml(secondary)}` : ''}</span>
-                            <span class="quran-revelation-text ${revelation.tone === 'makki' ? 'is-makki' : 'is-madani'}">${revelation.label}</span>
-                            <span class="quran-surah-name-primary" dir="rtl">${escapeHtml(arabicName)}</span>
-                            <span class="quran-surah-inline-actions">
-                                ${isRecentlyRead ? `<span class="quran-recent-dot" title="${ui.recentlyRead}" aria-hidden="true"></span>` : ''}
-                                ${cached
-                                    ? `<span class="quran-cached-icon" title="${ui.cached}">✓</span>`
-                                    : `<button class="quran-download-icon" type="button" title="${ui.downloadOffline}" onclick="event.stopPropagation(); downloadQuranSurahOffline(${surah.number});">↓</button>`}
-                            </span>
-                        </div>
-                        <div class="quran-surah-bottom-line">
-                            <span class="quran-surah-ayahs">${localizeQuranNumber(surah.numberOfAyahs)} ${ui.ayahs}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('') || `
-            <div class="quran-empty-state">
-                <div class="quran-empty-icon" aria-hidden="true">📚</div>
-                <div class="quran-empty-title">${ui.noData}</div>
-                <div class="quran-empty-sub">${isPashtoMode() ? 'د لټون متن بدل کړئ یا ټول سورتونه وښایئ.' : 'Try a different search term or clear the filter.'}</div>
-            </div>
-        `;
-
-        renderQuranJumpRail(rows);
-        updateQuranSurahSelectLabel();
-    }
-
-    function renderQuranJuzRows() {
-        const list = document.getElementById('quranJuzList');
-        if (!list) return;
-        const ui = getQuranUiText();
-
-        list.innerHTML = Array.from({ length: 30 }).map((_, index) => {
-            const juzNo = index + 1;
-            const start = QURAN_JUZ_STARTS[index] || { surah: 1, ayah: 1 };
-            const surahMeta = getCurrentSurahMetaByNumber(start.surah);
-            const surahName = surahMeta
-                ? (isPashtoMode() ? cleanSurahArabicName(surahMeta.name) : surahMeta.englishName)
-                : `${isPashtoMode() ? 'سورت' : 'Surah'} ${localizeQuranNumber(start.surah)}`;
-            return `
-                <div class="quran-juz-item" onclick="openQuranJuz(${juzNo})" role="button">
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <div>
-                            <strong>${ui.juzLabel} ${localizeQuranNumber(juzNo)}</strong>
-                            <div style="font-size:0.68rem;color:var(--text-subtle);margin-top:3px;">
-                                ${surahName} • ${isPashtoMode() ? 'آیت' : 'Ayah'} ${localizeQuranNumber(start.ayah)}
-                            </div>
-                        </div>
-                        <button class="quran-row-btn" type="button">${ui.open}</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-    }
-
-    function openQuranJuz(juzNumber) {
-        const idx = Math.max(1, Math.min(30, Number(juzNumber))) - 1;
-        const start = QURAN_JUZ_STARTS[idx] || { surah: 1, ayah: 1 };
-        openQuranSurah(start.surah, start.ayah);
-    }
-
-    function renderQuranBookmarksSection() {
-        const list = document.getElementById('quranBookmarksList');
-        if (!list) return;
-        const ui = getQuranUiText();
-        const bookmarks = getQuranBookmarks();
-
-        if (!bookmarks.length) {
-            list.innerHTML = `
-                <div class="quran-empty-state">
-                    <div class="quran-empty-icon" aria-hidden="true">🔖</div>
-                    <div class="quran-empty-title">${ui.noBookmarks}</div>
-                    <div class="quran-empty-sub">${isPashtoMode() ? 'د آیت تر څنګ نښه کېکاږئ تر څو وروسته ورته ژر وګرځئ.' : 'Tap bookmark on any ayah to quickly return later.'}</div>
-                    <button class="quran-row-btn quran-empty-cta" type="button" onclick="setQuranView('surah')">${isPashtoMode() ? 'سورتونه وګورئ' : 'Browse Surahs'}</button>
-                </div>`;
-            return;
-        }
-
-        list.innerHTML = bookmarks
-            .sort((a, b) => b.ts - a.ts)
-            .map((item) => `
-                <div class="quran-bookmark-item">
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <div>
-                            <div style="font-size:0.82rem;color:var(--text-primary)">${escapeHtml(item.surahLabel || `${isPashtoMode() ? 'سورت' : 'Surah'} ${item.surahNumber}`)}</div>
-                            <div style="font-size:0.66rem;color:var(--text-subtle)">${isPashtoMode() ? 'آیت' : 'Ayah'} ${localizeQuranNumber(item.ayahNumber)}</div>
-                            <div style="font-size:0.76rem;color:var(--gold-light);margin-top:3px;direction:rtl;text-align:right;">${escapeHtml(item.preview || '')}</div>
-                        </div>
-                        <div style="display:flex;gap:6px;">
-                            <button class="quran-row-btn" type="button" onclick="openQuranSurah(${item.surahNumber}, ${item.ayahNumber})">${ui.open}</button>
-                            <button class="quran-row-btn" type="button" onclick="removeQuranBookmark(${item.surahNumber}, ${item.ayahNumber})">×</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-    }
-
-    function renderQuranSettingsSection() {
-        const list = document.getElementById('quranSettingsList');
-        if (!list) return;
-        const ui = getQuranUiText();
-        const settings = getQuranSettings();
-        const isPashtoPanel = normalizeQuranPanelMode(quranState.panelMode) === 'pashto';
-        const currentReciter = QURAN_RECITERS.find((reciter) => reciter.id === settings.reciter)?.name || QURAN_RECITERS[0].name;
-
-        list.innerHTML = `
-            <div class="quran-settings-card">
-                <div class="quran-settings-grid">
-                    ${isPashtoPanel ? `
-                        <div class="quran-settings-info-card">
-                            <label>${ui.arabicReciter}</label>
-                            <div class="quran-settings-info-value">${escapeHtml(currentReciter)}</div>
-                            <div class="quran-settings-info-note">${escapeHtml(ui.pashtoAudioOptionHint)}</div>
-                        </div>
-                    ` : `
-                        <div>
-                            <label for="quranReciterSelect">${ui.defaultReciter}</label>
-                            <select id="quranReciterSelect" class="prayer-reminder-select">
-                                ${QURAN_RECITERS.map(reciter => `<option value="${reciter.id}" ${settings.reciter === reciter.id ? 'selected' : ''}>${reciter.name}</option>`).join('')}
-                            </select>
-                        </div>
-                    `}
-                    ${isPashtoPanel ? `
-                        <div class="quran-settings-info-card">
-                            <label>${ui.pashtoAudioOptionLabel}</label>
-                            <div class="quran-settings-info-value">${escapeHtml(ui.pashtoAudioStatus)}</div>
-                            <div class="quran-settings-info-note">${escapeHtml(ui.pashtoAudioOptionHint)}</div>
-                        </div>
-                    ` : ''}
-                    <div>
-                        <label for="quranTranslationModeSelect">${ui.translationMode}</label>
-                        <select id="quranTranslationModeSelect" class="prayer-reminder-select">
-                            <option value="all" ${settings.translationMode === 'all' ? 'selected' : ''}>AR + PS + EN</option>
-                            <option value="ar-ps" ${settings.translationMode === 'ar-ps' ? 'selected' : ''}>AR + PS</option>
-                            <option value="ar-en" ${settings.translationMode === 'ar-en' ? 'selected' : ''}>AR + EN</option>
-                            <option value="ar" ${settings.translationMode === 'ar' ? 'selected' : ''}>${ui.arabicOnly}</option>
-                        </select>
-                    </div>
-                    <label style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <span>${ui.autoScroll}</span>
-                        <input id="quranAutoScrollToggle" type="checkbox" ${settings.autoScrollAudio ? 'checked' : ''}>
-                    </label>
-                    <label style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <span>${ui.mushafMode}</span>
-                        <input id="quranMushafToggle" type="checkbox" ${settings.mushafMode ? 'checked' : ''}>
-                    </label>
-                    <label style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                        <span>${ui.autoPashtoAfterArabic}</span>
-                        <input id="quranAutoPashtoToggle" type="checkbox" ${settings.autoPashtoAfterArabic ? 'checked' : ''}>
-                    </label>
-                </div>
-            </div>
-        `;
-
-        const reciterSelect = document.getElementById('quranReciterSelect');
-        const modeSelect = document.getElementById('quranTranslationModeSelect');
-        const autoScrollToggle = document.getElementById('quranAutoScrollToggle');
-        const mushafToggle = document.getElementById('quranMushafToggle');
-        const autoPashtoToggle = document.getElementById('quranAutoPashtoToggle');
-
-        const persist = () => {
-            const current = getQuranSettings();
-            if (reciterSelect) current.reciter = reciterSelect.value;
-            if (modeSelect) current.translationMode = modeSelect.value;
-            if (autoScrollToggle) current.autoScrollAudio = autoScrollToggle.checked;
-            if (mushafToggle) current.mushafMode = mushafToggle.checked;
-            if (autoPashtoToggle) current.autoPashtoAfterArabic = autoPashtoToggle.checked;
-            saveQuranSettings(current);
-            applyQuranArabicFontSize();
-            refreshQuranTranslationModeButtons();
-            const inlineReciter = document.getElementById('quranInlineReciterSelect');
-            if (inlineReciter) inlineReciter.value = current.reciter;
-            showToast(ui.saveSettings);
-            if (quranState.currentSurahData) renderQuranAyahChunk(true);
-        };
-
-        if (reciterSelect) reciterSelect.addEventListener('change', persist);
-        if (modeSelect) modeSelect.addEventListener('change', persist);
-        if (autoScrollToggle) autoScrollToggle.addEventListener('change', persist);
-        if (mushafToggle) mushafToggle.addEventListener('change', persist);
-        if (autoPashtoToggle) autoPashtoToggle.addEventListener('change', persist);
     }
 
     function showQuranSkeleton(show) {
@@ -10562,35 +10104,6 @@ window.filterCategory = function(cat, btn) {
 
         saveCachedSurahData(surahNumber, data);
         return data;
-    }
-
-    function renderQuranReaderHeader(data) {
-        const header = document.getElementById('quranReaderHeader');
-        if (!header || !data) return;
-        const ui = getQuranUiText();
-        const rev = getRevelationMeta(data.revelationType);
-        const showBismillah = Number(data.surahNumber) !== 9;
-        const isOffline = getOfflineSurahs().map(Number).includes(Number(data.surahNumber));
-
-        header.innerHTML = `
-            <div class="quran-surah-frame mushaf-surah-head">
-                <div class="mushaf-surah-ar">${escapeHtml(cleanSurahArabicName(data.name))}</div>
-                <div class="mushaf-surah-meta">${escapeHtml(data.englishName)} • ${localizeQuranNumber(data.numberOfAyahs)} ${ui.ayahs}</div>
-                <div class="mushaf-surah-meta mushaf-surah-meta-rev">
-                    <span class="quran-revelation-text ${rev.tone === 'makki' ? 'is-makki' : 'is-madani'}">${rev.label}</span>
-                </div>
-            </div>
-            <button class="quran-row-btn quran-reader-download-btn" type="button" onclick="downloadQuranSurahOffline(${Number(data.surahNumber)})" title="${ui.downloadOffline}" aria-label="${ui.downloadOffline}">${isOffline ? '✓' : '↓'}</button>
-            ${showBismillah ? `
-                <div class="mushaf-bismillah-wrap">
-                    <div class="mushaf-ornament" aria-hidden="true"></div>
-                    <div class="mushaf-bismillah">${ui.bismillah}</div>
-                    <div class="mushaf-ornament" aria-hidden="true"></div>
-                </div>
-            ` : ''}
-        `;
-
-        requestAnimationFrame(() => syncQuranReaderStickyOffsets());
     }
 
     function syncQuranReaderStickyOffsets() {
@@ -10684,51 +10197,6 @@ window.filterCategory = function(cat, btn) {
             clearTimeout(quranDotLongPressTimer);
             quranDotLongPressTimer = null;
         }
-    }
-
-    function updateQuranFloatingAudioUi() {
-        const dot = document.getElementById('quran-floating-dot');
-        const dotIcon = dot ? dot.querySelector('.dot-icon') : null;
-        const label = document.getElementById('dot-ayah-info');
-        const playPauseBtn = document.getElementById('quranPlayPauseBtn');
-        const progressFill = document.getElementById('quranPlaybackProgressFill');
-        const progressLabel = document.getElementById('quranPlaybackProgressLabel');
-        if (label) label.textContent = getQuranCurrentAyahLabel();
-
-        const active = isQuranAudioSessionActive() && !!(quranState.audioAyah || (quranState.lastPlayedSurah && quranState.lastPlayedAyah));
-        const visualPlaying = quranState.playerState === 'playing' || quranState.playerState === 'loading';
-        if (dot) {
-            dot.classList.toggle('visible', active);
-            dot.classList.toggle('playing', visualPlaying);
-            dot.style.display = active ? 'flex' : 'none';
-            if (dotIcon) dotIcon.textContent = visualPlaying ? '⏸' : '▶';
-        }
-
-        if (playPauseBtn) {
-            const buttonLabel = visualPlaying
-                ? (isPashtoMode() ? 'تم' : 'Pause')
-                : (isPashtoMode() ? 'پلې' : 'Play');
-            playPauseBtn.textContent = visualPlaying ? '⏸' : '▶';
-            playPauseBtn.setAttribute('aria-label', buttonLabel);
-            playPauseBtn.setAttribute('title', buttonLabel);
-        }
-
-        if (quranState.isPashtoTranslationActive && quranState.pashtoTranslationSurah) {
-            if (progressFill) progressFill.style.width = quranState.playerState === 'hidden' ? '0%' : '100%';
-            if (progressLabel) progressLabel.textContent = getQuranUiText().pashtoAudioStatus;
-        } else {
-            const currentAyah = quranState.audioAyah ? Number(quranState.audioAyah.split(':')[1]) : Number(quranState.lastPlayedAyah || 0);
-            const totalAyahs = Number(quranState.currentSurahData?.ayahs?.length || 0);
-            const percent = totalAyahs > 0 ? Math.max(0, Math.min(100, (currentAyah / totalAyahs) * 100)) : 0;
-            if (progressFill) progressFill.style.width = `${percent}%`;
-            if (progressLabel) {
-                progressLabel.textContent = isPashtoMode()
-                    ? `آیت ${localizeQuranNumber(currentAyah)}/${localizeQuranNumber(totalAyahs)}`
-                    : `Ayah ${localizeQuranNumber(currentAyah)}/${localizeQuranNumber(totalAyahs)}`;
-            }
-        }
-
-        if (!active) closeQuranAudioPopup();
     }
 
     function markQuranControlsInteraction() {
@@ -10852,8 +10320,31 @@ window.filterCategory = function(cat, btn) {
 
         if (mode === 'ar-en') {
             const url = await getEnglishTranslationAyahAudioUrl(surahNumber, ayahNumber);
-            if (!url) return false;
-            return playOverlaySegment(audio, url, token);
+            if (!url) {
+                quranState.lastEnglishAudioError = isPashtoMode()
+                    ? `د آیت ${localizeQuranNumber(ayahNumber)} لپاره انګلیسي غږ نشته`
+                    : `Audio unavailable for ayah ${localizeQuranNumber(ayahNumber)}`;
+                console.warn('[QuranAudio] English translation audio unavailable', {
+                    surahNumber: Number(surahNumber),
+                    ayahNumber: Number(ayahNumber)
+                });
+                updateQuranFloatingAudioUi();
+                return false;
+            }
+            const ok = await playOverlaySegment(audio, url, token);
+            quranState.lastEnglishAudioError = ok
+                ? ''
+                : (isPashtoMode()
+                    ? `د آیت ${localizeQuranNumber(ayahNumber)} لپاره انګلیسي غږ ونه غږېد`
+                    : `Audio unavailable for ayah ${localizeQuranNumber(ayahNumber)}`);
+            if (!ok) {
+                console.warn('[QuranAudio] English translation audio playback failed', {
+                    surahNumber: Number(surahNumber),
+                    ayahNumber: Number(ayahNumber)
+                });
+            }
+            updateQuranFloatingAudioUi();
+            return ok;
         }
 
         if (mode === 'ar-ps') {
@@ -10907,6 +10398,11 @@ window.filterCategory = function(cat, btn) {
             ENGLISH_AUDIO_CACHE.set(key, url);
             return url;
         } catch (error) {
+            console.warn('[QuranAudio] English translation audio URL fetch failed', {
+                surahNumber: Number(surahNumber),
+                ayahNumber: Number(ayahNumber),
+                error: error?.message || error
+            });
             ENGLISH_AUDIO_CACHE.set(key, null);
             return null;
         }
@@ -11357,151 +10853,10 @@ window.filterCategory = function(cat, btn) {
         updateQuranPanelModeUi();
     }
 
-    function renderQuranAyahChunk(reset = false) {
-        if (!quranState.currentSurahData) return;
-        const list = document.getElementById('quranAyahList');
-        const loadMore = document.getElementById('quranLoadMore');
-        if (!list) return;
-
-        if (reset) {
-            quranState.renderedAyahs = 0;
-            list.innerHTML = '';
-        }
-
-        const settings = getQuranSettings();
-        const mode = getTranslationModeEffective();
-        const ui = getQuranUiText();
-        const allAyahs = quranState.currentSurahData.ayahs;
-        const nextEnd = Math.min(quranState.renderedAyahs + quranState.chunkSize, allAyahs.length);
-        const chunk = allAyahs.slice(quranState.renderedAyahs, nextEnd);
-
-        list.insertAdjacentHTML('beforeend', chunk.map((ayah) => {
-            const cardKey = `${quranState.currentSurah}:${ayah.numberInSurah}`;
-            const playing = quranState.audioAyah === cardKey;
-            const bookmarked = getQuranBookmarks().some(item => Number(item.surahNumber) === Number(quranState.currentSurah) && Number(item.ayahNumber) === Number(ayah.numberInSurah));
-            return `
-                <div class="quran-ayah-card ${playing ? 'playing' : ''}" data-ayah-no="${ayah.numberInSurah}" aria-current="${playing ? 'true' : 'false'}" id="quranAyah-${cardKey}">
-                    <div class="quran-ayah-head">
-                        <span class="quran-ayah-num">﴾${localizeQuranNumber(ayah.numberInSurah)}﴿</span>
-                    </div>
-                    <div class="quran-ayah-ar">${escapeHtml(ayah.arabic)}</div>
-                    ${shouldShowTranslationBlock(mode, 'ps') ? `<div class="quran-ayah-ps">${escapeHtml(ayah.pashto || '')}</div>` : ''}
-                    ${shouldShowTranslationBlock(mode, 'en') ? `<div class="quran-ayah-en">${escapeHtml(ayah.english || '')}</div>` : ''}
-                    <div class="quran-ayah-actions">
-                        <button type="button" class="quran-ayah-btn" data-ayah-action="play" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" aria-label="Play ayah">${playing ? '⏸' : '▶'}</button>
-                        <button type="button" class="quran-ayah-btn" data-ayah-action="bookmark" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" aria-label="Bookmark ayah">${bookmarked ? '★' : '☆'}</button>
-                    </div>
-                </div>
-            `;
-        }).join(''));
-
-        quranState.renderedAyahs = nextEnd;
-        if (loadMore) loadMore.classList.toggle('visible', quranState.renderedAyahs < allAyahs.length);
-    }
-
-    function updateQuranReaderProgress() {
-        const panel = document.querySelector('.quran-panel');
-        const reader = document.getElementById('quranReaderScreen');
-        if (!panel || !reader || !reader.classList.contains('active') || !quranState.currentSurahData) return;
-
-        const cards = Array.from(document.querySelectorAll('#quranAyahList .quran-ayah-card'));
-        if (!cards.length) return;
-
-        const anchorY = 150;
-        let activeCard = cards[cards.length - 1];
-        for (const card of cards) {
-            const rect = card.getBoundingClientRect();
-            if (rect.top >= anchorY) {
-                activeCard = card;
-                break;
-            }
-        }
-
-        const ayahNo = Number(activeCard.getAttribute('data-ayah-no') || 1);
-        const total = quranState.currentSurahData.numberOfAyahs || quranState.currentSurahData.ayahs.length || 1;
-        const percent = Math.max(0, Math.min(100, (ayahNo / total) * 100));
-        const fill = document.getElementById('quranTopProgressFill');
-        if (fill) fill.style.width = `${percent}%`;
-
-        setQuranLastRead({ surahNumber: quranState.currentSurah, ayahNumber: ayahNo });
-        renderQuranContinueCard();
-
-        if (quranState.renderedAyahs < quranState.currentSurahData.ayahs.length) {
-            const nearBottom = panel.scrollTop + panel.clientHeight > panel.scrollHeight - 260;
-            if (nearBottom) renderQuranAyahChunk(false);
-        }
-    }
-
-    function refreshQuranTranslationModeButtons() {
-        updateQuranPanelModeUi();
-    }
-
-    async function openQuranSurah(surahNumber, ayahNumber = 1) {
-        const reader = document.getElementById('quranReaderScreen');
-        const activeList = getQuranListContainerByView(quranState.view) || document.getElementById('quranSurahList');
-        const loadMore = document.getElementById('quranLoadMore');
-        if (!reader || !activeList) return;
-
-        closeQuranSurahDropdown();
-
-        quranState.currentSurah = Number(surahNumber);
-        quranState.loadingReader = true;
-        showQuranSkeleton(true);
-        activeList.style.display = 'none';
-        reader.classList.add('active');
-        if (loadMore) loadMore.classList.remove('visible');
-        if (!isQuranAudioSessionActive() && normalizeQuranPanelMode(quranState.panelMode) === 'pashto' && Number(ayahNumber || 1) === 1) {
-            void warmPashtoSurahAudio(quranState.currentSurah);
-        }
-
-        try {
-            const data = await fetchSurahBundle(quranState.currentSurah);
-            quranState.currentSurahData = data;
-            renderQuranReaderHeader(data);
-            renderQuranAyahChunk(true);
-            refreshQuranTranslationModeButtons();
-
-            const targetAyahNumber = Number(ayahNumber) || 1;
-
-            const targetCard = document.getElementById(`quranAyah-${quranState.currentSurah}:${targetAyahNumber}`);
-            if (!targetCard && targetAyahNumber > quranState.renderedAyahs) {
-                while (quranState.renderedAyahs < targetAyahNumber && quranState.renderedAyahs < data.ayahs.length) {
-                    renderQuranAyahChunk(false);
-                }
-            }
-            const finalCard = document.getElementById(`quranAyah-${quranState.currentSurah}:${targetAyahNumber}`);
-            if (finalCard) finalCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-            setQuranLastRead({ surahNumber: quranState.currentSurah, ayahNumber: Number(ayahNumber) || 1 });
-
-            pushQuranRecent({ surahNumber: quranState.currentSurah, ayahNumber, surahLabel: isPashtoMode() ? cleanSurahArabicName(data.name) : data.englishName });
-            markSurahOffline(quranState.currentSurah);
-            renderQuranContinueCard();
-            renderQuranRecentSection();
-            syncQuranReaderStickyOffsets();
-            updateQuranReaderProgress();
-            void refreshQuranPashtoAudioAvailability();
-            updateQuranFloatingAudioUi();
-            showQuranReaderControls();
-            recordInAppRoute(true, {
-                view: IN_APP_VIEWS.SURAH_READER,
-                surah: Number(quranState.currentSurah),
-                ayah: Number(ayahNumber) || 1
-            });
-        } catch (error) {
-            showToast(getQuranUiText().noData);
-            reader.classList.remove('active');
-            activeList.style.display = '';
-        } finally {
-            quranState.loadingReader = false;
-            showQuranSkeleton(false);
-        }
-    }
-
     window.resumeQuranReading = function() {
-        const last = getQuranLastRead();
-        if (!last?.surahNumber) return;
-        openQuranSurah(last.surahNumber, last.ayahNumber || 1);
+        const resume = getQuranResumeTarget();
+        if (!resume?.surahNumber) return;
+        openQuranSurah(resume.surahNumber, resume.ayahNumber || 1);
     };
 
     function updateQuranMiniPlayerLabel() {
@@ -12279,7 +11634,8 @@ window.filterCategory = function(cat, btn) {
     window.removeQuranBookmark = function(surahNumber, ayahNumber) {
         const list = getQuranBookmarks().filter(item => !(Number(item.surahNumber) === Number(surahNumber) && Number(item.ayahNumber) === Number(ayahNumber)));
         saveQuranBookmarks(list);
-        renderQuranBookmarksSection();
+        if (quranState.currentSurahData) renderQuranAyahChunk(true);
+        renderQuranContinueCard();
     };
 
     async function cacheSurahAudioByReciter(surahNumber, reciter) {
@@ -12320,72 +11676,554 @@ window.filterCategory = function(cat, btn) {
         }
     };
 
-    function bindQuranEvents() {
-        const searchInput = document.getElementById('quranSearchInput');
-        const selectBtn = document.getElementById('quranSurahSelectBtn');
-        const selectorWrap = document.getElementById('quranSurahSelector');
-        if (searchInput && searchInput.dataset.bound !== '1') {
-            searchInput.addEventListener('input', () => {
-                quranState.search = searchInput.value || '';
-                if (quranState.view === 'surah') renderQuranSurahRows();
-            });
-            searchInput.dataset.bound = '1';
-        }
+    function setQuranTabLabel(el, label, iconPath) {
+        if (!el) return;
+        el.innerHTML = `<span class="quran-tab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${iconPath}</svg></span><span class="quran-tab-text">${label}</span>`;
+    }
 
-        if (selectBtn && selectBtn.dataset.bound !== '1') {
-            selectBtn.addEventListener('click', () => toggleQuranSurahDropdown());
-            selectBtn.dataset.bound = '1';
-        }
+    function switchToHomeTab() {
+        switchTab('home');
+        backToCategories();
+    }
 
-        if (selectorWrap && selectorWrap.dataset.outsideBound !== '1') {
-            document.addEventListener('click', (event) => {
-                if (!quranState.dropdownOpen) return;
-                if (!selectorWrap.contains(event.target)) closeQuranSurahDropdown();
+    function closeQuranPanel({ skipHistory = false } = {}) {
+        setPanelLoading('quran', false);
+        closeQuranReader({ skipHistory: true });
+        clearQuranAudioDotHoldTimer();
+        closeQuranAudioPopup();
+        updateQuranMiniPlayerVisibility();
+        resetQuranAyahObserver();
+        quranState.currentSurah = null;
+        quranState.currentSurahData = null;
+        quranState.renderedAyahs = 0;
+        quranState.currentVisibleAyah = 1;
+        document.body.classList.remove('quran-reading-mode');
+        switchTab('home');
+        if (!skipHistory) {
+            recordInAppRoute(false, {
+                view: IN_APP_VIEWS.HOME
             });
-            selectorWrap.dataset.outsideBound = '1';
         }
+    }
 
-        document.querySelectorAll('.quran-view-tab').forEach(tab => {
-            if (tab.dataset.bound === '1') return;
-            tab.addEventListener('click', () => {
-                setQuranPanelMode(tab.getAttribute('data-qview'));
-            });
-            tab.dataset.bound = '1';
+    window.closeQuran = function() {
+        closeQuranPanel();
+        switchToHomeTab();
+    };
+
+    window.openQuranSurah = openQuranSurah;
+
+    function getQuranDisplayMode() {
+        const showPashto = !!quranState.showPashto;
+        const showEnglish = !!quranState.showEnglish;
+        if (showPashto && showEnglish) return 'all';
+        if (showPashto) return 'ar-ps';
+        if (showEnglish) return 'ar-en';
+        return 'ar';
+    }
+
+    function persistQuranDisplayToggles() {
+        localStorage.setItem(QURAN_SHOW_PASHTO_KEY, quranState.showPashto ? 'true' : 'false');
+        localStorage.setItem(QURAN_SHOW_ENGLISH_KEY, quranState.showEnglish ? 'true' : 'false');
+    }
+
+    function getQuranPreferredAudioSource() {
+        const panelMode = normalizeQuranPanelMode(quranState.panelMode);
+        return panelMode === 'pashto' ? 'pashto' : panelMode === 'english' ? 'english' : 'arabic';
+    }
+
+    function getQuranActiveAudioSource() {
+        if (quranState.isPashtoTranslationActive || (quranState.activeFlowMode === 'ps' && quranState.playerState !== 'hidden')) {
+            return 'pashto';
+        }
+        if (quranState.activeFlowMode === 'ar-en' && quranState.playerState !== 'hidden') {
+            return 'english';
+        }
+        return 'arabic';
+    }
+
+    function getTranslationModeEffective() {
+        return getQuranDisplayMode();
+    }
+
+    function updateQuranPanelModeUi() {
+        const preferredSource = getQuranPreferredAudioSource();
+        const activeSource = getQuranActiveAudioSource();
+        const sessionActive = isQuranAudioSessionActive();
+
+        document.querySelectorAll('.quran-audio-row[data-audio-row]').forEach((row) => {
+            const rowSource = row.getAttribute('data-audio-row');
+            row.classList.toggle('is-selected', rowSource === preferredSource);
+            row.classList.toggle('is-playing', sessionActive && rowSource === activeSource);
         });
 
-        // Harden mode switching in case class-based tab binding is skipped in slower init paths.
-        const viewTabsById = [
-            { id: 'quranTabArabic', mode: 'arabic' },
-            { id: 'quranTabPashto', mode: 'pashto' },
-            { id: 'quranTabEnglish', mode: 'english' }
-        ];
-        viewTabsById.forEach(({ id, mode }) => {
-            const tabEl = document.getElementById(id);
-            if (!tabEl || tabEl.dataset.boundViewMode === '1') return;
-            tabEl.addEventListener('click', () => setQuranPanelMode(mode));
-            tabEl.dataset.boundViewMode = '1';
-        });
+        const pashtoToggle = document.getElementById('quranTogglePashto');
+        const englishToggle = document.getElementById('quranToggleEnglish');
+        if (pashtoToggle) pashtoToggle.checked = !!quranState.showPashto;
+        if (englishToggle) englishToggle.checked = !!quranState.showEnglish;
+    }
 
+    function setQuranPanelMode(mode, { restartAudio = false } = {}) {
+        quranState.panelMode = normalizeQuranPanelMode(mode);
+        localStorage.setItem(QURAN_PANEL_MODE_KEY, quranState.panelMode);
+        updateQuranPanelModeUi();
+        updateQuranFloatingAudioUi();
+        if (restartAudio && quranState.currentSurah && isQuranAudioSessionActive()) {
+            handleQuranAudioRow(getQuranPreferredAudioSource(), { forceRestart: true });
+        }
+    }
+
+    function renderQuranSurahRows() {
+        const select = document.getElementById('quranSurahSelectNative');
+        const subtitle = document.getElementById('quranPanelSubtitle');
+        const prevBtn = document.getElementById('quranPrevSurahBtn');
+        const nextBtn = document.getElementById('quranNextSurahBtn');
+        const refs = quranState.meta?.surahs?.references || [];
+        if (!select || !refs.length) return;
+
+        const current = Number(quranState.currentSurah || getQuranLastRead()?.surahNumber || 1);
+        const options = refs.map((surah) => {
+            const primary = isPashtoMode()
+                ? String(surah.englishNameTranslation || surah.englishName || '')
+                : String(surah.englishName || '');
+            const secondary = cleanSurahArabicName(surah.name);
+            return `<option value="${surah.number}">${localizeQuranNumber(surah.number)}. ${escapeHtml(primary)} | ${escapeHtml(secondary)}</option>`;
+        }).join('');
+
+        if (select.innerHTML !== options) select.innerHTML = options;
+        select.value = String(current);
+
+        const activeMeta = refs.find((surah) => Number(surah.number) === current) || refs[0];
+        if (subtitle && activeMeta) {
+            const revelation = getRevelationMeta(activeMeta.revelationType);
+            const primary = isPashtoMode()
+                ? (activeMeta.englishNameTranslation || activeMeta.englishName)
+                : activeMeta.englishName;
+            subtitle.textContent = `${primary} · ${cleanSurahArabicName(activeMeta.name)} · ${localizeQuranNumber(activeMeta.numberOfAyahs)} ${isPashtoMode() ? 'آیتونه' : 'ayahs'} · ${revelation.label}`;
+        }
+        if (prevBtn) prevBtn.disabled = current <= 1;
+        if (nextBtn) nextBtn.disabled = current >= 114;
+    }
+
+    function renderQuranContinueCard() {
+        const card = document.getElementById('quranContinueCard');
+        if (!card) return;
+        const resume = getQuranResumeTarget();
+        if (!resume?.surahNumber) {
+            card.innerHTML = '';
+            return;
+        }
+
+        const meta = getCurrentSurahMetaByNumber(resume.surahNumber);
+        if (!meta) {
+            card.innerHTML = '';
+            return;
+        }
+
+        const hideResume = Number(quranState.currentSurah || 0) === Number(resume.surahNumber)
+            && Number(quranState.currentVisibleAyah || 1) === Number(resume.ayahNumber || 1);
+
+        const title = isPashtoMode()
+            ? cleanSurahArabicName(meta.name)
+            : (meta.englishName || cleanSurahArabicName(meta.name));
+        const ayahLabel = isPashtoMode() ? 'آیت' : 'Ayah';
+        const buttonText = isPashtoMode() ? 'بیا پرانیزئ' : 'Resume';
+        card.innerHTML = `
+            <div class="quran-continue-inner">
+                <div class="quran-continue-kicker">${isPashtoMode() ? 'وروستی لوستل' : 'Continue reading'}</div>
+                <div class="quran-continue-main">
+                    <div class="quran-continue-copy">
+                        <div class="quran-continue-surah">${escapeHtml(title)}</div>
+                        <div class="quran-continue-ayah">${ayahLabel} ${localizeQuranNumber(resume.ayahNumber || 1)}</div>
+                        <div class="quran-continue-lastread">${escapeHtml(getRelativeLastReadText(getQuranLastRead()?.ts || getQuranLastRead()?.timestamp))}</div>
+                    </div>
+                    ${hideResume ? '' : `<button class="quran-chip-btn" type="button" onclick="resumeQuranReading()">${buttonText}</button>`}
+                </div>
+            </div>`;
+    }
+
+    function renderQuranRecentSection() {
+        return;
+    }
+
+    function renderQuranReaderHeader(data) {
+        const header = document.getElementById('quranReaderHeader');
+        if (!header || !data) return;
+        const revelation = getRevelationMeta(data.revelationType);
+        const showBismillah = Number(data.surahNumber) !== 9;
+        const englishName = escapeHtml(data.englishName || '');
+        const arabicName = escapeHtml(cleanSurahArabicName(data.name));
+        header.innerHTML = `
+            <div class="quran-reader-header-main">
+                <div class="quran-reader-kicker">${isPashtoMode() ? 'سورت' : 'Surah'} ${localizeQuranNumber(data.surahNumber)} · ${escapeHtml(revelation.label)}</div>
+                <div class="quran-reader-title-row">
+                    <div class="quran-reader-title-copy">
+                        <h3 class="quran-reader-title">${englishName}</h3>
+                        <p class="quran-reader-title-ar" dir="rtl">${arabicName}</p>
+                    </div>
+                    <div class="quran-reader-meta-badge">${localizeQuranNumber(data.numberOfAyahs)} ${isPashtoMode() ? 'آیتونه' : 'ayahs'}</div>
+                </div>
+            </div>
+            ${showBismillah ? `<div class="quran-bismillah">${escapeHtml(getQuranUiText().bismillah)}</div>` : ''}
+        `;
+    }
+
+    function renderQuranAyahChunk(reset = false) {
+        if (!quranState.currentSurahData) return;
+        const list = document.getElementById('quranAyahList');
         const loadMore = document.getElementById('quranLoadMore');
-        if (loadMore && loadMore.dataset.bound !== '1') {
-            loadMore.addEventListener('click', () => renderQuranAyahChunk(false));
-            loadMore.dataset.bound = '1';
+        if (!list) return;
+
+        if (reset) {
+            quranState.renderedAyahs = 0;
+            list.innerHTML = '';
         }
 
-        const panel = document.querySelector('.quran-panel');
-        if (panel && panel.dataset.boundScroll !== '1') {
-            panel.addEventListener('scroll', () => {
+        const mode = getTranslationModeEffective();
+        const allAyahs = quranState.currentSurahData.ayahs;
+        const nextEnd = Math.min(quranState.renderedAyahs + quranState.chunkSize, allAyahs.length);
+        const chunk = allAyahs.slice(quranState.renderedAyahs, nextEnd);
+
+        list.insertAdjacentHTML('beforeend', chunk.map((ayah) => {
+            const cardKey = `${quranState.currentSurah}:${ayah.numberInSurah}`;
+            const playing = quranState.audioAyah === cardKey;
+            const bookmarked = getQuranBookmarks().some((item) => Number(item.surahNumber) === Number(quranState.currentSurah) && Number(item.ayahNumber) === Number(ayah.numberInSurah));
+            const showPashto = shouldShowTranslationBlock(mode, 'ps');
+            const showEnglish = shouldShowTranslationBlock(mode, 'en');
+            return `
+                <article class="quran-ayah-card ${playing ? 'playing' : ''}" data-ayah-no="${ayah.numberInSurah}" aria-current="${playing ? 'true' : 'false'}" id="quranAyah-${cardKey}">
+                    <div class="quran-ayah-topline">
+                        <span class="quran-ayah-num">${localizeQuranNumber(ayah.numberInSurah)}</span>
+                        <div class="quran-ayah-actions">
+                            <button type="button" class="quran-ayah-btn" data-ayah-action="bookmark" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" aria-label="Bookmark ayah">${bookmarked ? '★' : '☆'}</button>
+                            <button type="button" class="quran-ayah-btn quran-ayah-play" data-ayah-action="play" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" aria-label="Play ayah">${playing && (quranState.playerState === 'playing' || quranState.playerState === 'loading') ? '⏸' : '▶'}</button>
+                        </div>
+                    </div>
+                    <div class="quran-ayah-ar">${escapeHtml(ayah.arabic)}</div>
+                    ${showPashto ? `<div class="quran-ayah-translation quran-ayah-ps"><div class="quran-ayah-translation-label">${isPashtoMode() ? 'پښتو' : 'Pashto'}</div><p>${escapeHtml(ayah.pashto || '')}</p></div>` : ''}
+                    ${showEnglish ? `<div class="quran-ayah-translation quran-ayah-en"><div class="quran-ayah-translation-label">English</div><p>${escapeHtml(ayah.english || '')}</p></div>` : ''}
+                </article>
+            `;
+        }).join(''));
+
+        quranState.renderedAyahs = nextEnd;
+        if (loadMore) loadMore.classList.toggle('visible', quranState.renderedAyahs < allAyahs.length);
+        highlightPlayingAyah();
+    }
+
+    function getQuranAnchorAyah() {
+        const cards = Array.from(document.querySelectorAll('#quranAyahList .quran-ayah-card'));
+        if (!cards.length) return Number(quranState.currentVisibleAyah || quranState.lastPlayedAyah || 1);
+
+        const sticky = document.getElementById('quranReaderSticky');
+        const anchorY = (sticky ? sticky.getBoundingClientRect().bottom : 150) + 24;
+        let activeCard = cards[cards.length - 1];
+        for (const card of cards) {
+            const rect = card.getBoundingClientRect();
+            if (rect.top >= anchorY) {
+                activeCard = card;
+                break;
+            }
+        }
+        return Number(activeCard.getAttribute('data-ayah-no') || 1);
+    }
+
+    function scrollQuranAyahIntoView(ayahNumber, behavior = 'smooth') {
+        const targetAyah = Math.max(1, Number(ayahNumber) || 1);
+        ensureQuranAyahCardRendered(targetAyah);
+        const card = document.getElementById(`quranAyah-${quranState.currentSurah}:${targetAyah}`);
+        if (card) card.scrollIntoView({ behavior, block: 'start' });
+    }
+
+    function resetQuranAyahObserver() {
+        if (quranState.ayahObserver) quranState.ayahObserver.disconnect();
+        quranState.ayahVisibility = new Map();
+        quranState.ayahObserver = null;
+    }
+
+    function handleQuranAyahVisibility(entries) {
+        entries.forEach((entry) => {
+            const ayahNo = Number(entry.target?.getAttribute('data-ayah-no') || 0);
+            if (!ayahNo) return;
+            if (entry.isIntersecting) quranState.ayahVisibility.set(ayahNo, entry.intersectionRatio);
+            else quranState.ayahVisibility.delete(ayahNo);
+        });
+
+        let bestAyah = Number(quranState.currentVisibleAyah || 1);
+        let bestRatio = -1;
+        quranState.ayahVisibility.forEach((ratio, ayahNo) => {
+            if (ratio > bestRatio) {
+                bestRatio = ratio;
+                bestAyah = ayahNo;
+            }
+        });
+
+        if (bestRatio >= 0 && bestAyah !== Number(quranState.currentVisibleAyah || 0)) {
+            quranState.currentVisibleAyah = bestAyah;
+            updateQuranReaderProgress();
+        }
+    }
+
+    function ensureQuranAyahObserver() {
+        if (quranState.ayahObserver) return quranState.ayahObserver;
+        const root = document.querySelector('.quran-panel');
+        quranState.ayahObserver = new IntersectionObserver(handleQuranAyahVisibility, {
+            root,
+            rootMargin: '-220px 0px -35% 0px',
+            threshold: [0.25, 0.5, 0.75]
+        });
+        return quranState.ayahObserver;
+    }
+
+    function observeQuranAyahCards() {
+        const observer = ensureQuranAyahObserver();
+        document.querySelectorAll('#quranAyahList .quran-ayah-card').forEach((card) => observer.observe(card));
+    }
+
+    function updateQuranResumeUi() {
+        const resume = getQuranResumeTarget();
+        const resumeBtn = document.getElementById('quranResumeBtn');
+        const lastReadLabel = document.getElementById('quranBottomProgressLast');
+        if (!resume) {
+            if (resumeBtn) resumeBtn.hidden = true;
+            if (lastReadLabel) lastReadLabel.textContent = isPashtoMode() ? 'وروستی لوستل: نشته' : 'Last read: none';
+            return;
+        }
+
+        const sameLocation = Number(quranState.currentSurah || 0) === Number(resume.surahNumber)
+            && Number(quranState.currentVisibleAyah || 1) === Number(resume.ayahNumber || 1);
+        if (resumeBtn) resumeBtn.hidden = sameLocation;
+        if (lastReadLabel) {
+            const surahLabel = getQuranSurahDisplayName(resume.surahNumber);
+            lastReadLabel.textContent = isPashtoMode()
+                ? `وروستی لوستل: ${surahLabel}، آیت ${localizeQuranNumber(resume.ayahNumber || 1)}`
+                : `Last read: ${surahLabel}, Ayah ${localizeQuranNumber(resume.ayahNumber || 1)}`;
+        }
+    }
+
+    function updateQuranReaderProgress() {
+        if (!quranState.currentSurahData) return;
+
+        const total = quranState.currentSurahData.ayahs.length || 1;
+        const ayahNo = Math.max(1, Math.min(total, Number(quranState.currentVisibleAyah || getQuranAnchorAyah())));
+        quranState.currentVisibleAyah = ayahNo;
+
+        const fill = document.getElementById('quranTopProgressFill');
+        const label = document.getElementById('quranTopProgressLabel');
+        const bottomFill = document.getElementById('quranBottomProgressFill');
+        const bottomCurrent = document.getElementById('quranBottomProgressCurrent');
+        const percent = Math.max(0, Math.min(100, (ayahNo / total) * 100));
+        if (fill) fill.style.width = `${percent}%`;
+        if (bottomFill) bottomFill.style.width = `${percent}%`;
+        if (label) {
+            label.textContent = `${isPashtoMode() ? 'سورت' : 'Surah'} ${localizeQuranNumber(quranState.currentSurah)} · ${isPashtoMode() ? 'آیت' : 'Ayah'} ${localizeQuranNumber(ayahNo)} / ${localizeQuranNumber(total)}`;
+        }
+        if (bottomCurrent) {
+            bottomCurrent.textContent = `${isPashtoMode() ? 'سورت' : 'Surah'} ${localizeQuranNumber(quranState.currentSurah)} · ${isPashtoMode() ? 'آیت' : 'Ayah'} ${localizeQuranNumber(ayahNo)} / ${localizeQuranNumber(total)}`;
+        }
+
+        const last = getQuranLastRead();
+        if (Number(last?.surahNumber) !== Number(quranState.currentSurah) || Number(last?.ayahNumber) !== ayahNo) {
+            setQuranLastRead({ surahNumber: quranState.currentSurah, ayahNumber: ayahNo });
+            renderQuranContinueCard();
+        }
+        updateQuranResumeUi();
+
+        if (quranState.renderedAyahs < total) {
+            const panel = document.querySelector('.quran-panel');
+            if (panel) {
+                const nearBottom = panel.scrollTop + panel.clientHeight > panel.scrollHeight - 320;
+                if (nearBottom) renderQuranAyahChunk(false);
+            }
+        }
+    }
+
+    async function refreshCurrentQuranSurah(anchorAyah = 1, { forceRefresh = false } = {}) {
+        if (!quranState.currentSurah) return;
+        quranState.loadingReader = true;
+        showQuranSkeleton(true);
+        resetQuranAyahObserver();
+        try {
+            const data = await fetchSurahBundle(quranState.currentSurah, forceRefresh);
+            quranState.currentSurahData = data;
+            quranState.lastEnglishAudioError = '';
+            renderQuranSurahRows();
+            renderQuranReaderHeader(data);
+            renderQuranAyahChunk(true);
+            renderQuranContinueCard();
+            quranState.currentVisibleAyah = Math.max(1, Number(anchorAyah) || 1);
+            requestAnimationFrame(() => {
+                observeQuranAyahCards();
+                scrollQuranAyahIntoView(quranState.currentVisibleAyah, 'auto');
                 updateQuranReaderProgress();
-                scheduleQuranReaderControlsHide(900);
-            }, { passive: true });
-            panel.dataset.boundScroll = '1';
+                highlightPlayingAyah();
+            });
+            void refreshQuranPashtoAudioAvailability();
+            updateQuranFloatingAudioUi();
+        } catch (error) {
+            showToast(getQuranUiText().noData);
+        } finally {
+            quranState.loadingReader = false;
+            showQuranSkeleton(false);
+        }
+    }
+
+    async function openQuranSurah(surahNumber, ayahNumber = 1) {
+        const targetSurah = Math.max(1, Math.min(114, Number(surahNumber) || 1));
+        const targetAyah = Math.max(1, Number(ayahNumber) || 1);
+        const changingSurah = Number(quranState.currentSurah || 0) !== targetSurah;
+        const shouldResumeAudio = changingSurah && isQuranAudioSessionActive();
+        const preferredSource = getQuranPreferredAudioSource();
+
+        if (changingSurah && shouldResumeAudio) {
+            stopQuranAudio({ resetTime: true, navigatedAway: true });
         }
 
-        if (!window.__quranStickyOffsetResizeBound) {
-            window.addEventListener('resize', () => syncQuranReaderStickyOffsets(), { passive: true });
-            window.__quranStickyOffsetResizeBound = true;
+        quranState.currentSurah = targetSurah;
+        quranState.currentVisibleAyah = targetAyah;
+        await refreshCurrentQuranSurah(targetAyah);
+
+        const data = quranState.currentSurahData;
+        if (data) {
+            pushQuranRecent({
+                surahNumber: targetSurah,
+                ayahNumber: targetAyah,
+                surahLabel: isPashtoMode() ? cleanSurahArabicName(data.name) : data.englishName
+            });
+            markSurahOffline(targetSurah);
         }
 
+        recordInAppRoute(true, {
+            view: IN_APP_VIEWS.SURAH_READER,
+            surah: targetSurah,
+            ayah: targetAyah
+        });
+
+        if (changingSurah && shouldResumeAudio) {
+            handleQuranAudioRow(preferredSource, { forceRestart: true });
+        }
+        updateQuranResumeUi();
+    }
+
+    function updateQuranFloatingAudioUi() {
+        const dot = document.getElementById('quran-floating-dot');
+        const dotIcon = dot ? dot.querySelector('.dot-icon') : null;
+        const label = document.getElementById('dot-ayah-info');
+        const popup = document.getElementById('quran-dot-popup');
+        const sessionActive = isQuranAudioSessionActive() && !!(quranState.audioAyah || (quranState.lastPlayedSurah && quranState.lastPlayedAyah));
+        const visualPlaying = quranState.playerState === 'playing' || quranState.playerState === 'loading';
+        const activeSource = getQuranActiveAudioSource();
+        const reciterName = getCurrentReciterName();
+
+        if (label) label.textContent = getQuranCurrentAyahLabel();
+        if (dot) {
+            dot.classList.toggle('visible', sessionActive);
+            dot.classList.toggle('playing', visualPlaying);
+            dot.style.display = sessionActive ? 'flex' : 'none';
+            if (dotIcon) dotIcon.textContent = visualPlaying ? '⏸' : '▶';
+        }
+        if (!sessionActive && popup) closeQuranAudioPopup();
+
+        const arabicBtn = document.getElementById('quranPlayPauseBtn');
+        const pashtoBtn = document.getElementById('quranPlayPashtoBtn');
+        const englishBtn = document.getElementById('quranPlayEnglishBtn');
+        const arabicStatus = document.getElementById('quranArabicStatus');
+        const pashtoStatus = document.getElementById('quranPashtoStatus');
+        const englishStatus = document.getElementById('quranEnglishStatus');
+
+        if (arabicBtn) arabicBtn.textContent = activeSource === 'arabic' && visualPlaying ? (isPashtoMode() ? 'تم' : 'Pause') : (isPashtoMode() ? 'عربي وغږوئ' : 'Play Arabic');
+        if (pashtoBtn) pashtoBtn.textContent = activeSource === 'pashto' && visualPlaying ? (isPashtoMode() ? 'تم' : 'Pause') : (isPashtoMode() ? 'پښتو وغږوئ' : 'Play Pashto');
+        if (englishBtn) englishBtn.textContent = activeSource === 'english' && visualPlaying ? (isPashtoMode() ? 'تم' : 'Pause') : (isPashtoMode() ? 'انګلیسي وغږوئ' : 'Play English');
+
+        if (arabicStatus) {
+            arabicStatus.textContent = activeSource === 'arabic' && sessionActive
+                ? `${visualPlaying ? (isPashtoMode() ? 'روان' : 'Playing') : (isPashtoMode() ? 'درېدلی' : 'Paused')} · ${reciterName}`
+                : `${isPashtoMode() ? 'قاري' : 'Reciter'} · ${reciterName}`;
+        }
+
+        const pashtoAvailable = Number(quranState.currentSurah || 0) > 0
+            ? getPashtoSurahAudioAvailability(Number(quranState.currentSurah || 0))
+            : null;
+        if (pashtoStatus) {
+            if (pashtoAvailable === false) {
+                pashtoStatus.textContent = isPashtoMode() ? 'د دې سورت لپاره نشته' : 'Unavailable for this surah';
+            } else if (activeSource === 'pashto' && sessionActive) {
+                pashtoStatus.textContent = visualPlaying ? (isPashtoMode() ? 'بشپړه پښتو ژباړه روانه ده' : 'Playing full Pashto translation') : (isPashtoMode() ? 'درېدلې ده' : 'Paused');
+            } else if (pashtoAvailable === true) {
+                pashtoStatus.textContent = isPashtoMode() ? 'بشپړه سورت-په-سورت ژباړه' : 'Full-surah Pashto translation';
+            } else {
+                pashtoStatus.textContent = isPashtoMode() ? 'شتون کتل کېږي…' : 'Checking availability…';
+            }
+        }
+
+        if (englishStatus) {
+            englishStatus.textContent = quranState.lastEnglishAudioError
+                ? quranState.lastEnglishAudioError
+                : activeSource === 'english' && sessionActive
+                ? (visualPlaying ? (isPashtoMode() ? 'عربي + انګلیسي غږ روان دی' : 'Arabic + English translation audio playing') : (isPashtoMode() ? 'درېدلی دی' : 'Paused'))
+                : (isPashtoMode() ? 'Ibrahim Walk انګلیسي ژباړه' : 'Ibrahim Walk translation audio');
+        }
+
+        updateQuranPanelModeUi();
+    }
+
+    async function handleQuranAudioRow(source, { forceRestart = false } = {}) {
+        if (!quranState.currentSurah) {
+            showToast(getQuranUiText().openSurahFirst);
+            return;
+        }
+
+        const preferredSource = source === 'pashto' ? 'pashto' : source === 'english' ? 'english' : 'arabic';
+        setQuranPanelMode(preferredSource, { restartAudio: false });
+
+        const activeSource = getQuranActiveAudioSource();
+        const sameSource = activeSource === preferredSource;
+        if (!forceRestart && sameSource && (quranState.playerState === 'playing' || quranState.playerState === 'paused')) {
+            toggleQuranPlayPause();
+            return;
+        }
+
+        if (preferredSource === 'pashto') {
+            quranState.activeFlowMode = 'ps';
+            await playQuranAyahInternal(Number(quranState.currentSurah), 1, 0, true);
+            return;
+        }
+
+        quranState.lastEnglishAudioError = '';
+        quranState.activeFlowMode = preferredSource === 'english' ? 'ar-en' : 'ar';
+        await playQuranAyahInternal(Number(quranState.currentSurah), 1, 0, true);
+    }
+
+    async function stepQuranSurah(step) {
+        const current = Number(quranState.currentSurah || getQuranLastRead()?.surahNumber || 1);
+        const target = Math.max(1, Math.min(114, current + Number(step || 0)));
+        if (target === current) return;
+        await openQuranSurah(target, 1);
+    }
+
+    function handleQuranDisplayToggle(type, checked) {
+        const anchorAyah = getQuranAnchorAyah();
+        if (type === 'pashto') quranState.showPashto = !!checked;
+        if (type === 'english') quranState.showEnglish = !!checked;
+        persistQuranDisplayToggles();
+        updateQuranPanelModeUi();
+        if (quranState.currentSurah) {
+            void refreshCurrentQuranSurah(anchorAyah);
+        }
+    }
+
+    function bindQuranEvents() {
+        const panel = document.querySelector('.quran-panel');
+        const select = document.getElementById('quranSurahSelectNative');
+        const resumeBtn = document.getElementById('quranResumeBtn');
+        const pashtoToggle = document.getElementById('quranTogglePashto');
+        const englishToggle = document.getElementById('quranToggleEnglish');
+        const playArabicBtn = document.getElementById('quranPlayPauseBtn');
+        const playPashtoBtn = document.getElementById('quranPlayPashtoBtn');
+        const playEnglishBtn = document.getElementById('quranPlayEnglishBtn');
+        const prevSurahBtn = document.getElementById('quranPrevSurahBtn');
+        const nextSurahBtn = document.getElementById('quranNextSurahBtn');
+        const loadMore = document.getElementById('quranLoadMore');
         const ayahList = document.getElementById('quranAyahList');
         const audioDot = document.getElementById('quran-floating-dot');
         const audioPrev = document.getElementById('dot-prev');
@@ -12393,17 +12231,74 @@ window.filterCategory = function(cat, btn) {
         const audioStop = document.getElementById('dot-stop');
         const audioPopupClose = document.getElementById('dot-close');
         const audioPopup = document.getElementById('quran-dot-popup');
-        const reader = document.getElementById('quranReaderScreen');
-        const modeArabicBtn = document.getElementById('quranModeArabicBtn');
-        const modePashtoBtn = document.getElementById('quranModePashtoBtn');
-        const modeEnglishBtn = document.getElementById('quranModeEnglishBtn');
-        const prevSurahBtn = document.getElementById('quranPrevSurahBtn');
-        const playPauseBtn = document.getElementById('quranPlayPauseBtn');
-        const nextSurahBtn = document.getElementById('quranNextSurahBtn');
-        const bookmarkCurrentBtn = document.getElementById('quranBookmarkCurrentBtn');
-        const scrollContent = document.getElementById('quranScrollContent');
 
-        if (window.__quranPashtoStateBound !== true) {
+        if (select && select.dataset.bound !== '1') {
+            select.addEventListener('change', () => openQuranSurah(Number(select.value), 1));
+            select.dataset.bound = '1';
+        }
+
+        if (resumeBtn && resumeBtn.dataset.bound !== '1') {
+            resumeBtn.addEventListener('click', () => window.resumeQuranReading());
+            resumeBtn.dataset.bound = '1';
+        }
+
+        if (pashtoToggle && pashtoToggle.dataset.bound !== '1') {
+            pashtoToggle.addEventListener('change', () => handleQuranDisplayToggle('pashto', pashtoToggle.checked));
+            pashtoToggle.dataset.bound = '1';
+        }
+
+        if (englishToggle && englishToggle.dataset.bound !== '1') {
+            englishToggle.addEventListener('change', () => handleQuranDisplayToggle('english', englishToggle.checked));
+            englishToggle.dataset.bound = '1';
+        }
+
+        if (playArabicBtn && playArabicBtn.dataset.bound !== '1') {
+            playArabicBtn.addEventListener('click', () => handleQuranAudioRow('arabic'));
+            playArabicBtn.dataset.bound = '1';
+        }
+
+        if (playPashtoBtn && playPashtoBtn.dataset.bound !== '1') {
+            playPashtoBtn.addEventListener('click', () => handleQuranAudioRow('pashto'));
+            playPashtoBtn.dataset.bound = '1';
+        }
+
+        if (playEnglishBtn && playEnglishBtn.dataset.bound !== '1') {
+            playEnglishBtn.addEventListener('click', () => handleQuranAudioRow('english'));
+            playEnglishBtn.dataset.bound = '1';
+        }
+
+        if (prevSurahBtn && prevSurahBtn.dataset.bound !== '1') {
+            prevSurahBtn.addEventListener('click', () => stepQuranSurah(-1));
+            prevSurahBtn.dataset.bound = '1';
+        }
+
+        if (nextSurahBtn && nextSurahBtn.dataset.bound !== '1') {
+            nextSurahBtn.addEventListener('click', () => stepQuranSurah(1));
+            nextSurahBtn.dataset.bound = '1';
+        }
+
+        if (loadMore && loadMore.dataset.bound !== '1') {
+            loadMore.addEventListener('click', () => {
+                renderQuranAyahChunk(false);
+                observeQuranAyahCards();
+            });
+            loadMore.dataset.bound = '1';
+        }
+
+        if (ayahList && ayahList.dataset.boundActions !== '1') {
+            ayahList.addEventListener('touchstart', (event) => handleQuranAyahActionEvent(event, true), { passive: false });
+            ayahList.addEventListener('click', (event) => handleQuranAyahActionEvent(event, false));
+            ayahList.dataset.boundActions = '1';
+        }
+
+        if (panel && panel.dataset.boundScroll !== '1') {
+            panel.addEventListener('scroll', () => {
+                updateQuranReaderProgress();
+            }, { passive: true });
+            panel.dataset.boundScroll = '1';
+        }
+
+        if (!window.__quranPashtoStateBound) {
             window.addEventListener('pashto-translation-state', (event) => {
                 const detail = event?.detail || {};
                 const state = String(detail.state || '');
@@ -12420,148 +12315,36 @@ window.filterCategory = function(cat, btn) {
                 }
 
                 if (isSegmentEvent) {
-                    if (!quranState.isPashtoAyahSegmentPlayback || Number(quranState.pashtoTranslationSurah || surah) !== surah) {
-                        return;
-                    }
-
                     if (state === 'buffering') {
                         setQuranPlayerState('loading');
-                        setQuranPlayButtonLoading(true);
                     } else if (state === 'playing') {
                         setQuranPlayerState('playing');
-                        setQuranPlayButtonLoading(false);
                     } else if (state === 'paused') {
                         setQuranPlayerState('paused');
-                        setQuranPlayButtonLoading(false);
-                    } else if (state === 'error' || state === 'ended' || state === 'stopped') {
-                        setQuranPlayButtonLoading(false);
                     }
-
                     updateQuranFloatingAudioUi();
                     return;
                 }
 
                 if (state === 'preloading' || state === 'buffering') {
-                    if (Number(quranState.pashtoTranslationSurah || surah) === surah) {
-                        quranState.isPashtoTranslationActive = true;
-                        quranState.pashtoTranslationSurah = surah;
-                        setQuranPlayerState('loading');
-                        setQuranPlayButtonLoading(true);
-                    }
+                    quranState.isPashtoTranslationActive = true;
+                    quranState.pashtoTranslationSurah = surah;
+                    setQuranPlayerState('loading');
                 } else if (state === 'playing') {
-                    if (Number(quranState.pashtoTranslationSurah || surah) === surah) {
-                        quranState.isPashtoTranslationActive = true;
-                        quranState.pashtoTranslationSurah = surah;
-                        setQuranPlayerState('playing');
-                        setQuranPlayButtonLoading(false);
-                    }
+                    quranState.isPashtoTranslationActive = true;
+                    quranState.pashtoTranslationSurah = surah;
+                    setQuranPlayerState('playing');
                 } else if (state === 'paused') {
-                    if (quranState.isPashtoTranslationActive) {
-                        setQuranPlayerState('paused');
-                        setQuranPlayButtonLoading(false);
-                    }
-                } else if (state === 'stopped' || state === 'ended') {
-                    if (Number(quranState.pashtoTranslationSurah || surah) === surah) {
-                        quranState.isPashtoTranslationActive = false;
-                        quranState.pashtoTranslationSurah = null;
-                        setQuranPlayButtonLoading(false);
-                        setQuranPlayerState('hidden');
-                    }
-                } else if (state === 'error') {
-                    if (Number(quranState.pashtoTranslationSurah || surah) === surah) {
-                        quranState.isPashtoTranslationActive = false;
-                        quranState.pashtoTranslationSurah = null;
-                        setQuranPlayButtonLoading(false);
-                        setQuranPlayerState('hidden');
-                    }
+                    if (quranState.isPashtoTranslationActive) setQuranPlayerState('paused');
+                } else if (state === 'stopped' || state === 'ended' || state === 'error') {
+                    quranState.isPashtoTranslationActive = false;
+                    quranState.pashtoTranslationSurah = null;
+                    if (quranState.playerState !== 'hidden') setQuranPlayerState('hidden');
                 }
 
                 updateQuranFloatingAudioUi();
             });
             window.__quranPashtoStateBound = true;
-        }
-
-        if (ayahList && ayahList.dataset.boundActions !== '1') {
-            ayahList.addEventListener('touchstart', (event) => handleQuranAyahActionEvent(event, true), { passive: false });
-            ayahList.addEventListener('click', (event) => handleQuranAyahActionEvent(event, false));
-            ayahList.dataset.boundActions = '1';
-        }
-
-        if (modeArabicBtn && modeArabicBtn.dataset.bound !== '1') {
-            modeArabicBtn.addEventListener('click', () => setQuranPanelMode('arabic'));
-            modeArabicBtn.dataset.bound = '1';
-        }
-
-        if (modePashtoBtn && modePashtoBtn.dataset.bound !== '1') {
-            modePashtoBtn.addEventListener('click', () => setQuranPanelMode('pashto'));
-            modePashtoBtn.dataset.bound = '1';
-        }
-
-        if (modeEnglishBtn && modeEnglishBtn.dataset.bound !== '1') {
-            modeEnglishBtn.addEventListener('click', () => setQuranPanelMode('english'));
-            modeEnglishBtn.dataset.bound = '1';
-        }
-
-        if (playPauseBtn && playPauseBtn.dataset.bound !== '1') {
-            playPauseBtn.addEventListener('click', async () => {
-                if (!quranState.currentSurah) {
-                    showToast(getQuranUiText().openSurahFirst);
-                    return;
-                }
-
-                if (!isQuranAudioSessionActive()) {
-                    quranState.activeFlowMode = getFlowModeFromPanelMode(quranState.panelMode);
-                    const startAyah = Number(quranState.lastPlayedAyah || 1);
-                    if ((quranState.activeFlowMode || 'ar') === 'ar-ps' && startAyah <= 1) {
-                        await refreshQuranPashtoAudioAvailability();
-                    }
-                    playQuranAyahInternal(Number(quranState.currentSurah), startAyah, 0, true);
-                    return;
-                }
-
-                toggleQuranPlayPause();
-            });
-            playPauseBtn.dataset.bound = '1';
-        }
-
-        if (bookmarkCurrentBtn && bookmarkCurrentBtn.dataset.bound !== '1') {
-            bookmarkCurrentBtn.addEventListener('click', () => {
-                if (!quranState.currentSurahData || !quranState.currentSurah) return;
-                const cards = Array.from(document.querySelectorAll('#quranAyahList .quran-ayah-card'));
-                if (!cards.length) return;
-
-                const anchorY = 150;
-                let activeCard = cards[cards.length - 1];
-                for (const card of cards) {
-                    const rect = card.getBoundingClientRect();
-                    if (rect.top >= anchorY) {
-                        activeCard = card;
-                        break;
-                    }
-                }
-
-                const ayahNo = Number(activeCard.getAttribute('data-ayah-no') || 1);
-                toggleQuranAyahBookmark(Number(quranState.currentSurah), ayahNo);
-            });
-            bookmarkCurrentBtn.dataset.bound = '1';
-        }
-
-        if (prevSurahBtn && prevSurahBtn.dataset.bound !== '1') {
-            prevSurahBtn.addEventListener('click', () => {
-                const current = Number(quranState.currentSurah || 1);
-                const target = Math.max(1, current - 1);
-                openQuranSurah(target, 1).then(() => playQuranAyahInternal(target, 1, 0, true));
-            });
-            prevSurahBtn.dataset.bound = '1';
-        }
-
-        if (nextSurahBtn && nextSurahBtn.dataset.bound !== '1') {
-            nextSurahBtn.addEventListener('click', () => {
-                const current = Number(quranState.currentSurah || 1);
-                const target = Math.min(114, current + 1);
-                openQuranSurah(target, 1).then(() => playQuranAyahInternal(target, 1, 0, true));
-            });
-            nextSurahBtn.dataset.bound = '1';
         }
 
         if (audioDot && audioDot.dataset.bound !== '1') {
@@ -12615,144 +12398,77 @@ window.filterCategory = function(cat, btn) {
             audioPopupClose.dataset.bound = '1';
         }
 
-        if (document.body.dataset.quranPopupOutsideBound !== '1') {
-            document.addEventListener('click', (event) => {
-                const popup = document.getElementById('quran-dot-popup');
-                const dot = document.getElementById('quran-floating-dot');
-                if (!popup || !dot || popup.style.display !== 'block') return;
-                const insidePopup = event.target && popup.contains(event.target);
-                const onDot = event.target && dot.contains(event.target);
-                if (!insidePopup && !onDot) closeQuranAudioPopup();
-            });
-            document.body.dataset.quranPopupOutsideBound = '1';
-        }
-
         if (audioPopup && audioPopup.dataset.bound !== '1') {
             audioPopup.addEventListener('click', (event) => event.stopPropagation());
             audioPopup.dataset.bound = '1';
         }
 
-        if (reader && reader.dataset.popupDismissBound !== '1') {
-            reader.addEventListener('scroll', () => {
-                if (audioPopup?.style.display === 'block') closeQuranAudioPopup();
-            }, { passive: true });
-            reader.dataset.popupDismissBound = '1';
-        }
-
-        if (reader && reader.dataset.readerControlsBound !== '1') {
-            reader.addEventListener('click', (event) => {
-                const tools = document.querySelector('#quranReaderScreen .quran-reader-tools');
-                if (tools && tools.contains(event.target)) return;
-                showQuranReaderControls();
+        if (document.body.dataset.quranPopupOutsideBound !== '1') {
+            document.addEventListener('click', (event) => {
+                const popupEl = document.getElementById('quran-dot-popup');
+                const dotEl = document.getElementById('quran-floating-dot');
+                if (!popupEl || !dotEl || popupEl.style.display !== 'block') return;
+                const insidePopup = event.target && popupEl.contains(event.target);
+                const onDot = event.target && dotEl.contains(event.target);
+                if (!insidePopup && !onDot) closeQuranAudioPopup();
             });
-            reader.addEventListener('touchstart', (event) => {
-                const tools = document.querySelector('#quranReaderScreen .quran-reader-tools');
-                if (tools && tools.contains(event.target)) return;
-                showQuranReaderControls();
-            }, { passive: true });
-            reader.dataset.readerControlsBound = '1';
-        }
-
-        if (scrollContent && scrollContent.dataset.readerControlsBound !== '1') {
-            scrollContent.addEventListener('scroll', () => scheduleQuranReaderControlsHide(700), { passive: true });
-            scrollContent.dataset.readerControlsBound = '1';
+            document.body.dataset.quranPopupOutsideBound = '1';
         }
 
         updateQuranFloatingAudioUi();
-    }
-
-    function setQuranTabLabel(el, label, iconPath) {
-        if (!el) return;
-        el.innerHTML = `<span class="quran-tab-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${iconPath}</svg></span><span class="quran-tab-text">${label}</span>`;
     }
 
     function renderQuranTexts() {
-        const ui = getQuranUiText();
         const title = document.getElementById('quranPanelTitle');
-        const searchInput = document.getElementById('quranSearchInput');
-        const tabArabic = document.getElementById('quranTabArabic');
-        const tabPashto = document.getElementById('quranTabPashto');
-        const tabEnglish = document.getElementById('quranTabEnglish');
-        const popularTitle = document.getElementById('quranPopularTitle');
-        if (title) title.textContent = ui.panelTitle;
-        if (searchInput) searchInput.placeholder = ui.searchPlaceholder;
-        if (tabArabic) tabArabic.querySelector('.quran-tab-text').textContent = ui.tabArabic;
-        if (tabPashto) tabPashto.querySelector('.quran-tab-text').textContent = ui.tabPashto;
-        if (tabEnglish) tabEnglish.querySelector('.quran-tab-text').textContent = ui.tabEnglish;
-        if (popularTitle) popularTitle.textContent = isPashtoMode() ? 'مشهور سورتونه' : 'Popular Surahs';
-        updateQuranSurahSelectLabel();
-
+        const eyebrow = document.getElementById('quranPanelEyebrow');
+        const selectLabel = document.getElementById('quranSurahSelectLabel');
+        const resumeBtn = document.getElementById('quranResumeBtn');
+        const pashtoToggleLabel = document.getElementById('quranTogglePashtoLabel');
+        const englishToggleLabel = document.getElementById('quranToggleEnglishLabel');
+        const arabicLabel = document.getElementById('quranArabicAudioLabel');
+        const pashtoLabel = document.getElementById('quranPashtoAudioLabel');
+        const englishLabel = document.getElementById('quranEnglishAudioLabel');
         const loadMore = document.getElementById('quranLoadMore');
+
+        if (eyebrow) eyebrow.textContent = isPashtoMode() ? 'قرآن کریم' : 'Quran';
+        if (title) title.textContent = isPashtoMode() ? 'قرآن کریم' : 'Quran';
+        if (selectLabel) selectLabel.textContent = isPashtoMode() ? 'سورت وټاکئ' : 'Select Surah';
+        if (resumeBtn) resumeBtn.textContent = isPashtoMode() ? 'بیا پیل' : 'Resume';
+        if (pashtoToggleLabel) pashtoToggleLabel.textContent = isPashtoMode() ? 'پښتو ژباړه وښایئ' : 'Show Pashto';
+        if (englishToggleLabel) englishToggleLabel.textContent = isPashtoMode() ? 'انګلیسي ژباړه وښایئ' : 'Show English';
+        if (arabicLabel) arabicLabel.textContent = isPashtoMode() ? 'عربي تلاوت' : 'Arabic Recitation';
+        if (pashtoLabel) pashtoLabel.textContent = isPashtoMode() ? 'پښتو ژباړې غږ' : 'Pashto Translation Audio';
+        if (englishLabel) englishLabel.textContent = isPashtoMode() ? 'انګلیسي ژباړې غږ' : 'English Translation Audio';
         if (loadMore) loadMore.textContent = isPashtoMode() ? 'نور آیتونه ښکاره کړئ…' : 'Load more…';
 
-        const dotPrev = document.getElementById('dot-prev');
-        const dotNext = document.getElementById('dot-next');
-        const dotStop = document.getElementById('dot-stop');
-        const dotClose = document.getElementById('dot-close');
-        const modeArabicBtn = document.getElementById('quranModeArabicBtn');
-        const modePashtoBtn = document.getElementById('quranModePashtoBtn');
-        const modeEnglishBtn = document.getElementById('quranModeEnglishBtn');
-        const fontDownBtn = document.getElementById('quranFontDownBtn');
-        const fontUpBtn = document.getElementById('quranFontUpBtn');
-        const bookmarkCurrentBtn = document.getElementById('quranBookmarkCurrentBtn');
-        if (dotPrev) dotPrev.setAttribute('aria-label', isPashtoMode() ? 'مخکینی آیت' : 'Previous ayah');
-        if (dotNext) dotNext.setAttribute('aria-label', isPashtoMode() ? 'راتلونکی آیت' : 'Next ayah');
-        if (dotStop) {
-            dotStop.setAttribute('aria-label', isPashtoMode() ? 'غږ بند کړئ' : 'Stop audio');
-            dotStop.textContent = isPashtoMode() ? '⏹ بند' : '⏹ Stop';
-        }
-        if (dotClose) {
-            dotClose.setAttribute('aria-label', isPashtoMode() ? 'د غږ کړکۍ بنده کړئ' : 'Close audio popup');
-            dotClose.textContent = isPashtoMode() ? '× بند' : '× Close';
-        }
-        if (modeArabicBtn) modeArabicBtn.textContent = isPashtoMode() ? 'عربي' : 'Arabic';
-        if (modePashtoBtn) modePashtoBtn.textContent = isPashtoMode() ? 'پښتو' : 'Pashto';
-        if (modeEnglishBtn) modeEnglishBtn.textContent = isPashtoMode() ? 'انګلیسي' : 'English';
-        if (fontDownBtn) {
-            fontDownBtn.setAttribute('aria-label', isPashtoMode() ? 'د عربي لیکنې اندازه کمه کړئ' : 'Decrease text size');
-            fontDownBtn.setAttribute('title', isPashtoMode() ? 'اندازه کمه کړئ' : 'Decrease text size');
-        }
-        if (fontUpBtn) {
-            fontUpBtn.setAttribute('aria-label', isPashtoMode() ? 'د عربي لیکنې اندازه زیاته کړئ' : 'Increase text size');
-            fontUpBtn.setAttribute('title', isPashtoMode() ? 'اندازه زیاته کړئ' : 'Increase text size');
-        }
-        if (bookmarkCurrentBtn) {
-            bookmarkCurrentBtn.setAttribute('aria-label', isPashtoMode() ? 'اوسنی آیت په نښه کړئ' : 'Bookmark current ayah');
-            bookmarkCurrentBtn.setAttribute('title', isPashtoMode() ? 'اوسنی آیت په نښه کړئ' : 'Bookmark current ayah');
-        }
-
         renderQuranInlineReciterSelect();
-
-        updateFlowModeButtons();
-
+        renderQuranSurahRows();
+        updateQuranResumeUi();
+        updateQuranPanelModeUi();
         updateQuranFloatingAudioUi();
-        updateQuranMiniTime();
     }
 
     async function initQuran() {
         if (quranState.initialized) return;
         await fetchQuranMeta();
-        setQuranPanelMode(quranState.panelMode, { restartAudio: false });
         applyQuranArabicFontSize();
         bindQuranEvents();
         renderQuranTexts();
-        renderQuranContinueCard();
-        renderQuranRecentSection();
-        setQuranView(quranState.view || 'surah', { skipHistory: true });
         await ensurePashtoEdition();
         quranState.initialized = true;
+        await openQuranSurah(1, 1);
     }
 
     window.refreshQuranLanguage = function() {
         renderQuranTexts();
-        setQuranPanelMode(quranState.panelMode, { restartAudio: false });
         renderQuranContinueCard();
-        renderQuranRecentSection();
-        renderQuranSurahRows();
         if (quranState.currentSurahData) {
             renderQuranReaderHeader(quranState.currentSurahData);
             renderQuranAyahChunk(true);
-            syncQuranReaderStickyOffsets();
+            requestAnimationFrame(() => {
+                scrollQuranAyahIntoView(quranState.currentVisibleAyah || 1, 'auto');
+                updateQuranReaderProgress();
+            });
         }
     };
 
@@ -12763,11 +12479,12 @@ window.filterCategory = function(cat, btn) {
         if (needsInit) setPanelLoading('quran', true, isPashtoMode() ? 'قرآن بارېږي…' : 'Loading Quran…');
         switchTab('quran');
         await initQuran();
-        renderQuranContinueCard();
-        renderQuranRecentSection();
-        if (needsInit) {
-            setQuranView(quranState.view || localStorage.getItem(QURAN_ACTIVE_TAB_KEY) || 'surah', { skipHistory: true });
+        if (!quranState.currentSurahData || !quranState.currentSurah) {
+            await openQuranSurah(1, 1);
         }
+        renderQuranTexts();
+        renderQuranContinueCard();
+        updateQuranResumeUi();
         updateQuranFloatingAudioUi();
         recordInAppRoute(true, {
             view: IN_APP_VIEWS.QURAN_TAB
@@ -12776,15 +12493,7 @@ window.filterCategory = function(cat, btn) {
     };
 
     function closeQuranReader({ skipHistory = false } = {}) {
-        const reader = document.getElementById('quranReaderScreen');
-        const listScreen = document.getElementById('quranListScreen');
-        const activeList = getQuranListContainerByView(quranState.view) || document.getElementById('quranSurahList');
-        if (reader) reader.classList.remove('active');
-        clearQuranReaderControlsHide();
-        if (listScreen) listScreen.style.display = '';
-        if (activeList) activeList.style.display = '';
         stopQuranAudio({ resetTime: true, navigatedAway: true });
-        renderQuranContinueCard();
         updateQuranFloatingAudioUi();
         if (!skipHistory) {
             recordInAppRoute(false, {
@@ -12793,33 +12502,7 @@ window.filterCategory = function(cat, btn) {
         }
     }
 
-    function switchToHomeTab() {
-        switchTab('home');
-        backToCategories();
-    }
-
-    function closeQuranPanel({ skipHistory = false } = {}) {
-        setPanelLoading('quran', false);
-        closeQuranReader({ skipHistory: true });
-        clearQuranAudioDotHoldTimer();
-        closeQuranAudioPopup();
-        updateQuranMiniPlayerVisibility();
-        document.body.classList.remove('quran-reading-mode');
-        switchTab('home');
-        if (!skipHistory) {
-            recordInAppRoute(false, {
-                view: IN_APP_VIEWS.HOME
-            });
-        }
-    }
-
-    window.closeQuran = function() {
-        closeQuranPanel();
-        switchToHomeTab();
-    };
-
     window.openQuranSurah = openQuranSurah;
-    window.openQuranJuz = openQuranJuz;
 
     // ===== REGISTER SERVICE WORKER =====
     if ('serviceWorker' in navigator) {
