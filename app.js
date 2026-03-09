@@ -383,233 +383,237 @@
             }, 1500);
         }
 
-        updateStats();
-        checkStreak();
-        loadDailyDua();
-        applyFontSize(STATE.fontSize);
-        applyTheme();
         document.body.classList.add('startup-blocked');
+        try {
+            updateStats();
+            checkStreak();
+            loadDailyDua();
+            applyFontSize(STATE.fontSize);
+            applyTheme();
 
-        await ensureLanguageSelectionBeforeStartup();
-        await checkAppVersionOnStartup();
-        document.body.classList.remove('startup-blocked');
+            await ensureLanguageSelectionBeforeStartup();
+            await checkAppVersionOnStartup();
 
-        injectShareImageButtons();
-        injectAudioButtons();
-        renderTimeBanner();
-        trackDailyActivity();
-        renderBookmarksPanel();
-        wrapArabicWords();
-        injectDuaBismillahHeaders();
-        syncCategoryWatermarks();
-        syncHomeTileWatermarks();
-        initDailyReminderPrompt();
-        initHomeDashboard();
-        initDuasTabSearch();
-        renderDuasBookmarksSection();
-        initFontSizeControls();
+            injectShareImageButtons();
+            injectAudioButtons();
+            renderTimeBanner();
+            trackDailyActivity();
+            renderBookmarksPanel();
+            wrapArabicWords();
+            injectDuaBismillahHeaders();
+            syncCategoryWatermarks();
+            syncHomeTileWatermarks();
+            initDailyReminderPrompt();
+            initHomeDashboard();
+            initDuasTabSearch();
+            renderDuasBookmarksSection();
+            initFontSizeControls();
 
-        // Apply saved language preference after startup language gate.
-        if (typeof applyLanguage === 'function') applyLanguage();
-        if (typeof window.toggleLanguage === 'function' && !window.__wrappedToggleLanguageForDashboard) {
-            const originalToggleLanguage = window.toggleLanguage;
-            window.toggleLanguage = function(...args) {
-                const result = originalToggleLanguage.apply(this, args);
-                setTimeout(() => {
-                    refreshLanguageModeConsistency();
-                }, 0);
-                return result;
-            };
-            window.__wrappedToggleLanguageForDashboard = true;
-        }
-
-        initGlobalDigitLocalization();
-        scheduleNumberRelocalization();
-
-        showOnboardingIfFirstTime();
-        enhanceAccessibility();
-        setBottomNavActive('home');
-        initBottomNavTouchHandlers();
-        initNativeAndroidScrollSync();
-        initHomePullToRefresh();
-
-        // Legacy search listener (kept for compatibility if input exists)
-        if (els.searchInput) {
-            els.searchInput.addEventListener('input', (e) => filterDuas(e.target.value));
-        }
-
-        // Scroll listener
-        const onPrimaryScroll = () => {
-            const homePanel = document.getElementById('mainContainer');
-            const homeIsActive = !!homePanel?.classList.contains('active');
-            const winScroll = homeIsActive
-                ? (homePanel.scrollTop || 0)
-                : (document.body.scrollTop || document.documentElement.scrollTop || 0);
-            const height = homeIsActive
-                ? Math.max(1, (homePanel.scrollHeight || 1) - (homePanel.clientHeight || 0))
-                : Math.max(1, document.documentElement.scrollHeight - document.documentElement.clientHeight);
-            const scrolled = (winScroll / height) * 100;
-            if (els.progressBar) els.progressBar.style.width = scrolled + "%";
-
-            const backBtn = document.querySelector('.back-to-top');
-            if (backBtn) backBtn.classList.toggle('visible', winScroll > 500);
-
-            if (els.nav) {
-                if (winScroll > 50) els.nav.classList.add('scrolled');
-                else els.nav.classList.remove('scrolled');
+            // Apply saved language preference after startup language gate.
+            if (typeof applyLanguage === 'function') applyLanguage();
+            if (typeof window.toggleLanguage === 'function' && !window.__wrappedToggleLanguageForDashboard) {
+                const originalToggleLanguage = window.toggleLanguage;
+                window.toggleLanguage = function(...args) {
+                    const result = originalToggleLanguage.apply(this, args);
+                    setTimeout(() => {
+                        refreshLanguageModeConsistency();
+                    }, 0);
+                    return result;
+                };
+                window.__wrappedToggleLanguageForDashboard = true;
             }
 
-            updateInAppFabVisibility();
-        };
+            initGlobalDigitLocalization();
+            scheduleNumberRelocalization();
 
-        window.addEventListener('scroll', onPrimaryScroll);
-        const mainContainer = document.getElementById('mainContainer');
-        if (mainContainer) mainContainer.addEventListener('scroll', onPrimaryScroll, { passive: true });
+            showOnboardingIfFirstTime();
+            enhanceAccessibility();
+            setBottomNavActive('home');
+            initBottomNavTouchHandlers();
+            initNativeAndroidScrollSync();
+            initHomePullToRefresh();
 
-        // Restore bookmarks UI
-        STATE.bookmarks.forEach(id => {
-            const btn = document.querySelector(`.dua-card[data-id="${id}"] .bookmark-btn`);
-            if (btn) { btn.classList.add('bookmarked'); btn.innerHTML = '★'; }
-        });
+            // Legacy search listener (kept for compatibility if input exists)
+            if (els.searchInput) {
+                els.searchInput.addEventListener('input', (e) => filterDuas(e.target.value));
+            }
 
-        // Restore read UI
-        STATE.read.forEach(id => {
-            const card = document.querySelector(`.dua-card[data-id="${id}"]`);
-            if (card) {
-                card.classList.add('read-card');
-                const readBtn = card.querySelector('.action-btn[onclick*="markRead"]');
-                if (readBtn) {
-                    readBtn.classList.add('read');
-                    readBtn.innerHTML = '✓ Read';
+            // Scroll listener
+            const onPrimaryScroll = () => {
+                const homePanel = document.getElementById('mainContainer');
+                const homeIsActive = !!homePanel?.classList.contains('active');
+                const winScroll = homeIsActive
+                    ? (homePanel.scrollTop || 0)
+                    : (document.body.scrollTop || document.documentElement.scrollTop || 0);
+                const height = homeIsActive
+                    ? Math.max(1, (homePanel.scrollHeight || 1) - (homePanel.clientHeight || 0))
+                    : Math.max(1, document.documentElement.scrollHeight - document.documentElement.clientHeight);
+                const scrolled = (winScroll / height) * 100;
+                if (els.progressBar) els.progressBar.style.width = scrolled + "%";
+
+                const backBtn = document.querySelector('.back-to-top');
+                if (backBtn) backBtn.classList.toggle('visible', winScroll > 500);
+
+                if (els.nav) {
+                    if (winScroll > 50) els.nav.classList.add('scrolled');
+                    else els.nav.classList.remove('scrolled');
                 }
-            }
-        });
 
-        // Restore collapsed sections
-        const collapsedSections = JSON.parse(localStorage.getItem('crown_collapsed_sections') || '[]');
-        collapsedSections.forEach(sectionName => {
-            const header = document.querySelector(`.section-header[data-section="${sectionName}"]`);
-            if (header) {
-                header.classList.add('collapsed');
-                const hint = header.querySelector('.section-collapse-hint');
-                if (hint) hint.textContent = 'tap to expand';
-
-                let nextElement = header.nextElementSibling;
-                while (nextElement) {
-                    if (nextElement.classList.contains('section-header')) break;
-                    if (nextElement.classList.contains('dua-card')) {
-                        nextElement.style.display = 'none';
-                    }
-                    nextElement = nextElement.nextElementSibling;
-                }
-            }
-        });
-
-        // --- Intersection Observer for Card Animations ---
-    
-        if ('IntersectionObserver' in window) {
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.05
+                updateInAppFabVisibility();
             };
 
-            const cardObserver = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        cardObserver.unobserve(entry.target);
+            window.addEventListener('scroll', onPrimaryScroll);
+            const mainContainer = document.getElementById('mainContainer');
+            if (mainContainer) mainContainer.addEventListener('scroll', onPrimaryScroll, { passive: true });
+
+            // Restore bookmarks UI
+            STATE.bookmarks.forEach(id => {
+                const btn = document.querySelector(`.dua-card[data-id="${id}"] .bookmark-btn`);
+                if (btn) { btn.classList.add('bookmarked'); btn.innerHTML = '★'; }
+            });
+
+            // Restore read UI
+            STATE.read.forEach(id => {
+                const card = document.querySelector(`.dua-card[data-id="${id}"]`);
+                if (card) {
+                    card.classList.add('read-card');
+                    const readBtn = card.querySelector('.action-btn[onclick*="markRead"]');
+                    if (readBtn) {
+                        readBtn.classList.add('read');
+                        readBtn.innerHTML = '✓ Read';
                     }
+                }
+            });
+
+            // Restore collapsed sections
+            const collapsedSections = JSON.parse(localStorage.getItem('crown_collapsed_sections') || '[]');
+            collapsedSections.forEach(sectionName => {
+                const header = document.querySelector(`.section-header[data-section="${sectionName}"]`);
+                if (header) {
+                    header.classList.add('collapsed');
+                    const hint = header.querySelector('.section-collapse-hint');
+                    if (hint) hint.textContent = 'tap to expand';
+
+                    let nextElement = header.nextElementSibling;
+                    while (nextElement) {
+                        if (nextElement.classList.contains('section-header')) break;
+                        if (nextElement.classList.contains('dua-card')) {
+                            nextElement.style.display = 'none';
+                        }
+                        nextElement = nextElement.nextElementSibling;
+                    }
+                }
+            });
+
+            // --- Intersection Observer for Card Animations ---
+            if ('IntersectionObserver' in window) {
+                const observerOptions = {
+                    root: null,
+                    rootMargin: '0px',
+                    threshold: 0.05
+                };
+
+                const cardObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            cardObserver.unobserve(entry.target);
+                        }
+                    });
+                }, observerOptions);
+
+                els.cards.forEach(card => {
+                    cardObserver.observe(card);
                 });
-            }, observerOptions);
+            }
 
-            els.cards.forEach(card => {
-                cardObserver.observe(card);
+            // --- Keyboard Accessibility ---
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const ap = document.querySelector('.about-panel.active');
+                    if (ap) { closeAboutPanel(); return; }
+
+                    const pp = document.querySelector('.progress-panel.active');
+                    if (pp) { closeProgress(); return; }
+
+                    const tp = document.querySelector('.tasbeeh-panel.active');
+                    if (tp) { closeTasbeeh(); return; }
+
+                    const ep = document.querySelector('.etiquette-panel.active');
+                    if (ep) { closeEtiquette(); return; }
+
+                    const rp = document.querySelector('.routine-panel.active');
+                    if (rp) { closeRoutine(); return; }
+
+                    const prayerp = document.querySelector('.prayer-panel.active');
+                    if (prayerp) { closePrayer(); return; }
+
+                    const qp = document.querySelector('.quran-panel.active');
+                    if (qp) { closeQuran(); return; }
+
+                    const mp = document.getElementById('memorizePanel');
+                    if (mp && mp.classList.contains('active')) { closeMemorizeSession(); return; }
+
+                    const bp = document.getElementById('bookmarksPanel');
+                    if (bp && bp.classList.contains('active')) { toggleBookmarksPanel(); return; }
+
+                    if (els.searchInput && els.searchInput.value) {
+                        clearSearch();
+                        els.searchInput.blur();
+                        return;
+                    }
+                }
+            });
+
+            // Keyboard support for card headers and section headers
+            document.addEventListener('keydown', function(e) {
+                const target = e.target;
+                if (target.classList.contains('card-header')) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleCard(target);
+                    }
+                }
+                if (target.classList.contains('section-header')) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleSection(target);
+                    }
+                }
+            });
+
+            // Add a11y attributes to section headers
+            document.querySelectorAll('.section-header').forEach(header => {
+                header.setAttribute('role', 'button');
+                header.setAttribute('tabindex', '0');
+                header.setAttribute('aria-expanded', String(!header.classList.contains('collapsed')));
+            });
+
+            // Handle hash-based deep links (manifest shortcuts)
+            setTimeout(() => {
+                const hash = window.location.hash;
+                if (hash === '#daily') scrollToDailyDua();
+                else if (hash === '#tasbeeh') openTasbeeh();
+                else if (hash === '#routine') openRoutine();
+                else if (hash === '#prayer') openPrayer();
+                else if (hash === '#quran') openQuran();
+                window.location.hash = '';
+            }, 1600); // After splash screen
+
+            initDuaSwipeViewer();
+            initInAppNavigationUX();
+            closeAllPanelsForStateApply();
+            switchTab('home');
+            setBottomNavActive('home');
+            backToCategories();
+            history.replaceState({ view: IN_APP_VIEWS.HOME }, '');
+            inAppCurrentRoute = IN_APP_VIEWS.HOME;
+            updateInAppFabVisibility();
+        } finally {
+            window.requestAnimationFrame(() => {
+                document.body.classList.remove('startup-blocked');
             });
         }
-
-        // --- Keyboard Accessibility ---
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const ap = document.querySelector('.about-panel.active');
-                if (ap) { closeAboutPanel(); return; }
-
-                const pp = document.querySelector('.progress-panel.active');
-                if (pp) { closeProgress(); return; }
-
-                const tp = document.querySelector('.tasbeeh-panel.active');
-                if (tp) { closeTasbeeh(); return; }
-
-                const ep = document.querySelector('.etiquette-panel.active');
-                if (ep) { closeEtiquette(); return; }
-
-                const rp = document.querySelector('.routine-panel.active');
-                if (rp) { closeRoutine(); return; }
-
-                const prayerp = document.querySelector('.prayer-panel.active');
-                if (prayerp) { closePrayer(); return; }
-
-                const qp = document.querySelector('.quran-panel.active');
-                if (qp) { closeQuran(); return; }
-
-                const mp = document.getElementById('memorizePanel');
-                if (mp && mp.classList.contains('active')) { closeMemorizeSession(); return; }
-
-                const bp = document.getElementById('bookmarksPanel');
-                if (bp && bp.classList.contains('active')) { toggleBookmarksPanel(); return; }
-
-                if (els.searchInput && els.searchInput.value) {
-                    clearSearch();
-                    els.searchInput.blur();
-                    return;
-                }
-            }
-        });
-
-        // Keyboard support for card headers and section headers
-        document.addEventListener('keydown', function(e) {
-            const target = e.target;
-            if (target.classList.contains('card-header')) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleCard(target);
-                }
-            }
-            if (target.classList.contains('section-header')) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleSection(target);
-                }
-            }
-        });
-
-        // Add a11y attributes to section headers
-        document.querySelectorAll('.section-header').forEach(header => {
-            header.setAttribute('role', 'button');
-            header.setAttribute('tabindex', '0');
-            header.setAttribute('aria-expanded', String(!header.classList.contains('collapsed')));
-        });
-
-        // Handle hash-based deep links (manifest shortcuts)
-        setTimeout(() => {
-            const hash = window.location.hash;
-            if (hash === '#daily') scrollToDailyDua();
-            else if (hash === '#tasbeeh') openTasbeeh();
-            else if (hash === '#routine') openRoutine();
-            else if (hash === '#prayer') openPrayer();
-            else if (hash === '#quran') openQuran();
-            window.location.hash = '';
-        }, 1600); // After splash screen
-
-        initDuaSwipeViewer();
-        initInAppNavigationUX();
-        closeAllPanelsForStateApply();
-        switchTab('home');
-        setBottomNavActive('home');
-        backToCategories();
-        history.replaceState({ view: IN_APP_VIEWS.HOME }, '');
-        inAppCurrentRoute = IN_APP_VIEWS.HOME;
-        updateInAppFabVisibility();
     }
 
     function enhanceAccessibility() {
@@ -9516,9 +9520,6 @@ window.filterCategory = function(cat, btn) {
             pashtoAudioOptionLabel: isPS ? 'د پښتو غږیزه ژباړه' : 'Pashto translation audio',
             pashtoAudioOptionHint: isPS ? 'دا د پښتو ژباړې جلا غږ دی او د Pashto translation player له لارې چلېږي.' : 'This is a separate Pashto translation audio track and uses the Pashto translation player.',
             pashtoAudioStatus: isPS ? 'پښتو غږیزه ژباړه' : 'Pashto audio translation',
-            pashtoAudioHint: isPS ? 'پلې کېکاږئ: سورت به په عربي تلاوت شي، وروسته به د هماغه سورت پښتو غږیزه ژباړه چلېږي' : 'Press Play: the surah will recite in Arabic first, then the Pashto audio translation for that surah will play',
-            pashtoAudioLoadingBanner: isPS ? 'د پښتو غږیزه ژباړه چمتو کېږي...' : 'Preparing Pashto audio translation...',
-            pashtoAudioUnavailable: isPS ? 'د دې سورت لپاره د پښتو غږیزه ژباړه اوس نشته، خو عربي تلاوت به بیا هم وغږېږي' : 'Pashto audio is unavailable for this surah right now, but Arabic recitation will still play',
             openSurahFirst: isPS ? 'لومړی یو سورت پرانیزئ' : 'Open a surah first',
             saveSettings: isPS ? 'تنظیمات خوندي شول' : 'Settings saved',
             notPlaying: isPS ? 'اوس غږ نه شته' : 'Not playing',
@@ -9595,19 +9596,16 @@ window.filterCategory = function(cat, btn) {
     function refreshQuranPashtoAudioAvailability() {
         const surah = Number(quranState.currentSurah || 0);
         if (!canUsePashtoSurahAudio(surah)) {
-            updateQuranPashtoAudioBanner();
             updateQuranFloatingAudioUi();
             return Promise.resolve(false);
         }
 
         const cached = getPashtoSurahAudioAvailability(surah);
-        updateQuranPashtoAudioBanner();
         updateQuranFloatingAudioUi();
         if (cached !== null) return Promise.resolve(cached);
 
         return resolvePashtoSurahAudioAvailability(surah).then((available) => {
             if (Number(quranState.currentSurah || 0) === surah) {
-                updateQuranPashtoAudioBanner();
                 updateQuranFloatingAudioUi();
             }
             return available;
@@ -9655,42 +9653,9 @@ window.filterCategory = function(cat, btn) {
         return pending;
     }
 
-    function updateQuranPashtoAudioBanner() {
-        const banner = document.getElementById('quranPashtoAudioBanner');
-        if (!banner) return;
-        const ui = getQuranUiText();
-        const isPashtoPanel = normalizeQuranPanelMode(quranState.panelMode) === 'pashto';
-        const surahNo = Number(quranState.currentSurah || 0);
-        const availability = getPashtoSurahAudioAvailability(surahNo);
-
-        let text = '';
-        let state = 'hidden';
-
-        if (isPashtoPanel && surahNo > 0) {
-            if (!canUsePashtoSurahAudio(surahNo)) {
-                text = ui.pashtoAudioUnavailable;
-                state = 'unavailable';
-            } else if (availability === false) {
-                text = ui.pashtoAudioUnavailable;
-                state = 'unavailable';
-            } else if (availability === null) {
-                text = ui.pashtoAudioLoadingBanner;
-                state = 'loading';
-            } else {
-                text = ui.pashtoAudioHint;
-                state = 'ready';
-            }
-        }
-
-        banner.textContent = text;
-        banner.dataset.state = state;
-        banner.classList.toggle('visible', !!text);
-    }
-
     function renderQuranInlineReciterSelect() {
         const select = document.getElementById('quranInlineReciterSelect');
         const label = document.getElementById('quranInlineReciterLabel');
-        const wrap = select?.closest('.quran-reciter-inline');
         if (!select) return;
 
         const ui = getQuranUiText();
@@ -9701,20 +9666,6 @@ window.filterCategory = function(cat, btn) {
         select.innerHTML = QURAN_RECITERS
             .map((reciter) => `<option value="${reciter.id}" ${settings.reciter === reciter.id ? 'selected' : ''}>${reciter.name}</option>`)
             .join('');
-
-        if (wrap) {
-            let note = wrap.querySelector('.quran-reciter-note');
-            if (isPashtoPanel) {
-                if (!note) {
-                    note = document.createElement('div');
-                    note.className = 'quran-reciter-note';
-                    wrap.appendChild(note);
-                }
-                note.innerHTML = `<strong>${escapeHtml(ui.pashtoAudioOptionLabel)}:</strong> ${escapeHtml(ui.pashtoAudioOptionHint)}`;
-            } else if (note) {
-                note.remove();
-            }
-        }
 
         if (select.dataset.bound === '1') return;
 
@@ -10083,7 +10034,6 @@ window.filterCategory = function(cat, btn) {
             highlightPlayingAyah();
         }
 
-        updateQuranPashtoAudioBanner();
         if (quranState.currentSurah) void refreshQuranPashtoAudioAvailability();
 
         if (restartAudio && quranState.currentSurah && isQuranAudioSessionActive()) {
@@ -11531,7 +11481,6 @@ window.filterCategory = function(cat, btn) {
             syncQuranReaderStickyOffsets();
             updateQuranReaderProgress();
             void refreshQuranPashtoAudioAvailability();
-            updateQuranPashtoAudioBanner();
             updateQuranFloatingAudioUi();
             showQuranReaderControls();
             recordInAppRoute(true, {
@@ -12015,7 +11964,6 @@ window.filterCategory = function(cat, btn) {
             void resolvePashtoSurahAudioAvailability(surahNumber).then((pashtoAvailable) => {
                 if (pashtoAvailable) void warmPashtoSurahAudio(surahNumber);
                 if (Number(quranState.currentSurah || 0) === Number(surahNumber)) {
-                    updateQuranPashtoAudioBanner();
                     updateQuranFloatingAudioUi();
                 }
             });
@@ -12467,7 +12415,6 @@ window.filterCategory = function(cat, btn) {
                 }
 
                 if (isPreloadEvent) {
-                    updateQuranPashtoAudioBanner();
                     updateQuranFloatingAudioUi();
                     return;
                 }
@@ -12490,7 +12437,6 @@ window.filterCategory = function(cat, btn) {
                         setQuranPlayButtonLoading(false);
                     }
 
-                    updateQuranPashtoAudioBanner();
                     updateQuranFloatingAudioUi();
                     return;
                 }
@@ -12530,7 +12476,6 @@ window.filterCategory = function(cat, btn) {
                     }
                 }
 
-                updateQuranPashtoAudioBanner();
                 updateQuranFloatingAudioUi();
             });
             window.__quranPashtoStateBound = true;
@@ -12777,7 +12722,6 @@ window.filterCategory = function(cat, btn) {
         }
 
         renderQuranInlineReciterSelect();
-        updateQuranPashtoAudioBanner();
 
         updateFlowModeButtons();
 
@@ -12810,7 +12754,6 @@ window.filterCategory = function(cat, btn) {
             renderQuranAyahChunk(true);
             syncQuranReaderStickyOffsets();
         }
-        updateQuranPashtoAudioBanner();
     };
 
     window.openQuran = async function() {

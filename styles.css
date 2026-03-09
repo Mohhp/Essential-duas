@@ -3352,49 +3352,6 @@
             font-size: 0.72rem;
         }
 
-        .quran-reciter-note {
-            grid-column: 1 / -1;
-            font-size: 0.66rem;
-            line-height: 1.5;
-            color: var(--text-subtle);
-        }
-
-        .quran-reciter-note strong {
-            color: var(--text-primary);
-        }
-
-        .quran-audio-banner {
-            display: none;
-            border: 1px solid rgba(201, 168, 76, 0.3);
-            border-radius: 10px;
-            background: rgba(201, 168, 76, 0.1);
-            color: var(--gold-light);
-            font-family: var(--font-title);
-            font-size: 0.66rem;
-            letter-spacing: 0.18px;
-            padding: 8px 10px;
-            text-align: center;
-        }
-
-        .quran-audio-banner.visible {
-            display: block;
-        }
-
-        .quran-audio-banner[data-state="ready"] {
-            border-color: rgba(46, 196, 122, 0.34);
-            background: rgba(46, 196, 122, 0.14);
-        }
-
-        .quran-audio-banner[data-state="loading"] {
-            border-color: rgba(201, 168, 76, 0.36);
-            background: rgba(201, 168, 76, 0.12);
-        }
-
-        .quran-audio-banner[data-state="unavailable"] {
-            border-color: rgba(220, 108, 93, 0.36);
-            background: rgba(220, 108, 93, 0.12);
-        }
-
         .quran-player-btn {
             width: 40px;
             height: 40px;
@@ -3793,11 +3750,6 @@
         [data-theme="light"] .quran-reader-tools,
         [data-theme="light"] .quran-translation-toggle {
             background: var(--bg-card);
-        }
-        [data-theme="light"] .quran-audio-banner {
-            border-color: rgba(154, 122, 47, 0.42);
-            background: rgba(154, 122, 47, 0.14);
-            color: var(--text-primary);
         }
         [data-theme="light"] .quran-view-tab,
         [data-theme="light"] .quran-row-btn,
@@ -4497,6 +4449,49 @@
             inset: 0;
             z-index: 2600;
             background: rgba(16, 29, 41, 0.94);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(5, 12, 23, 0.82);
+            backdrop-filter: blur(7px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 220ms ease;
+        }
+        .first-launch-language-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .first-launch-language-overlay.closing {
+            opacity: 0;
+        }
+        .first-launch-language-card {
+            width: min(92vw, 430px);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+            border: 1px solid rgba(201, 168, 76, 0.28);
+            border-radius: 20px;
+            box-shadow: var(--shadow-elevated), 0 0 36px rgba(201, 168, 76, 0.12);
+            padding: 24px 18px 18px;
+            text-align: center;
+        }
+        .first-launch-language-logo img {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            margin: 0 auto 12px;
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+        }
+        .first-launch-language-title {
+            font: var(--text-h1);
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .first-launch-language-subtitle {
+            margin: 6px 0 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
             backdrop-filter: blur(22px) saturate(150%);
             opacity: 0;
             visibility: hidden;
@@ -5536,6 +5531,10 @@
         }
         .startup-blocked #appContent {
             visibility: hidden;
+        }
+        .startup-blocked .app-content .panel,
+        .startup-blocked #mainContainer {
+            visibility: hidden !important;
         }
         .startup-blocked .first-launch-language-overlay,
         .startup-blocked .app-update-overlay.active {

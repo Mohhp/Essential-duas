@@ -1,89 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <meta name="theme-color" content="#0a1210">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Falah">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="The Crown Collection — 63 essential Islamic duas from the Quran and Sunnah, with tasbeeh counter, bookmarks, daily routines, and scholarly authentication.">
-    <meta property="og:title" content="Falah — فلاح">
-    <meta property="og:description" content="63 essential Islamic duas from Quran & Sunnah — curated with full scholarly authentication, tasbeeh counter, prayer times, and memorization tools.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mohhp.github.io/Essential-duas/">
-    <meta property="og:image" content="https://mohhp.github.io/Essential-duas/icon-512.png">
-    <meta property="og:locale" content="en_US">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Falah — فلاح">
-    <meta name="twitter:description" content="63 essential Islamic duas from Quran & Sunnah with full scholarly authentication.">
-    <meta name="twitter:image" content="https://mohhp.github.io/Essential-duas/icon-512.png">
-    <link rel="canonical" href="https://mohhp.github.io/Essential-duas/">
-    <title>Falah — فلاح</title>
-
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="apple-touch-icon" href="icon-192.png">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" defer integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/adhan@4.4.3/lib/bundles/adhan.umd.min.js" defer integrity="sha384-GeFOMqrI151l2Qij2/14tUSIz2JXO7LEU+351FVjxD15CgX/7mp9w84GxJY0F1Gc" crossorigin="anonymous"></script>
-    <!-- Production assets (active) -->
-    <link rel="stylesheet" href="styles.css?v=20260308a">
-    <!-- Source assets (fallback for local debugging) -->
-    <!-- <link rel="stylesheet" href="styles.css?v=20260306k"> -->
-    <style>
-        .update-prompt-card {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin: 0 0 14px;
-            padding: 14px 16px;
-            border: 1px solid rgba(201, 168, 76, 0.28);
-            border-radius: 16px;
-            background: linear-gradient(140deg, rgba(201, 168, 76, 0.16), rgba(46, 196, 122, 0.12));
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
-        }
-
-        .update-prompt-title {
-            font-family: var(--font-title);
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            line-height: 1.4;
-        }
-
-        .update-prompt-title-ps {
-            font-family: var(--font-text);
-            color: var(--text-muted);
-        }
-
-        .update-prompt-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .update-prompt-btn {
-            border: 1px solid transparent;
-            border-radius: 999px;
-            padding: 8px 14px;
-            font-size: 0.84rem;
-            font-weight: 700;
-            text-decoration: none;
-            cursor: pointer;
-            font-family: var(--font-text);
-        }
-
-        .update-prompt-btn.primary {
-            background: linear-gradient(135deg, #1f8a5b, #0f6e47);
-            color: #f6fdf8;
-            border-color: rgba(255, 255, 255, 0.2);
-        }
 
         .update-prompt-btn.secondary {
             background: rgba(255, 255, 255, 0.14);
@@ -104,7 +20,7 @@
     </style>
 </head>
 
-    <body>
+    <body class="startup-blocked">
 <!-- ===== SPLASH SCREEN ===== -->
 <div class="splash-screen" id="splashScreen">
     <div class="splash-logo-large">
@@ -1517,90 +1433,6 @@
     <!-- DUA 27: La Sahla -->
     <div class="dua-card" data-categories="wellbeing" data-keywords="nothing easy except difficulty hardship grief exam impossible situation nawawi" data-id="27">
         <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
-            <div class="card-header-left">
-                <div class="dua-number">27</div>
-                <div class="card-title-group">
-                    <div class="dua-title">Lā Sahla — Nothing Is Easy Except What You Make Easy <span class="auth-badge badge-sahih">Sahih</span></div>
-                    <div class="dua-category-tag">For Every Difficulty • Ibn Ḥibbān 974</div>
-                </div>
-            </div>
-            <div class="card-actions">
-                <button class="card-action-btn bookmark-btn" onclick="event.stopPropagation(); toggleBookmark(27)" title="Bookmark">☆</button>
-                <span class="expand-icon">▾</span>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="card-body-inner">
-                <div class="ornament-divider"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
-                <div class="arabic-container">
-                    <div class="arabic-text">اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلًا</div>
-                </div>
-                <div class="transliteration">Allāhumma lā sahla illā mā ja'altahu sahlā, wa anta taj'alul-ḥazna idhā shi'ta sahlā.</div>
-                <div class="translation">"O Allah, there is nothing easy except what You make easy, and You make grief — when You will — easy."</div>
-                <div class="reference">
-                    <span class="ref-icon">📖</span>
-                    <span class="ref-text">Ibn Ḥibbān 974 (in his Ṣaḥīḥ) · Ibn as-Sunnī 351</span>
-                </div>
-                <div class="virtue-tag"><span class="gem">💎</span> Al-Nawawī included it in al-Adhkār as one of the most beloved daily supplications. The dua for every exam, every hardship, every impossible situation.</div>
-                <div class="copy-row">
-                    <button class="action-btn" onclick="copyText(this, 'اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلًا')">📋 Copy Arabic</button>
-                    <button class="action-btn" onclick="shareDua(27)">↗ Share</button>
-                    <button class="action-btn" onclick="markRead(this, 27)">✓ Mark Read</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- DUA 28: Jibril's Healing Dua -->
-    <div class="dua-card" data-categories="wellbeing" data-keywords="healing sick illness cure shifa doctor hospital ruqyah jibril final illness" data-id="28">
-        <div class="card-header" onclick="toggleCard(this)" tabindex="0" role="button" aria-expanded="false">
-            <div class="card-header-left">
-                <div class="dua-number">28</div>
-                <div class="card-title-group">
-                    <div class="dua-title">Jibril's Healing Dua <span class="auth-badge badge-sahih">Sahih</span></div>
-                    <div class="dua-category-tag">He ﷺ Repeated This Until His Soul Was Taken • Bukhari 5741</div>
-                </div>
-            </div>
-            <div class="card-actions">
-                <button class="card-action-btn bookmark-btn" onclick="event.stopPropagation(); toggleBookmark(28)" title="Bookmark">☆</button>
-                <span class="expand-icon">▾</span>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="card-body-inner">
-                <div class="ornament-divider"><span class="line"></span><span class="diamond"></span><span class="line"></span></div>
-                <div class="arabic-container">
-                    <div class="arabic-text">اللَّهُمَّ رَبَّ النَّاسِ مُذْهِبَ الْبَأْسِ اشْفِ أَنْتَ الشَّافِي لَا شَافِيَ إِلَّا أَنْتَ شِفَاءً لَا يُغَادِرُ سَقَمًا</div>
-                </div>
-                <div class="transliteration">Allāhumma Rabban-nāsi mudhhibal-ba's, ishfi antas-Shāfī lā shāfiya illā anta shifā'an lā yughādiru saqamā.</div>
-                <div class="translation">"O Allah, Lord of mankind, Remover of hardship, heal — You are the Healer. No healer but You; a healing that leaves no ailment."</div>
-                <div class="reference">
-                    <span class="ref-icon">📖</span>
-                    <span class="ref-text">Bukhari 5741 · Muslim 2191</span>
-                </div>
-                <div class="virtue-tag"><span class="gem">💎</span> 'Ā'ishah رضي الله عنها: "He kept repeating this until his soul was taken." Use when visiting the sick or making ruqyah.</div>
-                <div class="copy-row">
-                    <button class="action-btn" onclick="copyText(this, 'اللَّهُمَّ رَبَّ النَّاسِ مُذْهِبَ الْبَأْسِ اشْفِ أَنْتَ الشَّافِي لَا شَافِيَ إِلَّا أَنْتَ شِفَاءً لَا يُغَادِرُ سَقَمًا')">📋 Copy Arabic</button>
-                    <button class="action-btn" onclick="shareDua(28)">↗ Share</button>
-                    <button class="action-btn" onclick="markRead(this, 28)">✓ Mark Read</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════ -->
-    <!-- ===== SECTION 6: PROPHETS' DUAS ===== -->
-    <!-- ══════════════════════════════════════════ -->
-      <div class="section-header" data-section="prophets" onclick="toggleSection(this)">
-        <div class="section-ornament">
-            <span class="orn-line"></span>
-            <span class="orn-center" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M15.5 4.5a7.5 7.5 0 1 0 0 15 6.2 6.2 0 1 1 0-15Z"></path><path d="m8 8 1 2 2 .3-1.5 1.4.4 2-1.9-1-1.9 1 .4-2L5 10.3l2-.3 1-2Z"></path></svg></span>
-            <span class="orn-line"></span>
-        </div>
-        <div class="section-title">Duas of the Prophets</div>
-        <div class="section-subtitle">Treasured supplications from the chosen ones</div>
-        <div class="section-toggle">▾</div>
-        <div class="section-collapse-hint">tap to collapse</div>
     </div>
 
     <!-- DUA 29: Musa - Expand My Chest -->
@@ -3063,90 +2895,6 @@
 <script src="pashto.js"></script>
 <script src="pashto-translation-player.js?v=20260308a"></script>
 
-<script>
-    const APP_VERSION = '2.0.17';
-
-    (function() {
-        const VERSION_INFO_URL = 'https://mohhp.github.io/Essential-duas/version.json';
-        const DEFAULT_UPDATE_URL = 'https://play.google.com/store/apps/details?id=io.github.mohhp.essentialduas';
-        const UPDATE_DISMISS_KEY = 'falah_update_prompt_dismissed_at';
-        const DAY_MS = 24 * 60 * 60 * 1000;
-
-        function isDismissedRecently() {
-            const raw = localStorage.getItem(UPDATE_DISMISS_KEY);
-            if (!raw) return false;
-            const dismissedAt = Number(raw);
-            if (!Number.isFinite(dismissedAt)) return false;
-            return Date.now() - dismissedAt < DAY_MS;
-        }
-
-        function markDismissedNow() {
-            localStorage.setItem(UPDATE_DISMISS_KEY, String(Date.now()));
-        }
-
-        function removeUpdatePromptCard() {
-            const existing = document.getElementById('updatePromptCard');
-            if (existing) existing.remove();
-        }
-
-        function showUpdatePrompt(updateUrl) {
-            if (isDismissedRecently()) return;
-
-            const host = document.getElementById('homeDashboard');
-            if (!host || document.getElementById('updatePromptCard')) return;
-
-            const safeUrl = typeof updateUrl === 'string' && /^https?:\/\//i.test(updateUrl)
-                ? updateUrl
-                : DEFAULT_UPDATE_URL;
-
-            const card = document.createElement('div');
-            card.id = 'updatePromptCard';
-            card.className = 'update-prompt-card';
-            card.innerHTML = [
-                '<div class="update-prompt-title">A new version of Falah is available! Update now for new features.</div>',
-                '<div class="update-prompt-title update-prompt-title-ps">د فلاح نوې نسخه شتون لري! د نویو ځانګړتیاوو لپاره اوس تازه کړئ.</div>',
-                '<div class="update-prompt-actions">',
-                '  <a class="update-prompt-btn primary" id="updateNowBtn" href="' + safeUrl + '" target="_blank" rel="noopener noreferrer">Update</a>',
-                '  <button type="button" class="update-prompt-btn secondary" id="updateLaterBtn">Later</button>',
-                '</div>'
-            ].join('');
-
-            host.insertBefore(card, host.firstChild);
-
-            const laterBtn = card.querySelector('#updateLaterBtn');
-            const updateBtn = card.querySelector('#updateNowBtn');
-
-            if (laterBtn) {
-                laterBtn.addEventListener('click', function() {
-                    markDismissedNow();
-                    removeUpdatePromptCard();
-                });
-            }
-
-            if (updateBtn) {
-                updateBtn.addEventListener('click', function() {
-                    markDismissedNow();
-                });
-            }
-        }
-
-        window.showUpdatePrompt = showUpdatePrompt;
-
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch(VERSION_INFO_URL)
-                .then(function(response) { return response.json(); })
-                .then(function(data) {
-                    if (data && data.latest !== APP_VERSION) {
-                        showUpdatePrompt(data.updateUrl || DEFAULT_UPDATE_URL);
-                    }
-                })
-                .catch(function() {
-                    // Silent fail if offline or unreachable.
-                });
-        });
-    })();
-</script>
-
 <!-- ══════════════════════════════════════════ -->
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
@@ -3276,7 +3024,6 @@
                         <label for="quranInlineReciterSelect" id="quranInlineReciterLabel">Reciter</label>
                         <select id="quranInlineReciterSelect" class="prayer-reminder-select"></select>
                     </div>
-                    <div class="quran-audio-banner" id="quranPashtoAudioBanner" role="status" aria-live="polite"></div>
                 </div>
             </div>
             <div class="quran-scroll-content" id="quranScrollContent">
@@ -3569,16 +3316,4 @@
 <!-- ===== QURAN FLOATING AUDIO DOT (BODY LEVEL) ===== -->
 <div id="quran-floating-dot" class="quran-audio-dot" style="display:none;" aria-label="Play or pause Quran audio" role="button" tabindex="0">
     <span class="dot-icon">⏸</span>
-</div>
-
-<!-- ===== QURAN FLOATING DOT POPUP (BODY LEVEL) ===== -->
-<div id="quran-dot-popup" class="quran-dot-popup" style="display:none;" aria-hidden="true">
-    <button class="dot-popup-btn" id="dot-prev" type="button" aria-label="Previous ayah">⏮</button>
-    <button class="dot-popup-btn" id="dot-stop" type="button" aria-label="Stop audio">⏹ Stop</button>
-    <button class="dot-popup-btn" id="dot-next" type="button" aria-label="Next ayah">⏭</button>
-    <span class="dot-popup-info" id="dot-ayah-info">Ayah 1/7</span>
-    <button class="dot-popup-btn" id="dot-close" type="button" aria-label="Close audio popup">✕ Close</button>
-</div>
-
-</body>
-</html>
+    <span class="dot-icon">⏸</span>
