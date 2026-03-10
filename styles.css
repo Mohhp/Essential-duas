@@ -9039,19 +9039,49 @@
             padding: 10px 12px !important;
         }
 
-        .dashboard-tip-card,
-        .dashboard-hadith-card,
+        .dashboard-tip-card {
+            padding: 14px 16px !important;
+            position: relative !important;
+            overflow: hidden !important;
+            background: linear-gradient(135deg, rgba(8, 28, 18, 0.98), rgba(5, 18, 12, 0.99)) !important;
+            border-top: 1px solid rgba(46, 196, 122, 0.22) !important;
+            border-left: 1px solid rgba(46, 196, 122, 0.12) !important;
+            border-right: 1px solid rgba(46, 196, 122, 0.05) !important;
+            border-bottom: 1px solid rgba(46, 196, 122, 0.03) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22), 0 8px 22px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+        }
+
+        .dashboard-hadith-card {
+            padding: 14px 16px !important;
+            position: relative !important;
+            overflow: hidden !important;
+            background: linear-gradient(135deg, rgba(16, 32, 56, 0.98), rgba(8, 18, 36, 0.99)) !important;
+            border-top: 1px solid rgba(201, 168, 76, 0.22) !important;
+            border-left: 1px solid rgba(201, 168, 76, 0.12) !important;
+            border-right: 1px solid rgba(201, 168, 76, 0.05) !important;
+            border-bottom: 1px solid rgba(201, 168, 76, 0.03) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22), 0 8px 22px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+        }
+
         .dashboard-progress-summary {
-            padding: 12px !important;
-            background: rgba(255, 255, 255, 0.04) !important;
-            border-color: rgba(255, 255, 255, 0.08) !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16) !important;
+            padding: 14px 16px !important;
+            position: relative !important;
+            overflow: hidden !important;
+            background: linear-gradient(135deg, rgba(10, 24, 42, 0.98), rgba(6, 14, 26, 0.99)) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.10) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.07) !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22), 0 8px 22px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
         }
 
         .dashboard-tip-label,
         .dashboard-hadith-label,
         .dashboard-progress-heading {
-            font-size: 10px !important;
+            font-size: 11px !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
         }
 
         .dashboard-tip-text,
@@ -10342,4 +10372,93 @@
         [data-theme="light"] .prayer-countdown-card .prayer-countdown-time {
             color: #7b5a17 !important;
             text-shadow: none !important;
+        }
+
+        /* ===== PREMIUM HOME HERO WATERMARK ===== */
+        .home-hero-watermark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-family: 'Amiri', 'Noto Naskh Arabic', serif;
+            font-size: clamp(2.2rem, 7vw, 3.4rem);
+            line-height: 1;
+            color: rgba(201, 168, 76, 0.055);
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            padding-top: 12px;
+            letter-spacing: 0.04em;
+        }
+
+        /* ===== CARD LABEL ICON ===== */
+        .card-lbl-icon {
+            display: inline-flex;
+            align-items: center;
+            flex-shrink: 0;
+            opacity: 0.82;
+        }
+
+        .card-lbl-icon svg {
+            width: 11px;
+            height: 11px;
+            display: block;
+        }
+
+        /* ===== ARABIC BACKGROUND WATERMARK (tip / hadith / progress) ===== */
+        .card-bg-watermark {
+            position: absolute;
+            bottom: -10px;
+            right: -6px;
+            font-family: 'Amiri', 'Noto Naskh Arabic', serif;
+            font-size: 2.6rem;
+            line-height: 1;
+            pointer-events: none;
+            z-index: 0;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.05);
+            letter-spacing: 0.02em;
+        }
+
+        .hadith-watermark {
+            color: rgba(201, 168, 76, 0.07);
+            font-size: 1.55rem;
+            bottom: 8px;
+            right: 8px;
+        }
+
+        /* Keep all card text above the watermark */
+        .dashboard-tip-card > *:not(.card-bg-watermark),
+        .dashboard-hadith-card > *:not(.card-bg-watermark),
+        .dashboard-progress-summary > *:not(.card-bg-watermark) {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top shimmer highlight for Tip, Hadith, Progress cards */
+        .dashboard-tip-card::after,
+        .dashboard-hadith-card::after,
+        .dashboard-progress-summary::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .dashboard-tip-card::after {
+            background: linear-gradient(90deg, transparent, rgba(46, 196, 122, 0.35), transparent);
+        }
+
+        .dashboard-hadith-card::after {
+            background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.40), transparent);
+        }
+
+        .dashboard-progress-summary::after {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
         }
