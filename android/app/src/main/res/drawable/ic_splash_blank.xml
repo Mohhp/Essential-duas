@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Transparent splash icon for Android 12+ (API 31+).
+     Setting this as windowSplashScreenAnimatedIcon prevents the ic_launcher
+     (old crescent/star design) from flashing during the automatic splash screen
+     before the WebView renders the current brand splash. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="@color/falah_background" />
+</shape>

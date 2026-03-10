@@ -4,5 +4,9 @@
         <item name="android:statusBarColor">@color/falah_background</item>
         <item name="android:navigationBarColor">@color/falah_background</item>
         <item name="android:windowBackground">@color/falah_background</item>
+        <!-- Android 12+ (API 31+): suppress the ic_launcher icon from the automatic splash
+             screen so the WebView's own brand splash is the only logo the user sees. -->
+        <item name="android:windowSplashScreenBackground">@color/falah_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_blank</item>
     </style>
 </resources>
