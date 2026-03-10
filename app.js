@@ -8853,7 +8853,10 @@ window.filterCategory = function(cat, btn) {
                     : `Turn ${deg}° ${dir}`;
             }
         }
-        if (calibrateEl) calibrateEl.hidden = aligned;
+        if (calibrateEl) {
+            calibrateEl.textContent = uiText.qiblaCalibrate;
+            calibrateEl.hidden = aligned;
+        }
     }
 
     function queueCompassUpdate(heading) {
