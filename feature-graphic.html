@@ -1,426 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=1024">
-    <title>Feature Graphic — Falah</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1024">
+  <title>Falah – Feature Graphic (1024×500)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        :root {
-            --navy-900: #050b14;
-            --navy-800: #0a1628;
-            --navy-700: #0f1d30;
-            --gold-500: #c9a84c;
-            --gold-300: #efd082;
-            --green-500: #2ecc71;
-            --text-main: rgba(255, 255, 255, 0.96);
-            --text-soft: rgba(232, 239, 247, 0.78);
-        }
+    body {
+      width: 1024px;
+      height: 500px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      background: #0a1628;
+    }
 
-        html, body {
-            width: 1024px;
-            height: 500px;
-            overflow: hidden;
-            background: var(--navy-900);
-            font-family: 'Inter', system-ui, sans-serif;
-        }
+    .canvas {
+      width: 1024px;
+      height: 500px;
+      position: relative;
+      background: linear-gradient(135deg, #0f1d35 0%, #0a1628 42%, #07101f 100%);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
 
-        .graphic {
-            position: relative;
-            width: 1024px;
-            height: 500px;
-            overflow: hidden;
-            background:
-                radial-gradient(46% 70% at 18% 18%, rgba(201, 168, 76, 0.18) 0%, rgba(201, 168, 76, 0.04) 35%, transparent 72%),
-                radial-gradient(42% 65% at 76% 82%, rgba(46, 204, 113, 0.18) 0%, rgba(46, 204, 113, 0.04) 38%, transparent 74%),
-                linear-gradient(135deg, #14233a 0%, #0f1d30 32%, #0a1628 68%, #050b14 100%);
-        }
+    /* Geometric background lattice */
+    .canvas::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(45deg,  rgba(201,168,76,0.04) 0, rgba(201,168,76,0.04) 1px, transparent 0, transparent 50%),
+        repeating-linear-gradient(-45deg, rgba(201,168,76,0.028) 0, rgba(201,168,76,0.028) 1px, transparent 0, transparent 50%);
+      background-size: 56px 56px;
+      pointer-events: none;
+    }
 
-        .graphic::before {
-            content: '';
-            position: absolute;
-            inset: 18px;
-            border-radius: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            pointer-events: none;
-        }
+    /* Radial ambient glow, centred toward the icon */
+    .canvas::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 55% 80% at 22% 50%, rgba(201,168,76,0.14) 0%, transparent 70%),
+                  radial-gradient(ellipse 40% 60% at 78% 50%, rgba(46,196,122,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
 
-        .graphic::after {
-            content: '';
-            position: absolute;
-            inset: -120px auto auto -80px;
-            width: 620px;
-            height: 620px;
-            border-radius: 50%;
-            border: 1px solid rgba(201, 168, 76, 0.08);
-            pointer-events: none;
-        }
+    /* ─── Left panel: app icon ─── */
+    .icon-wrap {
+      position: relative;
+      z-index: 2;
+      flex-shrink: 0;
+      margin-left: 64px;
+      width: 200px;
+      height: 200px;
+      border-radius: 44px;
+      box-shadow:
+        0 0 0 2px rgba(201,168,76,0.22),
+        0 0 0 6px rgba(201,168,76,0.06),
+        0 24px 64px rgba(0,0,0,0.6),
+        0 0 80px rgba(201,168,76,0.18);
+      overflow: hidden;
+    }
 
-        .curve-one,
-        .curve-two {
-            position: absolute;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            pointer-events: none;
-        }
+    .icon-svg {
+      width: 200px;
+      height: 200px;
+    }
 
-        .curve-one {
-            width: 540px;
-            height: 540px;
-            right: -120px;
-            top: -140px;
-        }
+    /* ─── Right panel: text ─── */
+    .text-panel {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      padding: 0 56px 0 52px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
 
-        .curve-two {
-            width: 700px;
-            height: 700px;
-            right: -220px;
-            top: -220px;
-            border-color: rgba(201, 168, 76, 0.06);
-        }
+    .tagline-arabic {
+      font-family: 'Amiri', serif;
+      font-size: 26px;
+      color: #c9a84c;
+      letter-spacing: 0.04em;
+      line-height: 1.3;
+      margin-bottom: 10px;
+      opacity: 0.90;
+    }
 
-        .layout {
-            position: relative;
-            z-index: 1;
-            display: grid;
-            grid-template-columns: 1.02fr 0.98fr;
-            width: 100%;
-            height: 100%;
-            padding: 38px 44px 34px;
-            gap: 18px;
-        }
+    .app-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 72px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
 
-        .copy {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding-right: 12px;
-        }
+    .app-name .gold {
+      background: linear-gradient(135deg, #f5df82 0%, #d4a847 45%, #c9a84c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-        .brand-row {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
+    .tagline-english {
+      font-size: 17px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 34px;
+    }
 
-        .brand-mark {
-            position: relative;
-            width: 44px;
-            height: 44px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 14px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-        }
+    /* divider */
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, #c9a84c, transparent);
+      margin-bottom: 28px;
+      border-radius: 1px;
+    }
 
-        .brand-mark svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--gold-500);
-            filter: drop-shadow(0 0 10px rgba(201, 168, 76, 0.22));
-        }
+    /* Features grid */
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 36px;
+    }
 
-        .brand-text {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-        .brand-title {
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            color: var(--text-main);
-        }
+    .feat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(201,168,76,0.12);
+      border: 1px solid rgba(201,168,76,0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
 
-        .brand-subtitle {
-            font-family: 'Amiri', serif;
-            font-size: 17px;
-            color: rgba(239, 208, 130, 0.92);
-        }
+    .feat-icon svg {
+      width: 16px;
+      height: 16px;
+    }
 
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 14px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.24em;
-            text-transform: uppercase;
-            color: rgba(201, 168, 76, 0.88);
-        }
+    .feat-label {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.82);
+      letter-spacing: 0.01em;
+    }
 
-        .eyebrow::before {
-            content: '';
-            width: 42px;
-            height: 1px;
-            background: linear-gradient(90deg, rgba(46, 204, 113, 0), rgba(46, 204, 113, 0.9));
-        }
+    /* Bottom attribution */
+    .attribution {
+      position: absolute;
+      bottom: 18px;
+      right: 28px;
+      font-family: 'Amiri', serif;
+      font-size: 13px;
+      color: rgba(201,168,76,0.38);
+      letter-spacing: 0.02em;
+      z-index: 3;
+    }
 
-        h1 {
-            max-width: 430px;
-            margin-bottom: 14px;
-            font-size: 48px;
-            line-height: 0.98;
-            letter-spacing: -0.045em;
-            color: var(--text-main);
-            text-wrap: balance;
-        }
-
-        .headline-accent {
-            background: linear-gradient(135deg, #ffffff 0%, #efd082 52%, #c9a84c 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .summary {
-            max-width: 410px;
-            font-size: 16px;
-            line-height: 1.6;
-            color: var(--text-soft);
-            margin-bottom: 24px;
-        }
-
-        .pill-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            max-width: 440px;
-            margin-bottom: 22px;
-        }
-
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
-            font-size: 12px;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            white-space: nowrap;
-        }
-
-        .pill-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--gold-500);
-            box-shadow: 0 0 10px rgba(201, 168, 76, 0.3);
-        }
-
-        .meta-row {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            color: rgba(255, 255, 255, 0.72);
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .meta-accent {
-            color: rgba(46, 204, 113, 0.95);
-        }
-
-        .devices {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .device-glow {
-            position: absolute;
-            width: 420px;
-            height: 420px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(201, 168, 76, 0.16) 0%, rgba(46, 204, 113, 0.08) 36%, transparent 72%);
-            filter: blur(10px);
-        }
-
-        .phone {
-            position: absolute;
-            overflow: hidden;
-            border-radius: 32px;
-            background: #08111e;
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.38);
-        }
-
-        .phone::before {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 92px;
-            height: 8px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            z-index: 2;
-        }
-
-        .phone img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .phone.back {
-            width: 176px;
-            height: 390px;
-            right: 74px;
-            top: 34px;
-            transform: rotate(10deg);
-            opacity: 0.92;
-        }
-
-        .phone.front {
-            width: 206px;
-            height: 430px;
-            right: 178px;
-            top: 38px;
-            transform: rotate(-4deg);
-        }
-
-        .floating-card {
-            position: absolute;
-            padding: 14px 16px;
-            border-radius: 18px;
-            background: rgba(8, 17, 30, 0.72);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(14px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.22);
-        }
-
-        .floating-card.top {
-            top: 52px;
-            right: 0;
-            width: 178px;
-        }
-
-        .floating-card.bottom {
-            bottom: 42px;
-            left: 10px;
-            width: 194px;
-        }
-
-        .card-kicker {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: rgba(201, 168, 76, 0.8);
-            margin-bottom: 8px;
-        }
-
-        .card-value {
-            font-size: 21px;
-            font-weight: 800;
-            color: var(--text-main);
-            margin-bottom: 4px;
-        }
-
-        .card-copy {
-            font-size: 12px;
-            line-height: 1.45;
-            color: rgba(255, 255, 255, 0.72);
-        }
-
-        .card-value.green { color: rgba(46, 204, 113, 0.96); }
-
-        .instructions {
-            position: fixed;
-            top: 510px;
-            left: 0;
-            padding: 18px;
-            color: #7b8394;
-            font-family: system-ui, sans-serif;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-    </style>
+    /* corner accent lines */
+    .corner-tl, .corner-br {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .corner-tl { top: 20px; left: 20px; border-top: 1.5px solid rgba(201,168,76,0.3); border-left: 1.5px solid rgba(201,168,76,0.3); border-radius: 4px 0 0 0; }
+    .corner-br { bottom: 20px; right: 20px; border-bottom: 1.5px solid rgba(201,168,76,0.3); border-right: 1.5px solid rgba(201,168,76,0.3); border-radius: 0 0 4px 0; }
+  </style>
 </head>
 <body>
-    <div class="graphic">
-        <div class="curve-one"></div>
-        <div class="curve-two"></div>
+  <div class="canvas">
+    <div class="corner-tl"></div>
+    <div class="corner-br"></div>
 
-        <div class="layout">
-            <section class="copy">
-                <div class="brand-row">
-                    <div class="brand-mark" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                        </svg>
-                    </div>
-                    <div class="brand-text">
-                        <div class="brand-title">Falah</div>
-                        <div class="brand-subtitle">فلاح</div>
-                    </div>
-                </div>
+    <!-- App Icon (inline SVG = no external request) -->
+    <div class="icon-wrap">
+      <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        <defs>
+          <linearGradient id="fg-bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#111e38"/>
+            <stop offset="45%" stop-color="#0a1628"/>
+            <stop offset="100%" stop-color="#060d1d"/>
+          </linearGradient>
+          <radialGradient id="fg-ambientGlow" cx="44%" cy="46%" r="52%">
+            <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="fg-goldCrescent" x1="15%" y1="5%" x2="85%" y2="95%">
+            <stop offset="0%" stop-color="#f5df82"/>
+            <stop offset="30%" stop-color="#d4a847"/>
+            <stop offset="65%" stop-color="#c9a84c"/>
+            <stop offset="100%" stop-color="#9a7520"/>
+          </linearGradient>
+          <linearGradient id="fg-starGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#f8e89a"/>
+            <stop offset="100%" stop-color="#c9a84c"/>
+          </linearGradient>
+          <mask id="fg-crescentCut">
+            <rect width="512" height="512" fill="black"/>
+            <circle cx="242" cy="258" r="138" fill="white"/>
+            <circle cx="294" cy="228" r="122" fill="black"/>
+          </mask>
+          <filter id="fg-crescentGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
+            <feFlood flood-color="#d4a847" flood-opacity="0.5" result="color"/>
+            <feComposite in="color" in2="blur" operator="in" result="shadow"/>
+            <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <pattern id="fg-geomPattern" x="0" y="0" width="48" height="48" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
+            <line x1="0" y1="0" x2="48" y2="48" stroke="rgba(201,168,76,0.04)" stroke-width="0.8"/>
+            <line x1="48" y1="0" x2="0" y2="48" stroke="rgba(201,168,76,0.03)" stroke-width="0.8"/>
+          </pattern>
+          <clipPath id="fg-roundedSquare">
+            <rect width="512" height="512" rx="108" ry="108"/>
+          </clipPath>
+        </defs>
+        <g clip-path="url(#fg-roundedSquare)">
+          <rect width="512" height="512" fill="url(#fg-bgGrad)"/>
+          <rect width="512" height="512" fill="url(#fg-geomPattern)"/>
+          <rect width="512" height="512" fill="url(#fg-ambientGlow)"/>
+          <circle cx="242" cy="258" r="148" fill="#c9a84c" opacity="0.06"/>
+          <circle cx="242" cy="258" r="138" fill="url(#fg-goldCrescent)" mask="url(#fg-crescentCut)" filter="url(#fg-crescentGlow)"/>
+          <circle cx="242" cy="258" r="136" fill="none" stroke="#f5df82" stroke-width="2.5" stroke-opacity="0.28" mask="url(#fg-crescentCut)"/>
+          <g transform="translate(355,172) rotate(15)" filter="url(#fg-crescentGlow)">
+            <polygon points="0,-18 4,-4 18,0 4,4 0,18 -4,4 -18,0 -4,-4" fill="url(#fg-starGold)" opacity="0.92"/>
+          </g>
+          <circle cx="170" cy="358" r="5.5" fill="#d4a847" opacity="0.5"/>
+          <circle cx="190" cy="372" r="4"   fill="#d4a847" opacity="0.38"/>
+          <circle cx="214" cy="381" r="3"   fill="#d4a847" opacity="0.26"/>
+          <rect x="6" y="6" width="500" height="500" rx="103" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-opacity="0.22"/>
+          <rect x="15" y="15" width="482" height="482" rx="95" fill="none" stroke="#c9a84c" stroke-width="1" stroke-opacity="0.08"/>
+        </g>
+      </svg>
+    </div>
 
-                <div class="eyebrow">حي على الفلاح — Come to Success</div>
-                <h1><span class="headline-accent">Quran, Duas</span> & Prayer In One Companion</h1>
-                <p class="summary">
-                    A polished Islamic app for daily worship with authenticated duas, prayer times, Qibla, tasbeeh, memorization, bookmarks, and offline access.
-                </p>
-
-                <div class="pill-row">
-                    <div class="pill"><span class="pill-dot"></span>63 Authenticated Duas</div>
-                    <div class="pill"><span class="pill-dot"></span>Prayer Times & Qibla</div>
-                    <div class="pill"><span class="pill-dot"></span>Tasbeeh & Memorization</div>
-                </div>
-
-                <div class="meta-row">
-                    <span>Premium design</span>
-                    <span class="meta-accent">English + Pashto</span>
-                    <span>Works offline</span>
-                </div>
-            </section>
-
-            <section class="devices" aria-hidden="true">
-                <div class="device-glow"></div>
-
-                <div class="phone back">
-                    <img src="screenshots/mobile-cards-en.png" alt="">
-                </div>
-
-                <div class="phone front">
-                    <img src="screenshots/mobile-hero.png" alt="">
-                </div>
-
-                <div class="floating-card top">
-                    <div class="card-kicker">Prayer</div>
-                    <div class="card-value">Qibla + Times</div>
-                    <div class="card-copy">Built for your daily routine with calm, focused utility.</div>
-                </div>
-
-                <div class="floating-card bottom">
-                    <div class="card-kicker">Access</div>
-                    <div class="card-value green">Offline Ready</div>
-                    <div class="card-copy">Keep your duas, Quran flow, and worship tools close wherever you are.</div>
-                </div>
-            </section>
+    <!-- Text -->
+    <div class="text-panel">
+      <div class="tagline-arabic">حيّ على الفلاح</div>
+      <div class="app-name"><span class="gold">Falah</span></div>
+      <div class="tagline-english">Quran · Duas · Prayer Times</div>
+      <div class="divider"></div>
+      <div class="features">
+        <div class="feature">
+          <div class="feat-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 3h5.5v10H2V3zm6.5 0H14v10H8.5V3z" stroke="#c9a84c" stroke-width="1.3" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="feat-label">Full Quran</span>
         </div>
+        <div class="feature">
+          <div class="feat-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="8" cy="7" r="4.5" stroke="#c9a84c" stroke-width="1.3"/>
+              <path d="M8 2V1M8 13v1M2 7H1m14 0h-1M3.93 3.93l-.7-.7m9.54 9.54-.7-.7M3.93 10.07l-.7.7m9.54-9.54-.7.7" stroke="#c9a84c" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="feat-label">Prayer Times</span>
+        </div>
+        <div class="feature">
+          <div class="feat-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 2c0 0-4 3-4 6.5a4 4 0 008 0C12 5 8 2 8 2z" stroke="#c9a84c" stroke-width="1.3" stroke-linejoin="round"/>
+              <path d="M6 9.5c0 1.1.9 2 2 2" stroke="#c9a84c" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="feat-label">Essential Duas</span>
+        </div>
+        <div class="feature">
+          <div class="feat-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 5h10M3 8h7M3 11h5" stroke="#c9a84c" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span class="feat-label">Pashto &amp; English</span>
+        </div>
+        <div class="feature">
+          <div class="feat-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 2l10 6-10 6V2z" stroke="#c9a84c" stroke-width="1.3" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="feat-label">Audio Recitation</span>
+        </div>
+        <div class="feature">
+          <div class="feat-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 2.5L9.8 6l3.8.55-2.75 2.68.65 3.77L8 11.1l-3.5 1.9.65-3.77L2.4 6.55 6.2 6z" stroke="#c9a84c" stroke-width="1.2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span class="feat-label">Favorites &amp; 40 Hadith</span>
+        </div>
+      </div>
     </div>
 
-    <div class="instructions">
-        Export target: 1024x500 PNG. Suggested file name: <code>feature-graphic.png</code>
-    </div>
+    <div class="attribution">المهندس محمد فلاح</div>
+  </div>
 </body>
 </html>

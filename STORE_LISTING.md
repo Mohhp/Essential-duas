@@ -1,86 +1,149 @@
-# Google Play Store Listing — Falah — فلاح
+# Falah — Play Store Listing
+
+## App Details
+
+- **Package name**: `app.mohhp.falah`
+- **Category**: Education → Islam / Reference
+- **Content rating**: Everyone
+- **Available in**: All countries
+
+---
+
+## App Title (30 chars max)
+
+```
+Falah: Quran, Duas & Prayer
+```
 
 ## Short Description (80 chars max)
+
 ```
-63 essential Islamic duas with tasbeeh counter, prayer times & Qibla compass.
-```
-
-## Full Description (4000 chars max)
-```
-Falah — فلاح
-
-Discover 63 carefully curated duas (supplications) from the Quran and authentic Sunnah, presented with full scholarly authentication and beautiful Arabic calligraphy.
-
-Whether you're looking for morning and evening adhkar, protection duas, travel prayers, or daily supplications — this app puts the most important duas at your fingertips with a premium, distraction-free experience.
-
-━━━━━━━━━━━━━━━━━━━━━━
-✦ KEY FEATURES
-━━━━━━━━━━━━━━━━━━━━━━
-
-☪ 63 AUTHENTICATED DUAS
-Every dua includes the original Arabic text, English translation, transliteration, and source authentication (Sahih, Quran, Jayyid). Know exactly where each dua comes from.
-
-🕌 PRAYER TIMES & QIBLA
-Accurate prayer times calculated for your location using the Adhan library. Built-in Qibla compass to find the direction of the Kaaba from anywhere.
-
-📿 TASBEEH COUNTER
-Digital tasbeeh with preset dhikr phrases (SubhanAllah, Alhamdulillah, Allahu Akbar, and more). Track your count with haptic feedback and multiple target options.
-
-📅 DAILY ROUTINES
-Structured morning (Sabah) and evening (Masa) routines so you never miss your daily adhkar. Track your progress and build a consistent habit.
-
-🎯 MEMORIZATION TOOLS
-Built-in spaced repetition system to help you memorize duas gradually. Track which duas you've memorized and review them on schedule.
-
-🔊 AUDIO RECITATION
-Listen to each dua recited aloud using text-to-speech — helpful for learning correct pronunciation.
-
-🔖 BOOKMARKS & PROGRESS
-Bookmark your favorite duas for quick access. Track your reading progress across all 63 duas with visual stats and achievements.
-
-🌙 DUA OF THE DAY
-A fresh dua highlighted each day to keep your connection with Allah's words alive.
-
-🎨 BEAUTIFUL DESIGN
-Dark and light themes, adjustable Arabic font sizes, elegant typography, and smooth animations — designed for a premium reading experience.
-
-🌐 MULTI-LANGUAGE
-Switch between English and Pashto translations. Arabic text is always displayed.
-
-📱 WORKS OFFLINE
-Once loaded, the app works completely offline — perfect for travel, areas with poor connectivity, or use during prayer.
-
-🔒 PRIVACY FIRST
-No account needed. No ads. No tracking. No data collection. Everything is stored locally on your device.
-
-━━━━━━━━━━━━━━━━━━━━━━
-✦ CATEGORIES OF DUAS
-━━━━━━━━━━━━━━━━━━━━━━
-
-• Morning & Evening Adhkar
-• Protection & Healing
-• Before & After Meals
-• Travel Duas
-• Entering & Leaving Home/Masjid
-• Sleep & Waking Up
-• Forgiveness & Repentance
-• Gratitude & Praise
-• And many more...
-
-━━━━━━━━━━━━━━━━━━━━━━
-
-Built with love by Engineer Mohammad Falah (فلاح).
-
-May Allah accept our duas and grant us all Jannah. Ameen.
+Quran, duas, prayer times & Pashto audio. Daily reminders. حي على الفلاح
 ```
 
-## App Category
-Education
+---
 
-## Content Rating
-Everyone
+## Full Description (English)
 
-## Tags/Keywords
 ```
-islamic duas, dua app, muslim prayer, tasbeeh counter, prayer times, qibla compass, quran duas, dhikr, morning adhkar, evening adhkar, islamic supplications, memorize duas, muslim app, adkar
+حيّ على الفلاح — Come to success.
+
+Falah is a premium Islamic companion app for daily worship, designed for clarity, beauty, and ease of use — even offline.
+
+📖 FULL QURAN
+• Complete Quran with crisp Arabic text
+• Juz 30 full audio recitation
+• Swipe through surahs, bookmark your place
+• Pashto translation audio for Juz 30 (SoundCloud & local)
+
+🤲 ESSENTIAL DUAS
+• Curated duas for morning, evening, sleep, eating, travel, and more
+• Arabic text with full transliteration and English meaning
+• One-tap audio playback per dua
+• Save favourites for instant access
+
+📿 40 HADITH COLLECTION
+• Imam an-Nawawi's 40 Hadith with translations
+• Clean, readable layout
+• Offline — no connection needed
+
+🕌 PRAYER TIMES
+• Accurate prayer times using the Adhan library
+• Geolocation-based or manual city selection
+• Fajr, Dhuhr, Asr, Maghrib, Isha
+• Daily Fajr, Dhuhr and Asr phone reminders (Android)
+
+🔔 SMART REMINDERS
+• Custom daily notification reminders
+• Never miss a prayer or morning dhikr
+
+🌐 LANGUAGES
+• Arabic script (Uthmani)
+• English translation & transliteration
+• Pashto audio translation (Zakaria Sheikh)
+
+💎 WHY FALAH?
+• Works fully offline — Quran, duas, hadith always available
+• No ads, no accounts, no tracking
+• Premium dark-mode UI — easy on the eyes at night
+• Lightweight PWA: install from browser or Play Store
+• Regular updates with new content and refinements
+
+— المهندس محمد فلاح
 ```
+
+---
+
+## Full Description (Pashto / پښتو)
+
+```
+حيّ على الفلاح — د فلاح لپاره راشئ.
+
+فلاح د ورځني عبادت لپاره یو ممتاز اسلامي اپلیکیشن دی چې د وضاحت، ښکلا او آسانۍ لپاره جوړ شوی دی — حتی آفلاین هم.
+
+📖 بشپړ قرآن کریم
+• د روښانه عربي متن سره بشپړ قرآن
+• د جز ۳۰ بشپړ د تلاوت صوت
+• د سورو سره سپوریز کول، ځای نښه کول
+• د جز ۳۰ لپاره د پښتو ژباړې صوت (د زکریا شیخ)
+
+🤲 اساسي دعاګانې
+• د سهار، ماښام، د خوب، کول، سفر او نورو لپاره دعاګانې
+• عربي متن د انګریزي معنا او تلفظ سره
+• د هر دعا لپاره یو ټوک اودیو پلیبک
+• د سمدستي لاسرسي لپاره خپلې ګوندې خوندي کړئ
+
+📿 د ۴۰ حدیثو مجموعه
+• د امام نووي ۴۰ حدیثونه د ژباړو سره
+• پاک، د لوست وړ ډیزاین
+• آفلاین — اتصال ته اړتیا نشته
+
+🕌 د لمانځه وختونه
+• د ادهان کتابتون سره دقیق د لمانځه وختونه
+• د موقعیت پر بنیاد یا لاسي د ښار انتخاب
+• فجر، ظهر، عصر، مغرب، عشاء
+
+🔔 هوښیار یادونې
+• ورځنۍ د یادونې خبرتیاوې
+• هیڅکله لمونځ یا د سهار ذکر مه هیروئ
+
+💎 ولې فلاح؟
+• بشپړ آفلاین کار کوي — قرآن، دعاګانې، حدیثونه تل شتون لري
+• اعلانات نشته، حسابونه نشته، تعقیب نشته
+• ممتاز تیاره-حالت UI — شپه کې د سترګو لپاره اسانه
+• وزنه PWA: له براوزر یا پلیسټور نصب کړئ
+
+— المهندس محمد فلاح
+```
+
+---
+
+## Keywords / Tags
+
+```
+quran, duas, prayer times, islamic, muslim, pashto, arabic, hadith, dhikr, adhan, falah, ramadan, offline
+```
+
+---
+
+## App Icon & Graphic Assets
+
+| Asset | Size | File |
+|---|---|---|
+| App icon | 512×512 | `icon-512.png` |
+| Feature graphic | 1024×500 | `feature-graphic.html` (capture as PNG) |
+| Phone screenshots | 1080×1920 (9:16) | See `SCREENSHOTS_GUIDE.md` |
+
+---
+
+## Privacy Policy URL
+
+```
+https://mohhp.github.io/Essential-duas/privacy.html
+```
+
+---
+
+## Contact Email
+
+Provide developer contact email at publish time.
