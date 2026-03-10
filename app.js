@@ -213,6 +213,7 @@
     function refreshLanguageModeConsistency() {
         refreshHomeDashboard();
         renderDuasBookmarksSection();
+        updateFavoritesTile();
         if (typeof refreshEtiquetteLanguage === 'function') refreshEtiquetteLanguage();
         if (typeof refreshRoutineLanguage === 'function') refreshRoutineLanguage();
         if (typeof refreshProgressLanguage === 'function') refreshProgressLanguage();
@@ -407,6 +408,7 @@
             initHomeDashboard();
             initDuasTabSearch();
             renderDuasBookmarksSection();
+            updateFavoritesTile();
             initFontSizeControls();
             updateUnreadCount();
             initMemorizePromoCard();
@@ -1554,6 +1556,7 @@
         localStorage.setItem('crown_bookmarks', JSON.stringify(STATE.bookmarks));
         updateStats();
         renderBookmarksPanel();
+        updateFavoritesTile();
         if (isDuaSwipeViewerActive() && getCurrentSwipeDuaId() === id) renderDuaSwipeViewer();
     };
 
@@ -1803,6 +1806,9 @@ window.filterCategory = function(cat, btn) {
     }
 
     function getDuaIdsForCategory(cat) {
+        if (cat === 'favorites') {
+            return (STATE.bookmarks || []).map(Number).filter(Boolean);
+        }
         const cards = Array.from(document.querySelectorAll('#duaListSection .dua-card'));
         return cards
             .filter((card) => {
@@ -3989,85 +3995,485 @@ window.filterCategory = function(cat, btn) {
         refreshHomeDailyTip();
     }
 
+    const HADITH_COLLECTION = [
+        {
+            id: 1,
+            arabic: 'إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى',
+            english: '"Actions are judged by intentions, and every person will get what they intended."',
+            pashto: '"عملونه د نیتونو پربنسټ دي، او هر سړي ته هغه ورکول کیږي چې یې نیت کوي."',
+            source: 'Bukhari 1 · Muslim 1907',
+            narrator: 'ʿUmar ibn al-Khaṭṭāb (رضي الله عنه)',
+            theme: 'sincerity'
+        },
+        {
+            id: 2,
+            arabic: 'إِنَّ أَكْمَلَ الْمُؤْمِنِينَ إِيمَانًا أَحْسَنُهُمْ خُلُقًا',
+            english: '"The most complete of the believers in faith is the one with the best character."',
+            pashto: '"د ایمان له مخې تر ټولو بشپړ مؤمن هغه دی چې د خلق له مخې غوره وي."',
+            source: 'Abu Dawud 4682 · Tirmidhi 1162',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'character'
+        },
+        {
+            id: 3,
+            arabic: 'أَوَّلُ مَا يُحَاسَبُ بِهِ الْعَبْدُ يَوْمَ الْقِيَامَةِ الصَّلَاةُ',
+            english: '"The first matter the servant will be questioned about on the Day of Judgement is prayer."',
+            pashto: '"له قیامت ورځې بنده تر ټولو لومړی د لمانځه حساب ورکوي."',
+            source: 'Abu Dawud 864 · Tirmidhi 413',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'prayer'
+        },
+        {
+            id: 4,
+            arabic: 'عَجَبًا لِأَمْرِ الْمُؤْمِنِ، إِنَّ أَمْرَهُ كُلَّهُ خَيْرٌ',
+            english: '"How wonderful is the affair of the believer! All of his affairs are good — if good comes, he is thankful; if hardship comes, he is patient."',
+            pashto: '"د مؤمن حال عجیب دی! د هغه ټول چارې ښې دي — که خوشحالي راشي شکر کوي، که سختي راشي صبر کوي."',
+            source: 'Muslim 2999',
+            narrator: 'Ṣuhayb ibn Sinān (رضي الله عنه)',
+            theme: 'patience'
+        },
+        {
+            id: 5,
+            arabic: 'الدُّعَاءُ هُوَ الْعِبَادَةُ',
+            english: '"Supplication — it is worship."',
+            pashto: '"دعا — دا ده عبادت."',
+            source: 'Tirmidhi 2969 · Abu Dawud 1479',
+            narrator: 'al-Nu\'mān ibn Bashīr (رضي الله عنه)',
+            theme: 'supplication'
+        },
+        {
+            id: 6,
+            arabic: 'مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ طَرِيقًا إِلَى الْجَنَّةِ',
+            english: '"Whoever takes a path in which he seeks knowledge, Allah will make easy for him a path to Paradise."',
+            pashto: '"چا چې د علم د پلټنې لپاره لار ونیوله، الله به ور ته جنت ته لار اسانه کړي."',
+            source: 'Muslim 2699',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'knowledge'
+        },
+        {
+            id: 7,
+            arabic: 'خَيْرُكُمْ خَيْرُكُمْ لِأَهْلِهِ، وَأَنَا خَيْرُكُمْ لِأَهْلِي',
+            english: '"The best of you is the best to his family, and I am the best of you to my family."',
+            pashto: '"ستاسو غوره هغه دی چې خپل کورنۍ ته غوره وي، ما خپلې کورنۍ ته تر ټولو غوره یم."',
+            source: 'Tirmidhi 3895 · Ibn Majah 1977',
+            narrator: 'ʿĀ\'ishah (رضي الله عنها)',
+            theme: 'family'
+        },
+        {
+            id: 8,
+            arabic: 'اتَّقُوا النَّارَ وَلَوْ بِشِقِّ تَمْرَةٍ',
+            english: '"Protect yourselves from the Fire, even if it is with half a date."',
+            pashto: '"خپل ځانونه د اور له عذابه وساتئ، که چیرې د یوه خرما نیمایي ورکولو سره هم وي."',
+            source: 'Bukhari 1417 · Muslim 1016',
+            narrator: 'ʿAdī ibn Ḥātim (رضي الله عنه)',
+            theme: 'charity'
+        },
+        {
+            id: 9,
+            arabic: 'أَلَا أُخْبِرُكُمْ بِخَيْرِ أَعْمَالِكُمْ؟ ذِكْرُ اللَّهِ',
+            english: '"Shall I not inform you of the best of your deeds? Remembrance of Allah."',
+            pashto: '"ایا درته ونه وایم چې ستاسو د عملونو غوره کوم دی؟ د الله ذکر."',
+            source: 'Tirmidhi 3377 · Ibn Majah 3790',
+            narrator: 'Abu al-Dardā\' (رضي الله عنه)',
+            theme: 'remembrance'
+        },
+        {
+            id: 10,
+            arabic: 'إِذَا مَاتَ الْإِنْسَانُ انْقَطَعَ عَنْهُ عَمَلُهُ إِلَّا مِنْ ثَلَاثَةٍ: صَدَقَةٍ جَارِيَةٍ، أَوْ عِلْمٍ يُنْتَفَعُ بِهِ، أَوْ وَلَدٍ صَالِحٍ يَدْعُو لَهُ',
+            english: '"When a person dies, his deeds end except for three: a continuous charity, beneficial knowledge, or a righteous child who prays for him."',
+            pashto: '"کله چې انسان مري، د هغه عملونه ختم شي، پرته له درو شیانو: جاري صدقه، ګټور علم، یا نیکه اولاد چې ور لپاره دعا کوي."',
+            source: 'Muslim 1631',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'afterlife'
+        },
+        {
+            id: 11,
+            arabic: 'لَا تَحْقِرَنَّ مِنَ الْمَعْرُوفِ شَيْئًا وَلَوْ أَنْ تَلْقَى أَخَاكَ بِوَجْهٍ طَلْقٍ',
+            english: '"Do not belittle any act of goodness, even if it is meeting your brother with a cheerful face."',
+            pashto: '"هیڅ نیکي کوچنۍ مه ګڼه، که چیرې د ورور سره د خوشحاله مخ سره لیدل وي."',
+            source: 'Muslim 2626',
+            narrator: 'Abu Dharr al-Ghifārī (رضي الله عنه)',
+            theme: 'character'
+        },
+        {
+            id: 12,
+            arabic: 'الطُّهُورُ شَطْرُ الْإِيمَانِ',
+            english: '"Purity is half of faith."',
+            pashto: '"پاکي د ایمان نیمایي برخه ده."',
+            source: 'Muslim 223',
+            narrator: 'Abu Mālik al-Ash\'arī (رضي الله عنه)',
+            theme: 'worship'
+        },
+        {
+            id: 13,
+            arabic: 'الرَّاحِمُونَ يَرْحَمُهُمُ الرَّحْمَنُ، ارْحَمُوا مَنْ فِي الْأَرْضِ يَرْحَمْكُمْ مَنْ فِي السَّمَاءِ',
+            english: '"The merciful are shown mercy by the Most Merciful. Show mercy to those on earth and the One in heaven will show mercy to you."',
+            pashto: '"رحم کوونکو باندې رحمن رحم کوي. چا ته چې پر ځمکه یئ رحم وکړئ، هغه به مو درباندې رحم وکړي چې آسمان کې دی."',
+            source: 'Abu Dawud 4941 · Tirmidhi 1924',
+            narrator: 'ʿAbdullāh ibn \'Amr (رضي الله عنه)',
+            theme: 'mercy'
+        },
+        {
+            id: 14,
+            arabic: 'لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ',
+            english: '"None of you truly believes until he loves for his brother what he loves for himself."',
+            pashto: '"ستاسو هیڅوک مؤمن نه شي کیدی تر دې چې خپل ورور ته هم هماغه ومینه چې ځان ته یې ومینه."',
+            source: 'Bukhari 13 · Muslim 45',
+            narrator: 'Anas ibn Mālik (رضي الله عنه)',
+            theme: 'brotherhood'
+        },
+        {
+            id: 15,
+            arabic: 'الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ',
+            english: '"A Muslim is the one from whose tongue and hand other Muslims are safe."',
+            pashto: '"مسلمان هغه دی چې نور مسلمانان د هغه د ژبې او لاس له اذیته خوندي وي."',
+            source: 'Bukhari 10 · Muslim 41',
+            narrator: 'ʿAbdullāh ibn \'Amr (رضي الله عنه)',
+            theme: 'character'
+        },
+        {
+            id: 16,
+            arabic: 'أَحَبُّ الْأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ',
+            english: '"The most beloved deeds to Allah are the most consistent ones, even if they are small."',
+            pashto: '"الله ته تر ټولو محبوب عملونه هغه دي چې دوام ولري، که لږ هم وي."',
+            source: 'Bukhari 6465 · Muslim 783',
+            narrator: 'ʿĀ\'ishah (رضي الله عنها)',
+            theme: 'sincerity'
+        },
+        {
+            id: 17,
+            arabic: 'مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ',
+            english: '"Whoever fasts Ramadan out of faith and seeking reward, his previous sins will be forgiven."',
+            pashto: '"چا چې د ایمان او د ثواب د لاسته راوړلو لپاره د رمضان روژه ونیوله، د هغه تیر ګناهونه بخښل کیږي."',
+            source: 'Bukhari 38 · Muslim 760',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'fasting'
+        },
+        {
+            id: 18,
+            arabic: 'إِنَّ اللَّهَ لَا يَنْظُرُ إِلَى أَجْسَادِكُمْ وَلَا إِلَى صُوَرِكُمْ، وَلَكِنْ يَنْظُرُ إِلَى قُلُوبِكُمْ',
+            english: '"Allah does not look at your bodies or appearances, but He looks at your hearts."',
+            pashto: '"الله ستاسو جسمونو او بڼو ته نه ګوري، بلکې ستاسو زړونو ته ګوري."',
+            source: 'Muslim 2564',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'sincerity'
+        },
+        {
+            id: 19,
+            arabic: 'خَيْرُ الصَّدَقَةِ مَا كَانَ عَنْ ظَهْرِ غِنًى',
+            english: '"The best charity is that given when you yourself have enough."',
+            pashto: '"غوره صدقه هغه ده چې د وخت له ودانه ورکړل شي."',
+            source: 'Bukhari 1426',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'charity'
+        },
+        {
+            id: 20,
+            arabic: 'مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ',
+            english: '"Whoever believes in Allah and the Last Day should speak good or remain silent."',
+            pashto: '"چا چې الله او روستۍ ورځ ته ایمان لري، نیکه خبره دې وکړي یا چپ دې پاتې شي."',
+            source: 'Bukhari 6018 · Muslim 47',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'character'
+        },
+        {
+            id: 21,
+            arabic: 'إِنَّ مِنْ أَحَبِّكُمْ إِلَيَّ وَأَقْرَبِكُمْ مِنِّي مَجْلِسًا يَوْمَ الْقِيَامَةِ أَحَاسِنَكُمْ أَخْلَاقًا',
+            english: '"The most beloved of you to me and closest in position on the Day of Judgement are those with the best character."',
+            pashto: '"ستاسو هغه کس ما ته تر ټولو محبوب او د قیامت پر ورځ تر ټولو نږدې دی چې د خلق له مخې غوره دی."',
+            source: 'Tirmidhi 2018',
+            narrator: 'Jābir ibn ʿAbdillāh (رضي الله عنه)',
+            theme: 'character'
+        },
+        {
+            id: 22,
+            arabic: 'مَنْ تَوَضَّأَ فَأَحْسَنَ وُضُوءَهُ ثُمَّ قَالَ: أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ... فُتِحَتْ لَهُ أَبْوَابُ الْجَنَّةِ الثَّمَانِيَةُ',
+            english: '"Whoever perfects their wudū\', then recites the shahādah after it — all eight gates of Paradise are opened for him."',
+            pashto: '"چا چې پاک وضو وکړ، بیا یې شهاده ووایه، نو د جنت اته دروازې ور لپاره خلاصیږي."',
+            source: 'Muslim 234 · Tirmidhi 55',
+            narrator: 'ʿUmar ibn al-Khaṭṭāb (رضي الله عنه)',
+            theme: 'prayer'
+        },
+        {
+            id: 23,
+            arabic: 'الصِّيَامُ جُنَّةٌ، فَلَا يَرْفُثْ وَلَا يَجْهَلْ',
+            english: '"Fasting is a shield, so the fasting person should not speak lewdly or act ignorantly."',
+            pashto: '"روژه سپر ده، نو روژه‌وال باید فحش نه ووایي او نه بد چلند وکړي."',
+            source: 'Bukhari 1894 · Muslim 1151',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'fasting'
+        },
+        {
+            id: 24,
+            arabic: 'تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ لَكَ صَدَقَةٌ',
+            english: '"Your smile for your brother is charity."',
+            pashto: '"ستا د ورور سره تبسم (مسکا) در لپاره صدقه ده."',
+            source: 'Tirmidhi 1956',
+            narrator: 'Abu Dharr al-Ghifārī (رضي الله عنه)',
+            theme: 'character'
+        },
+        {
+            id: 25,
+            arabic: 'مَنْ قَرَأَ حَرْفًا مِنْ كِتَابِ اللَّهِ فَلَهُ بِهِ حَسَنَةٌ وَالْحَسَنَةُ بِعَشْرِ أَمْثَالِهَا',
+            english: '"Whoever recites one letter from the Book of Allah has one good deed, and one good deed is multiplied by ten."',
+            pashto: '"چا چې د الله د کتاب یوه توری ولوست، د هغه یوه نیکي ده او هره نیکي لسو نیکو برابر ده."',
+            source: 'Tirmidhi 2910',
+            narrator: 'ʿAbdullāh ibn Masʿūd (رضي الله عنه)',
+            theme: 'quran'
+        },
+        {
+            id: 26,
+            arabic: 'أَفْضَلُ الصِّيَامِ بَعْدَ رَمَضَانَ شَهْرُ اللَّهِ الْمُحَرَّمُ',
+            english: '"The best fasting after Ramadan is fasting in the month of Allah, al-Muḥarram."',
+            pashto: '"د رمضان وروسته غوره روژه د الله د میاشتې، محرم، روژه ده."',
+            source: 'Muslim 1163',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'fasting'
+        },
+        {
+            id: 27,
+            arabic: 'مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيُكْرِمْ ضَيْفَهُ',
+            english: '"Whoever believes in Allah and the Last Day, let him honour his guest."',
+            pashto: '"چا چې الله او روستۍ ورځ ته ایمان لري، خپل مهمان ته درناوی دې وکړي."',
+            source: 'Bukhari 6018 · Muslim 47',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'character'
+        },
+        {
+            id: 28,
+            arabic: 'اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي',
+            english: '"O Allah, You are the Pardoner and You love to pardon, so pardon me." — Best du\'ā for Laylat al-Qadr.',
+            pashto: '"اللهمه ته معاف کوونکی یی او معافي خوښوې، نو ما ته معافي راکه." — د لیلة القدر غوره دعا.',
+            source: 'Tirmidhi 3513 · Ibn Majah 3850',
+            narrator: 'ʿĀ\'ishah (رضي الله عنها)',
+            theme: 'forgiveness'
+        },
+        {
+            id: 29,
+            arabic: 'اعْقِلْهَا وَتَوَكَّلْ',
+            english: '"Tie it (your camel) first, and then put your trust in Allah."',
+            pashto: '"لومړی یې وتاله، بیا پر الله توکل وکړه."',
+            source: 'Tirmidhi 2517',
+            narrator: 'Anas ibn Mālik (رضي الله عنه)',
+            theme: 'tawakkul'
+        },
+        {
+            id: 30,
+            arabic: 'مَنْ صَلَّى عَلَيَّ وَاحِدَةً صَلَّى اللَّهُ عَلَيْهِ عَشْرًا',
+            english: '"Whoever sends one prayer upon me, Allah sends ten upon him."',
+            pashto: '"چا چې پرما یو ځل درود ووايه، الله پرې لس رحمتونه نازلوي."',
+            source: 'Muslim 408',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'remembrance'
+        },
+        {
+            id: 31,
+            arabic: 'إِنَّ اللَّهَ رَفِيقٌ يُحِبُّ الرِّفْقَ فِي الْأَمْرِ كُلِّهِ',
+            english: '"Allah is gentle and loves gentleness in all matters."',
+            pashto: '"الله نرم دی او د هر چار کې نرمي خوښوي."',
+            source: 'Bukhari 6927 · Muslim 2593',
+            narrator: 'ʿĀ\'ishah (رضي الله عنها)',
+            theme: 'mercy'
+        },
+        {
+            id: 32,
+            arabic: 'حَقُّ الْمُسْلِمِ عَلَى الْمُسْلِمِ سِتٌّ',
+            english: '"The rights of a Muslim over another Muslim are six: return his salām, visit him when sick, follow his funeral, accept his invitations, say yarḥamukallāh when he sneezes, and wish him well in his absence."',
+            pashto: '"د مسلمان پر مسلمان شپږ حقونه دي: سلام ورکړه، ناروغه یې وګوره، جنازه یې ولوله، بلنه یې ومنه، چینجي وهلو پر وخت دعا ورکړه، غیب کې یې خیر وغواړه."',
+            source: 'Muslim 2162',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'brotherhood'
+        },
+        {
+            id: 33,
+            arabic: 'خَيْرُكُمُ الَّذِي يَتَعَلَّمُ الْقُرْآنَ وَيُعَلِّمُهُ',
+            english: '"The best among you are those who learn the Quran and teach it."',
+            pashto: '"ستاسو غوره هغه دي چې قرآن زده کوي او ور زده کوي."',
+            source: 'Bukhari 5027',
+            narrator: 'ʿUthmān ibn ʿAffān (رضي الله عنه)',
+            theme: 'quran'
+        },
+        {
+            id: 34,
+            arabic: 'لَا تَغْضَبْ',
+            english: '"Do not get angry." (Said three times when asked for advice.)',
+            pashto: '"غوسه مه کوه." (د نصیحت غوښتنه کولو پر وخت یې درې ځله ووایه.)',
+            source: 'Bukhari 6116',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'character'
+        },
+        {
+            id: 35,
+            arabic: 'إِنَّمَا الصَّبْرُ عِنْدَ الصَّدْمَةِ الْأُولَى',
+            english: '"True patience is only at the first strike of grief."',
+            pashto: '"ریښتینی صبر یوازې د لومړي غم پر مهال دی."',
+            source: 'Bukhari 1283 · Muslim 926',
+            narrator: 'Anas ibn Mālik (رضي الله عنه)',
+            theme: 'patience'
+        },
+        {
+            id: 36,
+            arabic: 'إِنَّ الصِّدْقَ يَهْدِي إِلَى الْبِرِّ وَإِنَّ الْبِرَّ يَهْدِي إِلَى الْجَنَّةِ',
+            english: '"Truthfulness leads to righteousness, and righteousness leads to Paradise."',
+            pashto: '"ریښتینولي نیکۍ ته بیایي او نیکي جنت ته بیایي."',
+            source: 'Bukhari 6094 · Muslim 2607',
+            narrator: 'ʿAbdullāh ibn Masʿūd (رضي الله عنه)',
+            theme: 'character'
+        },
+        {
+            id: 37,
+            arabic: 'أَفْشُوا السَّلَامَ بَيْنَكُمْ',
+            english: '"Spread the greeting of peace (salām) among yourselves."',
+            pashto: '"سلام خپور کړئ ستاسو د مینځ کې."',
+            source: 'Muslim 54 · Tirmidhi 2485',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'character'
+        },
+        {
+            id: 38,
+            arabic: 'إِنَّ اللَّهَ جَمِيلٌ يُحِبُّ الْجَمَالَ',
+            english: '"Allah is beautiful and loves beauty."',
+            pashto: '"الله ښکلی دی او ښکلا خوښوي."',
+            source: 'Muslim 91',
+            narrator: 'Ibn Masʿūd (رضي الله عنه)',
+            theme: 'sincerity'
+        },
+        {
+            id: 39,
+            arabic: 'نِعْمَتَانِ مَغْبُونٌ فِيهِمَا كَثِيرٌ مِنَ النَّاسِ: الصِّحَّةُ وَالْفَرَاغُ',
+            english: '"Two blessings that many people are cheated of: health and free time."',
+            pashto: '"دوه نعمتونه چې ډیر خلک پکې تاوانمن دي: روغتیا او فرصت."',
+            source: 'Bukhari 6412',
+            narrator: 'Ibn ʿAbbās (رضي الله عنه)',
+            theme: 'gratitude'
+        },
+        {
+            id: 40,
+            arabic: 'الْكَلِمَةُ الطَّيِّبَةُ صَدَقَةٌ',
+            english: '"A good word is charity."',
+            pashto: '"ښه خبره صدقه ده."',
+            source: 'Bukhari 2989 · Muslim 1009',
+            narrator: 'Abu Hurayrah (رضي الله عنه)',
+            theme: 'character'
+        }
+    ];
+
+    function getDailyHadith() {
+        const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+        return HADITH_COLLECTION[dayOfYear % HADITH_COLLECTION.length];
+    }
+
     function getDashboardHadiths() {
-        return isPashtoMode()
-            ? [
-                { text: 'الله ته تر ټولو محبوب عمل هغه دی چې دوام ولري که لږ هم وي.', source: 'صحیح بخاري 6465' },
-                { text: 'د خلکو له منځه غوره هغه څوک دی چې خلکو ته ډېر ګټور وي.', source: 'المعجم الاوسط 5787' },
-                { text: 'پاکي د ایمان نیمایي برخه ده.', source: 'صحیح مسلم 223' },
-                { text: 'نرمښت په هر څه کې ښکلا راولي.', source: 'صحیح مسلم 2594' },
-                { text: 'تبسم دې د ورور په مخ کې صدقه ده.', source: 'جامع ترمذي 1956' },
-                { text: 'رحم کوونکو باندې رحمن رحم کوي.', source: 'جامع ترمذي 1924' },
-                { text: 'مؤمن مؤمن ته د ودانۍ په څېر دی؛ یو بل پیاوړی کوي.', source: 'صحیح بخاري 481' },
-                { text: 'الله د بندګانو لپاره اساني غواړي، سختي نه غواړي.', source: 'صحیح بخاري 39' },
-                { text: 'قوي مؤمن د الله په نزد محبوب او غوره دی.', source: 'صحیح مسلم 2664' },
-                { text: 'دعا عبادت دی.', source: 'جامع ترمذي 2969' },
-                { text: 'د الله په یاد سره زړونه ډاډمنېږي.', source: 'صحیح تفسیر معنا' },
-                { text: 'چا چې پر ما یو ځل درود ووايه، الله پرې لس رحمتونه نازلوي.', source: 'صحیح مسلم 408' },
-                { text: 'بهتره صدقه هغه ده چې خپلوانو ته وشي.', source: 'سنن نسائي 2582' },
-                { text: 'له تاسو هېڅوک مؤمن نه شي کېدای تر څو خپل ورور ته هماغه خوښ نه کړي چې ځان ته یې خوښوي.', source: 'صحیح بخاري 13' },
-                { text: 'حیا د ایمان څانګه ده.', source: 'صحیح مسلم 35' },
-                { text: 'غوسه مه کوه.', source: 'صحیح بخاري 6116' },
-                { text: 'الله ښکلی دی او ښکلا خوښوي.', source: 'صحیح مسلم 91' },
-                { text: 'سحرۍ وکړئ؛ په سحرۍ کې برکت دی.', source: 'صحیح بخاري 1923' },
-                { text: 'په جنت کې یوه دروازه د روژتیانو لپاره ده: الريان.', source: 'صحیح بخاري 1896' },
-                { text: 'ښه خبره هم صدقه ده.', source: 'صحیح بخاري 2989' },
-                { text: 'سلام خپور کړئ، یو بل سره مینه پیدا کېږي.', source: 'صحیح مسلم 54' },
-                { text: 'نیتونه په عملونو کې بنسټ دي.', source: 'صحیح بخاري 1' },
-                { text: 'د مور پلار رضایت کې د الله رضایت دی.', source: 'جامع ترمذي 1899' },
-                { text: 'ریښتینولي نېکۍ ته بیایي.', source: 'صحیح بخاري 6094' },
-                { text: 'امانت ادا کوه د هغه چا امانت چې تا ته یې سپارلی.', source: 'جامع ترمذي 1264' },
-                { text: 'تر ټولو ښه خلک هغه دي چې قرآن زده کوي او ور زده کوي.', source: 'صحیح بخاري 5027' },
-                { text: 'په دنیا کې زاهد اوسئ، الله به مو خوښ کړي.', source: 'سنن ابن ماجه 4102' },
-                { text: 'دوه نعمتونه دي چې ډېری خلک پکې تاواني دي: روغتیا او فرصت.', source: 'صحیح بخاري 6412' },
-                { text: 'د سهار او ماښام اذکار د زړه ساتنه کوي.', source: 'نبوي لارښوونې' },
-                { text: 'د مسلمان ورور عیب مه لټوئ.', source: 'جامع ترمذي 2032' }
-            ]
-            : [
-                { text: 'The most beloved deeds to Allah are those done consistently, even if they are small.', source: 'Sahih al-Bukhari 6465' },
-                { text: 'The best of people are those most beneficial to others.', source: 'Al-Mu\'jam al-Awsat 5787' },
-                { text: 'Purity is half of faith.', source: 'Sahih Muslim 223' },
-                { text: 'Gentleness beautifies whatever it enters.', source: 'Sahih Muslim 2594' },
-                { text: 'Your smile for your brother is charity.', source: 'Jami\' at-Tirmidhi 1956' },
-                { text: 'The Merciful shows mercy to those who are merciful.', source: 'Jami\' at-Tirmidhi 1924' },
-                { text: 'A believer to another believer is like a building, one part strengthening another.', source: 'Sahih al-Bukhari 481' },
-                { text: 'Allah loves ease for this Ummah, not hardship.', source: 'Sahih al-Bukhari 39' },
-                { text: 'The strong believer is more beloved to Allah than the weak believer.', source: 'Sahih Muslim 2664' },
-                { text: 'Supplication is worship.', source: 'Jami\' at-Tirmidhi 2969' },
-                { text: 'Whoever sends one prayer upon me, Allah sends ten upon him.', source: 'Sahih Muslim 408' },
-                { text: 'The best charity is that given to relatives in need.', source: 'Sunan an-Nasa\'i 2582' },
-                { text: 'None of you truly believes until he loves for his brother what he loves for himself.', source: 'Sahih al-Bukhari 13' },
-                { text: 'Modesty is a branch of faith.', source: 'Sahih Muslim 35' },
-                { text: 'Do not get angry.', source: 'Sahih al-Bukhari 6116' },
-                { text: 'Allah is beautiful and loves beauty.', source: 'Sahih Muslim 91' },
-                { text: 'Take suhoor, for in suhoor there is blessing.', source: 'Sahih al-Bukhari 1923' },
-                { text: 'In Paradise there is a gate called Ar-Rayyan for those who fast.', source: 'Sahih al-Bukhari 1896' },
-                { text: 'A good word is charity.', source: 'Sahih al-Bukhari 2989' },
-                { text: 'Spread salam among yourselves.', source: 'Sahih Muslim 54' },
-                { text: 'Actions are judged by intentions.', source: 'Sahih al-Bukhari 1' },
-                { text: 'The pleasure of Allah lies in the pleasure of the parents.', source: 'Jami\' at-Tirmidhi 1899' },
-                { text: 'Truthfulness leads to righteousness.', source: 'Sahih al-Bukhari 6094' },
-                { text: 'Return the trust to the one who entrusted you.', source: 'Jami\' at-Tirmidhi 1264' },
-                { text: 'The best among you are those who learn the Quran and teach it.', source: 'Sahih al-Bukhari 5027' },
-                { text: 'Be detached from worldly excess, and Allah will love you.', source: 'Sunan Ibn Majah 4102' },
-                { text: 'Two blessings many people lose: health and free time.', source: 'Sahih al-Bukhari 6412' },
-                { text: 'Morning and evening remembrance protects the heart.', source: 'Prophetic guidance' },
-                { text: 'Do not search for your Muslim brother\'s faults.', source: 'Jami\' at-Tirmidhi 2032' },
-                { text: 'The believer is the mirror of his brother.', source: 'Abu Dawud 4918' }
-            ];
+        // Legacy shim — not used by the new card
+        return HADITH_COLLECTION.map(h => ({ text: h.english, source: h.source }));
     }
 
     function refreshDashboardHadithCard() {
-        const textEl = document.getElementById('dashboardHadithText');
-        const sourceEl = document.getElementById('dashboardHadithSource');
+        const arabicEl  = document.getElementById('dashboardHadithArabic');
+        const textEl    = document.getElementById('dashboardHadithText');
+        const sourceEl  = document.getElementById('dashboardHadithSource');
+        const narratorEl = document.getElementById('dashboardHadithNarrator');
+        const labelEl   = document.getElementById('dashboardHadithLabel');
+        const copyLabel = document.getElementById('hadithCopyLabel');
+        const shareLabel = document.getElementById('hadithShareLabel');
+        const seeAllBtn = document.getElementById('hadithSeeAllBtn');
         if (!textEl || !sourceEl) return;
-        const rows = getDashboardHadiths();
-        if (!rows.length) return;
-        const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-        const current = rows[dayOfYear % rows.length];
-        textEl.textContent = current.text;
-        sourceEl.textContent = current.source;
+
+        const h    = getDailyHadith();
+        const isPS = isPashtoMode();
+        if (labelEl) labelEl.textContent = isPS ? '📜 ورځنی حدیث ✨' : '📜 Hadith of the Day ✨';
+        if (arabicEl)  arabicEl.textContent  = h.arabic;
+        textEl.textContent = isPS ? h.pashto : h.english;
+        sourceEl.textContent = '— ' + h.source;
+        if (narratorEl) narratorEl.textContent = (isPS ? 'روایت: ' : 'Narrated by ') + h.narrator;
+        if (copyLabel)  copyLabel.textContent  = isPS ? 'کاپي' : 'Copy';
+        if (shareLabel) shareLabel.textContent = isPS ? 'شریک' : 'Share';
+        if (seeAllBtn)  seeAllBtn.textContent  = isPS ? 'ټول حدیثونه ›' : 'See All ›';
     }
+
+    window.copyHadith = function() {
+        const h    = getDailyHadith();
+        const isPS = isPashtoMode();
+        const trans = isPS ? h.pashto : h.english;
+        const text  = h.arabic + '\n\n' + trans + '\n\n— ' + h.source + '\n' + (isPS ? 'روایت: ' : 'Narrated by ') + h.narrator;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text)
+                .then(() => showToast(isPS ? 'حدیث کاپي شوه' : 'Hadith copied'))
+                .catch(() => showToast('Copy failed'));
+        }
+    };
+
+    window.shareHadith = function() {
+        const h    = getDailyHadith();
+        const isPS = isPashtoMode();
+        const trans = isPS ? h.pashto : h.english;
+        const text  = h.arabic + '\n\n' + trans + '\n\n— ' + h.source;
+        if (navigator.share) {
+            navigator.share({ text }).catch(() => window.copyHadith());
+        } else {
+            window.copyHadith();
+        }
+    };
+
+    function escapeHtml(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    window.openAllHadiths = function() {
+        const overlay = document.getElementById('allHadithsOverlay');
+        const list    = document.getElementById('allHadithsList');
+        const title   = document.getElementById('allHadithsTitle');
+        if (!overlay || !list) return;
+        const isPS = isPashtoMode();
+        if (title) title.textContent = isPS ? '📜 د حدیث ټولګه' : '📜 Hadith Collection';
+        list.innerHTML = HADITH_COLLECTION.map(h => {
+            const trans = isPS ? h.pashto : h.english;
+            const narratorLabel = isPS ? 'روایت: ' : 'Narrated by ';
+            return '<div class="hadith-list-item">'
+                + '<div class="hadith-list-arabic" lang="ar" dir="rtl">' + escapeHtml(h.arabic) + '</div>'
+                + '<div class="hadith-list-trans">' + escapeHtml(trans) + '</div>'
+                + '<div class="hadith-list-source">— ' + escapeHtml(h.source) + '</div>'
+                + '<div class="hadith-list-narrator">' + narratorLabel + escapeHtml(h.narrator) + '</div>'
+                + '<div class="hadith-list-actions">'
+                + '<button class="hadith-action-btn" onclick="copyHadithById(' + h.id + ')">📋 ' + (isPS ? 'کاپي' : 'Copy') + '</button>'
+                + '<button class="hadith-action-btn" onclick="shareHadithById(' + h.id + ')">↗ ' + (isPS ? 'شریک' : 'Share') + '</button>'
+                + '</div></div>';
+        }).join('');
+        overlay.hidden = false;
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeAllHadiths = function() {
+        const overlay = document.getElementById('allHadithsOverlay');
+        if (overlay) overlay.hidden = true;
+        document.body.style.overflow = '';
+    };
+
+    window.copyHadithById = function(id) {
+        const h = HADITH_COLLECTION.find(x => x.id === id);
+        if (!h) return;
+        const isPS  = isPashtoMode();
+        const trans = isPS ? h.pashto : h.english;
+        const text  = h.arabic + '\n\n' + trans + '\n\n— ' + h.source + '\n' + (isPS ? 'روایت: ' : 'Narrated by ') + h.narrator;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text)
+                .then(() => showToast(isPS ? 'حدیث کاپي شوه' : 'Hadith copied'))
+                .catch(() => {});
+        }
+    };
+
+    window.shareHadithById = function(id) {
+        const h = HADITH_COLLECTION.find(x => x.id === id);
+        if (!h) return;
+        const isPS  = isPashtoMode();
+        const trans = isPS ? h.pashto : h.english;
+        const text  = h.arabic + '\n\n' + trans + '\n\n— ' + h.source;
+        if (navigator.share) {
+            navigator.share({ text }).catch(() => window.copyHadithById(id));
+        } else {
+            window.copyHadithById(id);
+        }
+    };
 
     function getTasbeehTodayCount() {
         const key = new Date().toISOString().slice(0, 10);
@@ -4360,6 +4766,25 @@ window.filterCategory = function(cat, btn) {
             const title = document.querySelector(`.dua-card[data-id="${id}"] .dua-title`)?.textContent?.trim() || `Dua ${id}`;
             return `<button class="duas-bookmark-chip" onclick="scrollToDua(${id})">${escapeHtml(title)}</button>`;
         }).join('');
+    }
+
+    function updateFavoritesTile() {
+        const tile     = document.getElementById('favoritesCategoryTile');
+        const nameEl   = document.getElementById('favoritesTileName');
+        const countEl  = document.getElementById('favoritesTileCount');
+        if (!tile || !nameEl || !countEl) return;
+        const isPS  = isPashtoMode();
+        nameEl.textContent = isPS ? 'زما خوښې' : 'My Favorites';
+        const count = (STATE.bookmarks || []).length;
+        if (count === 0) {
+            countEl.textContent = isPS ? 'د ♡ کولو سره دعا خوندي کړئ' : 'Tap ♡ on any dua to save it';
+            tile.classList.add('cat-favorites-empty');
+        } else {
+            countEl.textContent = isPS
+                ? localizeDigits(count) + ' دعاګانې خوندي شوي'
+                : count + ' dua' + (count === 1 ? '' : 's') + ' saved';
+            tile.classList.remove('cat-favorites-empty');
+        }
     }
 
     function showToast(msg) {

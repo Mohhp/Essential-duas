@@ -13,7 +13,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="styles.css?v=20260310e">
+    <link rel="stylesheet" href="styles.css?v=20260310f">
 </head>
 
     <body class="startup-blocked">
@@ -195,9 +195,21 @@
         </div>
 
         <div class="dashboard-hadith-card" id="dashboardHadithCard" aria-live="polite">
-            <div class="dashboard-hadith-label" id="dashboardHadithLabel">Hadith of the Day ✨</div>
-            <div class="dashboard-hadith-text" id="dashboardHadithText">The most beloved deeds to Allah are those done consistently, even if small.</div>
-            <div class="dashboard-hadith-source" id="dashboardHadithSource">Sahih al-Bukhari</div>
+            <div class="hadith-card-top-ornament" aria-hidden="true">
+                <span class="hadith-ornament-line"></span>
+                <span class="hadith-ornament-diamond">◆</span>
+                <span class="hadith-ornament-line"></span>
+            </div>
+            <div class="dashboard-hadith-label" id="dashboardHadithLabel">📜 Hadith of the Day ✨</div>
+            <div class="dashboard-hadith-arabic" id="dashboardHadithArabic" lang="ar" dir="rtl"></div>
+            <div class="dashboard-hadith-text" id="dashboardHadithText"></div>
+            <div class="dashboard-hadith-source" id="dashboardHadithSource"></div>
+            <div class="dashboard-hadith-narrator" id="dashboardHadithNarrator"></div>
+            <div class="hadith-card-actions">
+                <button class="hadith-action-btn" onclick="copyHadith()" aria-label="Copy hadith">📋 <span id="hadithCopyLabel">Copy</span></button>
+                <button class="hadith-action-btn" onclick="shareHadith()" aria-label="Share hadith">↗ <span id="hadithShareLabel">Share</span></button>
+                <button class="hadith-action-btn hadith-see-all-btn" onclick="openAllHadiths()" id="hadithSeeAllBtn">See All ›</button>
+            </div>
         </div>
 
         <div class="dashboard-progress-summary" id="dashboardProgressCard" aria-live="polite">
@@ -214,12 +226,16 @@
         <div class="duas-tab-search-wrap">
             <input id="duasSearchInput" class="duas-tab-search" type="search" placeholder="Search duas..." aria-label="Search duas">
         </div>
-        <div class="duas-bookmarks" id="duasBookmarksSection" hidden>
-            <div class="duas-bookmarks-title" id="duasBookmarksTitle">Bookmarked Duas</div>
-            <div class="duas-bookmarks-list" id="duasBookmarksList"></div>
-        </div>
-
         <div class="category-grid" id="categoryGrid">
+        <div class="cat-card cat-card-favorites featured" id="favoritesCategoryTile" data-cat="favorites" onclick="openCategory('favorites')" role="button" aria-label="My Favorites">
+            <div class="cat-card-wave"></div>
+            <span class="category-watermark" aria-hidden="true">المفضلة</span>
+            <div class="cat-card-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="rgba(255,255,255,0.25)" stroke="rgba(255,255,255,0.9)" stroke-width="1.85"/></svg>
+            </div>
+            <div class="cat-card-name" id="favoritesTileName">My Favorites</div>
+            <div class="cat-card-count" id="favoritesTileCount">Tap ♡ on any dua to save it</div>
+        </div>
         <div class="cat-card featured" data-cat="all" onclick="openCategory('all')">
             <div class="cat-card-wave"></div>
             <span class="category-watermark" aria-hidden="true" title="Call upon Me; I will respond to you (2:186)">ادعوني أستجب لكم</span>
@@ -3509,6 +3525,17 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (active) -->
-    <script src="app.js?v=20260310e"></script>
+    <script src="app.js?v=20260310f"></script>
 <!-- Source assets (fallback for local debugging) -->
 <!-- <script src="app.js?v=20260306k"></script> -->
+
+<!-- ===== ALL HADITHS PANEL ===== -->
+<div class="all-hadiths-overlay" id="allHadithsOverlay" hidden aria-modal="true" role="dialog" aria-labelledby="allHadithsTitle">
+    <div class="all-hadiths-panel" id="allHadithsPanel">
+        <div class="all-hadiths-header">
+            <h2 class="all-hadiths-title" id="allHadithsTitle">📜 Hadith Collection</h2>
+            <button class="all-hadiths-close" onclick="closeAllHadiths()" aria-label="Close">×</button>
+        </div>
+        <div class="all-hadiths-list" id="allHadithsList"></div>
+    </div>
+</div>
