@@ -1,145 +1,119 @@
-# Falah — Screenshots Guide
+# Screenshots Guide — Play Store
 
-All screenshots target **1080 × 1920 px** (9:16 portrait, Phone).  
-Capture in Chrome DevTools → Device toolbar → 1080×1920 → screenshot, or Android phone screenshot.  
-Upload to Play Console under: **Main store listing → Phone screenshots** (max 8).
-
----
-
-## Screenshot 1 — Home / Prayer Times
-
-**Shows**: Home screen with today's prayer countdown  
-**State**: Asr prayer active / next prayer highlighted  
-**Theme**: Dark (default)  
-**Lang**: English  
-**Highlight**: "Prayer Times" section visible, Adhan countdown timer shown  
-
-**Steps**:
-1. Open app, grant location permission
-2. Wait for prayer times to load
-3. Scroll so the active prayer row is centred on screen
-4. Capture at 1080 × 1920
+Capture 8 screenshots at **1080×1920** (or any 9:16 ratio).  
+Use Chrome DevTools device emulation → Pixel 6 preset works well.
 
 ---
 
-## Screenshot 2 — Dua Detail (Arabic + Translation)
+## Setup
 
-**Shows**: A full dua card open — Arabic, transliteration, English meaning  
-**State**: Sleeping / Bedtime dua expanded  
-**Theme**: Dark  
-**Lang**: English  
-**Highlight**: Gold Arabic text, clean transliteration, play-audio button  
-
-**Steps**:
-1. Tap "Duas" tab → "Sleep & Waking"
-2. Open the *Dua before sleeping* card
-3. Ensure the audio play button is visible
-4. Capture
+1. Open `index.html` locally (or `https://<your-gh-pages-url>/Essential-duas/`)
+2. Open DevTools → Device toolbar → set to 390×844 (iPhone 14) or 360×800 (Pixel 6)
+3. Full-page screenshot via DevTools → right-click in canvas → "Capture screenshot"
+4. Upscale to 1080×1920 with any tool if needed
 
 ---
 
-## Screenshot 3 — Quran — Surah List
+## Screenshot 1 — Home: Prayer Countdown
 
-**Shows**: Surah browser with Juz 30 surahs listed  
-**State**: Surah list, fully loaded  
-**Theme**: Dark  
-**Lang**: English / Arabic mixed  
-**Highlight**: Surah numbers, Arabic names, verse counts  
+**Tab:** Home  
+**Shows:** Next prayer name + live countdown, current date in Islamic calendar
 
-**Steps**:
-1. Tap "Quran" tab
-2. Scroll to Juz 30 section (An-Naba onward)
-3. Capture the list view
+**Steps:**
+1. Open app → Home tab (automatically active)
+2. Allow location so accurate prayer times load
+3. Screenshot the top half showing the prayer countdown card
 
 ---
 
-## Screenshot 4 — Quran — Ayah Reading View
+## Screenshot 2 — Home: Quick Tiles + Hadith
 
-**Shows**: Full surah open, Ayahs displayed with Arabic text  
-**State**: Al-Fatiha or Al-Ikhlas open  
-**Theme**: Dark  
-**Lang**: Arabic + English  
-**Highlight**: Crisp Uthmani script, large readable text, verse numbers  
+**Tab:** Home  
+**Shows:** Four quick-access tiles (Quran · Duas · Tasbeeh · Qibla) + Hadith of the Day
 
-**Steps**:
-1. Open Al-Fatiha
-2. Ensure all 7 ayahs visible
-3. Capture
+**Steps:**
+1. Home tab → scroll down to the tiles section
+2. Screenshot to show all four tiles and the hadith card below
 
 ---
 
-## Screenshot 5 — Pashto Audio Player
+## Screenshot 3 — Duas: Category Grid
 
-**Shows**: A surah playing with the Pashto audio player visible  
-**State**: Audio playing, progress bar visible  
-**Theme**: Dark  
-**Lang**: Pashto (toggle active)  
-**Highlight**: Play/pause, waveform or progress bar, Pashto label  
+**Tab:** Duas  
+**Shows:** 12 category tiles (Morning Adhkar, Protection, Forgiveness, etc.)
 
-**Steps**:
-1. Open Quran → Juz 30 surah (e.g. An-Nas)
-2. Switch to Pashto mode
-3. Tap play
-4. Capture while playing
+**Steps:**
+1. Tap the Duas tab (bottom nav, دعاوو icon)
+2. Screenshot the full category grid
 
 ---
 
-## Screenshot 6 — 40 Hadith Collection
+## Screenshot 4 — Dua Detail
 
-**Shows**: 40 Hadith list or a single hadith detail  
-**State**: Hadith #1 (Intentions) open  
-**Theme**: Dark  
-**Lang**: English  
-**Highlight**: Arabic hadith text + English translation, Chapter number  
+**Tab:** Duas → any category  
+**Shows:** A dua card with Arabic text, English meaning, and favourite button
 
-**Steps**:
-1. Tap "Hadith" or "Collections" tab
-2. Open Hadith #1
-3. Capture showing full text
+**Steps:**
+1. Duas tab → tap "Morning & Evening Adhkar" (or any category)
+2. Tap any dua to expand it
+3. Screenshot showing Arabic text + English meaning
 
 ---
 
-## Screenshot 7 — Favourites
+## Screenshot 5 — Quran: Juz 30 Surah List
 
-**Shows**: Favourites screen with saved duas  
-**State**: 3–5 duas saved as favourites  
-**Theme**: Dark  
-**Lang**: English  
-**Highlight**: Star/bookmark icon, list of saved duas, quick-access feel  
+**Tab:** Quran  
+**Shows:** List of surahs in Juz 30 with Pashto audio play buttons
 
-**Steps**:
-1. Favourite 3–5 duas using the star button
-2. Navigate to Favourites tab
-3. Capture the saved list
+**Steps:**
+1. Tap the Quran tab
+2. Screenshot the surah list (An-Naba through An-Nas)
 
 ---
 
-## Screenshot 8 — Morning Adhkar / Daily Dhikr
+## Screenshot 6 — Quran: Audio Player
 
-**Shows**: Morning adhkar collection  
-**State**: Morning page open, counter-style dhikr  
-**Theme**: Dark  
-**Lang**: Arabic + English  
-**Highlight**: Repetition counter (×33 / ×100 style), Arabic primary, gold accent  
+**Tab:** Quran  
+**Shows:** A surah open with Pashto audio playing (progress bar visible)
 
-**Steps**:
-1. Open "Morning Adhkar" section
-2. Show 2–3 adhkar with repetition counts
-3. Capture
+**Steps:**
+1. Quran tab → tap any surah → tap play
+2. Screenshot while audio is playing to show the player UI
 
 ---
 
-## Capture Tips
+## Screenshot 7 — 40 Hadith: Single Hadith
 
-- Use real device screenshots (1080×1920) or Chrome DevTools at that exact size
-- Avoid the system status bar if it shows personal info (time, battery, notifications)
-  — or enable "Demo mode" on Android (Settings → Developer options → Demo mode)
-- Crop to exactly 1080×1920 if needed — Play Console rejects non-matching aspect ratios
-- Compress with `pngquant` or TinyPNG before upload to stay under 8 MB per image
+**Tab:** More → 40 Hadith  
+**Shows:** One hadith expanded with Arabic and English text
+
+**Steps:**
+1. Bottom nav → More tab
+2. Tap "40 Hadith" option
+3. Tap any hadith to read the full text
+4. Screenshot the detail view
 
 ---
 
-## Optional: Tablet Screenshots (1600×2560)
+## Screenshot 8 — Favourites
 
-If targeting tablets, repeat screenshots 1, 4, and 6 on a 1600×2560 tablet layout.  
-Play Console allows separate tablet screenshot slots.
+**Tab:** More → Favourites  
+**Shows:** A list of saved duas (add a few first)
+
+**Steps:**
+1. Go to Duas → open a few cards → tap ♡ to favourite them
+2. Return to More tab → Favourites
+3. Screenshot the favourites list
+
+---
+
+## Feature Graphic (1024×500)
+
+1. Open `feature-graphic.html` in Chrome
+2. DevTools → set viewport to **1024×500**
+3. Right-click page → "Capture screenshot" (or use the screenshot button in DevTools)
+4. Upload as the feature graphic in Play Console
+
+---
+
+*Last updated: 2025-06*

@@ -1,324 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=1024">
-  <title>Falah – Feature Graphic (1024×500)</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1024">
+<title>Falah — Feature Graphic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    body {
-      width: 1024px;
-      height: 500px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Inter', sans-serif;
-      background: #0a1628;
-    }
+  body {
+    width: 1024px; height: 500px;
+    overflow: hidden;
+    background: #060D1A;
+    font-family: 'Inter', Arial, sans-serif;
+  }
 
-    .canvas {
-      width: 1024px;
-      height: 500px;
-      position: relative;
-      background: linear-gradient(135deg, #0f1d35 0%, #0a1628 42%, #07101f 100%);
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-    }
+  .canvas {
+    width: 1024px; height: 500px;
+    position: relative;
+    background: radial-gradient(ellipse 70% 120% at 35% 45%, #0E1C34 0%, #08101A 55%, #030508 100%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
 
-    /* Geometric background lattice */
-    .canvas::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        repeating-linear-gradient(45deg,  rgba(201,168,76,0.04) 0, rgba(201,168,76,0.04) 1px, transparent 0, transparent 50%),
-        repeating-linear-gradient(-45deg, rgba(201,168,76,0.028) 0, rgba(201,168,76,0.028) 1px, transparent 0, transparent 50%);
-      background-size: 56px 56px;
-      pointer-events: none;
-    }
+  /* ── Decorative geometry ───────────────────── */
+  .deco-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid #C9A84C;
+    opacity: 0.07;
+  }
+  .deco-ring.r1 { width: 520px; height: 520px; top: -110px; left: -60px; }
+  .deco-ring.r2 { width: 380px; height: 380px; top: -40px; left: 10px; }
+  .deco-ring.r3 { width: 800px; height: 800px; bottom: -350px; right: -180px; opacity: 0.04; }
 
-    /* Radial ambient glow, centred toward the icon */
-    .canvas::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 55% 80% at 22% 50%, rgba(201,168,76,0.14) 0%, transparent 70%),
-                  radial-gradient(ellipse 40% 60% at 78% 50%, rgba(46,196,122,0.06) 0%, transparent 70%);
-      pointer-events: none;
-    }
+  .deco-h-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #C9A84C22 30%, #C9A84C44 50%, #C9A84C22 70%, transparent 100%);
+  }
+  .deco-h-line.top { top: 48px; }
+  .deco-h-line.bot { bottom: 48px; }
 
-    /* ─── Left panel: app icon ─── */
-    .icon-wrap {
-      position: relative;
-      z-index: 2;
-      flex-shrink: 0;
-      margin-left: 64px;
-      width: 200px;
-      height: 200px;
-      border-radius: 44px;
-      box-shadow:
-        0 0 0 2px rgba(201,168,76,0.22),
-        0 0 0 6px rgba(201,168,76,0.06),
-        0 24px 64px rgba(0,0,0,0.6),
-        0 0 80px rgba(201,168,76,0.18);
-      overflow: hidden;
-    }
+  /* ── Left column — icon ────────────────────── */
+  .left-col {
+    flex: 0 0 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-left: 48px;
+    position: relative;
+    z-index: 2;
+  }
 
-    .icon-svg {
-      width: 200px;
-      height: 200px;
-    }
+  .icon-wrap {
+    width: 210px; height: 210px;
+    border-radius: 46px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 1px #C9A84C26,
+      0 12px 48px #00000080,
+      0 2px 12px #C9A84C18;
+    flex-shrink: 0;
+  }
 
-    /* ─── Right panel: text ─── */
-    .text-panel {
-      position: relative;
-      z-index: 2;
-      flex: 1;
-      padding: 0 56px 0 52px;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
+  .icon-wrap svg {
+    display: block;
+    width: 210px; height: 210px;
+  }
 
-    .tagline-arabic {
-      font-family: 'Amiri', serif;
-      font-size: 26px;
-      color: #c9a84c;
-      letter-spacing: 0.04em;
-      line-height: 1.3;
-      margin-bottom: 10px;
-      opacity: 0.90;
-    }
+  /* ── Right column — copy ───────────────────── */
+  .right-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 52px 0 40px;
+    position: relative;
+    z-index: 2;
+  }
 
-    .app-name {
-      font-family: 'Inter', sans-serif;
-      font-size: 72px;
-      font-weight: 800;
-      color: #ffffff;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
+  /* Divider line between columns */
+  .divider {
+    position: absolute;
+    left: 340px;
+    top: 60px; bottom: 60px;
+    width: 1px;
+    background: linear-gradient(180deg, transparent, #C9A84C30 30%, #C9A84C30 70%, transparent);
+    z-index: 1;
+  }
 
-    .app-name .gold {
-      background: linear-gradient(135deg, #f5df82 0%, #d4a847 45%, #c9a84c 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+  .arabic-label {
+    font-family: 'Amiri', 'Times New Roman', serif;
+    font-size: 18px;
+    color: #C9A84C;
+    letter-spacing: 0.04em;
+    opacity: 0.85;
+    margin-bottom: 6px;
+    direction: rtl;
+    text-align: left;
+  }
 
-    .tagline-english {
-      font-size: 17px;
-      font-weight: 400;
-      color: rgba(255,255,255,0.55);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin-bottom: 34px;
-    }
+  .app-name {
+    font-size: 78px;
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #FDF5CB 0%, #EDD66C 25%, #C9A84C 55%, #9A7520 85%, #5A400D 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
 
-    /* divider */
-    .divider {
-      width: 60px;
-      height: 2px;
-      background: linear-gradient(90deg, #c9a84c, transparent);
-      margin-bottom: 28px;
-      border-radius: 1px;
-    }
+  .tagline {
+    font-size: 15px;
+    font-weight: 400;
+    color: #8FA8C8;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
 
-    /* Features grid */
-    .features {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 36px;
-    }
+  .tagline span {
+    color: #C9A84C;
+    opacity: 0.7;
+    margin: 0 6px;
+  }
 
-    .feature {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 14px;
+    margin-bottom: 28px;
+  }
 
-    .feat-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: rgba(201,168,76,0.12);
-      border: 1px solid rgba(201,168,76,0.22);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+  .feat {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
 
-    .feat-icon svg {
-      width: 16px;
-      height: 16px;
-    }
+  .feat-icon {
+    font-size: 15px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
 
-    .feat-label {
-      font-size: 14.5px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.82);
-      letter-spacing: 0.01em;
-    }
+  .feat-text {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #B8CCDF;
+    letter-spacing: 0.01em;
+  }
 
-    /* Bottom attribution */
-    .attribution {
-      position: absolute;
-      bottom: 18px;
-      right: 28px;
-      font-family: 'Amiri', serif;
-      font-size: 13px;
-      color: rgba(201,168,76,0.38);
-      letter-spacing: 0.02em;
-      z-index: 3;
-    }
+  .bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid #C9A84C18;
+  }
 
-    /* corner accent lines */
-    .corner-tl, .corner-br {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      z-index: 2;
-      pointer-events: none;
-    }
-    .corner-tl { top: 20px; left: 20px; border-top: 1.5px solid rgba(201,168,76,0.3); border-left: 1.5px solid rgba(201,168,76,0.3); border-radius: 4px 0 0 0; }
-    .corner-br { bottom: 20px; right: 20px; border-bottom: 1.5px solid rgba(201,168,76,0.3); border-right: 1.5px solid rgba(201,168,76,0.3); border-radius: 0 0 4px 0; }
-  </style>
+  .pashto-label {
+    font-family: 'Amiri', 'Times New Roman', serif;
+    font-size: 13px;
+    color: #C9A84C;
+    opacity: 0.65;
+    direction: rtl;
+  }
+
+  .author {
+    font-size: 11px;
+    font-weight: 300;
+    color: #4A6280;
+    letter-spacing: 0.05em;
+  }
+
+  .badge {
+    background: linear-gradient(135deg, #C9A84C18, #C9A84C08);
+    border: 1px solid #C9A84C30;
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #C9A84C;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+</style>
 </head>
 <body>
-  <div class="canvas">
-    <div class="corner-tl"></div>
-    <div class="corner-br"></div>
+<div class="canvas">
 
-    <!-- App Icon (inline SVG = no external request) -->
+  <!-- Decorative rings -->
+  <div class="deco-ring r1"></div>
+  <div class="deco-ring r2"></div>
+  <div class="deco-ring r3"></div>
+  <div class="deco-h-line top"></div>
+  <div class="deco-h-line bot"></div>
+
+  <div class="left-col">
     <div class="icon-wrap">
-      <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+      <!-- Inline icon SVG — same crescent+star design as favicon.svg -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
         <defs>
-          <linearGradient id="fg-bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#111e38"/>
-            <stop offset="45%" stop-color="#0a1628"/>
-            <stop offset="100%" stop-color="#060d1d"/>
-          </linearGradient>
-          <radialGradient id="fg-ambientGlow" cx="44%" cy="46%" r="52%">
-            <stop offset="0%" stop-color="#c9a84c" stop-opacity="0.18"/>
-            <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+          <radialGradient id="bg" cx="40%" cy="38%" r="72%">
+            <stop offset="0%"   stop-color="#0E1725"/>
+            <stop offset="50%"  stop-color="#08101A"/>
+            <stop offset="100%" stop-color="#030508"/>
           </radialGradient>
-          <linearGradient id="fg-goldCrescent" x1="15%" y1="5%" x2="85%" y2="95%">
-            <stop offset="0%" stop-color="#f5df82"/>
-            <stop offset="30%" stop-color="#d4a847"/>
-            <stop offset="65%" stop-color="#c9a84c"/>
-            <stop offset="100%" stop-color="#9a7520"/>
+          <linearGradient id="gold" x1="72" y1="72" x2="440" y2="440" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#FDF5CB"/>
+            <stop offset="14%"  stop-color="#EDD66C"/>
+            <stop offset="40%"  stop-color="#C9A84C"/>
+            <stop offset="70%"  stop-color="#9A7520"/>
+            <stop offset="100%" stop-color="#5A400D"/>
           </linearGradient>
-          <linearGradient id="fg-starGold" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#f8e89a"/>
-            <stop offset="100%" stop-color="#c9a84c"/>
-          </linearGradient>
-          <mask id="fg-crescentCut">
-            <rect width="512" height="512" fill="black"/>
-            <circle cx="242" cy="258" r="138" fill="white"/>
-            <circle cx="294" cy="228" r="122" fill="black"/>
-          </mask>
-          <filter id="fg-crescentGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
-            <feFlood flood-color="#d4a847" flood-opacity="0.5" result="color"/>
-            <feComposite in="color" in2="blur" operator="in" result="shadow"/>
-            <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <pattern id="fg-geomPattern" x="0" y="0" width="48" height="48" patternUnits="userSpaceOnUse" patternTransform="rotate(30)">
-            <line x1="0" y1="0" x2="48" y2="48" stroke="rgba(201,168,76,0.04)" stroke-width="0.8"/>
-            <line x1="48" y1="0" x2="0" y2="48" stroke="rgba(201,168,76,0.03)" stroke-width="0.8"/>
-          </pattern>
-          <clipPath id="fg-roundedSquare">
+          <clipPath id="icon">
             <rect width="512" height="512" rx="108" ry="108"/>
           </clipPath>
         </defs>
-        <g clip-path="url(#fg-roundedSquare)">
-          <rect width="512" height="512" fill="url(#fg-bgGrad)"/>
-          <rect width="512" height="512" fill="url(#fg-geomPattern)"/>
-          <rect width="512" height="512" fill="url(#fg-ambientGlow)"/>
-          <circle cx="242" cy="258" r="148" fill="#c9a84c" opacity="0.06"/>
-          <circle cx="242" cy="258" r="138" fill="url(#fg-goldCrescent)" mask="url(#fg-crescentCut)" filter="url(#fg-crescentGlow)"/>
-          <circle cx="242" cy="258" r="136" fill="none" stroke="#f5df82" stroke-width="2.5" stroke-opacity="0.28" mask="url(#fg-crescentCut)"/>
-          <g transform="translate(355,172) rotate(15)" filter="url(#fg-crescentGlow)">
-            <polygon points="0,-18 4,-4 18,0 4,4 0,18 -4,4 -18,0 -4,-4" fill="url(#fg-starGold)" opacity="0.92"/>
-          </g>
-          <circle cx="170" cy="358" r="5.5" fill="#d4a847" opacity="0.5"/>
-          <circle cx="190" cy="372" r="4"   fill="#d4a847" opacity="0.38"/>
-          <circle cx="214" cy="381" r="3"   fill="#d4a847" opacity="0.26"/>
-          <rect x="6" y="6" width="500" height="500" rx="103" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-opacity="0.22"/>
-          <rect x="15" y="15" width="482" height="482" rx="95" fill="none" stroke="#c9a84c" stroke-width="1" stroke-opacity="0.08"/>
+        <g clip-path="url(#icon)">
+          <rect width="512" height="512" fill="url(#bg)"/>
+          <circle cx="235" cy="270" r="195" fill="#C9A84C" fill-opacity="0.05"/>
+          <path fill-rule="evenodd"
+                d="M  86,258 A 168,168 0 1 0 422,258 A 168,168 0 1 0  86,258 Z
+                   M 151,210 A 145,145 0 1 0 441,210 A 145,145 0 1 0 151,210 Z"
+                fill="url(#gold)"/>
+          <polygon
+            transform="translate(312,192)"
+            points="0,-26 4.13,-9.98 18.38,-18.38 9.98,-4.13 26,0 9.98,4.13 18.38,18.38 4.13,9.98
+                    0,26 -4.13,9.98 -18.38,18.38 -9.98,4.13 -26,0 -9.98,-4.13 -18.38,-18.38 -4.13,-9.98"
+            fill="url(#gold)"/>
+          <rect x="10" y="10" width="492" height="492" rx="100" ry="100"
+                fill="none" stroke="#D4AF37" stroke-width="1.5" stroke-opacity="0.22"/>
         </g>
       </svg>
     </div>
+  </div>
 
-    <!-- Text -->
-    <div class="text-panel">
-      <div class="tagline-arabic">حيّ على الفلاح</div>
-      <div class="app-name"><span class="gold">Falah</span></div>
-      <div class="tagline-english">Quran · Duas · Prayer Times</div>
-      <div class="divider"></div>
-      <div class="features">
-        <div class="feature">
-          <div class="feat-icon">
-            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M2 3h5.5v10H2V3zm6.5 0H14v10H8.5V3z" stroke="#c9a84c" stroke-width="1.3" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <span class="feat-label">Full Quran</span>
-        </div>
-        <div class="feature">
-          <div class="feat-icon">
-            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="8" cy="7" r="4.5" stroke="#c9a84c" stroke-width="1.3"/>
-              <path d="M8 2V1M8 13v1M2 7H1m14 0h-1M3.93 3.93l-.7-.7m9.54 9.54-.7-.7M3.93 10.07l-.7.7m9.54-9.54-.7.7" stroke="#c9a84c" stroke-width="1.2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <span class="feat-label">Prayer Times</span>
-        </div>
-        <div class="feature">
-          <div class="feat-icon">
-            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 2c0 0-4 3-4 6.5a4 4 0 008 0C12 5 8 2 8 2z" stroke="#c9a84c" stroke-width="1.3" stroke-linejoin="round"/>
-              <path d="M6 9.5c0 1.1.9 2 2 2" stroke="#c9a84c" stroke-width="1.2" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <span class="feat-label">Essential Duas</span>
-        </div>
-        <div class="feature">
-          <div class="feat-icon">
-            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 5h10M3 8h7M3 11h5" stroke="#c9a84c" stroke-width="1.3" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <span class="feat-label">Pashto &amp; English</span>
-        </div>
-        <div class="feature">
-          <div class="feat-icon">
-            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 2l10 6-10 6V2z" stroke="#c9a84c" stroke-width="1.3" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <span class="feat-label">Audio Recitation</span>
-        </div>
-        <div class="feature">
-          <div class="feat-icon">
-            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 2.5L9.8 6l3.8.55-2.75 2.68.65 3.77L8 11.1l-3.5 1.9.65-3.77L2.4 6.55 6.2 6z" stroke="#c9a84c" stroke-width="1.2" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <span class="feat-label">Favorites &amp; 40 Hadith</span>
-        </div>
-      </div>
+  <div class="divider"></div>
+
+  <div class="right-col">
+    <div class="arabic-label">حيّ على الفلاح — تطبيق المسلم اليومي</div>
+    <div class="app-name">Falah</div>
+    <div class="tagline">
+      Quran <span>·</span> Duas <span>·</span> Prayer Times <span>·</span> Pashto Audio
     </div>
 
-    <div class="attribution">المهندس محمد فلاح</div>
+    <div class="features-grid">
+      <div class="feat"><span class="feat-icon">📖</span><span class="feat-text">Quran Juz 30</span></div>
+      <div class="feat"><span class="feat-icon">🤲</span><span class="feat-text">60+ Essential Duas</span></div>
+      <div class="feat"><span class="feat-icon">🕌</span><span class="feat-text">5 Prayer Times</span></div>
+      <div class="feat"><span class="feat-icon">📿</span><span class="feat-text">Tasbeeh Counter</span></div>
+      <div class="feat"><span class="feat-icon">🧭</span><span class="feat-text">Qibla Compass</span></div>
+      <div class="feat"><span class="feat-icon">📜</span><span class="feat-text">40 Hadith</span></div>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="pashto-label">د پښتو اوډیو سره</div>
+      <div class="badge">Free · Offline</div>
+      <div class="author">By المهندس محمد فلاح</div>
+    </div>
   </div>
+
+</div>
 </body>
 </html>
