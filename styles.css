@@ -6685,7 +6685,7 @@
             align-items: center;
             justify-content: center;
             background: rgba(255, 140, 66, 0.18);
-            font-size: 15px;
+            color: #ff8c42;
             flex-shrink: 0;
         }
 
