@@ -2721,6 +2721,128 @@
         .tasbeeh-complete-pulse {
             animation: tasbeeh-complete 0.6s ease-out;
         }
+
+        /* ===== PRAYER-PERIOD AMBIENT THEMING ===== */
+        :root {
+            --ambient-tint: rgba(201, 168, 76, 0.04);
+            --ambient-accent: #C9A84C;
+        }
+        [data-prayer-period="fajr"]    { --ambient-tint: rgba(30, 50, 80, 0.2);    --ambient-accent: #7BA7CC; }
+        [data-prayer-period="morning"] { --ambient-tint: rgba(255, 220, 150, 0.08); --ambient-accent: #D4A84B; }
+        [data-prayer-period="dhuhr"]   { --ambient-tint: rgba(255, 245, 220, 0.06); --ambient-accent: #E8C547; }
+        [data-prayer-period="asr"]     { --ambient-tint: rgba(200, 150, 50, 0.1);   --ambient-accent: #C9A84C; }
+        [data-prayer-period="maghrib"] { --ambient-tint: rgba(180, 80, 40, 0.12);   --ambient-accent: #D4764B; }
+        [data-prayer-period="isha"]    { --ambient-tint: rgba(10, 15, 40, 0.3);     --ambient-accent: #6B7FBF; }
+
+        /* Light mode period variants */
+        [data-theme="light"][data-prayer-period="fajr"]    { --ambient-tint: rgba(30, 50, 80, 0.07);    --ambient-accent: #4A7BAA; }
+        [data-theme="light"][data-prayer-period="morning"] { --ambient-tint: rgba(255, 200, 100, 0.1);  --ambient-accent: #8A6800; }
+        [data-theme="light"][data-prayer-period="dhuhr"]   { --ambient-tint: rgba(255, 240, 180, 0.12); --ambient-accent: #7A6200; }
+        [data-theme="light"][data-prayer-period="asr"]     { --ambient-tint: rgba(180, 120, 30, 0.08);  --ambient-accent: #7A5800; }
+        [data-theme="light"][data-prayer-period="maghrib"] { --ambient-tint: rgba(160, 60, 20, 0.09);   --ambient-accent: #A04A20; }
+        [data-theme="light"][data-prayer-period="isha"]    { --ambient-tint: rgba(10, 15, 40, 0.06);    --ambient-accent: #3A4F9A; }
+
+        /* Ambient gradient on home screen top */
+        .home-dashboard {
+            position: relative;
+            isolation: isolate;
+        }
+        .home-ambient-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 340px;
+            background: linear-gradient(to bottom, var(--ambient-tint), transparent);
+            pointer-events: none;
+            z-index: -1;
+            transition: background 1.5s ease;
+            border-radius: 0;
+        }
+
+        /* Ambient accent on countdown */
+        #dashboardPrayerCountdown {
+            color: var(--ambient-accent);
+            transition: color 1.5s ease;
+        }
+
+        /* Greeting fade-in animation */
+        @keyframes greetingFadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .dashboard-greeting-enter {
+            animation: greetingFadeIn 0.5s ease forwards;
+        }
+
+        /* ===== SURAH INFO CARD ===== */
+        .surah-info-card {
+            text-align: center;
+            padding: 28px 20px 20px;
+            margin-bottom: 4px;
+        }
+        .surah-info-name {
+            font-family: var(--arabic-font);
+            font-size: 2.4rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.4;
+            margin: 0 0 8px;
+            direction: rtl;
+        }
+        .surah-info-english {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            margin: 0 0 14px;
+            letter-spacing: 0.2px;
+        }
+        .surah-info-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+        .surah-info-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-secondary);
+        }
+        .surah-info-badge--makki {
+            background: rgba(201, 168, 76, 0.12);
+            border-color: rgba(201, 168, 76, 0.3);
+            color: #D4A84B;
+        }
+        .surah-info-badge--madani {
+            background: rgba(46, 196, 113, 0.1);
+            border-color: rgba(46, 196, 113, 0.28);
+            color: #2DC87A;
+        }
+        .surah-info-divider {
+            color: var(--text-subtle);
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            opacity: 0.5;
+        }
+        [data-theme="light"] .surah-info-badge {
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.1);
+            color: var(--text-secondary);
+        }
+        [data-theme="light"] .surah-info-badge--makki { background: rgba(150, 100, 20, 0.1); border-color: rgba(150, 100, 20, 0.25); color: #7A5500; }
+        [data-theme="light"] .surah-info-badge--madani { background: rgba(30, 140, 80, 0.1); border-color: rgba(30, 140, 80, 0.25); color: #156040; }
+
+        /* ===== ONBOARDING ICON ===== */
+        .onboarding-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 12px;
+            line-height: 1;
+        }
+
         .prayer-location-bar {
             display: flex; align-items: center; justify-content: center;
             margin-bottom: 8px; padding: 6px;

@@ -754,16 +754,14 @@
 
         const slides = isPS
             ? [
-                { title: 'ښه راغلاست', body: 'اساسي دعاګانو ته ښه راغلاست — د قرآن او سنتو څخه تایید شوې غوره دعاګانې.' },
-                { title: 'مهمې ځانګړنې', body: 'د کټګورۍ له مخې ولټوئ، خوښې خوندي کړئ، پرمختګ تعقیب کړئ، تسبیح وکاروئ، او د قبلې سره د لمانځه وختونه وګورئ.' },
-                { title: 'د کارولو طریقه', body: 'کټګوري ټک کړئ، کارت خلاص کړئ، او د لړۍ جوړولو لپاره "لوستل شوی" وکاروئ.' },
-                { title: 'پیل وکړئ', body: 'نن یوازې له یوې دعا پیل وکړئ. لږ دوام لوی برکت راولي.' }
+                { icon: '📖', title: '۶۳ صحیحه دعاګانې', body: 'ورځنۍ دعاګانې ولولئ، واورئ، او حفظ کړئ — د قرآن او سنتو له معتبرو سرچینو.' },
+                { icon: '🕌', title: 'قرآن په ۳ ژبو کې', body: 'عربي متن د پښتو او انګلیسي ترجمو او آډیو سره — آنلاین او آفلاین.' },
+                { icon: '🔔', title: 'هېڅکله لمونځ مه هېروئ', body: 'ستاسو د موقعیت لپاره د اذان یادونې سره دقیق لمانځ وختونه او قبله.' }
             ]
             : [
-                { title: 'Welcome', body: 'Welcome to Falah — your curated collection of verified duas from Quran and Sunnah.' },
-                { title: 'Key Features', body: 'Browse by category, save favorites, track progress, use Tasbeeh, and view prayer times with Qibla.' },
-                { title: 'How to Use', body: 'Tap a category to explore, expand a card to read details, and use Mark Read to build your streak.' },
-                { title: 'Get Started', body: 'Begin with one dua today. Small consistency brings lasting barakah over time.' }
+                { icon: '📖', title: '63 Authentic Duas', body: 'Read, listen, and memorize daily supplications with scholarly references from Quran and Sunnah.' },
+                { icon: '🕌', title: 'Quran in 3 Languages', body: 'Arabic text with Pashto and English translations and audio — works online and offline.' },
+                { icon: '🔔', title: 'Never Miss a Prayer', body: 'Accurate prayer times with adhan reminders for your location, plus Qibla compass.' }
             ];
 
         let index = 0;
@@ -833,13 +831,13 @@
             const directionClass = slideDirection === 'prev' ? 'slide-in-prev' : 'slide-in-next';
             overlay.innerHTML = `
                 <div class="onboarding-card ${directionClass}" role="dialog" aria-modal="true" aria-label="App onboarding">
-                    <div class="onboarding-step">${isPS ? 'ګام' : 'Step'} ${index + 1} ${isPS ? 'له' : 'of'} ${slides.length}</div>
+                    <div class="onboarding-icon" aria-hidden="true">${slide.icon || ''}</div>
                     <div class="onboarding-title">${slide.title}</div>
                     <div class="onboarding-body">${slide.body}</div>
                     <div class="onboarding-dots">${dots}</div>
                     <div class="onboarding-actions">
                         <button class="onboarding-btn" id="onboardingSkip">${isPS ? 'تېرول' : 'Skip'}</button>
-                        <button class="onboarding-btn ${isLast ? 'primary' : ''}" id="onboardingNext">${isLast ? (isPS ? 'پیل' : 'Get Started') : (isPS ? 'بل' : 'Next')}</button>
+                        <button class="onboarding-btn ${isLast ? 'primary' : ''}" id="onboardingNext">${isLast ? (isPS ? 'پیل کړئ' : 'Get Started') : (isPS ? 'بل' : 'Next')}</button>
                     </div>
                 </div>`;
 
@@ -3323,6 +3321,40 @@ window.filterCategory = function(cat, btn) {
         }
     }
 
+    function getContextualGreeting() {
+        const isPS = isPashtoMode();
+        const rawPeriod = getTimePeriodFromPrayers() || (() => {
+            const h = new Date().getHours();
+            if (h < 5) return 'latenight';
+            if (h < 7) return 'fajr';
+            if (h < 12) return 'morning';
+            if (h < 16) return 'dhuhr';
+            if (h < 19) return 'asr';
+            if (h < 21) return 'maghrib';
+            return 'isha';
+        })();
+
+        const greetings = isPS ? {
+            fajr:      'السلام علیکم — د فجر وخت',
+            morning:   'سهار مو پخیر — خپله ورځ د ذکر سره پیل کړئ',
+            dhuhr:     'السلام علیکم — د غرمې لمانځ وخت دی',
+            asr:       'مازدیګر مو پخیر — د مازیګر لمانځ وخت دی',
+            maghrib:   'السلام علیکم — د ماښام لمانځ وخت دی',
+            isha:      'ماښام مو پخیر — خپله ورځ د لمانځه سره پای ته ورسوئ',
+            latenight: 'ماښام مو پخیر — خپله ورځ د لمانځه سره پای ته ورسوئ',
+        } : {
+            fajr:      'Assalamu Alaikum — Fajr time',
+            morning:   'Good morning — start your day with dhikr',
+            dhuhr:     'Assalamu Alaikum — Dhuhr is here',
+            asr:       'Good afternoon — time for Asr',
+            maghrib:   'Assalamu Alaikum — Maghrib time',
+            isha:      'Good evening — end your day with prayer',
+            latenight: 'Good evening — end your day with prayer',
+        };
+
+        return greetings[rawPeriod] || (isPS ? 'السلام عليكم' : 'Assalamu Alaikum');
+    }
+
     function refreshHomeDashboardGreeting() {
         const greeting = document.getElementById('dashboardGreeting');
         const dateEl = document.getElementById('dashboardDate');
@@ -3336,7 +3368,7 @@ window.filterCategory = function(cat, btn) {
             document.body.setAttribute('data-day-phase', phase);
         }
         const ui = getDashboardText();
-        greeting.textContent = ui.warmGreeting;
+        greeting.textContent = getContextualGreeting();
         greeting.setAttribute('aria-hidden', 'false');
         greeting.classList.remove('dashboard-greeting-enter');
         // Reflow to restart animation when language/time segment changes.
@@ -4034,6 +4066,7 @@ window.filterCategory = function(cat, btn) {
         bindDashboardSuggestionCard();
         bindDashboardDuaSuggestionCard();
         bindDashboardQuranStreakCard();
+        applyPrayerPeriodTheme();
         if (!window.__dashboardRefreshTimer) {
             window.__dashboardRefreshTimer = setInterval(() => {
                 refreshHomeNextPrayerCard();
@@ -8257,6 +8290,7 @@ window.filterCategory = function(cat, btn) {
         prayerPanelHydrated = true;
         setPanelLoading('prayer', false);
         refreshHomeNextPrayerCard();
+        applyPrayerPeriodTheme();
     }
 
     function renderPrayerGrid() {
@@ -8458,6 +8492,7 @@ window.filterCategory = function(cat, btn) {
             renderPrayerGrid();
             refreshHomeNextPrayerCard();
         }
+        applyPrayerPeriodTheme();
     }
 
     function normalizeMeridiem(text) {
@@ -8510,6 +8545,40 @@ window.filterCategory = function(cat, btn) {
         cutoff.setHours(cutoff.getHours() + 2);
         if (now < cutoff) return 'isha';
         return 'latenight';
+    }
+
+    // --- Prayer period for ambient theming (6-value, exported to data-prayer-period) ---
+    function getCurrentPrayerPeriod() {
+        if (prayerTimesData) {
+            const now = new Date();
+            if (now < prayerTimesData.fajr) return 'isha';
+            if (now < prayerTimesData.sunrise) return 'fajr';
+            if (now < prayerTimesData.dhuhr) return 'morning';
+            if (now < prayerTimesData.asr) return 'dhuhr';
+            if (now < prayerTimesData.maghrib) return 'asr';
+            if (now < prayerTimesData.isha) return 'maghrib';
+            return 'isha';
+        }
+        // Hour-based fallback when prayer times not loaded yet
+        const h = new Date().getHours();
+        if (h < 5) return 'isha';
+        if (h < 7) return 'fajr';
+        if (h < 12) return 'morning';
+        if (h < 15) return 'dhuhr';
+        if (h < 18) return 'asr';
+        if (h < 20) return 'maghrib';
+        return 'isha';
+    }
+
+    let _lastAppliedPeriod = null;
+    function applyPrayerPeriodTheme() {
+        const period = getCurrentPrayerPeriod();
+        if (_lastAppliedPeriod === period) return;
+        _lastAppliedPeriod = period;
+        document.body.setAttribute('data-prayer-period', period);
+        if (typeof refreshHomeDashboardGreeting === 'function') {
+            refreshHomeDashboardGreeting();
+        }
     }
 
     // ===== QIBLA COMPASS =====
@@ -11950,6 +12019,41 @@ window.filterCategory = function(cat, btn) {
         return;
     }
 
+    function renderSurahInfoCard(data) {
+        const scrollContent = document.getElementById('quranScrollContent');
+        if (!scrollContent) return;
+        let card = document.getElementById('surahInfoCard');
+        if (!card) {
+            card = document.createElement('div');
+            card.id = 'surahInfoCard';
+            card.className = 'surah-info-card';
+            scrollContent.insertBefore(card, scrollContent.firstChild);
+        }
+        if (!data) { card.hidden = true; return; }
+        const isPS = isPashtoMode();
+        const ui = getQuranUiText();
+        const revelation = getRevelationMeta(data.revelationType);
+        const arabicName = escapeHtml(cleanSurahArabicName(data.name || ''));
+        const englishName = escapeHtml(data.englishName || '');
+        const englishMeaning = escapeHtml(data.englishNameTranslation || '');
+        const ayahCount = data.numberOfAyahs || '?';
+        const surahNum = data.surahNumber || data.number || '';
+        const ayahLabel = isPS ? 'آیتونه' : 'Ayahs';
+        const surahLabel = isPS ? 'سورت' : 'Surah';
+        const isMakki = revelation.tone === 'makki';
+        card.hidden = false;
+        card.innerHTML = `
+            <h2 class="surah-info-name" dir="rtl">${arabicName}</h2>
+            <p class="surah-info-english">${englishName}${englishMeaning ? ` \u2014 ${englishMeaning}` : ''}</p>
+            <div class="surah-info-meta">
+                <span class="surah-info-badge surah-info-badge--${isMakki ? 'makki' : 'madani'}">${escapeHtml(revelation.label)}</span>
+                <span class="surah-info-badge">${localizeQuranNumber(ayahCount)} ${escapeHtml(ayahLabel)}</span>
+                <span class="surah-info-badge">${escapeHtml(surahLabel)} ${localizeQuranNumber(surahNum)}</span>
+            </div>
+            <div class="surah-info-divider" aria-hidden="true">\u25C6</div>
+        `;
+    }
+
     function renderQuranReaderHeader(data) {
         const header = document.getElementById('quranReaderHeader');
         if (!header || !data) return;
@@ -11970,6 +12074,7 @@ window.filterCategory = function(cat, btn) {
             </div>
             ${showBismillah ? `<div class="quran-bismillah">${escapeHtml(getQuranUiText().bismillah)}</div>` : ''}
         `;
+        renderSurahInfoCard(data);
     }
 
     function renderQuranAyahChunk(reset = false) {
