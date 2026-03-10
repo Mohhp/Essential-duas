@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#8B6914"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#E8D088"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="4" fill="#0A1628"/>
+  <g transform="rotate(-30, 16, 16)">
+    <path d="M 23.70,7.29 A 12.60,12.60 0 1,0 23.70,24.71 A 10.08,10.08 0 1,1 23.70,7.29 Z" fill="url(#goldGrad)"/>
+    <path d="M 19.36,12.92 L 20.04,13.79 L 21.14,13.66 L 21.01,14.76 L 21.88,15.44 L 21.01,16.12 L 21.14,17.22 L 20.04,17.09 L 19.36,17.96 L 18.68,17.09 L 17.58,17.22 L 17.71,16.12 L 16.84,15.44 L 17.71,14.76 L 17.58,13.66 L 18.68,13.79 Z" fill="url(#goldGrad)"/>
+  </g>
+</svg>

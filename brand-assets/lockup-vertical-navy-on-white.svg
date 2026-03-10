@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500">
+  
+  <rect width="400" height="500" fill="#FFFFFF"/>
+  <g transform="rotate(-30, 200.0, 140)">
+    <path d="M 249.52,84.00 A 81.00,81.00 0 1,0 249.52,196.00 A 64.80,64.80 0 1,1 249.52,84.00 Z" fill="#0A1628"/>
+    <path d="M 221.60,120.20 L 225.98,125.82 L 233.06,124.94 L 232.18,132.02 L 237.80,136.40 L 232.18,140.78 L 233.06,147.86 L 225.98,146.98 L 221.60,152.60 L 217.22,146.98 L 210.14,147.86 L 211.02,140.78 L 205.40,136.40 L 211.02,132.02 L 210.14,124.94 L 217.22,125.82 Z" fill="#0A1628"/>
+  </g>
+  <text x="200.0" y="310" text-anchor="middle" font-family="Amiri, 'Noto Naskh Arabic', serif" font-weight="bold" font-size="72" fill="#0A1628" direction="rtl" xml:lang="ar">فلاح</text>
+  <line x1="120.0" y1="345" x2="280.0" y2="345" stroke="#0A1628" stroke-width="1" opacity="0.6"/>
+  <text x="200.0" y="390" text-anchor="middle" font-family="'Cormorant Garamond', 'Noto Serif', Georgia, serif" font-weight="600" font-size="28" letter-spacing="4" fill="#0A1628">FALAH</text>
+</svg>
