@@ -26,6 +26,7 @@
   let playerAudio = null;
   let preloadAudio = null;
   let activePlay = null;
+  let stopCount = 0;
   let recoveryTimer = null;
 
   function clearRecoveryTimer() {
@@ -193,6 +194,7 @@
   }
 
   function stopPashtoTranslation() {
+    stopCount++;
     if (!playerAudio) return;
     clearRecoveryTimer();
     playerAudio.pause();
@@ -423,7 +425,9 @@
     }
 
     const segment = normalizeSegmentOptions(options);
+    const myStopCount = stopCount;
     const urls = await getPashtoTranslationUrls(surah);
+    if (stopCount !== myStopCount) throw new Error("Playback stopped");
     const audio = ensurePlayerAudio();
 
     if (activePlay) {

@@ -11519,6 +11519,8 @@ window.filterCategory = function(cat, btn) {
                 const token = quranState.translationQueueToken;
                 const translationPlayed = await playTranslationAfterAyah(sNo, aNo, mode, token);
 
+                if (token !== quranState.translationQueueToken) return;
+
                 if (quranState.audioAyah !== `${sNo}:${aNo}` || mode !== (quranState.activeFlowMode || 'ar')) {
                     return;
                 }
