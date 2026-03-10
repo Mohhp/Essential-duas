@@ -82,6 +82,23 @@ class PrayerAlarmScheduler(
         if (saveState) repository.clearLastSchedule()
     }
 
+    /**
+     * DEBUG ONLY — schedules a one-shot test alarm [delaySeconds] seconds from now
+     * using "fajr" as the prayer name so the full alarm+adhan path is exercised.
+     * Remove or gate behind a BuildConfig flag before public release.
+     */
+    fun scheduleTestAlarm(delaySeconds: Int): ScheduledReminder? {
+        if (alarmManager == null) return null
+        if (!permissionChecker.canScheduleExactAlarms()) return null
+        ensureNotificationChannels()
+        val clampedDelay = delaySeconds.coerceIn(5, 600)
+        val triggerAt = System.currentTimeMillis() + clampedDelay * 1000L
+        val reminder = ScheduledReminder(prayerName = "fajr", triggerAt = triggerAt, offsetMinutes = 0)
+        scheduleExactAlarm(reminder)
+        Log.d(logTag, "Test alarm scheduled: triggerAt=$triggerAt delaySeconds=$clampedDelay")
+        return reminder
+    }
+
     fun notifyReminder(reminder: ScheduledReminder, forceSilent: Boolean = false) {
         val settings = repository.getSettings()
         val prayerLabel = reminder.prayerName.replaceFirstChar { it.uppercase() }
