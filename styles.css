@@ -756,7 +756,7 @@
             max-width: 900px;
             margin: 0 auto;
             display: grid;
-            gap: 12px;
+            gap: 8px;
         }
 
         .quran-top-progress {
@@ -2532,7 +2532,7 @@
             min-height: 28px;
             padding: 0 9px;
             margin-top: 10px;
-            margin-bottom: 6px;
+            margin-bottom: 2px;
             border-radius: 999px;
             border: 1px solid rgba(46, 196, 122, 0.2);
             background: rgba(46, 196, 122, 0.06);
@@ -3898,11 +3898,20 @@
 
         .quran-top-progress {
             position: static;
+            display: block;
             height: 2px;
             border-radius: 2px;
             overflow: hidden;
-            margin-bottom: 8px;
+            padding: 0;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            margin-bottom: 4px;
         }
+        .quran-top-progress::before { display: none; }
+        .quran-top-progress-copy { display: none; }
         .quran-top-progress span {
             display: block;
             height: 100%;
