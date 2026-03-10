@@ -192,13 +192,9 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        swipeRefresh.setOnRefreshListener {
-            webView.reload()
-        }
-        swipeRefresh.setOnChildScrollUpCallback { _, _ ->
-            // DOM panels own scrolling in this app, so use the last scrollTop reported from JS.
-            lastReportedContentScrollTopPx > 0.5
-        }
+        // Pull-to-refresh is disabled: DOM panels own scrolling and a swipe-down at scrollTop=0
+        // would otherwise reload the page mid-session.
+        swipeRefresh.isEnabled = false
 
         with(webView.settings) {
             javaScriptEnabled = true
@@ -206,6 +202,7 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
             mediaPlaybackRequiresUserGesture = false
             databaseEnabled = true
             allowContentAccess = true
+            setGeolocationEnabled(true)
             cacheMode = WebSettings.LOAD_DEFAULT
             mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
         }
