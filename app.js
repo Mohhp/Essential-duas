@@ -2671,26 +2671,27 @@ window.filterCategory = function(cat, btn) {
             }
         }
         if (navigator.vibrate) navigator.vibrate(10);
+        safeVibrate(35);
         playTasbeehClick();
         refreshDashboardProgressSummaryCard();
 
-        if (tasbeehCount >= tasbeehTarget && tasbeehTarget !== 0) {
+        if (tasbeehCount === tasbeehTarget && tasbeehTarget !== 0) {
             if (display) {
-                display.classList.add('target-reached');
-                setTimeout(() => display.classList.remove('target-reached'), 1000);
+                display.classList.remove('tasbeeh-complete-pulse');
+                void display.offsetWidth; // force reflow to restart animation
+                display.classList.add('tasbeeh-complete-pulse');
+                setTimeout(() => display.classList.remove('tasbeeh-complete-pulse'), 650);
             }
-            if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+            safeVibrate([50, 30, 50]);
             playTasbeehCompletionChime();
             saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
             triggerTasbeehCelebration();
-            tasbeehCount = 0;
-            showToast('Target reached! ✨ Count saved.');
-            // Auto-advance to next dhikr if user reached target
-            setTimeout(() => {
-                const display2 = document.getElementById('tasbeehDisplay');
-                if (display2) display2.textContent = localizeDigits('0');
-                updateTasbeehUI();
-            }, 300);
+            const dhikr = DHIKR_LIST[currentDhikrIndex];
+            const countStr = (typeof isPashtoMode === 'function' && isPashtoMode()) ? localizeDigits(tasbeehTarget) : String(tasbeehTarget);
+            const toastMsg = (typeof isPashtoMode === 'function' && isPashtoMode())
+                ? `✓ ${dhikr.ar} × ${countStr} بشپړ شو`
+                : `✓ ${dhikr.en} × ${tasbeehTarget} completed`;
+            showToast(toastMsg);
         }
     };
 
@@ -4568,7 +4569,7 @@ window.filterCategory = function(cat, btn) {
 
         // Milestone
         let milestone = '';
-        if (readCount >= 55) milestone = isPS && psUI?.milestones?.all ? psUI.milestones.all : '🏆 Completed the entire Crown Collection!';
+        if (readCount >= 55) milestone = isPS && psUI?.milestones?.all ? psUI.milestones.all : '🏆 Completed all duas — حي على الفلاح!';
         else if (readCount >= 40) milestone = isPS && psUI?.milestones?.m40 ? psUI.milestones.m40 : '⭐ Almost there — a true seeker of knowledge!';
         else if (readCount >= 25) milestone = isPS && psUI?.milestones?.m25 ? psUI.milestones.m25 : '💪 Halfway champion — keep going!';
         else if (readCount >= 10) milestone = isPS && psUI?.milestones?.m10 ? psUI.milestones.m10 : '🌱 Growing beautifully — 10+ duas learned!';
@@ -4659,7 +4660,7 @@ window.filterCategory = function(cat, btn) {
 
         // Milestone text
         let milestone = '';
-        if (readCount >= 63) milestone = '🏆 Completed the entire Crown Collection!';
+        if (readCount >= 63) milestone = '🏆 Completed all duas — حي على الفلاح!';
         else if (readPct >= 40) milestone = '⭐ Nearly there — a true seeker of knowledge!';
         else if (readPct >= 25) milestone = '💪 Halfway hero — keep going!';
         else if (readPct >= 10) milestone = '🌱 Beautiful growth — 10+ duas learned!';
@@ -8069,6 +8070,14 @@ window.filterCategory = function(cat, btn) {
             updateCountdown();
             startCountdown();
             setPanelLoading('prayer', false);
+            // Restore GPS button state from cached location
+            try {
+                const cachedStr = localStorage.getItem('crown_location');
+                if (cachedStr) {
+                    const loc = JSON.parse(cachedStr);
+                    updateGpsLocationBtnState('success', loc.city || '');
+                }
+            } catch (_) {}
         }
 
         recordInAppRoute(true);
@@ -8080,6 +8089,31 @@ window.filterCategory = function(cat, btn) {
         if (pp) pp.classList.remove('active');
         if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
         history.back();
+    };
+
+    function updateGpsLocationBtnState(state, cityName = '') {
+        const btn = document.getElementById('gpsLocationBtn');
+        const lbl = document.getElementById('gpsLocationBtnLabel');
+        const isPS = typeof isPashtoMode === 'function' && isPashtoMode();
+        if (!btn || !lbl) return;
+        btn.classList.remove('gps-loading', 'gps-success', 'gps-error');
+        if (state === 'loading') {
+            btn.classList.add('gps-loading');
+            lbl.textContent = isPS ? 'موقعیت لټول...' : 'Detecting location...';
+        } else if (state === 'success') {
+            btn.classList.add('gps-success');
+            lbl.textContent = cityName ? `📍 ${cityName}` : (isPS ? '📍 موقعیت وموندل شو' : '📍 Location found');
+        } else if (state === 'error') {
+            btn.classList.add('gps-error');
+            lbl.textContent = isPS ? 'موقعیت شتون نلري — مهرباني وکړئ لاندې خپل ښار ولټوئ' : 'Location unavailable — please search for your city below';
+        } else {
+            lbl.textContent = isPS ? 'زما موقعیت وکاروئ' : 'Use my location';
+        }
+    }
+
+    window.handleGpsLocationBtn = function() {
+        updateGpsLocationBtnState('loading');
+        window.requestLocation();
     };
 
     window.requestLocation = function() {
@@ -8134,6 +8168,7 @@ window.filterCategory = function(cat, btn) {
                 detectedGpsCityKey = selectedCity ? selectedCity.key : null;
                 localStorage.setItem('crown_location', JSON.stringify(savedLoc));
                 if (isNativeAndroidReminderMode()) syncNativeAndroidReminderState('gps-location-selected', savedLoc);
+                updateGpsLocationBtnState('success', savedLoc.city || city);
                 onLocationReady(lat, lng, city);
                 if (document.getElementById('cityDropdown')?.classList.contains('open')) {
                     renderCityDropdown(cityInput?.value || '');
@@ -8145,6 +8180,7 @@ window.filterCategory = function(cat, btn) {
                 setPanelLoading('prayer', false);
                 if (cityInput) cityInput.value = uiText.locationDenied;
                 setSelectedCityChip(uiText.locationDenied);
+                updateGpsLocationBtnState('error');
                 const grid = document.getElementById('prayerTimesGrid');
                 if (grid) grid.innerHTML = `<div style="text-align:center;padding:14px;opacity:0.7;">${uiText.enableLocation}</div>`;
             },
@@ -8166,9 +8202,12 @@ window.filterCategory = function(cat, btn) {
 
         const cached = localStorage.getItem('crown_location');
         if (cached) {
-            updateCityInputFromLocation(JSON.parse(cached));
+            const loc = JSON.parse(cached);
+            updateCityInputFromLocation(loc);
+            updateGpsLocationBtnState('success', loc.city || city);
         } else {
             updateCityInputFromLocation({ lat, lng, city });
+            if (city) updateGpsLocationBtnState('success', city);
         }
         if (isNativeAndroidReminderMode()) syncNativeAndroidReminderState('location-ready');
         isGpsResolving = false;
