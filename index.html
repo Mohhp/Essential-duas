@@ -13,7 +13,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="styles.css?v=20260310h">
+    <link rel="stylesheet" href="styles.css?v=20260310i">
 </head>
 
     <body class="startup-blocked">
@@ -3299,7 +3299,6 @@
 <div class="quran-panel panel" onclick="if(event.target === this) closeQuran()">
     <div class="quran-panel-content" id="quranPanelContent">
         <button class="panel-back-btn" onclick="closeQuran()" aria-label="Back">← Back / ← بیرته</button>
-        <button class="quran-focus-exit-btn" id="quranFocusExitBtn" onclick="toggleQuranFocusMode(false)" aria-label="Exit focus mode">✕ Exit Focus / تمرکز وتھ</button>
         <div class="panel-loading-overlay" id="quranPanelLoading" aria-hidden="true">Loading…</div>
         <div class="quran-shell">
             <div class="quran-top-progress" id="quranTopProgress">
@@ -3317,9 +3316,6 @@
                         <button type="button" class="quran-nav-btn" id="quranPrevSurahBtn" aria-label="Previous surah">←</button>
                         <button type="button" class="quran-chip-btn" id="quranResumeBtn">Resume</button>
                         <button type="button" class="quran-nav-btn" id="quranNextSurahBtn" aria-label="Next surah">→</button>
-                        <button type="button" class="quran-nav-btn quran-focus-btn" id="quranFocusBtn" onclick="toggleQuranFocusMode()" aria-label="Focus reading mode" aria-pressed="false" title="Focus reading mode">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 0 0-10 10 10 10 0 0 0 10 10 10 10 0 0 0 10-10 10 10 0 0 0-10-10z" opacity="0.3"/><path d="M12 6a6 6 0 0 0-6 6 6 6 0 0 0 6 6 6 6 0 0 0 6-6 6 6 0 0 0-6-6z" opacity="0.6"/></svg>
-                        </button>
                     </div>
                 </div>
                 <div class="quran-surah-select-wrap">
@@ -3510,7 +3506,17 @@
 <!-- ===== QURAN FLOATING AUDIO DOT (BODY LEVEL) ===== -->
 <div id="quran-floating-dot" class="quran-audio-dot" style="display:none;" aria-label="Play or pause Quran audio" role="button" tabindex="0">
     <span class="dot-icon">⏸</span>
- </div>
+</div>
+
+<!-- ===== QURAN FOCUS MODE TOGGLE (BODY LEVEL – always visible on Quran tab) ===== -->
+<button id="quranFocusDot" class="quran-focus-dot" aria-label="Toggle focus reading mode" aria-pressed="false" title="Focus reading mode" onclick="toggleQuranFocusMode()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+        <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+        <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+        <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+    </svg>
+</button>
 
 <div id="quran-dot-popup" class="quran-dot-popup" aria-hidden="true">
     <span class="dot-popup-info" id="dot-ayah-info">Ayah 0/0</span>
@@ -3529,7 +3535,7 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (active) -->
-    <script src="app.js?v=20260310g"></script>
+    <script src="app.js?v=20260310h"></script>
 <!-- Source assets (fallback for local debugging) -->
 <!-- <script src="app.js?v=20260306k"></script> -->
 

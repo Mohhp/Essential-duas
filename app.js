@@ -1345,7 +1345,14 @@
     function closeAllPanelsForStateApply() {
         if (isDuaSwipeViewerActive()) closeDuaSwipeViewer({ skipRoute: true });
 
-        closeQuranReader({ skipHistory: true });
+        // Preserve audio when it is actively playing — the floating audio dot
+        // provides controls from any screen so audio can continue across navigation.
+        if (!isQuranAudioSessionActive()) {
+            closeQuranReader({ skipHistory: true });
+        } else {
+            clearQuranAudioDotHoldTimer();
+            closeQuranAudioPopup();
+        }
         setPanelLoading('quran', false);
         setPanelLoading('prayer', false);
 
@@ -12616,15 +12623,24 @@ window.filterCategory = function(cat, btn) {
 
     function closeQuranPanel({ skipHistory = false } = {}) {
         setPanelLoading('quran', false);
-        closeQuranReader({ skipHistory: true });
         clearQuranAudioDotHoldTimer();
         closeQuranAudioPopup();
         updateQuranMiniPlayerVisibility();
         resetQuranAyahObserver();
-        quranState.currentSurah = null;
-        quranState.currentSurahData = null;
-        quranState.renderedAyahs = 0;
-        quranState.currentVisibleAyah = 1;
+        const audioActive = isQuranAudioSessionActive();
+        if (audioActive) {
+            // Audio is playing — keep it running across navigation.
+            // The floating audio dot gives the user control from any screen.
+            updateQuranFloatingAudioUi();
+        } else {
+            // No active audio — fully reset playback state.
+            stopQuranAudio({ resetTime: true, navigatedAway: true });
+            quranState.currentSurah = null;
+            quranState.currentSurahData = null;
+            quranState.renderedAyahs = 0;
+            quranState.currentVisibleAyah = 1;
+            updateQuranFloatingAudioUi();
+        }
         document.body.classList.remove('quran-reading-mode');
         switchTab('home');
         if (!skipHistory) {
@@ -13476,10 +13492,11 @@ window.filterCategory = function(cat, btn) {
         if (!panel) return;
         const activate = (force !== undefined) ? Boolean(force) : !panel.classList.contains('focus-mode');
         panel.classList.toggle('focus-mode', activate);
-        const btn = document.getElementById('quranFocusBtn');
-        if (btn) {
-            btn.setAttribute('aria-pressed', String(activate));
-            btn.title = activate
+        // Update the persistent body-level focus dot (always visible on Quran tab)
+        const focusDot = document.getElementById('quranFocusDot');
+        if (focusDot) {
+            focusDot.setAttribute('aria-pressed', String(activate));
+            focusDot.title = activate
                 ? (isPashtoMode() ? 'د تمرکز حالت بند کړئ' : 'Exit focus mode')
                 : (isPashtoMode() ? 'د تمرکز حالت' : 'Focus reading mode');
         }
