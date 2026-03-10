@@ -13,7 +13,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="styles.css?v=20260310b">
+    <link rel="stylesheet" href="styles.css?v=20260310c">
 </head>
 
     <body class="startup-blocked">
@@ -3076,6 +3076,7 @@
                 <div class="qibla-degree" id="qiblaDegree">--°</div>
                 <div class="qibla-distance" id="qiblaDistance">-- km to the Kaaba</div>
                 <div class="qibla-status" id="qiblaStatus">Enable location to see Qibla</div>
+                <div class="qibla-calibrate-hint" id="qiblaCalibrate" hidden>Move your phone in a figure-8 to calibrate</div>
                 <div class="qibla-instruction" id="qiblaInstruction">Point your phone toward the highlighted direction.</div>
             </div>
         </div>
@@ -3186,6 +3187,7 @@
 <div class="quran-panel panel" onclick="if(event.target === this) closeQuran()">
     <div class="quran-panel-content" id="quranPanelContent">
         <button class="panel-back-btn" onclick="closeQuran()" aria-label="Back">← Back / ← بیرته</button>
+        <button class="quran-focus-exit-btn" id="quranFocusExitBtn" onclick="toggleQuranFocusMode(false)" aria-label="Exit focus mode">✕ Exit Focus / تمرکز وتھ</button>
         <div class="panel-loading-overlay" id="quranPanelLoading" aria-hidden="true">Loading…</div>
         <div class="quran-shell">
             <div class="quran-top-progress" id="quranTopProgress">
@@ -3203,6 +3205,9 @@
                         <button type="button" class="quran-nav-btn" id="quranPrevSurahBtn" aria-label="Previous surah">←</button>
                         <button type="button" class="quran-chip-btn" id="quranResumeBtn">Resume</button>
                         <button type="button" class="quran-nav-btn" id="quranNextSurahBtn" aria-label="Next surah">→</button>
+                        <button type="button" class="quran-nav-btn quran-focus-btn" id="quranFocusBtn" onclick="toggleQuranFocusMode()" aria-label="Focus reading mode" aria-pressed="false" title="Focus reading mode">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M12 2a10 10 0 0 0-10 10 10 10 0 0 0 10 10 10 10 0 0 0 10-10 10 10 0 0 0-10-10z" opacity="0.3"/><path d="M12 6a6 6 0 0 0-6 6 6 6 0 0 0 6 6 6 6 0 0 0 6-6 6 6 0 0 0-6-6z" opacity="0.6"/></svg>
+                        </button>
                     </div>
                 </div>
                 <div class="quran-surah-select-wrap">
@@ -3412,6 +3417,6 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (active) -->
-    <script src="app.js?v=20260310b"></script>
+    <script src="app.js?v=20260310c"></script>
 <!-- Source assets (fallback for local debugging) -->
 <!-- <script src="app.js?v=20260306k"></script> -->

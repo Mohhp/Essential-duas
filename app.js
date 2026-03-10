@@ -3075,6 +3075,13 @@ window.filterCategory = function(cat, btn) {
             streak = Math.max(streak, 1);
         } else if (gap === 1) {
             streak = Math.max(1, streak + 1);
+        } else if (gap === 2 && isGraceAvailable(GRACE_KEYS.quran)) {
+            // Missed exactly 1 day — use weekly grace day
+            consumeGraceDay(GRACE_KEYS.quran);
+            streak = Math.max(1, streak + 1);
+            setTimeout(() => showToast(isPashtoMode()
+                ? 'د قرآن لړۍ خوندي شوه! هفتنۍ بخښنه مصرف شوه.'
+                : 'Quran streak saved! You used your weekly grace day.'), 900);
         } else {
             streak = 1;
         }
@@ -3813,7 +3820,11 @@ window.filterCategory = function(cat, btn) {
         const ui = getDashboardText();
         const streak = getQuranStreakForDisplay();
         const daysLabel = ui.days;
-        title.textContent = `${ui.quranStreakTitle}: ${localizeDigits(streak)} ${daysLabel}`;
+        const graceAvail = isGraceAvailable(GRACE_KEYS.quran);
+        const graceLabel = graceAvail
+            ? (isPashtoMode() ? ' (۱ بخښنه شتون لري)' : ' (1 grace day available)')
+            : '';
+        title.textContent = `${ui.quranStreakTitle}: ${localizeDigits(streak)} ${daysLabel}${streak > 0 ? graceLabel : ''}`;
 
         const lastRead = (() => {
             try { return JSON.parse(localStorage.getItem('crown_quran_last_read') || 'null'); }
@@ -4322,16 +4333,56 @@ window.filterCategory = function(cat, btn) {
         homePanel.dataset.pullRefreshBound = '1';
     }
 
+    // ===== GRACE DAY STREAK RECOVERY =====
+    const GRACE_KEYS = { dua: 'crown_streak_grace', quran: 'crown_quran_streak_grace' };
+
+    function getISOWeekKey(d = new Date()) {
+        const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+        tmp.setUTCDate(tmp.getUTCDate() + 4 - (tmp.getUTCDay() || 7));
+        const y = tmp.getUTCFullYear();
+        const w = Math.ceil((((tmp - new Date(Date.UTC(y, 0, 1))) / 86400000) + 1) / 7);
+        return `${y}-W${String(w).padStart(2, '0')}`;
+    }
+
+    function isGraceAvailable(storeKey) {
+        try {
+            const raw = localStorage.getItem(storeKey);
+            if (!raw) return true;
+            const { weekKey, used } = JSON.parse(raw);
+            return weekKey !== getISOWeekKey() || !used;
+        } catch (_) { return true; }
+    }
+
+    function consumeGraceDay(storeKey) {
+        localStorage.setItem(storeKey, JSON.stringify({ weekKey: getISOWeekKey(), used: true }));
+    }
+
     function checkStreak() {
         const today = new Date().toDateString();
         if (STATE.lastVisit !== today) {
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
-            if (STATE.lastVisit === yesterday.toDateString()) STATE.streak++;
-            else STATE.streak = 1;
+            const twoDaysAgo = new Date();
+            twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+            let graceUsed = false;
+            if (STATE.lastVisit === yesterday.toDateString()) {
+                STATE.streak++;
+            } else if (STATE.lastVisit === twoDaysAgo.toDateString() && isGraceAvailable(GRACE_KEYS.dua)) {
+                consumeGraceDay(GRACE_KEYS.dua);
+                STATE.streak++;
+                graceUsed = true;
+            } else {
+                STATE.streak = 1;
+            }
             STATE.lastVisit = today;
             localStorage.setItem('crown_streak', STATE.streak);
             localStorage.setItem('crown_last_visit', today);
+            if (graceUsed) {
+                setTimeout(() => showToast(isPashtoMode()
+                    ? 'ستاسو لړۍ خوندي شوه! هفتنۍ بخښنه مصرف شوه.'
+                    : 'Your streak was saved! You used your weekly grace day.'), 900);
+            }
         }
         if (els.streakCount) els.streakCount.innerText = STATE.streak;
         if (els.lastVisit) els.lastVisit.innerText = 'Today';
@@ -7422,8 +7473,9 @@ window.filterCategory = function(cat, btn) {
                 ? 'په براوزر او iPhone کې یادونې یوازې د پرانیستي اپ لپاره دي. شالیدي یادونې د Android اپ ته اړتیا لري.'
                 : 'Browser and iPhone reminders are foreground-only. Exact background reminders require the Android app.',
             remindersInactive: isPS ? 'یادونې غیرفعاله دي' : 'Reminders inactive',
-            qiblaFacing: isPS ? 'ماشاءالله! تاسو قبلې ته برابر یاست.' : 'MashaAllah! You are facing Qibla.',
+            qiblaFacing: isPS ? 'ماشاءالله! تاسو قبلې ته برابر یاست. ✓' : 'Facing Qibla ✓',
             qiblaAlmost: isPS ? 'نږدې یاست — {delta}° توپیر' : 'Almost there — {delta}° off',
+            qiblaCalibrate: isPS ? 'د کالیبریشن لپاره موبایل د ۸ ګڼه شکل کې وڅرخوئ' : 'Move your phone in a figure-8 to calibrate',
             qiblaRotateHint: isPS ? 'موبایل وڅرخوئ — ستنه د قبلې نښې ته برابره کړئ' : 'Rotate phone until the needle aligns with the highlighted direction',
             qiblaNeedleHint: isPS ? 'موبایل د روښانه شوي لوري پر خوا ونیسئ' : 'Point your phone toward the highlighted direction',
             change: isPS ? 'بدل' : 'Change',
@@ -8778,19 +8830,30 @@ window.filterCategory = function(cat, btn) {
 
         const section = document.getElementById('qiblaSection');
         const statusEl = document.getElementById('qiblaStatus');
+        const calibrateEl = document.getElementById('qiblaCalibrate');
         const uiText = getPrayerUiText();
 
         const needleTarget = normalizeDegrees(userQibla - latestCompassHeading);
         setNeedleRotation(needleTarget);
 
-        const delta = Math.abs(shortestAngleDelta(latestCompassHeading, userQibla));
+        const signedDelta = shortestAngleDelta(latestCompassHeading, userQibla);
+        const delta = Math.abs(signedDelta);
         const aligned = delta <= 5;
         if (section) section.classList.toggle('aligned', aligned);
         if (statusEl) {
-            statusEl.textContent = aligned
-                ? uiText.qiblaFacing
-                : uiText.qiblaAlmost.replace('{delta}', localizeDigits(Math.round(delta)));
+            if (aligned) {
+                statusEl.textContent = uiText.qiblaFacing;
+            } else {
+                const dir = signedDelta > 0
+                    ? (isPashtoMode() ? 'ښي' : 'right')
+                    : (isPashtoMode() ? 'کیڼ' : 'left');
+                const deg = localizeDigits(Math.round(delta));
+                statusEl.textContent = isPashtoMode()
+                    ? `${deg}° ${dir} خوا وګرځئ`
+                    : `Turn ${deg}° ${dir}`;
+            }
         }
+        if (calibrateEl) calibrateEl.hidden = aligned;
     }
 
     function queueCompassUpdate(heading) {
@@ -11827,32 +11890,89 @@ window.filterCategory = function(cat, btn) {
         const target = event.target && event.target.closest
             ? event.target.closest('.quran-ayah-btn[data-ayah-action]')
             : null;
-        if (!target) return;
 
-        if (isTouch) {
-            event.preventDefault();
-            target.classList.add('pressed');
-            setTimeout(() => target.classList.remove('pressed'), 90);
+        if (target) {
+            if (isTouch) {
+                event.preventDefault();
+                target.classList.add('pressed');
+                setTimeout(() => target.classList.remove('pressed'), 90);
+            }
+
+            const action = target.getAttribute('data-ayah-action');
+            const surah = Number(target.getAttribute('data-surah'));
+            const ayah = Number(target.getAttribute('data-ayah'));
+            if (!action || !surah || !ayah) return;
+
+            const lockKey = `ayah-${action}-${surah}-${ayah}`;
+            const now = Date.now();
+            const last = quranTapLocks.get(lockKey) || 0;
+            if (now - last < 220) return;
+            quranTapLocks.set(lockKey, now);
+
+            if (action === 'play') {
+                quranState.activeFlowMode = getFlowModeFromPanelMode(quranState.panelMode);
+                updateFlowModeButtons();
+                playQuranAyahInternal(surah, ayah);
+            } else if (action === 'bookmark') {
+                toggleQuranAyahBookmark(surah, ayah);
+            } else if (action === 'copy') {
+                copyQuranAyahToClipboard(surah, ayah);
+            } else if (action === 'share') {
+                shareQuranAyah(surah, ayah);
+            }
+            return;
         }
 
-        const action = target.getAttribute('data-ayah-action');
-        const surah = Number(target.getAttribute('data-surah'));
-        const ayah = Number(target.getAttribute('data-ayah'));
-        if (!action || !surah || !ayah) return;
-        console.log('[QuranAudio] ayah action tapped', { action, surah, ayah, isTouch });
+        // Card-body tap: toggle inline action row (click only, not touch — touch fires its own click)
+        if (isTouch) return;
+        const card = event.target?.closest?.('.quran-ayah-card');
+        if (!card) return;
+        if (event.target?.closest?.('.quran-ayah-topline') || event.target?.closest?.('.ayah-inline-actions')) return;
 
-        const lockKey = `ayah-${action}-${surah}-${ayah}`;
-        const now = Date.now();
-        const last = quranTapLocks.get(lockKey) || 0;
-        if (now - last < 220) return;
-        quranTapLocks.set(lockKey, now);
+        const cardKey = `${quranState.currentSurah}:${card.getAttribute('data-ayah-no')}`;
+        const actionsEl = document.getElementById(`ayahAct-${cardKey}`);
+        const isOpen = actionsEl && !actionsEl.hidden;
 
-        if (action === 'play') {
-            quranState.activeFlowMode = getFlowModeFromPanelMode(quranState.panelMode);
-            updateFlowModeButtons();
-            playQuranAyahInternal(surah, ayah);
+        // Close all open inline action rows
+        document.querySelectorAll('.ayah-inline-actions:not([hidden])').forEach(el => {
+            el.hidden = true;
+        });
+
+        // Open this one if it was closed
+        if (!isOpen && actionsEl) actionsEl.hidden = false;
+    }
+
+    function getQuranAyahShareText(surahNo, ayahNo) {
+        const data = quranState.currentSurahData;
+        const ayah = data?.ayahs?.find(a => Number(a.numberInSurah) === Number(ayahNo));
+        if (!ayah) return null;
+        const mode = getTranslationModeEffective();
+        const parts = [ayah.arabic];
+        if (shouldShowTranslationBlock(mode, 'ps') && ayah.pashto) parts.push(ayah.pashto);
+        if (shouldShowTranslationBlock(mode, 'en') && ayah.english) parts.push(ayah.english);
+        const surahName = isPashtoMode() ? cleanSurahArabicName(data.name) : (data.englishName || `Surah ${surahNo}`);
+        parts.push(isPashtoMode()
+            ? `— سورت ${surahName}، آیت ${localizeDigits(ayahNo)}`
+            : `— Surah ${surahName}, Ayah ${ayahNo}`);
+        return parts.join('\n\n');
+    }
+
+    function copyQuranAyahToClipboard(surahNo, ayahNo) {
+        const text = getQuranAyahShareText(surahNo, ayahNo);
+        if (!text) return;
+        navigator.clipboard.writeText(text)
+            .then(() => showToast(isPashtoMode() ? 'آیت کاپي شوه' : 'Ayah copied'))
+            .catch(() => showToast(isPashtoMode() ? 'کاپي ناکام شوه' : 'Copy failed'));
+    }
+
+    function shareQuranAyah(surahNo, ayahNo) {
+        const text = getQuranAyahShareText(surahNo, ayahNo);
+        if (!text) { return; }
+        if (navigator.share) {
+            navigator.share({ text }).catch(() => copyQuranAyahToClipboard(surahNo, ayahNo));
+        } else {
+            copyQuranAyahToClipboard(surahNo, ayahNo);
         }
-        else if (action === 'bookmark') toggleQuranAyahBookmark(surah, ayah);
     }
 
     function playRelativeAyah(step) {
@@ -12187,6 +12307,10 @@ window.filterCategory = function(cat, btn) {
             const bookmarked = getQuranBookmarks().some((item) => Number(item.surahNumber) === Number(quranState.currentSurah) && Number(item.ayahNumber) === Number(ayah.numberInSurah));
             const showPashto = shouldShowTranslationBlock(mode, 'ps');
             const showEnglish = shouldShowTranslationBlock(mode, 'en');
+            const isPS = isPashtoMode();
+            const copyLabel = isPS ? 'کاپي' : 'Copy';
+            const bkLabel = isPS ? 'نښه' : 'Bookmark';
+            const shareLabel = isPS ? 'شریکول' : 'Share';
             return `
                 <article class="quran-ayah-card ${playing ? 'playing' : ''}" data-ayah-no="${ayah.numberInSurah}" aria-current="${playing ? 'true' : 'false'}" id="quranAyah-${cardKey}">
                     <div class="quran-ayah-topline">
@@ -12197,8 +12321,13 @@ window.filterCategory = function(cat, btn) {
                         </div>
                     </div>
                     <div class="quran-ayah-ar">${escapeHtml(ayah.arabic)}</div>
-                    ${showPashto ? `<div class="quran-ayah-translation quran-ayah-ps"><div class="quran-ayah-translation-label">${isPashtoMode() ? 'پښتو' : 'Pashto'}</div><p>${escapeHtml(ayah.pashto || '')}</p></div>` : ''}
+                    ${showPashto ? `<div class="quran-ayah-translation quran-ayah-ps"><div class="quran-ayah-translation-label">${isPS ? 'پښتو' : 'Pashto'}</div><p>${escapeHtml(ayah.pashto || '')}</p></div>` : ''}
                     ${showEnglish ? `<div class="quran-ayah-translation quran-ayah-en"><div class="quran-ayah-translation-label">English</div><p>${escapeHtml(ayah.english || '')}</p></div>` : ''}
+                    <div class="ayah-inline-actions" id="ayahAct-${cardKey}" hidden>
+                        <button type="button" class="quran-ayah-btn ayah-action-pill" data-ayah-action="copy" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" aria-label="Copy ayah"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> ${copyLabel}</button>
+                        <button type="button" class="quran-ayah-btn ayah-action-pill ayah-action-bk${bookmarked ? ' bookmarked' : ''}" data-ayah-action="bookmark" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" aria-label="Bookmark ayah"><svg width="12" height="12" viewBox="0 0 24 24" fill="${bookmarked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg> ${bkLabel}</button>
+                        <button type="button" class="quran-ayah-btn ayah-action-pill" data-ayah-action="share" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" aria-label="Share ayah"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> ${shareLabel}</button>
+                    </div>
                 </article>
             `;
         }).join(''));
@@ -12794,6 +12923,22 @@ window.filterCategory = function(cat, btn) {
         updateQuranFloatingAudioUi();
     }
 
+    // ===== QURAN FOCUS READING MODE =====
+    window.toggleQuranFocusMode = function(force) {
+        const panel = document.querySelector('.quran-panel');
+        if (!panel) return;
+        const activate = (force !== undefined) ? Boolean(force) : !panel.classList.contains('focus-mode');
+        panel.classList.toggle('focus-mode', activate);
+        const btn = document.getElementById('quranFocusBtn');
+        if (btn) {
+            btn.setAttribute('aria-pressed', String(activate));
+            btn.title = activate
+                ? (isPashtoMode() ? 'د تمرکز حالت بند کړئ' : 'Exit focus mode')
+                : (isPashtoMode() ? 'د تمرکز حالت' : 'Focus reading mode');
+        }
+        localStorage.setItem('crown_quran_focus_mode', activate ? '1' : '0');
+    };
+
     async function initQuran() {
         if (quranState.initialized) return;
         await fetchQuranMeta();
@@ -12802,6 +12947,10 @@ window.filterCategory = function(cat, btn) {
         renderQuranTexts();
         await ensurePashtoEdition();
         quranState.initialized = true;
+        // Restore focus mode preference
+        if (localStorage.getItem('crown_quran_focus_mode') === '1') {
+            toggleQuranFocusMode(true);
+        }
         await openQuranSurah(1, 1);
     }
 

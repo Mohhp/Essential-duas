@@ -858,6 +858,46 @@
             height: 42px;
             font-size: 1rem;
         }
+        /* Focus mode button */
+        .quran-focus-btn {
+            width: 36px;
+            height: 36px;
+            opacity: 0.7;
+        }
+        .quran-focus-btn:hover { opacity: 1; }
+        .quran-panel.focus-mode .quran-focus-btn { opacity: 1; color: var(--gold-lightest); border-color: rgba(201,168,76,0.5); }
+        /* Focus exit floating button */
+        .quran-focus-exit-btn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            padding: 10px 22px;
+            border-radius: 50px;
+            background: rgba(18, 32, 25, 0.92);
+            border: 1px solid rgba(201, 168, 76, 0.35);
+            color: var(--gold-lightest);
+            font-family: var(--font-title);
+            font-size: 0.72rem;
+            letter-spacing: 0.8px;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            white-space: nowrap;
+        }
+        .quran-panel.focus-mode .quran-focus-exit-btn { display: block; }
+        /* Focus mode: hide chrome */
+        .quran-panel.focus-mode .panel-back-btn,
+        .quran-panel.focus-mode .quran-control-card,
+        .quran-panel.focus-mode .quran-audio-hub,
+        .quran-panel.focus-mode .quran-top-progress,
+        .quran-panel.focus-mode .quran-bottom-progress { display: none !important; }
+        /* Focus mode: amplify reading */
+        .quran-panel.focus-mode .quran-ayah-ar { font-size: 2.3rem; line-height: 2.1; }
+        .quran-panel.focus-mode .quran-ayah-card { padding: 24px 18px; }
+        .quran-panel.focus-mode .quran-ayah-translation p { font-size: 0.9rem; line-height: 1.75; }
+        .quran-panel.focus-mode { background: rgba(8, 17, 12, 0.97); }
         .quran-chip-btn,
         .quran-row-btn {
             min-height: 38px;
@@ -1213,6 +1253,35 @@
             padding: 0;
             font-size: 0.95rem;
         }
+        /* Inline ayah action row */
+        .ayah-inline-actions {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            padding: 10px 0 2px;
+            margin-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            animation: ayahActionsSlide 150ms ease;
+        }
+        .ayah-inline-actions[hidden] { display: none; }
+        @keyframes ayahActionsSlide {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .ayah-action-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 13px;
+            height: auto;
+            width: auto;
+            font-size: 0.72rem;
+            letter-spacing: 0.4px;
+            border-radius: 50px;
+            color: var(--text-subtle);
+        }
+        .ayah-action-pill:hover { color: var(--text-primary); }
+        .ayah-action-pill.bookmarked { color: var(--gold-lightest); border-color: rgba(201,168,76,0.4); }
         .quran-ayah-ar {
             font-family: var(--font-arabic);
             font-size: calc(var(--quran-ar-size, 2rem) * var(--font-scale));
@@ -3531,6 +3600,16 @@
             font-size: 0.72rem;
             color: var(--text-subtle);
             line-height: 1.55;
+        }
+        .qibla-calibrate-hint {
+            margin-top: 6px;
+            padding: 5px 12px;
+            border-radius: var(--radius-sm, 6px);
+            background: rgba(255, 255, 255, 0.04);
+            font-family: var(--font-text);
+            font-size: 0.68rem;
+            color: var(--text-subtle);
+            letter-spacing: 0.3px;
         }
         .qibla-section.aligned {
             border-color: rgba(201, 168, 76, 0.45);
