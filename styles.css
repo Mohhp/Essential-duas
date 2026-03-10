@@ -861,8 +861,8 @@
         /* Persistent focus mode toggle dot (always visible on Quran tab, body-level) */
         .quran-focus-dot {
             position: fixed !important;
-            bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 14px) !important;
-            right: 74px !important; /* sits left of the 48px audio dot + 10px gap */
+            bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 74px) !important; /* 14px base + 48px audio dot + 12px gap */
+            right: 16px !important; /* right-aligned with the audio dot */
             width: 40px;
             height: 40px;
             border-radius: 50%;
