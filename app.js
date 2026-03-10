@@ -1002,7 +1002,8 @@
         touchStartY: 0,
         dragX: 0,
         isDragging: false,
-        transitionLock: false
+        transitionLock: false,
+        openedCardHeader: null
     };
     let swipeHintTimer = null;
     let duaViewerCloseTimer = null;
@@ -2087,6 +2088,10 @@ window.filterCategory = function(cat, btn) {
         DUA_SWIPE_STATE.category = category;
         DUA_SWIPE_STATE.ids = ids;
         DUA_SWIPE_STATE.index = Math.max(0, Math.min(startIndex, ids.length - 1));
+        // Set aria-expanded on the source card header
+        const _openedHeader = document.querySelector(`#duaListSection .dua-card[data-id="${ids[DUA_SWIPE_STATE.index]}"] .card-header`);
+        if (_openedHeader) _openedHeader.setAttribute('aria-expanded', 'true');
+        DUA_SWIPE_STATE.openedCardHeader = _openedHeader || null;
 
         grid?.classList.add('hidden-grid');
         duaList?.classList.add('hidden-list');
@@ -2160,6 +2165,11 @@ window.filterCategory = function(cat, btn) {
             }, 200);
         } else if (afterClose) {
             afterClose();
+        }
+        // Reset aria-expanded on the card header that opened the viewer
+        if (DUA_SWIPE_STATE.openedCardHeader) {
+            DUA_SWIPE_STATE.openedCardHeader.setAttribute('aria-expanded', 'false');
+            DUA_SWIPE_STATE.openedCardHeader = null;
         }
         DUA_SWIPE_STATE.active = false;
         DUA_SWIPE_STATE.ids = [];
@@ -2431,6 +2441,82 @@ window.filterCategory = function(cat, btn) {
         { id: 'lahawla', ar: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِٱللَّهِ', en: 'La hawla wala quwwata illa billah', virtue: 'A treasure of Jannah — Bukhari 6384', defaultTarget: 33 }
     ];
 
+    function getCustomDhikr() {
+        try { return JSON.parse(localStorage.getItem('crown_custom_dhikr') || '[]'); } catch { return []; }
+    }
+    function saveCustomDhikr(list) {
+        localStorage.setItem('crown_custom_dhikr', JSON.stringify(list));
+    }
+    function getAllDhikr() {
+        return [...DHIKR_LIST, ...getCustomDhikr()];
+    }
+    function getActiveDhikrItem() {
+        return getAllDhikr()[currentDhikrIndex] || DHIKR_LIST[0];
+    }
+    window.deleteCustomDhikr = function(customIndex) {
+        const all = getAllDhikr();
+        const globalIndex = DHIKR_LIST.length + customIndex;
+        if (currentDhikrIndex === globalIndex) {
+            // Reset to first dhikr before deleting
+            if (tasbeehCount > 0) saveDhikrTotal(getActiveDhikrItem().id, tasbeehCount);
+            currentDhikrIndex = 0;
+            tasbeehCount = 0;
+            tasbeehTarget = DHIKR_LIST[0].defaultTarget;
+            localStorage.setItem('crown_dhikr_selected', '0');
+        } else if (currentDhikrIndex > globalIndex) {
+            currentDhikrIndex--;
+            localStorage.setItem('crown_dhikr_selected', String(currentDhikrIndex));
+        }
+        const list = getCustomDhikr();
+        list.splice(customIndex, 1);
+        saveCustomDhikr(list);
+        renderDhikrSelector();
+        updateTasbeehUI();
+    };
+    window.openCustomDhikrModal = function() {
+        const existing = document.getElementById('customDhikrModal');
+        if (existing) { existing.remove(); }
+        const isPS = isPashtoMode();
+        const modal = document.createElement('div');
+        modal.id = 'customDhikrModal';
+        modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0.55);';
+        modal.innerHTML = `
+            <div style="background:var(--card-bg,#1a1a1a);border-radius:18px 18px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;box-shadow:0 -4px 32px rgba(0,0,0,0.4);">
+                <h3 style="margin:0 0 16px;font-size:1rem;color:var(--accent,#d4a847);">${isPS ? 'خپل ذکر ولیکئ' : 'Add Custom Dhikr'}</h3>
+                <input id="cdAr" type="text" placeholder="${isPS ? 'عربي متن (اړین)' : 'Arabic text (required)'}" dir="rtl"
+                    style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--border,#333);background:var(--input-bg,#111);color:inherit;font-size:1.1rem;margin-bottom:10px;font-family:inherit;">
+                <input id="cdEn" type="text" placeholder="${isPS ? 'ژباړه / لیکلاسه (اختیاري)' : 'Translation / transliteration (optional)'}"
+                    style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--border,#333);background:var(--input-bg,#111);color:inherit;font-size:0.9rem;margin-bottom:10px;font-family:inherit;">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+                    <label style="font-size:0.85rem;color:var(--text-muted,#888);">${isPS ? 'هدف شمیر:' : 'Target count:'}</label>
+                    <input id="cdTarget" type="number" min="1" max="9999" value="33"
+                        style="width:80px;padding:8px 10px;border-radius:10px;border:1px solid var(--border,#333);background:var(--input-bg,#111);color:inherit;font-size:0.95rem;">
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <button onclick="document.getElementById('customDhikrModal').remove()" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border,#333);background:transparent;color:inherit;font-size:0.95rem;cursor:pointer;">${isPS ? 'لغوه' : 'Cancel'}</button>
+                    <button id="cdSaveBtn" style="flex:2;padding:12px;border-radius:12px;border:none;background:var(--accent,#d4a847);color:#000;font-size:0.95rem;font-weight:700;cursor:pointer;">${isPS ? 'خوندي کړئ' : 'Save'}</button>
+                </div>
+            </div>`;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+        document.getElementById('cdSaveBtn').addEventListener('click', () => {
+            const ar = (document.getElementById('cdAr')?.value || '').trim();
+            const en = (document.getElementById('cdEn')?.value || '').trim() || ar;
+            const target = Math.max(1, Math.min(9999, parseInt(document.getElementById('cdTarget')?.value || '33', 10) || 33));
+            if (!ar) { document.getElementById('cdAr')?.focus(); return; }
+            const list = getCustomDhikr();
+            if (list.length >= 5) {
+                alert(isPS ? 'ډیری ۵ دودیز ذکرونه خوندي کولای شئ.' : 'Maximum 5 custom dhikr entries allowed.');
+                return;
+            }
+            list.push({ id: 'custom_' + Date.now(), ar, en, virtue: isPS ? 'دودیز ذکر' : 'Custom dhikr', defaultTarget: target });
+            saveCustomDhikr(list);
+            modal.remove();
+            renderDhikrSelector();
+        });
+        setTimeout(() => document.getElementById('cdAr')?.focus(), 100);
+    };
+
     let tasbeehCount = 0;
     let tasbeehTarget = 33;
     let currentDhikrIndex = 0;
@@ -2456,19 +2542,31 @@ window.filterCategory = function(cat, btn) {
     function renderDhikrSelector() {
         const container = document.getElementById('dhikrSelector');
         if (!container) return;
-        container.innerHTML = DHIKR_LIST.map((d, i) => `
-            <div class="dhikr-option${i === currentDhikrIndex ? ' active' : ''}" onclick="selectDhikr(${i})">
+        const allDhikr = getAllDhikr();
+        const isPS = isPashtoMode();
+        const customList = getCustomDhikr();
+        container.innerHTML = allDhikr.map((d, i) => {
+            const isCustom = i >= DHIKR_LIST.length;
+            const customIdx = i - DHIKR_LIST.length;
+            const deleteBtn = isCustom
+                ? `<button class="dhikr-delete-btn" onclick="event.stopPropagation();deleteCustomDhikr(${customIdx})" title="${isPS ? 'ړنګول' : 'Delete'}" aria-label="${isPS ? 'ړنګول' : 'Delete'}">🗑</button>`
+                : '';
+            return `<div class="dhikr-option${i === currentDhikrIndex ? ' active' : ''}${isCustom ? ' dhikr-custom' : ''}" onclick="selectDhikr(${i})">
                 <div class="dhikr-option-ar">${d.ar}</div>
-                <div class="dhikr-option-en">${d.en}</div>
-            </div>
-        `).join('');
+                <div class="dhikr-option-en">${d.en}</div>${deleteBtn}
+            </div>`;
+        }).join('') + (customList.length < 5 ? `
+            <div class="dhikr-option dhikr-add-btn" onclick="openCustomDhikrModal()" title="${isPS ? 'نوی ذکر ولیکئ' : 'Add custom dhikr'}">
+                <div class="dhikr-option-ar" style="font-size:1.4rem;">＋</div>
+                <div class="dhikr-option-en">${isPS ? 'دودیز' : 'Custom'}</div>
+            </div>` : '');
         // Scroll active into view
         const active = container.querySelector('.dhikr-option.active');
         if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
 
     function updateTasbeehUI() {
-        const d = DHIKR_LIST[currentDhikrIndex];
+        const d = getActiveDhikrItem();
         const arEl = document.getElementById('tasbeehArabic');
         const virtueEl = document.getElementById('tasbeehVirtue');
         const lifetimeEl = document.getElementById('tasbeehLifetime');
@@ -2495,7 +2593,7 @@ window.filterCategory = function(cat, btn) {
         const rd = document.getElementById('tasbeehRound');
         if (rd) {
             if (sessionRoundsCompleted > 0 && tasbeehTarget > 0) {
-                const dhikr = DHIKR_LIST[currentDhikrIndex];
+                const dhikr = getActiveDhikrItem();
                 const isPashto = typeof isPashtoMode === 'function' && isPashtoMode();
                 const ordinals = isPashto
                     ? ['لومړی', 'دویم', 'دریم', 'څلورم', 'پنځم']
@@ -2637,10 +2735,10 @@ window.filterCategory = function(cat, btn) {
     window.selectDhikr = function(index) {
         // Save current session count before switching
         if (tasbeehCount > 0) {
-            saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
+            saveDhikrTotal(getActiveDhikrItem().id, tasbeehCount);
         }
         currentDhikrIndex = index;
-        const d = DHIKR_LIST[index];
+        const d = getAllDhikr()[index] || DHIKR_LIST[0];
         tasbeehTarget = d.defaultTarget;
         tasbeehCount = 0;
         const display = document.getElementById('tasbeehDisplay');
@@ -2660,8 +2758,8 @@ window.filterCategory = function(cat, btn) {
         if (tp) tp.scrollTop = 0;
         // Restore last selected dhikr
         const saved = parseInt(localStorage.getItem('crown_dhikr_selected') || '0', 10);
-        currentDhikrIndex = (saved >= 0 && saved < DHIKR_LIST.length) ? saved : 0;
-        tasbeehTarget = DHIKR_LIST[currentDhikrIndex].defaultTarget;
+        currentDhikrIndex = (saved >= 0 && saved < getAllDhikr().length) ? saved : 0;
+        tasbeehTarget = getActiveDhikrItem().defaultTarget;
         sessionTasbeehCount = 0;
         sessionRoundsCompleted = 0;
         resetTasbeeh();
@@ -2687,7 +2785,7 @@ window.filterCategory = function(cat, btn) {
     window.closeTasbeeh = function() {
         // Save session count on close
         if (tasbeehCount > 0) {
-            saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
+            saveDhikrTotal(getActiveDhikrItem().id, tasbeehCount);
             tasbeehCount = 0;
         }
         const tp = document.querySelector('.tasbeeh-panel');
@@ -2766,11 +2864,11 @@ window.filterCategory = function(cat, btn) {
             }
             safeVibrate([50, 30, 50]);
             playTasbeehCompletionChime();
-            saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
+            saveDhikrTotal(getActiveDhikrItem().id, tasbeehCount);
             sessionRoundsCompleted++;
             updateSessionDisplay();
             triggerTasbeehCelebration();
-            const dhikr = DHIKR_LIST[currentDhikrIndex];
+            const dhikr = getActiveDhikrItem();
             const countStr = (typeof isPashtoMode === 'function' && isPashtoMode()) ? localizeDigits(tasbeehTarget) : String(tasbeehTarget);
             const toastMsg = (typeof isPashtoMode === 'function' && isPashtoMode())
                 ? `✓ ${dhikr.ar} × ${countStr} بشپړ شو`
@@ -2782,7 +2880,7 @@ window.filterCategory = function(cat, btn) {
     window.resetTasbeeh = function() {
         // Save partial count before reset
         if (tasbeehCount > 0) {
-            saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
+            saveDhikrTotal(getActiveDhikrItem().id, tasbeehCount);
         }
         tasbeehCount = 0;
         sessionTasbeehCount = 0;
@@ -3726,6 +3824,27 @@ window.filterCategory = function(cat, btn) {
 
     function getDashboardSuggestedDua() {
         const ui = getDashboardText();
+        // Bookmark rotation: ~35% chance to surface a random bookmarked dua
+        const bookmarks = STATE.bookmarks || [];
+        if (bookmarks.length > 0 && Math.random() < 0.35) {
+            const randomId = bookmarks[Math.floor(Math.random() * bookmarks.length)];
+            const card = document.querySelector(`#duaListSection .dua-card[data-id="${randomId}"]`);
+            const cardTitle = card?.querySelector('.dua-title')?.textContent?.trim() || '';
+            const rawSub = card?.querySelector('.translation')?.textContent?.trim() || '';
+            const sub = rawSub.length > 80 ? rawSub.substring(0, 80) + '\u2026' : rawSub;
+            if (cardTitle) {
+                return {
+                    kicker: isPashtoMode() ? '\u0633\u062a\u0627\u0633\u0648 \u062f \u0646\u069a\u0648 \u2665' : 'FROM YOUR BOOKMARKS \u2665',
+                    title: cardTitle,
+                    sub: sub,
+                    cta: ui.openDua,
+                    action: () => {
+                        switchTab('duas');
+                        openDuaViewerAtId(Number(randomId), 'all', { pushHistory: true });
+                    }
+                };
+            }
+        }
         const period = getTimePeriodFromPrayers() || (() => {
             const hour = new Date().getHours();
             if (hour < 6) return 'latenight';

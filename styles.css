@@ -2422,6 +2422,9 @@
             color: var(--text-muted); line-height: 1.9;
         }
         .how-to-box strong { color: var(--emerald-light); }
+        .how-to-box-ps { display: none; }
+        .lang-ps .how-to-box:not(.how-to-box-ps) { display: none; }
+        .lang-ps .how-to-box.how-to-box-ps { display: block; }
 
         /* Action Buttons Row */
         .copy-row {
@@ -4164,6 +4167,16 @@
             color: var(--text-faint); white-space: nowrap;
         }
         .dhikr-option.active .dhikr-option-en { color: rgba(46, 196, 122, 0.55); }
+        .dhikr-option.dhikr-add-btn { opacity: 0.65; border-style: dashed; }
+        .dhikr-option.dhikr-add-btn:hover { opacity: 1; }
+        .dhikr-option.dhikr-custom { position: relative; padding-bottom: 22px; }
+        .dhikr-delete-btn {
+            position: absolute; bottom: 4px; right: 6px;
+            background: none; border: none; cursor: pointer;
+            font-size: 0.7rem; opacity: 0.45; padding: 2px 4px;
+            color: inherit; line-height: 1;
+        }
+        .dhikr-delete-btn:hover { opacity: 1; }
 
         /* Dhikr virtue hint */
         .tasbeeh-virtue {
