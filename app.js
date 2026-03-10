@@ -408,6 +408,8 @@
             initDuasTabSearch();
             renderDuasBookmarksSection();
             initFontSizeControls();
+            updateUnreadCount();
+            initMemorizePromoCard();
 
             // Apply saved language preference after startup language gate.
             if (typeof applyLanguage === 'function') applyLanguage();
@@ -1563,11 +1565,49 @@
             if (card) card.classList.add('read-card');
             if (btn) { btn.classList.add('read'); btn.innerHTML = '✓ Read'; }
             updateStats();
+            updateUnreadCount();
             showToast(`Marked as Read (${STATE.read.length}/63)`);
             if (isDuaSwipeViewerActive() && getCurrentSwipeDuaId() === id) renderDuaSwipeViewer();
         } else {
             showToast('Already marked as read');
         }
+    };
+
+    function updateUnreadCount() {
+        const total = document.querySelectorAll('.dua-card[data-id]').length;
+        const unread = total - STATE.read.length;
+        const el = document.getElementById('countUnread');
+        if (el) el.textContent = unread;
+        const pill = document.getElementById('unreadPill');
+        if (pill) {
+            const isPashto = typeof isPashtoMode === 'function' && isPashtoMode();
+            const label = isPashto ? 'نالوستي' : 'Unread';
+            pill.childNodes[0].textContent = label + ' ';
+        }
+    }
+
+    function initMemorizePromoCard() {
+        const card = document.getElementById('memorizePromoCard');
+        if (!card) return;
+        if (localStorage.getItem('crown_memorize_promo_dismissed') === 'true') {
+            card.classList.add('dismissed');
+            return;
+        }
+        const isPashto = typeof isPashtoMode === 'function' && isPashtoMode();
+        const title = document.getElementById('memorizePromoTitle');
+        const desc = document.getElementById('memorizePromoDesc');
+        const btn = document.getElementById('memorizePromoBtn');
+        if (isPashto) {
+            if (title) title.textContent = 'خپلې دعاګانې حفظ کړئ';
+            if (desc) desc.textContent = 'د تکرار کارتونو سره هره دعا حفظ کړئ — یوه کارت به مهاله.';
+            if (btn) btn.textContent = 'حفظ پیل کړئ';
+        }
+    }
+
+    window.dismissMemorizePromo = function() {
+        const card = document.getElementById('memorizePromoCard');
+        if (card) card.classList.add('dismissed');
+        localStorage.setItem('crown_memorize_promo_dismissed', 'true');
     };
 
     // ===== COPY TEXT =====
@@ -1628,9 +1668,16 @@ window.filterCategory = function(cat, btn) {
     if (btn && btn.classList.contains('pill')) btn.classList.add('active');
 
     let visibleCount = 0;
+    const readSet = new Set(STATE.read);
     els.cards.forEach(card => {
-        const cats = card.getAttribute('data-categories').split(',');
-        const isMatch = cat === 'all' || cats.includes(cat);
+        let isMatch;
+        if (cat === 'unread') {
+            const id = parseInt(card.getAttribute('data-id'), 10);
+            isMatch = !readSet.has(id);
+        } else {
+            const cats = card.getAttribute('data-categories').split(',');
+            isMatch = cat === 'all' || cats.includes(cat);
+        }
         card.classList.toggle('hidden-card', !isMatch);
         card.style.display = '';  // ✅ always clear any stuck inline style
         if (isMatch) visibleCount++;
@@ -2389,6 +2436,8 @@ window.filterCategory = function(cat, btn) {
     let currentDhikrIndex = 0;
     let tasbeehSoundEnabled = localStorage.getItem('crown_tasbeeh_sound') === 'true';
     let tasbeehAudioCtx = null;
+    let sessionTasbeehCount = 0;
+    let sessionRoundsCompleted = 0;
 
     // Load saved totals
     function getDhikrTotals() {
@@ -2430,6 +2479,36 @@ window.filterCategory = function(cat, btn) {
         if (display) display.textContent = localizeDigits(tasbeehCount);
         const ringRatio = tasbeehTarget > 0 ? Math.max(0, Math.min(1, tasbeehCount / tasbeehTarget)) : 0;
         document.documentElement.style.setProperty('--tasbeeh-progress', `${Math.round(ringRatio * 100)}%`);
+    }
+
+    function updateSessionDisplay() {
+        const sc = document.getElementById('tasbeehSessionCount');
+        if (sc) sc.textContent = localizeDigits(sessionTasbeehCount);
+        const sessionEl = document.getElementById('tasbeehSession');
+        if (sessionEl) {
+            const isPashto = typeof isPashtoMode === 'function' && isPashtoMode();
+            const label = isPashto ? 'دا ناسته: ' : 'This session: ';
+            if (sessionEl.childNodes[0] && sessionEl.childNodes[0].nodeType === 3) {
+                sessionEl.childNodes[0].textContent = label;
+            }
+        }
+        const rd = document.getElementById('tasbeehRound');
+        if (rd) {
+            if (sessionRoundsCompleted > 0 && tasbeehTarget > 0) {
+                const dhikr = DHIKR_LIST[currentDhikrIndex];
+                const isPashto = typeof isPashtoMode === 'function' && isPashtoMode();
+                const ordinals = isPashto
+                    ? ['لومړی', 'دویم', 'دریم', 'څلورم', 'پنځم']
+                    : ['1st', '2nd', '3rd', '4th', '5th'];
+                const ord = ordinals[Math.min(sessionRoundsCompleted - 1, 4)] || `${sessionRoundsCompleted}×`;
+                rd.textContent = isPashto
+                    ? `${dhikr.ar} × ${localizeDigits(tasbeehTarget)} ✓ (${ord} پړاو)`
+                    : `${dhikr.en} × ${tasbeehTarget} ✓ (${ord} round)`;
+                rd.style.display = '';
+            } else {
+                rd.style.display = 'none';
+            }
+        }
     }
 
     function formatTasbeehTargetLabel(target) {
@@ -2583,7 +2662,10 @@ window.filterCategory = function(cat, btn) {
         const saved = parseInt(localStorage.getItem('crown_dhikr_selected') || '0', 10);
         currentDhikrIndex = (saved >= 0 && saved < DHIKR_LIST.length) ? saved : 0;
         tasbeehTarget = DHIKR_LIST[currentDhikrIndex].defaultTarget;
+        sessionTasbeehCount = 0;
+        sessionRoundsCompleted = 0;
         resetTasbeeh();
+        updateSessionDisplay();
         renderDhikrSelector();
         updateTasbeehUI();
         const tt = document.getElementById('tasbeehTargetLabel');
@@ -2638,6 +2720,7 @@ window.filterCategory = function(cat, btn) {
         lastTasbeehTapAt = nowTap;
 
         tasbeehCount++;
+        sessionTasbeehCount++;
         try {
             const key = new Date().toISOString().slice(0, 10);
             const counts = JSON.parse(localStorage.getItem('crown_tasbeeh_daily_counts') || '{}') || {};
@@ -2651,6 +2734,7 @@ window.filterCategory = function(cat, btn) {
             display.classList.remove('bump');
             requestAnimationFrame(() => display.classList.add('bump'));
         }
+        updateSessionDisplay();
         if (btn) {
             btn.classList.add('pulse');
             setTimeout(() => btn.classList.remove('pulse'), 100);
@@ -2683,6 +2767,8 @@ window.filterCategory = function(cat, btn) {
             safeVibrate([50, 30, 50]);
             playTasbeehCompletionChime();
             saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
+            sessionRoundsCompleted++;
+            updateSessionDisplay();
             triggerTasbeehCelebration();
             const dhikr = DHIKR_LIST[currentDhikrIndex];
             const countStr = (typeof isPashtoMode === 'function' && isPashtoMode()) ? localizeDigits(tasbeehTarget) : String(tasbeehTarget);
@@ -2699,8 +2785,10 @@ window.filterCategory = function(cat, btn) {
             saveDhikrTotal(DHIKR_LIST[currentDhikrIndex].id, tasbeehCount);
         }
         tasbeehCount = 0;
+        sessionTasbeehCount = 0;
         const display = document.getElementById('tasbeehDisplay');
         if (display) display.textContent = localizeDigits('0');
+        updateSessionDisplay();
         updateTasbeehUI();
     };
 

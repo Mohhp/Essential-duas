@@ -1,4 +1,4 @@
-const CACHE_NAME = 'falah-v103';
+const CACHE_NAME = 'falah-v104';
 const QURAN_AUDIO_CACHE = 'crown-quran-audio-v1';
 const QURAN_AUDIO_RUNTIME_META_CACHE = 'crown-quran-audio-meta-v1';
 const QURAN_AUDIO_RUNTIME_META_URL = '/__quran-audio-runtime-meta__';
