@@ -54,18 +54,4 @@ class ReminderBridge(
         val base = JsonParser.parseString(activity.buildBridgeStateJson("status"))
         return gson.toJson(base)
     }
-
-    /**
-     * DEBUG ONLY — schedules a test alarm [delaySeconds] seconds from now so
-     * the full native alarm → notification → adhan path can be verified on device.
-     */
-    @JavascriptInterface
-    fun scheduleTestAlarm(delaySeconds: Int): String {
-        if (!activity.canScheduleExactAlarms() || !activity.canPostNotifications()) {
-            return """{"success":false,"error":"permissions_missing"}"""
-        }
-        val reminder = scheduler.scheduleTestAlarm(delaySeconds)
-            ?: return """{"success":false,"error":"scheduler_unavailable"}"""
-        return """{"success":true,"prayerName":"${reminder.prayerName}","triggerAt":${reminder.triggerAt},"delaySeconds":$delaySeconds}"""
-    }
 }

@@ -8278,9 +8278,7 @@ window.filterCategory = function(cat, btn) {
         renderPrayerReminderStatusLine();
         updateForegroundReminderBanner();
 
-        // Show debug test alarm row only on Android (bridge present)
-        const debugRow = document.getElementById('reminderDebugRow');
-        if (debugRow) debugRow.style.display = isNativeAndroidReminderMode() ? 'block' : 'none';
+
     }
 
     function refreshReminderControlLanguage() {
@@ -8296,7 +8294,13 @@ window.filterCategory = function(cat, btn) {
         if (masterLabel) masterLabel.textContent = uiText.reminderMaster;
         if (soundLabel) soundLabel.textContent = 'Reminder Sound / د یادونې غږ';
         if (sameAllLabel) sameAllLabel.textContent = isPashtoMode() ? 'د ټولو لمونځونو لپاره یو غږ' : 'Same sound for all prayers';
-        if (playAdhanLabel) playAdhanLabel.textContent = isPashtoMode() ? 'د اذان غږ فعال وساتئ (Android)' : 'Play adhan sound (Android app)';
+        if (playAdhanLabel) {
+            if (isNativeAndroidReminderMode()) {
+                playAdhanLabel.textContent = isPashtoMode() ? 'د اذان غږ' : 'Adhan sound';
+            } else {
+                playAdhanLabel.textContent = isPashtoMode() ? 'د اذان غږ فعال وساتئ (Android)' : 'Play adhan sound (Android app)';
+            }
+        }
         if (beforeLabel) beforeLabel.textContent = uiText.reminderBefore;
 
         const beforeSelect = document.getElementById('reminderBefore');
@@ -8476,29 +8480,6 @@ window.filterCategory = function(cat, btn) {
                     showFirstEnabledReminderConfirmation();
                 } else {
                     showToast(getPrayerUiText().reminderSaved);
-                }
-            });
-        }
-
-        const testAlarmBtn = document.getElementById('reminderTestAlarmBtn');
-        if (testAlarmBtn) {
-            testAlarmBtn.addEventListener('click', () => {
-                const bridge = getAndroidReminderBridge();
-                if (!bridge || typeof bridge.scheduleTestAlarm !== 'function') {
-                    showToast('Test alarm not available on this device');
-                    return;
-                }
-                const result = parseJsonSafely(bridge.scheduleTestAlarm(120), null);
-                const statusEl = document.getElementById('reminderDebugStatus');
-                if (result?.success) {
-                    const fireAt = new Date(result.triggerAt);
-                    const msg = `Test alarm set ✓ — fires at ${fireAt.toLocaleTimeString()}`;
-                    showToast(msg);
-                    if (statusEl) statusEl.textContent = msg;
-                } else {
-                    const msg = `Failed: ${result?.error || 'unknown error'}`;
-                    showToast(msg);
-                    if (statusEl) statusEl.textContent = msg;
                 }
             });
         }

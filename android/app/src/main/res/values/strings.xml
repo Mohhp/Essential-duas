@@ -5,6 +5,10 @@
     <string name="notification_channel_description">Exact prayer reminders scheduled from the app.</string>
     <string name="notification_channel_silent_name">Prayer reminders (silent)</string>
     <string name="notification_channel_silent_description">Silent exact prayer reminders scheduled from the app.</string>
+    <string name="notification_alarm_channel_name">Prayer Alarms</string>
+    <string name="notification_alarm_channel_description">Prayer time alarm with alarm sound and strong vibration.</string>
+    <string name="notification_adhan_channel_name">Prayer Adhan</string>
+    <string name="notification_adhan_channel_description">Shown while adhan is playing — vibrates but defers sound to the adhan service.</string>
     <string name="notification_title_suffix">Prayer reminder</string>
     <string name="reminder_permission_needed">Allow notifications and exact alarms in Android settings to keep prayer reminders reliable.</string>
     <string name="loading_label">Loading Falah…</string>

@@ -82,23 +82,6 @@ class PrayerAlarmScheduler(
         if (saveState) repository.clearLastSchedule()
     }
 
-    /**
-     * DEBUG ONLY — schedules a one-shot test alarm [delaySeconds] seconds from now
-     * using "fajr" as the prayer name so the full alarm+adhan path is exercised.
-     * Remove or gate behind a BuildConfig flag before public release.
-     */
-    fun scheduleTestAlarm(delaySeconds: Int): ScheduledReminder? {
-        if (alarmManager == null) return null
-        if (!permissionChecker.canScheduleExactAlarms()) return null
-        ensureNotificationChannels()
-        val clampedDelay = delaySeconds.coerceIn(5, 600)
-        val triggerAt = System.currentTimeMillis() + clampedDelay * 1000L
-        val reminder = ScheduledReminder(prayerName = "fajr", triggerAt = triggerAt, offsetMinutes = 0)
-        scheduleExactAlarm(reminder)
-        Log.d(logTag, "Test alarm scheduled: triggerAt=$triggerAt delaySeconds=$clampedDelay")
-        return reminder
-    }
-
     fun notifyReminder(reminder: ScheduledReminder, forceSilent: Boolean = false) {
         val settings = repository.getSettings()
         val prayerLabel = reminder.prayerName.replaceFirstChar { it.uppercase() }
@@ -113,6 +96,14 @@ class PrayerAlarmScheduler(
             "It is now time for $prayerLabel."
         }
 
+        val isSilentMode = settings.mode == "silent" || settings.soundId == "silent"
+        val channelId = when {
+            isSilentMode -> SILENT_CHANNEL_ID
+            forceSilent  -> ADHAN_NOTIFICATION_CHANNEL_ID  // adhan service plays audio — notification vibrates only
+            else         -> ALARM_CHANNEL_ID               // no adhan — notification plays alarm ringtone + vibrates
+        }
+        val alarmVibrationPattern = longArrayOf(0, 500, 200, 500, 200, 500)
+
         val launchIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             putExtra(EXTRA_OPEN_PRAYER_PANEL, true)
@@ -124,29 +115,33 @@ class PrayerAlarmScheduler(
             launchIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        val fullScreenIntent = PendingIntent.getActivity(
+            context,
+            reminder.prayerName.hashCode() + 5000,
+            launchIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val largeIcon = runCatching {
             context.assets.open("icon-192.png").use(BitmapFactory::decodeStream)
         }.getOrNull()
 
-        val builder = NotificationCompat.Builder(
-            context,
-            if (forceSilent || settings.mode == "silent" || settings.soundId == "silent") SILENT_CHANNEL_ID else AUDIBLE_CHANNEL_ID
-        )
+        val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setAutoCancel(true)
             .setContentIntent(contentIntent)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setFullScreenIntent(fullScreenIntent, true)
 
         if (largeIcon != null) builder.setLargeIcon(largeIcon)
-        if (!forceSilent && settings.mode != "silent" && settings.soundId != "silent") {
-            builder.setDefaults(NotificationCompat.DEFAULT_ALL)
-        } else {
+        if (isSilentMode) {
             builder.setSilent(true)
+        } else {
+            builder.setVibrate(alarmVibrationPattern)
         }
 
         if (permissionChecker.canPostNotifications()) {
@@ -188,20 +183,49 @@ class PrayerAlarmScheduler(
     private fun ensureNotificationChannels() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(NotificationManager::class.java)
-        val defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val attributes = AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+        val alarmVibrationPattern = longArrayOf(0, 500, 200, 500, 200, 500)
+        val alarmAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
             .build()
 
-        val audible = NotificationChannel(
+        // Alarm channel: plays alarm ringtone + strong vibration (used when adhan is disabled)
+        val alarmChannel = NotificationChannel(
+            ALARM_CHANNEL_ID,
+            context.getString(R.string.notification_alarm_channel_name),
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = context.getString(R.string.notification_alarm_channel_description)
+            enableVibration(true)
+            vibrationPattern = alarmVibrationPattern
+            setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM), alarmAttributes)
+        }
+
+        // Adhan notification channel: no sound (AdhanPlaybackService handles audio), strong vibration
+        val adhanNotifChannel = NotificationChannel(
+            ADHAN_NOTIFICATION_CHANNEL_ID,
+            context.getString(R.string.notification_adhan_channel_name),
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = context.getString(R.string.notification_adhan_channel_description)
+            enableVibration(true)
+            vibrationPattern = alarmVibrationPattern
+            setSound(null, null)
+        }
+
+        // Legacy audible channel: retained for AdhanPlaybackService foreground notification
+        val notifAttributes = AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        val legacyAudible = NotificationChannel(
             AUDIBLE_CHANNEL_ID,
             context.getString(R.string.notification_channel_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = context.getString(R.string.notification_channel_description)
             enableVibration(true)
-            setSound(defaultSound, attributes)
+            setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), notifAttributes)
         }
 
         val silent = NotificationChannel(
@@ -214,7 +238,9 @@ class PrayerAlarmScheduler(
             enableVibration(false)
         }
 
-        manager.createNotificationChannel(audible)
+        manager.createNotificationChannel(alarmChannel)
+        manager.createNotificationChannel(adhanNotifChannel)
+        manager.createNotificationChannel(legacyAudible)
         manager.createNotificationChannel(silent)
     }
 
@@ -225,7 +251,9 @@ class PrayerAlarmScheduler(
         const val EXTRA_PRAYER_NAME = "extra_prayer_name"
         const val EXTRA_OFFSET_MINUTES = "extra_offset_minutes"
         const val EXTRA_OPEN_PRAYER_PANEL = "extra_open_prayer_panel"
-        const val AUDIBLE_CHANNEL_ID = "prayer_reminders"
+        const val ALARM_CHANNEL_ID = "prayer_alarms"                    // alarm ringtone + vibration
+        const val ADHAN_NOTIFICATION_CHANNEL_ID = "prayer_alarms_adhan" // vibration only (service plays audio)
+        const val AUDIBLE_CHANNEL_ID = "prayer_reminders"               // legacy: AdhanPlaybackService foreground
         const val SILENT_CHANNEL_ID = "prayer_reminders_silent"
     }
 }

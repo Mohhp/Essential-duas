@@ -30,8 +30,9 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         val playAdhanSound = repository.getSettings().playAdhanSound
         Log.d(logTag, "Adhan service decision: playAdhanSound=$playAdhanSound prayerName=$prayerName")
 
-        // Keep the standard reminder notification silent; adhan playback is handled by the service.
-        scheduler.notifyReminder(reminder, forceSilent = true)
+        // When adhan plays, the service handles all audio — silence the notification sound but keep vibration.
+        // When adhan is disabled, the notification itself must play an alarm ringtone + vibrate.
+        scheduler.notifyReminder(reminder, forceSilent = playAdhanSound)
         if (playAdhanSound) {
             Log.d(logTag, "Starting AdhanPlaybackService for prayerName=$prayerName")
             AdhanPlaybackService.start(context, reminder)
