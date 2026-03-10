@@ -3541,24 +3541,24 @@ window.filterCategory = function(cat, btn) {
         })();
 
         const greetings = isPS ? {
-            fajr:      'السلام علیکم — د فجر وخت',
+            fajr:      'د فجر وخت',
             morning:   'سهار مو پخیر — خپله ورځ د ذکر سره پیل کړئ',
-            dhuhr:     'السلام علیکم — د غرمې لمانځ وخت دی',
+            dhuhr:     'د غرمې لمانځ وخت دی',
             asr:       'مازدیګر مو پخیر — د مازیګر لمانځ وخت دی',
-            maghrib:   'السلام علیکم — د ماښام لمانځ وخت دی',
+            maghrib:   'د ماښام لمانځ وخت دی',
             isha:      'ماښام مو پخیر — خپله ورځ د لمانځه سره پای ته ورسوئ',
             latenight: 'ماښام مو پخیر — خپله ورځ د لمانځه سره پای ته ورسوئ',
         } : {
-            fajr:      'Assalamu Alaikum — Fajr time',
+            fajr:      'Fajr time',
             morning:   'Good morning — start your day with dhikr',
-            dhuhr:     'Assalamu Alaikum — Dhuhr is here',
+            dhuhr:     'Time for Dhuhr',
             asr:       'Good afternoon — time for Asr',
-            maghrib:   'Assalamu Alaikum — Maghrib time',
+            maghrib:   'Maghrib time',
             isha:      'Good evening — end your day with prayer',
             latenight: 'Good evening — end your day with prayer',
         };
 
-        return greetings[rawPeriod] || (isPS ? 'السلام عليكم' : 'Assalamu Alaikum');
+        return greetings[rawPeriod] || '';
     }
 
     function refreshHomeDashboardGreeting() {

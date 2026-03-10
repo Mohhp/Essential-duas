@@ -13,7 +13,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="styles.css?v=20260310l">
+    <link rel="stylesheet" href="styles.css?v=20260310m">
 </head>
 
     <body class="startup-blocked">
@@ -59,15 +59,17 @@
 
     <section class="home-dashboard" id="homeDashboard">
         <div class="home-ambient-overlay" aria-hidden="true"></div>
-        <span class="home-hero-watermark" aria-hidden="true">بسم الله الرحمن الرحيم</span>
         <button class="home-falah-brand" type="button" onclick="handleLogoTap()" aria-label="Go to home">
             <svg class="home-falah-crescent-svg" width="24" height="24" viewBox="0 0 24 24" fill="#C9A84C" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
             </svg>
             <span class="home-falah-text">Falah</span>
         </button>
-        <div class="dashboard-greeting" id="dashboardGreeting">Assalamu Alaikum</div>
-        <div class="dashboard-date date-display" id="dashboardDate">Rabi al-Awwal 14, 1447</div>
+        <div class="home-greeting-tile" id="homeGreetingTile">
+            <div class="home-greeting-salam" aria-label="Assalamu Alaikum">السلام عليكم</div>
+            <div class="dashboard-greeting" id="dashboardGreeting"></div>
+            <div class="dashboard-date date-display" id="dashboardDate">Rabi al-Awwal 14, 1447</div>
+        </div>
 
         <button class="dashboard-prayer-card" id="dashboardNextPrayerCard" onclick="openPrayerFromDashboard()" aria-label="Open prayer times">
             <span class="prayer-watermark" aria-hidden="true">بسم الله الرحمن الرحيم</span>
@@ -3537,7 +3539,7 @@
 <!-- ===== JAVASCRIPT ENGINE ===== -->
 <!-- ══════════════════════════════════════════ -->
 <!-- Production assets (active) -->
-    <script src="app.js?v=20260310j"></script>
+    <script src="app.js?v=20260310k"></script>
 <!-- Source assets (fallback for local debugging) -->
 <!-- <script src="app.js?v=20260306k"></script> -->
 
