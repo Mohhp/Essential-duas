@@ -5481,8 +5481,10 @@
             box-shadow: 0 0 18px rgba(46, 196, 122, 0.18);
         }
         .achievement-badge.locked {
-            opacity: 0.62;
-            filter: grayscale(1);
+            opacity: 0.82;
+            filter: grayscale(0.6);
+            border-color: rgba(255, 255, 255, 0.10);
+            background: rgba(255, 255, 255, 0.04);
         }
         .achievement-lock {
             position: absolute;
@@ -7076,21 +7078,26 @@
             transform: none;
         }
 
-        ::-webkit-scrollbar {
-            width: 4px;
+        /* ── Scrollbar styling: applies to all scroll containers ─────────── */
+        /* Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
         }
-
+        /* Chrome / Edge / WebView */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
         ::-webkit-scrollbar-track {
             background: transparent;
         }
-
         ::-webkit-scrollbar-thumb {
-            background: rgba(201, 168, 76, 0.36);
-            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
         }
-
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(201, 168, 76, 0.52);
+            background: rgba(255, 255, 255, 0.28);
         }
 
         .dashboard-quick-tile {

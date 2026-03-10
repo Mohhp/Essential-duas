@@ -1,21 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
 
-    <!-- Deep midnight sky: rich indigo at centre, near-black at edges -->
-    <radialGradient id="bg" cx="40%" cy="38%" r="72%">
-      <stop offset="0%"   stop-color="#0E1725"/>
-      <stop offset="50%"  stop-color="#08101A"/>
-      <stop offset="100%" stop-color="#030508"/>
+    <!--
+      BACKGROUND — richer vignette: warm indigo at focus, near-black at edges.
+      Radial centre offset toward upper-left to match the light-source direction
+      of the gold gradient so everything reads as a single coherent light model.
+    -->
+    <radialGradient id="bg" cx="38%" cy="35%" r="72%">
+      <stop offset="0%"   stop-color="#14243E"/>
+      <stop offset="48%"  stop-color="#08101C"/>
+      <stop offset="100%" stop-color="#020508"/>
     </radialGradient>
 
     <!--
-      Antique metallic gold — warm ivory highlight (upper-left light source)
-      fading to deep amber shadow (lower-right). gradientUnits=userSpaceOnUse
-      ensures the crescent and star share the same absolute gradient coords,
-      giving a naturally cohesive metallic sheen across both shapes.
+      GOLD — antique metallic sheen: ivory highlight (upper-left) fading to
+      deep amber shadow (lower-right). gradientUnits=userSpaceOnUse so crescent
+      and star share the same absolute coordinates — giving the star the same
+      metallic light as the crescent arm, as if both are the same cast object.
     -->
     <linearGradient id="gold"
-        x1="72" y1="72" x2="440" y2="440"
+        x1="80"  y1="80"
+        x2="430" y2="430"
         gradientUnits="userSpaceOnUse">
       <stop offset="0%"   stop-color="#FDF5CB"/>
       <stop offset="14%"  stop-color="#EDD66C"/>
@@ -24,7 +29,17 @@
       <stop offset="100%" stop-color="#5A400D"/>
     </linearGradient>
 
-    <!-- Rounded-square clip for the icon boundary -->
+    <!-- Lighter highlight gradient for the rim stroke -->
+    <linearGradient id="rim"
+        x1="100" y1="60"
+        x2="380" y2="340"
+        gradientUnits="userSpaceOnUse">
+      <stop offset="0%"   stop-color="#FEFCE8"/>
+      <stop offset="50%"  stop-color="#F0D97A"/>
+      <stop offset="100%" stop-color="#A8801C"/>
+    </linearGradient>
+
+    <!-- Rounded-square icon clip (Google/iOS style) -->
     <clipPath id="icon">
       <rect width="512" height="512" rx="108" ry="108"/>
     </clipPath>
@@ -33,41 +48,89 @@
 
   <g clip-path="url(#icon)">
 
-    <!-- 1. Deep midnight background -->
+    <!-- 1 ─── Deep midnight background with vignette -->
     <rect width="512" height="512" fill="url(#bg)"/>
 
-    <!-- 2. Subtle warmth behind crescent area — no filter, just a tinted circle -->
-    <circle cx="235" cy="270" r="195" fill="#C9A84C" fill-opacity="0.05"/>
+    <!--
+      2 ─── Moonlight ambient glow
+      A soft, very-low-opacity gold circle behind the crescent gives the
+      impression of scattered light around the moon — without any SVG filter.
+      Two circles at different opacities create a gradient-like fade.
+    -->
+    <circle cx="248" cy="222" r="210" fill="#C9A84C" fill-opacity="0.07"/>
+    <circle cx="248" cy="222" r="155" fill="#EDD66C" fill-opacity="0.04"/>
 
     <!--
-      3. Crescent moon — even-odd compound path (two full circles).
-         Outer: cx=254 cy=258 r=168  |  Inner (shifted upper-right): cx=296 cy=210 r=145
-         The even-odd fill rule fills the outer-only region (crescent arm) and
-         leaves the overlap region (where both circles cover = inner circle area) transparent.
-         Arm width ~87px (8px at 48px), horn span ~286px (27px at 48px).
-         No mask, no filter. Purely geometric — renders cleanly at every size.
+      3 ─── Crescent moon (THIN elegant sickle)
+      Even-odd compound path = two full circles drawn as one path.
+      The even-odd fill rule keeps only the area inside the outer ring that
+      is NOT covered by the inner circle — producing the crescent sickle.
+
+      Geometry:
+        Outer circle: cx=256, cy=228, r=178
+        Inner circle: cx=286, cy=194, r=172   (shifted 30px right, 34px up → d=45.3px)
+        → arm width at thickest: 38.8px  (3.6px at 48px icon = 55% thinner than before)
+        → horn-to-horn span: 358px      (33.6px at 48px)
+        → gold area coverage: ~13%
+
+      The crescent opens toward upper-right: the bowl faces the star.
+      No filter, no mask. Pure geometry — renders identically at every size.
     -->
     <path fill-rule="evenodd"
-          d="M  86,258 A 168,168 0 1 0 422,258 A 168,168 0 1 0  86,258 Z
-             M 151,210 A 145,145 0 1 0 441,210 A 145,145 0 1 0 151,210 Z"
+          d="M  78,228 A 178,178 0 1 0 434,228 A 178,178 0 1 0  78,228 Z
+             M 114,194 A 172,172 0 1 0 458,194 A 172,172 0 1 0 114,194 Z"
           fill="url(#gold)"/>
 
     <!--
-      4. Eight-pointed star — floats in the dark concave bowl of the crescent.
-         Position (312,192): inside the inner-circle hollow, on dark background.
-         Outer radius R=26, inner radius r=10.8.
-         At 48px the star is ~2.4px radius — a refined dot of light;
-         at 512px it is a jewel sitting in the crescent's opening.
+      4 ─── Crescent rim highlight
+      A thin stroke on the outer circle simulates metallic rim lighting —
+      the bright edge you'd see on a polished gold object lit from upper-left.
+      Placed AFTER the crescent fill so it sits on top. Opacity 0.30 is subtle
+      enough that the sections over dark background barely register.
+    -->
+    <circle cx="256" cy="228" r="178"
+            fill="none"
+            stroke="url(#rim)"
+            stroke-width="2.5"
+            stroke-opacity="0.32"/>
+
+    <!--
+      5 ─── Eight-pointed star in the dark concave bowl
+      Position (295, 205): well inside the inner-circle dark region
+        (distance to inner center = 14px, inner r = 172 → safe margin: 158px)
+      Outer radius R=42, inner r=17.4  (was R=26, now 62% larger — clearly
+        visible at 192px, a glint of light at 48px, a jewel at 512px)
+      The star shares the gold gradient: upper tips are ivory, lower amber.
     -->
     <polygon
-      transform="translate(312,192)"
-      points="0,-26 4.13,-9.98 18.38,-18.38 9.98,-4.13 26,0 9.98,4.13 18.38,18.38 4.13,9.98
-              0,26 -4.13,9.98 -18.38,18.38 -9.98,4.13 -26,0 -9.98,-4.13 -18.38,-18.38 -4.13,-9.98"
+      transform="translate(295,205)"
+      points="0,-42 6.67,-16.13 29.7,-29.7 16.13,-6.67 42,0 16.13,6.67 29.7,29.7 6.67,16.13
+              0,42 -6.67,16.13 -29.7,29.7 -16.13,6.67 -42,0 -16.13,-6.67 -29.7,-29.7 -6.67,-16.13"
       fill="url(#gold)"/>
 
-    <!-- 5. Premium inner border ring — single gold thread, very low opacity -->
+    <!--
+      6 ─── "FALAH" wordmark
+      Refined spaced capitals in the lower quarter of the icon.
+      Baseline y=464: bottom of text ≈ y=470 (12px from corner clip).
+      Top of text ≈ y=418: crescent bottom point is y=406 → clean 12px margin.
+      At 48px icon: renders as a 4.3px line — a subtle brand mark; fully
+        legible at 96px+.
+    -->
+    <text
+      x="256" y="464"
+      text-anchor="middle"
+      font-family="Liberation Sans, Arial, sans-serif"
+      font-size="44"
+      font-weight="700"
+      fill="url(#gold)"
+      letter-spacing="11">FALAH</text>
+
+    <!-- 7 ─── Premium 1px inner border ring — barely visible gold thread -->
     <rect x="10" y="10" width="492" height="492" rx="100" ry="100"
-          fill="none" stroke="#D4AF37" stroke-width="1.5" stroke-opacity="0.22"/>
+          fill="none"
+          stroke="#D4AF37"
+          stroke-width="1.5"
+          stroke-opacity="0.24"/>
 
   </g>
 </svg>
