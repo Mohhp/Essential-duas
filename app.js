@@ -10921,20 +10921,28 @@ window.filterCategory = function(cat, btn) {
     function ensurePashtoAyahsForBundle(bundle, surahNumber) {
         if (!bundle || !Array.isArray(bundle.ayahs) || !bundle.ayahs.length) return bundle;
         const pashtoAyahs = getPashtoZakariaAyahTexts(Number(surahNumber), bundle.ayahs.length);
-        return {
+        const hydrated = {
             ...bundle,
             surahNumber: Number(bundle.surahNumber || surahNumber),
             ayahs: bundle.ayahs.map((ayah, index) => ({
                 ...ayah,
-                pashto: stripPashtoAyahPrefix(
-                    Object.prototype.hasOwnProperty.call(ayah || {}, 'pashto')
-                        ? ayah.pashto
-                        : (pashtoAyahs[index] || ''),
-                    bundle.surahNumber || surahNumber,
-                    ayah?.numberInSurah || index + 1
-                )
+                pashto: (() => {
+                    const existingPashto = stripPashtoAyahPrefix(
+                        Object.prototype.hasOwnProperty.call(ayah || {}, 'pashto') ? ayah.pashto : '',
+                        bundle.surahNumber || surahNumber,
+                        ayah?.numberInSurah || index + 1
+                    );
+                    if (existingPashto) return existingPashto;
+                    return stripPashtoAyahPrefix(
+                        pashtoAyahs[index] || '',
+                        bundle.surahNumber || surahNumber,
+                        ayah?.numberInSurah || index + 1
+                    );
+                })()
             }))
         };
+
+        return hydrated;
     }
 
     async function ensurePashtoEdition() {
@@ -10975,7 +10983,11 @@ window.filterCategory = function(cat, btn) {
         if (!forceRefresh) {
             const requirePashto = shouldShowTranslationBlock(getTranslationModeEffective(), 'ps');
             if (isCachedSurahBundleUsable(cached, { requirePashto })) {
-                return ensurePashtoAyahsForBundle(cached.data, surahNumber);
+                const hydratedCached = ensurePashtoAyahsForBundle(cached.data, surahNumber);
+                if (JSON.stringify(hydratedCached) !== JSON.stringify(cached.data)) {
+                    saveCachedSurahData(surahNumber, hydratedCached);
+                }
+                return hydratedCached;
             }
         }
 
@@ -11018,7 +11030,11 @@ window.filterCategory = function(cat, btn) {
             return data;
         } catch (error) {
             if (cached?.data && Array.isArray(cached.data.ayahs) && cached.data.ayahs.length) {
-                return ensurePashtoAyahsForBundle(cached.data, surahNumber);
+                const hydratedCached = ensurePashtoAyahsForBundle(cached.data, surahNumber);
+                if (JSON.stringify(hydratedCached) !== JSON.stringify(cached.data)) {
+                    saveCachedSurahData(surahNumber, hydratedCached);
+                }
+                return hydratedCached;
             }
             throw error;
         }
