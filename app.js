@@ -8886,12 +8886,20 @@ window.filterCategory = function(cat, btn) {
                     return currentDist < bestDist ? current : best;
                 }, null);
 
+                const nearestGlobalCity = ALL_CITIES.reduce((best, current) => {
+                    const bestDist = best ? Math.hypot(best.lat - lat, best.lng - lng) : Infinity;
+                    const currentDist = Math.hypot(current.lat - lat, current.lng - lng);
+                    return currentDist < bestDist ? current : best;
+                }, null);
+
                 const isAfghanistan = /(افغانستان|afghanistan)/i.test(geodata?.address?.country || '');
-                const selectedCity = isAfghanistan && nearestCity ? nearestCity : null;
+                const selectedCity = isAfghanistan && nearestCity
+                    ? nearestCity
+                    : nearestGlobalCity;
                 const savedLoc = {
                     lat,
                     lng,
-                    city: selectedCity ? selectedCity.en : city,
+                    city: selectedCity ? selectedCity.en : (city || `${lat.toFixed(2)}°, ${lng.toFixed(2)}°`),
                     cityKey: selectedCity ? selectedCity.key : null,
                     country: geodata?.address?.country || ''
                 };
@@ -8901,7 +8909,7 @@ window.filterCategory = function(cat, btn) {
                 localStorage.setItem('crown_location', JSON.stringify(savedLoc));
                 if (isNativeAndroidReminderMode()) syncNativeAndroidReminderState('gps-location-selected', savedLoc);
                 updateGpsLocationBtnState('success', savedLoc.city || city);
-                onLocationReady(lat, lng, city);
+                onLocationReady(lat, lng, savedLoc.city || city);
                 if (document.getElementById('cityDropdown')?.classList.contains('open')) {
                     renderCityDropdown(cityInput?.value || '');
                 }
@@ -10777,6 +10785,20 @@ window.filterCategory = function(cat, btn) {
         return String(name || '').replace(/^سُورَةُ\s*/u, '').replace(/^سورة\s*/u, '').trim();
     }
 
+    function stripPashtoAyahPrefix(text, surahNumber = null, ayahNumber = null) {
+        let value = String(text || '').trim();
+        if (!value) return '';
+
+        const surahNo = Number(surahNumber);
+        const ayahNo = Number(ayahNumber);
+        if (surahNo > 0 && ayahNo > 0) {
+            const exactPrefix = new RegExp(`^\\s*${surahNo}[\\-:.،]\s*${ayahNo}\\s*`);
+            value = value.replace(exactPrefix, '');
+        }
+
+        return value.replace(/^\s*[0-9۰-۹]+[\-:.،]\s*[0-9۰-۹]+\s*/u, '').trim();
+    }
+
     function normalizeLatinSearchText(value) {
         let text = String(value || '')
             .toLowerCase()
@@ -10868,7 +10890,7 @@ window.filterCategory = function(cat, btn) {
                     const ayahRows = Array.isArray(surahRow?.ayahs) ? surahRow.ayahs : [];
                     const texts = ayahRows
                         .sort((a, b) => Number(a.ayah) - Number(b.ayah))
-                        .map((ayahRow) => String(ayahRow?.text || '').trim());
+                        .map((ayahRow) => stripPashtoAyahPrefix(ayahRow?.text, surahNo, ayahRow?.ayah));
                     map.set(surahNo, texts);
                 });
                 quranState.pashtoZakariaMap = map;
@@ -10894,6 +10916,25 @@ window.filterCategory = function(cat, btn) {
         const out = rows.slice();
         while (out.length < Number(expectedAyahCount)) out.push('');
         return out;
+    }
+
+    function ensurePashtoAyahsForBundle(bundle, surahNumber) {
+        if (!bundle || !Array.isArray(bundle.ayahs) || !bundle.ayahs.length) return bundle;
+        const pashtoAyahs = getPashtoZakariaAyahTexts(Number(surahNumber), bundle.ayahs.length);
+        return {
+            ...bundle,
+            surahNumber: Number(bundle.surahNumber || surahNumber),
+            ayahs: bundle.ayahs.map((ayah, index) => ({
+                ...ayah,
+                pashto: stripPashtoAyahPrefix(
+                    Object.prototype.hasOwnProperty.call(ayah || {}, 'pashto')
+                        ? ayah.pashto
+                        : (pashtoAyahs[index] || ''),
+                    bundle.surahNumber || surahNumber,
+                    ayah?.numberInSurah || index + 1
+                )
+            }))
+        };
     }
 
     async function ensurePashtoEdition() {
@@ -10930,48 +10971,57 @@ window.filterCategory = function(cat, btn) {
     }
 
     async function fetchSurahBundle(surahNumber, forceRefresh = false) {
+        const cached = getCachedSurahData(surahNumber);
         if (!forceRefresh) {
-            const cached = getCachedSurahData(surahNumber);
             const requirePashto = shouldShowTranslationBlock(getTranslationModeEffective(), 'ps');
-            if (isCachedSurahBundleUsable(cached, { requirePashto })) return cached.data;
+            if (isCachedSurahBundleUsable(cached, { requirePashto })) {
+                return ensurePashtoAyahsForBundle(cached.data, surahNumber);
+            }
         }
 
         if (!quranState.pashtoZakariaMap) {
             await loadPashtoZakariaMap();
         }
 
-        const editionList = ['quran-uthmani', 'en.sahih'];
-        const response = await fetchWithTimeout(`${QURAN_API_BASE}/surah/${surahNumber}/editions/${editionList.join(',')}`, {}, 15000);
-        if (!response.ok) throw new Error('Failed to fetch surah data');
-        const json = await response.json();
-        const blocks = json?.data || [];
-        if (!Array.isArray(blocks) || !blocks.length) throw new Error('Failed to fetch surah data');
+        try {
+            const editionList = ['quran-uthmani', 'en.sahih'];
+            const response = await fetchWithTimeout(`${QURAN_API_BASE}/surah/${surahNumber}/editions/${editionList.join(',')}`, {}, 15000);
+            if (!response.ok) throw new Error('Failed to fetch surah data');
+            const json = await response.json();
+            const blocks = json?.data || [];
+            if (!Array.isArray(blocks) || !blocks.length) throw new Error('Failed to fetch surah data');
 
-        const arabic = blocks.find(b => b.edition?.identifier === 'quran-uthmani') || blocks[0];
-        const english = blocks.find(b => b.edition?.identifier === 'en.sahih') || null;
-        const pashtoAyahs = getPashtoZakariaAyahTexts(Number(surahNumber), arabic?.ayahs?.length || 0);
+            const arabic = blocks.find(b => b.edition?.identifier === 'quran-uthmani') || blocks[0];
+            const english = blocks.find(b => b.edition?.identifier === 'en.sahih') || null;
+            const pashtoAyahs = getPashtoZakariaAyahTexts(Number(surahNumber), arabic?.ayahs?.length || 0);
 
-        const ayahs = (arabic.ayahs || []).map((ayah, index) => ({
-            numberInSurah: ayah.numberInSurah,
-            number: ayah.number,
-            juz: ayah.juz,
-            arabic: ayah.text,
-            english: english?.ayahs?.[index]?.text || '',
-            pashto: pashtoAyahs[index] || ''
-        }));
+            const ayahs = (arabic.ayahs || []).map((ayah, index) => ({
+                numberInSurah: ayah.numberInSurah,
+                number: ayah.number,
+                juz: ayah.juz,
+                arabic: ayah.text,
+                english: english?.ayahs?.[index]?.text || '',
+                pashto: stripPashtoAyahPrefix(pashtoAyahs[index] || '', surahNumber, ayah.numberInSurah)
+            }));
 
-        const data = {
-            surahNumber,
-            name: arabic.name,
-            englishName: arabic.englishName,
-            englishNameTranslation: arabic.englishNameTranslation,
-            revelationType: arabic.revelationType,
-            numberOfAyahs: arabic.numberOfAyahs,
-            ayahs
-        };
+            const data = {
+                surahNumber,
+                name: arabic.name,
+                englishName: arabic.englishName,
+                englishNameTranslation: arabic.englishNameTranslation,
+                revelationType: arabic.revelationType,
+                numberOfAyahs: arabic.numberOfAyahs,
+                ayahs
+            };
 
-        saveCachedSurahData(surahNumber, data);
-        return data;
+            saveCachedSurahData(surahNumber, data);
+            return data;
+        } catch (error) {
+            if (cached?.data && Array.isArray(cached.data.ayahs) && cached.data.ayahs.length) {
+                return ensurePashtoAyahsForBundle(cached.data, surahNumber);
+            }
+            throw error;
+        }
     }
 
     function syncQuranReaderStickyOffsets() {
@@ -11866,6 +11916,15 @@ window.filterCategory = function(cat, btn) {
         return match?.name || 'Quran Recitation';
     }
 
+    function getPashtoSurahAudioUrl(surahNumber) {
+        const surah = Math.max(1, Math.min(114, Number(surahNumber) || 0));
+        if (!surah) return null;
+        const fileName = `${String(surah).padStart(3, '0')}.mp3`;
+        const relativePath = `/audio/quran-pashto-soundcloud-normalized/${fileName}`;
+        const base = String(PASHTO_AUDIO_BASE_URL || '').trim().replace(/\/$/, '');
+        return base ? `${base}${relativePath}` : relativePath;
+    }
+
     function updateQuranMediaSession() {
         if (!('mediaSession' in navigator)) return;
 
@@ -11885,7 +11944,7 @@ window.filterCategory = function(cat, btn) {
         navigator.mediaSession.metadata = new MediaMetadata({
             title: ayah ? `${surahLabel} - Ayah ${ayah}` : surahLabel,
             artist: reciterLabel,
-            album: 'Falah Quran',
+            album: 'Al-Falah Quran',
             artwork: [{ src: '/icon-512.png', sizes: '512x512', type: 'image/png' }]
         });
 
@@ -12885,7 +12944,6 @@ window.filterCategory = function(cat, btn) {
             return `
                 <article class="quran-ayah-card ${playing ? 'playing' : ''}" data-ayah-no="${ayah.numberInSurah}" aria-current="${playing ? 'true' : 'false'}" id="quranAyah-${cardKey}">
                     <div class="quran-ayah-topline">
-                        <span class="quran-ayah-num">${localizeQuranNumber(ayah.numberInSurah)}</span>
                         <div class="quran-ayah-actions">
                             <button type="button" class="quran-ayah-btn" data-ayah-action="bookmark" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" aria-label="Bookmark ayah">${bookmarked ? '★' : '☆'}</button>
                             <button type="button" class="quran-ayah-btn quran-ayah-play" data-ayah-action="play" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" aria-label="Play ayah">${playing && (quranState.playerState === 'playing' || quranState.playerState === 'loading') ? '⏸' : '▶'}</button>
