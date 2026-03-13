@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Falah</string>
+    <string name="app_name">Al-Falah</string>
     <string name="notification_channel_name">Prayer reminders</string>
     <string name="notification_channel_description">Exact prayer reminders scheduled from the app.</string>
     <string name="notification_channel_silent_name">Prayer reminders (silent)</string>
@@ -11,5 +11,5 @@
     <string name="notification_adhan_channel_description">Shown while adhan is playing — vibrates but defers sound to the adhan service.</string>
     <string name="notification_title_suffix">Prayer reminder</string>
     <string name="reminder_permission_needed">Allow notifications and exact alarms in Android settings to keep prayer reminders reliable.</string>
-    <string name="loading_label">Loading Falah…</string>
+    <string name="loading_label">Loading Al-Falah…</string>
 </resources>

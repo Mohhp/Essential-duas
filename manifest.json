@@ -1,9 +1,9 @@
 {
   "id": "/Essential-duas/",
-  "name": "Falah: Quran, Duas & Prayer",
-  "short_name": "Falah",
+  "name": "Al-Falah — الفلاح",
+  "short_name": "Al-Falah",
   "version": "2.0.17",
-  "description": "Falah — Your Islamic Companion. Duas, Quran, Prayer Times, and Dhikr with Pashto and English support.",
+  "description": "Al-Falah — Your Islamic Companion. Duas, Quran, Prayer Times, and Dhikr with Pashto and English support.",
   "start_url": "/Essential-duas/",
   "scope": "/Essential-duas/",
   "lang": "en",

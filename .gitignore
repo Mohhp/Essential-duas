@@ -25,3 +25,20 @@ node_modules/
 # Generated Pashto audio artifacts (do not commit)
 audio/quran-pashto-soundcloud-raw/
 audio/quran-pashto-soundcloud-normalized/
+
+# Android build output
+android/app/build/
+android/build/
+android/.gradle/
+
+# Generated files
+*.apk
+*.aab
+
+# Large Quran source audio (handled outside Git)
+audio/quran-pashto-soundcloud-raw/
+audio/quran-pashto-soundcloud-normalized/
+
+# OS files
+.DS_Store
+Thumbs.db
