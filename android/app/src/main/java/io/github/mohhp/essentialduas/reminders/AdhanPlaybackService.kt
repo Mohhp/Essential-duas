@@ -8,6 +8,7 @@ import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
+import android.media.audiofx.LoudnessEnhancer
 import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
@@ -26,8 +27,10 @@ class AdhanPlaybackService : Service() {
     private var mediaPlayer: MediaPlayer? = null
     private var wakeLock: PowerManager.WakeLock? = null
     private var audioFocusRequest: AudioFocusRequest? = null
+    private var loudnessEnhancer: LoudnessEnhancer? = null
     private var hasAudioFocus: Boolean = false
     private var isPlayingAudio: Boolean = false
+    private var previousAlarmVolume: Int? = null
 
     private val audioManager by lazy {
         getSystemService(AudioManager::class.java)
@@ -112,6 +115,8 @@ class AdhanPlaybackService : Service() {
         )
         @Suppress("DEPRECATION")
         player.setAudioStreamType(AudioManager.STREAM_ALARM)
+        player.setWakeMode(applicationContext, PowerManager.PARTIAL_WAKE_LOCK)
+        player.setVolume(1.0f, 1.0f)
         player.setOnCompletionListener {
             Log.d(logTag, "Playback complete for prayer=${currentReminder?.prayerName}")
             stopCurrentPlayback(clearQueue = false)
@@ -123,10 +128,65 @@ class AdhanPlaybackService : Service() {
         }
 
         mediaPlayer = player
+        attachLoudnessEnhancer(player)
         acquireWakeLock()
+        boostAlarmStreamVolume()
         isPlayingAudio = true
         Log.d(logTag, "Starting MediaPlayer for prayer=${next.prayerName}")
         player.start()
+    }
+
+    private fun attachLoudnessEnhancer(player: MediaPlayer) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return
+        releaseLoudnessEnhancer()
+        runCatching {
+            LoudnessEnhancer(player.audioSessionId).apply {
+                // 1800 mB gives a noticeable lift without pushing as hard as the max 2000 mB.
+                setTargetGain(1800)
+                enabled = true
+                loudnessEnhancer = this
+            }
+        }.onFailure {
+            Log.w(logTag, "Unable to enable LoudnessEnhancer for adhan playback", it)
+        }
+    }
+
+    private fun releaseLoudnessEnhancer() {
+        loudnessEnhancer?.let { enhancer ->
+            runCatching {
+                enhancer.enabled = false
+                enhancer.release()
+            }.onFailure {
+                Log.w(logTag, "Unable to release LoudnessEnhancer", it)
+            }
+        }
+        loudnessEnhancer = null
+    }
+
+    private fun boostAlarmStreamVolume() {
+        val manager = audioManager ?: return
+        runCatching {
+            val current = manager.getStreamVolume(AudioManager.STREAM_ALARM)
+            val max = manager.getStreamMaxVolume(AudioManager.STREAM_ALARM)
+            previousAlarmVolume = current
+            val target = max.coerceAtLeast(current)
+            if (target > current) {
+                manager.setStreamVolume(AudioManager.STREAM_ALARM, target, 0)
+            }
+        }.onFailure {
+            Log.e(logTag, "Unable to boost alarm stream volume", it)
+        }
+    }
+
+    private fun restoreAlarmStreamVolume() {
+        val manager = audioManager ?: return
+        val previous = previousAlarmVolume ?: return
+        runCatching {
+            manager.setStreamVolume(AudioManager.STREAM_ALARM, previous, 0)
+        }.onFailure {
+            Log.e(logTag, "Unable to restore alarm stream volume", it)
+        }
+        previousAlarmVolume = null
     }
 
     private fun buildForegroundNotification(reminder: ScheduledReminder) = NotificationCompat.Builder(
@@ -252,6 +312,8 @@ class AdhanPlaybackService : Service() {
         mediaPlayer = null
         isPlayingAudio = false
 
+        releaseLoudnessEnhancer()
+        restoreAlarmStreamVolume()
         releaseWakeLock()
         releaseAudioFocus()
 
@@ -274,6 +336,8 @@ class AdhanPlaybackService : Service() {
             }
         }
         mediaPlayer = null
+        releaseLoudnessEnhancer()
+        restoreAlarmStreamVolume()
         releaseWakeLock()
         releaseAudioFocus()
         currentReminder = null

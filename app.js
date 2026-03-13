@@ -1243,6 +1243,24 @@
 
     function syncNativeAndroidScrollTop() {
         nativeAndroidScrollSyncRaf = null;
+        const mainContainer = document.getElementById('mainContainer');
+        const mainMode = mainContainer?.getAttribute('data-main-mode') || 'home';
+        const hasSecondaryPanel = !!document.querySelector('.panel.active:not(#mainContainer)');
+        const quranReaderActive = !!document.getElementById('quranReaderScreen')?.classList.contains('active');
+
+        // Native pull-to-refresh should only be possible on the Home surface.
+        // Force a non-zero top for other views so Android SwipeRefresh does not
+        // reload while scrolling Duas, Prayer/Reminder, Quran reader, etc.
+        const allowNativeRefresh = !!mainContainer?.classList.contains('active')
+            && mainMode === 'home'
+            && !hasSecondaryPanel
+            && !quranReaderActive;
+
+        if (!allowNativeRefresh) {
+            reportNativeAndroidScrollTop(999);
+            return;
+        }
+
         const activeScroller = getActiveScrollableElement();
         reportNativeAndroidScrollTop(getScrollableElementTop(activeScroller));
     }
@@ -8268,6 +8286,55 @@ window.filterCategory = function(cat, btn) {
         localStorage.setItem('crown_prayer_reminders', JSON.stringify(settingsOverride));
     }
 
+    function getReminderChannelModeDescription(settings) {
+        if (!settings) return 'Unknown';
+        const silentMode = settings.mode === 'silent' || settings.soundId === 'silent';
+        if (silentMode) return 'SILENT_CHANNEL_ID (prayer_reminders_silent_v2)';
+        if (settings.playAdhanSound !== false) {
+            return 'ADHAN_NOTIFICATION_CHANNEL_ID (prayer_alarms_adhan_v2) + AdhanPlaybackService';
+        }
+        return 'ALARM_CHANNEL_ID (prayer_alarms_v2)';
+    }
+
+    function getReminderDiagnosticsText() {
+        const settings = loadReminderSettings();
+        const nativeMode = isNativeAndroidReminderMode();
+        const nativeState = nativeMode ? ensureNativeAndroidReminderState() : null;
+        const perms = nativeState?.permissions || null;
+
+        const notificationPermission = nativeMode
+            ? (perms?.notificationsGranted ? 'granted' : 'missing')
+            : (typeof Notification !== 'undefined' ? Notification.permission : 'unsupported');
+        const exactAlarmPermission = nativeMode
+            ? (perms?.exactAlarmGranted ? 'granted' : 'missing')
+            : 'n/a (web mode)';
+
+        const nextReminder = nativeMode && nativeState?.nextReminder?.triggerAt
+            ? `${nativeState.nextReminder.prayerName || 'unknown'} @ ${new Date(nativeState.nextReminder.triggerAt).toLocaleString()}`
+            : 'not scheduled';
+
+        return [
+            `Mode: ${nativeMode ? 'Native Android bridge' : 'Web/foreground only'}`,
+            `Notifications permission: ${notificationPermission}`,
+            `Exact alarm permission: ${exactAlarmPermission}`,
+            `Reminders enabled: ${settings.enabled ? 'yes' : 'no'}`,
+            `Adhan sound toggle: ${settings.playAdhanSound !== false ? 'on' : 'off'}`,
+            `Reminder mode: ${settings.mode || 'tone'}`,
+            `Sound id: ${settings.soundId || 'ding'}`,
+            `Effective channel path: ${getReminderChannelModeDescription(settings)}`,
+            `Offset: ${Number(settings.offsetMinutes) || 0} min`,
+            `Native next reminder: ${nextReminder}`,
+            `Last sync reason: ${nativeState?.reason || nativeState?.lastSyncReason || 'unknown'}`,
+            `Generated: ${new Date().toLocaleString()}`
+        ].join('\n');
+    }
+
+    function renderReminderDiagnostics() {
+        const output = document.getElementById('reminderDiagOutput');
+        if (!output) return;
+        output.textContent = getReminderDiagnosticsText();
+    }
+
     function syncReminderUi() {
         const settings = loadReminderSettings();
         const master = document.getElementById('notifyToggle');
@@ -8294,6 +8361,7 @@ window.filterCategory = function(cat, btn) {
 
         renderPrayerReminderStatusLine();
         updateForegroundReminderBanner();
+        renderReminderDiagnostics();
 
 
     }
@@ -8497,6 +8565,27 @@ window.filterCategory = function(cat, btn) {
                     showFirstEnabledReminderConfirmation();
                 } else {
                     showToast(getPrayerUiText().reminderSaved);
+                }
+            });
+        }
+
+        const refreshDiagBtn = document.getElementById('reminderDiagRefreshBtn');
+        if (refreshDiagBtn) {
+            refreshDiagBtn.addEventListener('click', () => {
+                renderReminderDiagnostics();
+                showToast(isPashtoMode() ? 'تشخیص تازه شو' : 'Diagnostics refreshed');
+            });
+        }
+
+        const copyDiagBtn = document.getElementById('reminderDiagCopyBtn');
+        if (copyDiagBtn) {
+            copyDiagBtn.addEventListener('click', async () => {
+                const text = getReminderDiagnosticsText();
+                try {
+                    await navigator.clipboard.writeText(text);
+                    showToast(isPashtoMode() ? 'تشخیص کاپي شو' : 'Diagnostics copied');
+                } catch (_) {
+                    showToast(isPashtoMode() ? 'کاپي ناکامه شوه' : 'Copy failed');
                 }
             });
         }

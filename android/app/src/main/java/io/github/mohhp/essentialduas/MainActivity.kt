@@ -192,13 +192,10 @@ class MainActivity : AppCompatActivity(), ReminderPermissionChecker {
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        swipeRefresh.setOnRefreshListener {
-            webView.reload()
-        }
-        swipeRefresh.setOnChildScrollUpCallback { _, _ ->
-            // DOM panels own scrolling in this app, so use the last scrollTop reported from JS.
-            lastReportedContentScrollTopPx > 0.5
-        }
+        // Pull-to-refresh in SwipeRefreshLayout conflicts with in-app panel scrolling
+        // in this WebView app and can trigger unintended full reloads. Disable it.
+        swipeRefresh.isEnabled = false
+        swipeRefresh.setOnChildScrollUpCallback { _, _ -> true }
 
         with(webView.settings) {
             javaScriptEnabled = true

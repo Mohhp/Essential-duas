@@ -3260,6 +3260,17 @@
                         <option value="15">15 min before</option>
                     </select>
 
+                    <div class="foreground-reminder-banner" id="reminderDiagnostics" role="status" aria-live="polite">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                            <strong id="reminderDiagnosticsTitle">Reminder Diagnostics</strong>
+                            <div style="display:flex;gap:8px;">
+                                <button type="button" class="reminder-sound-preview-btn" id="reminderDiagRefreshBtn" aria-label="Refresh reminder diagnostics">↻</button>
+                                <button type="button" class="reminder-sound-preview-btn" id="reminderDiagCopyBtn" aria-label="Copy reminder diagnostics">⧉</button>
+                            </div>
+                        </div>
+                        <pre id="reminderDiagOutput" style="margin:10px 0 0;font-size:0.78rem;white-space:pre-wrap;line-height:1.45;">Loading diagnostics…</pre>
+                    </div>
+
 
                 </div>
             </div>

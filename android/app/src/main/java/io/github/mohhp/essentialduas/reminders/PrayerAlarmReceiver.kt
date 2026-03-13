@@ -30,9 +30,10 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         val playAdhanSound = repository.getSettings().playAdhanSound
         Log.d(logTag, "Adhan service decision: playAdhanSound=$playAdhanSound prayerName=$prayerName")
 
-        // When adhan plays, the service handles all audio — silence the notification sound but keep vibration.
-        // When adhan is disabled, the notification itself must play an alarm ringtone + vibrate.
-        scheduler.notifyReminder(reminder, forceSilent = playAdhanSound)
+        // Always keep reminder notifications audible as a fallback. Some devices may
+        // suppress or kill foreground playback services in the background; in that case
+        // the user still hears the alarm channel sound.
+        scheduler.notifyReminder(reminder, forceSilent = false)
         if (playAdhanSound) {
             Log.d(logTag, "Starting AdhanPlaybackService for prayerName=$prayerName")
             AdhanPlaybackService.start(context, reminder)
