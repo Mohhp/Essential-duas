@@ -27,6 +27,10 @@ android/.gradle/
 *.apk
 *.aab
 
+# Large Quran source audio (handled outside Git)
+audio/quran-pashto-soundcloud-raw/
+audio/quran-pashto-soundcloud-normalized/
+
 # OS files
 .DS_Store
 Thumbs.db

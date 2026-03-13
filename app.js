@@ -71,9 +71,9 @@
         overlay.innerHTML = `
             <div class="first-launch-language-card" role="dialog" aria-modal="true" aria-labelledby="firstLaunchLanguageTitle" aria-describedby="firstLaunchLanguageHint">
                 <div class="first-launch-language-logo">
-                    <img src="icon-192.png" alt="Falah" width="72" height="72">
+                    <img src="icon-192.png" alt="Al-Falah" width="72" height="72">
                 </div>
-                <h2 id="firstLaunchLanguageTitle" class="first-launch-language-title">Falah</h2>
+                <h2 id="firstLaunchLanguageTitle" class="first-launch-language-title">Al-Falah</h2>
                 <p class="first-launch-language-subtitle">Choose your language / خپله ژبه وټاکئ</p>
                 <div class="first-launch-language-actions">
                     <button type="button" class="first-launch-language-btn" data-lang-choice="en" aria-label="English">🇬🇧 English</button>
@@ -3115,8 +3115,8 @@ window.filterCategory = function(cat, btn) {
     window.sharePage = function() {
         if (navigator.share) {
             navigator.share({
-                title: 'Falah — فلاح',
-                text: '63 Essential Islamic Duas from Quran & Sunnah — by Engineer Mohammad Falah',
+                title: 'Al-Falah — الفلاح',
+                text: '63 Essential Islamic Duas from Quran & Sunnah — by Engineer Mohammad Al-Falah',
                 url: window.location.href
             });
         } else {
@@ -3131,7 +3131,7 @@ window.filterCategory = function(cat, btn) {
         if (!card) return;
         const title = card.querySelector('.dua-title').textContent;
         const arabic = card.querySelector('.arabic-text').textContent;
-        const text = `${title}\n\n${arabic}\n\nFrom: Falah — فلاح\n${window.location.href}`;
+        const text = `${title}\n\n${arabic}\n\nFrom: Al-Falah — الفلاح\n${window.location.href}`;
         if (navigator.share) {
             navigator.share({ title: title, text: text });
         } else {
@@ -3259,7 +3259,7 @@ window.filterCategory = function(cat, btn) {
     function getDashboardText() {
         if (isPashtoMode()) {
             return {
-                appTitle: 'فلاح',
+                appTitle: 'الفلاح',
                 warmGreeting: 'السلام عليكم',
                 nextPrayer: 'راتلونکی لمونځ',
                 nowPrefix: 'اوس',
@@ -3318,7 +3318,7 @@ window.filterCategory = function(cat, btn) {
         }
 
         return {
-            appTitle: 'Falah',
+            appTitle: 'Al-Falah',
             warmGreeting: 'Assalamu Alaikum',
             nextPrayer: 'Next Prayer',
             nowPrefix: 'NOW',
@@ -5112,13 +5112,13 @@ window.filterCategory = function(cat, btn) {
     function renderAboutPanelContent() {
         const isPS = isPashtoMode();
         const map = {
-            aboutAppName: 'Falah — فلاح',
+            aboutAppName: 'Al-Falah — الفلاح',
             aboutDescription: 'Your complete Islamic companion app with authentic duas, full Quran with Pashto and English translations, prayer times, Qibla direction, tasbeeh counter, and more.',
             aboutDescriptionPs: 'ستاسو بشپړ اسلامي ملګری اپلیکیشن چې معتبرې دعاګانې، بشپړ قرآن د پښتو او انګلیسي ترجمو سره، د لمانځه وختونه، د قبلې سمت، تسبیح شمېرونکی او نور لري.',
             aboutTagline: 'حي على الفلاح — Come to Success',
             aboutVersion: 'Version: 2.0.17',
-            aboutDeveloper: isPS ? 'پراختیاکوونکی: Falah' : 'Developer: Falah',
-            aboutCopyright: '© 2026 Falah. All rights reserved.',
+            aboutDeveloper: isPS ? 'پراختیاکوونکی: Al-Falah' : 'Developer: Al-Falah',
+            aboutCopyright: '© 2026 Al-Falah. All rights reserved.',
             aboutContactLabel: isPS ? 'اړیکه ونیسئ' : 'Contact Us',
             aboutPrivacyLink: isPS ? 'د محرمیت تګلاره' : 'Privacy Policy',
             aboutLicenses: isPS ? 'اوپن سورس لایسنسونه: Adhan.js او د وېب پلاتفورم API ګانې' : 'Open-source libraries: Adhan.js and web platform APIs'
@@ -5149,7 +5149,7 @@ window.filterCategory = function(cat, btn) {
     };
 
     window.openContactEmail = function() {
-        window.location.href = 'mailto:fallahapp16@gmail.com?subject=Falah App Feedback&body=Assalamu Alaikum,%0A%0A';
+        window.location.href = 'mailto:fallahapp16@gmail.com?subject=Al-Falah App Feedback&body=Assalamu Alaikum,%0A%0A';
     };
 
     window.rateApp = function() {
@@ -5406,7 +5406,7 @@ window.filterCategory = function(cat, btn) {
         wrap.innerHTML = `
             <div style="text-align:center;margin-bottom:20px;">
                 <div style="font-family:'Noto Naskh Arabic','Amiri',serif;font-size:16px;color:#2ec47a;margin-bottom:4px;">ف</div>
-                <div style="font-family:'Playfair Display',serif;font-size:11px;letter-spacing:1px;text-transform:none;color:#2ec47a;margin-bottom:6px;">Falah — فلاح</div>
+                <div style="font-family:'Playfair Display',serif;font-size:11px;letter-spacing:1px;text-transform:none;color:#2ec47a;margin-bottom:6px;">Al-Falah — الفلاح</div>
                 <div style="font-family:'Playfair Display',serif;font-size:16px;letter-spacing:0.5px;text-transform:none;color:#e0eccc;font-weight:600;">My Journey</div>
             </div>
             <div style="display:flex;gap:12px;margin-bottom:16px;">
@@ -5427,7 +5427,7 @@ window.filterCategory = function(cat, btn) {
             <div style="text-align:center;font-family:'Playfair Display',serif;font-size:14px;color:rgba(224,238,210,0.85);margin-bottom:16px;">${milestone}</div>
             <div style="display:flex;justify-content:space-between;padding-top:14px;border-top:1px solid rgba(46,196,122,0.1);">
                 <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:0.3px;text-transform:none;color:rgba(160,210,180,0.55);">${readPct}% Complete</span>
-                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:0.3px;text-transform:none;color:rgba(160,210,180,0.35);">فلاح · mohhp.github.io/Essential-duas</span>
+                <span style="font-family:'Playfair Display',serif;font-size:9px;letter-spacing:0.3px;text-transform:none;color:rgba(160,210,180,0.35);">الفلاح · mohhp.github.io/Essential-duas</span>
             </div>
         `;
         document.body.appendChild(wrap);
@@ -5453,7 +5453,7 @@ window.filterCategory = function(cat, btn) {
                         await navigator.share({
                             files: [new File([blob], 'progress.png', { type: 'image/png' })],
                             title: 'My Dua Journey',
-                            text: 'From Falah — فلاح'
+                            text: 'From Al-Falah — الفلاح'
                         });
                         showToast('Shared!');
                         return;
@@ -6308,7 +6308,7 @@ window.filterCategory = function(cat, btn) {
         if (arabicText) arabicText.textContent = arabic;
         if (translationText) translationText.textContent = translation;
         if (referenceText) referenceText.textContent = ref || title;
-        if (brandName) brandName.textContent = isPS ? 'فلاح' : 'Falah';
+        if (brandName) brandName.textContent = isPS ? 'الفلاح' : 'Al-Falah';
 
         try {
             if (typeof html2canvas === 'undefined') {
@@ -6336,7 +6336,7 @@ window.filterCategory = function(cat, btn) {
                         await navigator.share({
                             files: [new File([blob], 'dua.png', { type: 'image/png' })],
                             title: title,
-                            text: isPS ? 'له فلاح څخه' : 'From Falah'
+                            text: isPS ? 'له الفلاح څخه' : 'From Al-Falah'
                         });
                         showToast('Shared!');
                         return;
@@ -10556,7 +10556,7 @@ window.filterCategory = function(cat, btn) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: surahLabel + ' \u2013 Ayah ' + _current.ayah,
                 artist: getCurrentReciterName(),
-                album: 'Falah Quran',
+                album: 'Al-Falah Quran',
                 artwork: [{ src: '/icon-512.png', sizes: '512x512', type: 'image/png' }]
             });
             var safeSet = function(act, fn) { try { navigator.mediaSession.setActionHandler(act, fn); } catch(_) {} };
