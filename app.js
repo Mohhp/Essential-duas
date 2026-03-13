@@ -1,11 +1,28 @@
     // ===== STATE MANAGEMENT =====
+    function safeStorageGet(key) {
+        try {
+            return localStorage.getItem(key);
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function safeStorageArray(key) {
+        try {
+            const parsed = JSON.parse(safeStorageGet(key) || '[]');
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (_) {
+            return [];
+        }
+    }
+
     const STATE = {
-        bookmarks: JSON.parse(localStorage.getItem('crown_bookmarks')) || [],
-        read: JSON.parse(localStorage.getItem('crown_read')) || [],
-        streak: parseInt(localStorage.getItem('crown_streak')) || 0,
-        lastVisit: localStorage.getItem('crown_last_visit') || null,
+        bookmarks: safeStorageArray('crown_bookmarks'),
+        read: safeStorageArray('crown_read'),
+        streak: parseInt(safeStorageGet('crown_streak')) || 0,
+        lastVisit: safeStorageGet('crown_last_visit') || null,
         fontSize: (() => {
-            const raw = parseFloat(localStorage.getItem('fontSize') || localStorage.getItem('crown_font_size'));
+            const raw = parseFloat(safeStorageGet('fontSize') || safeStorageGet('crown_font_size'));
             if (!Number.isFinite(raw)) return 16;
             if (raw > 3) return raw;
             return Math.round(raw * 16);
