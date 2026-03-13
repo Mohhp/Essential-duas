@@ -1,5 +1,6 @@
 package io.github.mohhp.essentialduas
 
+import android.util.Log
 import android.webkit.JavascriptInterface
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -21,6 +22,7 @@ class ReminderBridge(
 
     @JavascriptInterface
     fun syncReminderState(reminderSettingsJson: String?, locationJson: String?, reason: String?): String {
+        Log.d("FalahAlarm", "ReminderBridge.syncReminderState: reason=$reason")
         repository.saveReminderState(reminderSettingsJson, locationJson, reason ?: "bridge-sync")
         scheduler.rescheduleAll(reason ?: "bridge-sync")
         activity.runOnUiThread {

@@ -83,6 +83,7 @@ class PrayerAlarmScheduler(
     }
 
     fun notifyReminder(reminder: ScheduledReminder, forceSilent: Boolean = false) {
+        Log.d(logTag, "notifyReminder: prayer=${reminder.prayerName} forceSilent=$forceSilent offset=${reminder.offsetMinutes}")
         val settings = repository.getSettings()
         val prayerLabel = reminder.prayerName.replaceFirstChar { it.uppercase() }
         val title = if (reminder.offsetMinutes > 0) {
@@ -183,6 +184,13 @@ class PrayerAlarmScheduler(
     private fun ensureNotificationChannels() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(NotificationManager::class.java)
+
+        // Delete old channel IDs so Android picks up fresh sound/importance settings
+        listOf("prayer_reminders", "prayer_alarms", "prayer_alarms_adhan", "prayer_reminders_silent").forEach {
+            manager.deleteNotificationChannel(it)
+        }
+        Log.d(logTag, "ensureNotificationChannels: deleted legacy channels, creating v3")
+
         val alarmVibrationPattern = longArrayOf(0, 500, 200, 500, 200, 500)
         val alarmAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_ALARM)
@@ -251,10 +259,10 @@ class PrayerAlarmScheduler(
         const val EXTRA_PRAYER_NAME = "extra_prayer_name"
         const val EXTRA_OFFSET_MINUTES = "extra_offset_minutes"
         const val EXTRA_OPEN_PRAYER_PANEL = "extra_open_prayer_panel"
-        const val ALARM_CHANNEL_ID = "prayer_alarms"                    // alarm ringtone + vibration
-        const val ADHAN_NOTIFICATION_CHANNEL_ID = "prayer_alarms_adhan" // vibration only (service plays audio)
-        const val AUDIBLE_CHANNEL_ID = "prayer_reminders"               // legacy: AdhanPlaybackService foreground
-        const val SILENT_CHANNEL_ID = "prayer_reminders_silent"
+        const val ALARM_CHANNEL_ID = "falah_alarm_v3"                    // alarm ringtone + vibration
+        const val ADHAN_NOTIFICATION_CHANNEL_ID = "falah_alarm_adhan_v3" // vibration only (service plays audio)
+        const val AUDIBLE_CHANNEL_ID = "falah_alarm_service_v3"          // AdhanPlaybackService foreground
+        const val SILENT_CHANNEL_ID = "falah_alarm_silent_v3"
     }
 }
 

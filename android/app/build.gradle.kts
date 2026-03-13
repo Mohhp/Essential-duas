@@ -99,6 +99,7 @@ val syncWebAssets by tasks.registering(Sync::class) {
             "audio/duas/**",
             "audio/reminders/**",
             "audio/pashto_audit/*.json",
+            "vendor/**",
             "chrome/**"
         )
         exclude("android/**")
