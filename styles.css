@@ -6047,6 +6047,7 @@
             will-change: transform;
             touch-action: pan-y;
             background: var(--bg-dark);
+            direction: ltr;
         }
         .dua-swipe-slide {
             flex: 0 0 calc(100% - 32px);
@@ -9835,6 +9836,15 @@
             line-height: var(--arabic-line-height) !important;
             color: var(--text-primary) !important;
             word-spacing: normal !important;
+        }
+
+        .quran-ayah-end-number {
+            display: inline-block;
+            margin-inline-start: 0.4em;
+            font-size: 0.8em;
+            color: var(--emerald-light);
+            opacity: 0.95;
+            white-space: nowrap;
         }
 
         .quran-ayah-en,

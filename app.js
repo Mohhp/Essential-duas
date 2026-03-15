@@ -13057,6 +13057,7 @@ window.filterCategory = function(cat, btn) {
             const cardKey = `${quranState.currentSurah}:${ayah.numberInSurah}`;
             const playing = quranState.audioAyah === cardKey;
             const bookmarked = getQuranBookmarks().some((item) => Number(item.surahNumber) === Number(quranState.currentSurah) && Number(item.ayahNumber) === Number(ayah.numberInSurah));
+            const ayahNumberDisplay = localizeQuranNumber(ayah.numberInSurah);
             const showPashto = shouldShowTranslationBlock(mode, 'ps');
             const showEnglish = shouldShowTranslationBlock(mode, 'en');
             const isPS = isPashtoMode();
@@ -13071,7 +13072,7 @@ window.filterCategory = function(cat, btn) {
                             <button type="button" class="quran-ayah-btn quran-ayah-play" data-ayah-action="play" data-surah="${quranState.currentSurah}" data-ayah="${ayah.numberInSurah}" aria-label="Play ayah">${playing && (quranState.playerState === 'playing' || quranState.playerState === 'loading') ? '⏸' : '▶'}</button>
                         </div>
                     </div>
-                    <div class="quran-ayah-ar">${escapeHtml(ayah.arabic)}</div>
+                    <div class="quran-ayah-ar">${escapeHtml(ayah.arabic)} <span class="quran-ayah-end-number">${ayahNumberDisplay}</span></div>
                     ${showPashto ? `<div class="quran-ayah-translation quran-ayah-ps"><div class="quran-ayah-translation-label">${isPS ? 'پښتو' : 'Pashto'}</div><p>${escapeHtml(ayah.pashto || '')}</p></div>` : ''}
                     ${showEnglish ? `<div class="quran-ayah-translation quran-ayah-en"><div class="quran-ayah-translation-label">English</div><p>${escapeHtml(ayah.english || '')}</p></div>` : ''}
                     <div class="ayah-inline-actions" id="ayahAct-${cardKey}" hidden>
